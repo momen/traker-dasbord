@@ -8,7 +8,7 @@ function AuthGuard({ children }) {
   const [{ user }] = useStateValue();
 
   if (!user) {
-    return <Redirect to="/" />;
+    return <Redirect to="/sign-in" />;
   }
 
   return children;

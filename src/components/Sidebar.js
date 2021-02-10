@@ -154,6 +154,15 @@ const Link = styled(ListItem)`
     color: ${(props) => rgba(props.theme.sidebar.color, 0.7)};
   }
 
+  svg {
+    color: ${(props) => props.theme.sidebar.color};
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    opacity: 0.5;
+    margin-right:15px;
+  } 
+
   &:hover span {
     color: ${(props) => rgba(props.theme.sidebar.color, 0.9)};
   }
@@ -278,7 +287,7 @@ const SidebarLink = ({ name, to, badge, icon }) => {
       exact
       to={to}
       activeClassName="active"
-    >
+    >{icon}
       <LinkText>{name}</LinkText>
       {badge ? <LinkBadge label={badge} /> : ""}
     </Link>

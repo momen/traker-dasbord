@@ -14,6 +14,7 @@ import {
 } from "@material-ui/core";
 
 import { isWidthUp } from "@material-ui/core/withWidth";
+import AuthGuard from "../components/AuthGuard";
 
 const drawerWidth = 258;
 
@@ -76,35 +77,37 @@ const Dashboard = ({ children, routes, width }) => {
   };
 
   return (
-    <Root>
-      <CssBaseline />
-      <GlobalStyle />
-      <Drawer>
-        <Hidden mdUp implementation="js">
-          <Sidebar
-            routes={routes}
-            PaperProps={{ style: { width: drawerWidth } }}
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-          />
-        </Hidden>
-        <Hidden smDown implementation="css">
-          <Sidebar
-            routes={routes}
-            PaperProps={{ style: { width: drawerWidth } }}
-          />
-        </Hidden>
-      </Drawer>
-      <AppContent>
-        <Header onDrawerToggle={handleDrawerToggle} />
-        <MainContent p={isWidthUp("lg", width) ? 12 : 5}>
-          {children}
-        </MainContent>
-        <Footer />
-      </AppContent>
-      {/* <Settings /> */}
-    </Root>
+    <AuthGuard>
+      <Root>
+        <CssBaseline />
+        <GlobalStyle />
+        <Drawer>
+          <Hidden mdUp implementation="js">
+            <Sidebar
+              routes={routes}
+              PaperProps={{ style: { width: drawerWidth } }}
+              variant="temporary"
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+            />
+          </Hidden>
+          <Hidden smDown implementation="css">
+            <Sidebar
+              routes={routes}
+              PaperProps={{ style: { width: drawerWidth } }}
+            />
+          </Hidden>
+        </Drawer>
+        <AppContent>
+          <Header onDrawerToggle={handleDrawerToggle} />
+          <MainContent p={isWidthUp("lg", width) ? 12 : 5}>
+            {children}
+          </MainContent>
+          <Footer />
+        </AppContent>
+        {/* <Settings /> */}
+      </Root>
+    </AuthGuard>
   );
 };
 

@@ -5,6 +5,7 @@ import async from "../components/Async";
 import { Briefcase, ShoppingCart, Users } from "react-feather";
 import SignIn from "../components/pages/SignIn/SignIn";
 import AuthGuard from "../components/AuthGuard";
+import { Group, LockOpen } from "@material-ui/icons";
 
 // Guards
 // const AuthGuard = async(() => import("../components/AuthGuard"));
@@ -51,21 +52,36 @@ const UserManagement = async(() =>
 
 const dashboardRoutes = {
   id: "Dashborad",
-  path: "/dashboard",
+  path: "/",
   icon: <Briefcase />,
   badge: "8",
   component: Dashborad,
   children: null,
-  guard: AuthGuard,
 };
 
 const userManagementRoutes = {
   id: "User Management",
   path: "/user-mgt",
-  icon: <ShoppingCart />,
-  component: UserManagement,
-  children: null,
-  guard: AuthGuard,
+  icon: <Group />,
+  component: null,
+  children: [
+    {
+      path: "/user-mgt/permissions",
+      name: "Permissions",
+      component: UserManagement,
+      icon: <LockOpen />,
+    },
+    {
+      path: "/user-mgt/default",
+      name: "Permissions",
+      component: UserManagement,
+    },
+    {
+      path: "/user-mgt/default",
+      name: "Permissions",
+      component: UserManagement,
+    },
+  ],
 };
 
 const authRoutes = {
@@ -74,7 +90,7 @@ const authRoutes = {
   icon: <Users />,
   children: [
     {
-      path: "/",
+      path: "/sign-in",
       name: "Sign In",
       component: SignIn,
     },

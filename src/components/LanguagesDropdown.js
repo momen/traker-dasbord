@@ -41,7 +41,7 @@ function LanguagesDropdown() {
           onClick={toggleMenu}
           color="inherit"
         >
-          <Flag src="/static/img/flags/us.png" alt="English" />
+          <Flag src="/static/img/flags/us.png" alt="En" />
         </IconButton>
       </Tooltip>
       <Menu

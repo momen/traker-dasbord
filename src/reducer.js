@@ -3,7 +3,7 @@ import { THEMES } from "./constants";
 //The initial Global State values
 export const initialState = {
   CSRF:null,
-  user: null,
+  user: "null",
   theme : THEMES.DEFAULT
 };
 
