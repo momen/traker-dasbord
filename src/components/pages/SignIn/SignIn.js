@@ -42,6 +42,7 @@ const BigAvatar = styled(Avatar)`
 function SignIn() {
   //   const dispatch = useDispatch();
   const history = useHistory();
+  const formData = new FormData();
 
   return (
     <Wrapper>
@@ -72,6 +73,8 @@ function SignIn() {
             .required("Password is required"),
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+          formData.append("email", values.email);
+          formData.append("password", values.password);
           try {
             // await dispatch(
             //   signIn({ email: values.email, password: values.password })
@@ -83,13 +86,11 @@ function SignIn() {
                 return res.data.token;
               })
               .then((token) => {
-                  console.log(`Token Again: ${token}`);
+                console.log(`Form Data: ${values}`);
                 axios
                   .post("/login", {
                     headers: {
-                      Accept: "application/json",
                       "Content-Type": "application/xhtml+xml",
-                      "X-CSRF-TOKEN": token,
                     },
                     data: values,
                   })
