@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 // import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components/macro";
@@ -20,6 +20,7 @@ import {
 } from "@material-ui/core";
 import { spacing } from "@material-ui/system";
 import { Alert as MuiAlert } from "@material-ui/lab";
+import { useStateValue } from "../../../StateProvider";
 
 const Alert = styled(MuiAlert)(spacing);
 
@@ -42,7 +43,20 @@ const BigAvatar = styled(Avatar)`
 function SignIn() {
   //   const dispatch = useDispatch();
   const history = useHistory();
-  const formData = new FormData();
+  const [{ CSRF }, dispatch] = useStateValue();
+
+  useEffect(() => {
+    axios.get("/login").then(async (res) => {
+      await document
+        .getElementById("csrf-token")
+        .setAttribute("content", res.data.token);
+      console.log(res.data.token);
+      dispatch({
+        type: "GET_CSRF",
+        CSRF: res.data.token,
+      });
+    });
+  }, []);
 
   return (
     <Wrapper>
@@ -60,6 +74,7 @@ function SignIn() {
         initialValues={{
           email: "",
           password: "",
+          _token: "",
           //   submit: false,
         }}
         validationSchema={Yup.object().shape({
@@ -73,33 +88,42 @@ function SignIn() {
             .required("Password is required"),
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-          formData.append("email", values.email);
-          formData.append("password", values.password);
+          values._token = CSRF;
           try {
             // await dispatch(
             //   signIn({ email: values.email, password: values.password })
             // );
+
+            // console.log(`Form Data: ${values}`);
+            console.log(values);
             axios
-              .get("/login")
-              .then((res) => {
-                console.log(res.data.token);
-                return res.data.token;
+              .post("/login", values, {
+                headers: {
+                  // Accept: "application/json",
+                  // "Content-Type": "application/json",
+                  "X-CSRF-TOKEN": CSRF,
+                },
               })
-              .then((token) => {
-                console.log(`Form Data: ${values}`);
-                axios
-                  .post("/login", {
-                    headers: {
-                      "Content-Type": "application/xhtml+xml",
-                    },
-                    data: values,
-                  })
-                  .then((res) => {
-                    console.log(res);
-                  });
+              .then((res) => {
+                console.log(res);
+              })
+              .catch((res) => {
+                console.log(`Error: ${res.errors}`);
               });
 
-            console.log(values);
+            // fetch("https://development.lacasacode.dev/api/v1/login", {
+            //   method: "POST",
+            //   headers: {
+            //     Accept: "application/json",
+            //     "Content-Type": "application/json",
+            //   },
+            //   body: JSON.stringify(values),
+            // })
+            //   .then((res) => res.json())
+            //   .then((data) => {
+            //     console.log(data);
+            //   });
+
             // history.push("/dashborad");
           } catch (error) {
             const message = error.message || "Something went wrong";
@@ -154,6 +178,11 @@ function SignIn() {
               onChange={handleChange}
               my={2}
               required
+            />
+            <input
+              type="hidden"
+              name="_token"
+              value={CSRF}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
