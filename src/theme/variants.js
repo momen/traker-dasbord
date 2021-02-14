@@ -23,10 +23,10 @@ const defaultVariant = {
       main: customBlue[700],
       contrastText: "#FFF",
     },
-    secondary: {
-      main: customBlue[500],
-      contrastText: "#FFF",
-    },
+    // secondary: {
+    //   main: customBlue[500],
+    //   contrastText: "#FFF",
+    // },
     background: {
       default: "#F7F9FC",
       paper: "#FFF",

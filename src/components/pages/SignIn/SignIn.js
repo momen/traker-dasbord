@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 // import { useDispatch } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -43,20 +43,20 @@ const BigAvatar = styled(Avatar)`
 function SignIn() {
   //   const dispatch = useDispatch();
   const history = useHistory();
-  const [{ CSRF }, dispatch] = useStateValue();
+  const [{ user, CSRF }, dispatch] = useStateValue();
 
-  useEffect(() => {
-    axios.get("/login").then(async (res) => {
-      await document
-        .getElementById("csrf-token")
-        .setAttribute("content", res.data.token);
-      console.log(res.data.token);
-      dispatch({
-        type: "GET_CSRF",
-        CSRF: res.data.token,
-      });
-    });
-  }, []);
+  // useEffect(() => {
+  //   axios.get("/login").then(async (res) => {
+  //     await document
+  //       .getElementById("csrf-token")
+  //       .setAttribute("content", res.data.token);
+  //     console.log(res.data.token);
+  //     dispatch({
+  //       type: "GET_CSRF",
+  //       CSRF: res.data.token,
+  //     });
+  //   });
+  // }, []);
 
   return (
     <Wrapper>
@@ -101,14 +101,19 @@ function SignIn() {
                 headers: {
                   // Accept: "application/json",
                   // "Content-Type": "application/json",
-                  "X-CSRF-TOKEN": CSRF,
+                  // "X-CSRF-TOKEN": CSRF,
                 },
               })
-              .then((res) => {
-                console.log(res);
+              .then(async (res) => {
+                console.log(res.data.data);
+                await dispatch({
+                  type: "LOGIN",
+                  user: res.data.data,
+                });
+                history.push("/");
               })
               .catch((res) => {
-                console.log(`Error: ${res.errors}`);
+                console.log(`Error: ${res.response.data.errors}`);
               });
 
             // fetch("https://development.lacasacode.dev/api/v1/login", {
@@ -123,8 +128,6 @@ function SignIn() {
             //   .then((data) => {
             //     console.log(data);
             //   });
-
-            // history.push("/dashborad");
           } catch (error) {
             const message = error.message || "Something went wrong";
 
@@ -179,11 +182,7 @@ function SignIn() {
               my={2}
               required
             />
-            <input
-              type="hidden"
-              name="_token"
-              value={CSRF}
-            />
+            <input type="hidden" name="_token" value={CSRF} />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"

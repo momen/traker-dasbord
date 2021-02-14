@@ -1,6 +1,8 @@
 import React from "react";
 import styled, { createGlobalStyle } from "styled-components/macro";
 import { CssBaseline } from "@material-ui/core";
+import { useStateValue } from "../StateProvider";
+import { Redirect } from "react-router-dom";
 
 const GlobalStyle = createGlobalStyle`
   html,
@@ -23,6 +25,7 @@ const Root = styled.div`
 `;
 
 const Auth = ({ children }) => {
+  
   return (
     <Root>
       <CssBaseline />

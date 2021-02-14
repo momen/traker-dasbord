@@ -338,7 +338,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
       <Brand component={NavLink} to="/" button>
         <BrandIcon />{" "}
         <Box ml={1}>
-          Material App <BrandChip label="PRO" />
+          TRKAR <BrandChip label="PRO" />
         </Box>
       </Brand>
       <Scrollbar>

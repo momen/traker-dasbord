@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import styled from "styled-components/macro";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -11,11 +11,19 @@ import {
   Divider as MuiDivider,
   Paper as MuiPaper,
   Typography,
-  Button,
+  Button as MuiButton,
+  Toolbar,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@material-ui/core";
 import { DataGrid } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
+import { UnfoldLess } from "@material-ui/icons";
+import Popup from "../../../Popup";
+import AddForm from "../../../AddForm";
 
 const Card = styled(MuiCard)(spacing);
 
@@ -27,27 +35,13 @@ const Breadcrumbs = styled(MuiBreadcrumbs)(spacing);
 
 const Paper = styled(MuiPaper)(spacing);
 
+const Button = styled(MuiButton)(spacing);
+
+
 const columns = [
-  { field: "id", headerName: "ID", width: 150 },
-  { field: "firstName", headerName: "First name", width: 200 },
-  { field: "lastName", headerName: "Last name", width: 200 },
-  {
-    field: "fullName",
-    headerName: "Full name",
-    description: "This column has a value getter and is not sortable.",
-    sortable: false,
-    width: 250,
-    valueGetter: (params) =>
-      `${params.getValue("firstName") || ""} ${
-        params.getValue("lastName") || ""
-      }`,
-  },
-  {
-    field: "age",
-    headerName: "Age",
-    type: "number",
-    width: 150,
-  },
+  { field: "id", headerName: "ID", width: 150,  },
+  { field: "title", headerName: "Title", width: 200, flex: 1,},
+  { field: "actions", headerName: "Actions", width: 200 },
 ];
 
 const rows = [
@@ -64,9 +58,13 @@ const rows = [
 
 function DataGridDemo() {
   return (
-    <Card mb={6}>
-      <CardContent pb={1}>
-        {/* <Typography variant="h6" gutterBottom>
+    <Fragment>
+      <Button mb={3} color="primary" variant="contained">
+        Add Permission
+      </Button>
+      <Card mb={6}>
+        <CardContent pb={1}>
+          {/* <Typography variant="h6" gutterBottom>
           Data Grid
         </Typography>
         <Typography variant="body2" gutterBottom>
@@ -81,23 +79,36 @@ function DataGridDemo() {
           </Link>
           .
         </Typography> */}
-            <Button color="secondary">Add Permission</Button>
-      </CardContent>
-      <Paper>
-        <div style={{ height: 400, width: "100%" }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            pageSize={5}
-            checkboxSelection
-          />
-        </div>
-      </Paper>
-    </Card>
+          <Toolbar>
+            <FormControl variant="outlined">
+              <InputLabel id="demo-simple-select-outlined-label">
+                Age
+              </InputLabel>
+              <Select IconComponent={UnfoldLess}>
+                <MenuItem value={10}>10</MenuItem>
+                <MenuItem value={20}>25</MenuItem>
+                <MenuItem value={30}>100</MenuItem>
+              </Select>
+            </FormControl>
+          </Toolbar>
+        </CardContent>
+        <Paper>
+          <div style={{ height: "600px", width: "100%" }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pageSize={10}
+              checkboxSelection
+              autoPageSize
+            />
+          </div>
+        </Paper>
+      </Card>
+    </Fragment>
   );
 }
 
-function DataGridPage() {
+function Permissions() {
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
@@ -118,8 +129,23 @@ function DataGridPage() {
       <Divider my={6} />
 
       <DataGridDemo />
+      <Popup
+        // title={popUpTitle}
+        openPopup={false}
+        // setOpenPopup={setOpenPopup}
+      >
+        <AddForm
+        //   user={userToEdit}
+        //   setUsers={setUsers}
+        //   setUsersCount={setUsersCount}
+        //   rowsPerPage={rowsPerPage}
+        //   page={page}
+        //   order={order}
+        //   orderBy={orderBy}
+        />
+      </Popup>
     </React.Fragment>
   );
 }
 
-export default DataGridPage;
+export default Permissions;
