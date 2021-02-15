@@ -114,22 +114,19 @@ function SignIn() {
               })
               .catch((res) => {
                 console.log(`Error: ${res.response.data.errors}`);
+                const message =
+                  res.response.data.errors ===
+                  "either email or password incorrect"
+                    ? "Please check your Email or Password"
+                    : "Something went wrong";
+
+                setStatus({ success: false });
+                setErrors({ submit: message });
+                setSubmitting(false);
               });
 
-            // fetch("https://development.lacasacode.dev/api/v1/login", {
-            //   method: "POST",
-            //   headers: {
-            //     Accept: "application/json",
-            //     "Content-Type": "application/json",
-            //   },
-            //   body: JSON.stringify(values),
-            // })
-            //   .then((res) => res.json())
-            //   .then((data) => {
-            //     console.log(data);
-            //   });
           } catch (error) {
-            const message = error.message || "Something went wrong";
+            const message = error.message || "Couldn't send request";
 
             setStatus({ success: false });
             setErrors({ submit: message });
@@ -151,11 +148,11 @@ function SignIn() {
               Use <strong>demo@bootlab.io</strong> and{" "}
               <strong>unsafepassword</strong> to sign in
             </Alert> */}
-            {/* {errors.submit && (
-              <Alert mt={2} mb={1} severity="warning">
+            {errors.submit && (
+              <Alert mt={2} mb={1} severity="error">
                 {errors.submit}
               </Alert>
-            )} */}
+            )}
             <TextField
               type="email"
               name="email"

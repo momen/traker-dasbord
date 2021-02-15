@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -17,6 +17,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  makeStyles,
 } from "@material-ui/core";
 import { DataGrid } from "@material-ui/data-grid";
 
@@ -24,42 +25,97 @@ import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import AddForm from "../../../AddForm";
+import axios from "../../../../axios";
+import { useStateValue } from "../../../../StateProvider";
 
 const Card = styled(MuiCard)(spacing);
-
 const CardContent = styled(MuiCardContent)(spacing);
-
 const Divider = styled(MuiDivider)(spacing);
-
-const Breadcrumbs = styled(MuiBreadcrumbs)(spacing);
-
 const Paper = styled(MuiPaper)(spacing);
-
 const Button = styled(MuiButton)(spacing);
 
-
 const columns = [
-  { field: "id", headerName: "ID", width: 150,  },
-  { field: "title", headerName: "Title", width: 200, flex: 1,},
-  { field: "actions", headerName: "Actions", width: 200 },
+  { field: "id", headerName: "ID", width: 50 },
+  { field: "title", headerName: "Title", width: 200, flex: 1 },
+  {
+    field: "actions",
+    headerName: "Actions",
+    width: 250,
+    sortable: false,
+    disableClickEventBubbling: true,
+    renderCell: () => {
+      return (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-around",
+            width: "100%",
+          }}
+        >
+          <Button color="warning" variant="contained">
+            View
+          </Button>
+          <Button color="primary" variant="contained">
+            Edit
+          </Button>
+          <Button color="secondary" variant="contained">
+            Delete
+          </Button>
+        </div>
+      );
+    },
+  },
 ];
 
-const rows = [
-  { id: "1", lastName: "Snow", firstName: "Jon", age: 35 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: 25 },
-  { id: 6, lastName: "Melisandre", firstName: "Harvey", age: 150 },
-  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-];
+const useStyles = makeStyles({
+  button: {
+    background: "#4caf50",
+    color: "#ffffff",
+    "&:hover": {
+      background: "#388e3c",
+    },
+  },
+});
 
-function DataGridDemo() {
+function Permissions() {
+  const classes = useStyles();
+  const [{ user }] = useStateValue();
+  const [rows, setRows] = useState([]);
+  const [openPopup, setOpenPopup] = useState(false);
+
+  const [rowsCount, setRowsCount] = useState(10);
+
+  const handleRowsCountChange = (event) => {
+    setRowsCount(event.target.value);
+  };
+
+  useEffect(() => {
+    axios
+      .get("/permissions", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setRows(res.data.data);
+      });
+  }, []);
   return (
-    <Fragment>
-      <Button mb={3} color="primary" variant="contained">
+    <React.Fragment>
+      <Helmet title="Data Grid" />
+      <Typography variant="h3" gutterBottom display="inline">
+        Permissions
+      </Typography>
+
+      <Divider my={6} />
+
+      <Button
+        mb={3}
+        className={classes.button}
+        variant="contained"
+        onClick={() => setOpenPopup(true)}
+      >
         Add Permission
       </Button>
       <Card mb={6}>
@@ -81,58 +137,41 @@ function DataGridDemo() {
         </Typography> */}
           <Toolbar>
             <FormControl variant="outlined">
-              <InputLabel id="demo-simple-select-outlined-label">
-                Age
-              </InputLabel>
-              <Select IconComponent={UnfoldLess}>
+              <Select
+                value={rowsCount}
+                onChange={handleRowsCountChange}
+                // displayEmpty
+                // style={{ width: 150 }}
+                autoWidth
+                IconComponent={UnfoldLess}
+                MenuProps={{ getContentAnchorEl: () => null, }}
+              >
+                {/* <MenuItem value="" disabled>
+                  Rows Count
+                </MenuItem> */}
                 <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={20}>25</MenuItem>
-                <MenuItem value={30}>100</MenuItem>
+                <MenuItem value={25}>25</MenuItem>
+                <MenuItem value={100}>100</MenuItem>
               </Select>
             </FormControl>
           </Toolbar>
         </CardContent>
         <Paper>
-          <div style={{ height: "600px", width: "100%" }}>
+          <div style={{width: "100%" }}>
             <DataGrid
               rows={rows}
               columns={columns}
-              pageSize={10}
+              pageSize={rowsCount}
               checkboxSelection
-              autoPageSize
+              autoHeight={true}
             />
           </div>
         </Paper>
       </Card>
-    </Fragment>
-  );
-}
-
-function Permissions() {
-  return (
-    <React.Fragment>
-      <Helmet title="Data Grid" />
-      <Typography variant="h3" gutterBottom display="inline">
-        Permissions
-      </Typography>
-
-      {/* <Breadcrumbs aria-label="Breadcrumb" mt={2}>
-        <Link component={NavLink} exact to="/">
-          Dashboard
-        </Link>
-        <Link component={NavLink} exact to="/">
-          Tables
-        </Link>
-        <Typography>Data Grid</Typography>
-      </Breadcrumbs> */}
-
-      <Divider my={6} />
-
-      <DataGridDemo />
       <Popup
-        // title={popUpTitle}
-        openPopup={false}
-        // setOpenPopup={setOpenPopup}
+        title="New Permission"
+        openPopup={openPopup}
+        setOpenPopup={setOpenPopup}
       >
         <AddForm
         //   user={userToEdit}
