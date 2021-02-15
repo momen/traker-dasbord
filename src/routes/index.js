@@ -38,7 +38,7 @@ const Categories = async(() =>
   import("../components/pages/ProductManagement/Categories")
 );
 const CarMade = async(() =>
-  import("../components/pages/ProductManagement/CarMade")
+  import("../components/pages/ProductManagement/CarMade/CarMade.js")
 );
 const CarModel = async(() =>
   import("../components/pages/ProductManagement/CarModel")
@@ -133,7 +133,7 @@ const userManagementRoutes = {
 
 const productManagementRoutes = {
   id: "Product Management",
-  path: "/product-mgt",
+  path: "/product",
   icon: <ShoppingCart />,
   component: null,
   children: [
@@ -146,7 +146,7 @@ const productManagementRoutes = {
     {
       path: "/product/car-made",
       name: "Car Made",
-      component: Permissions,
+      component: CarMade,
       icon: <TimeToLeave />,
     },
     {

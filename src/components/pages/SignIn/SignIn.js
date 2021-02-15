@@ -95,7 +95,7 @@ function SignIn() {
             // );
 
             // console.log(`Form Data: ${values}`);
-            console.log(values);
+            // console.log(values);
             axios
               .post("/login", values, {
                 headers: {
@@ -113,20 +113,17 @@ function SignIn() {
                 history.push("/");
               })
               .catch((res) => {
-                console.log(`Error: ${res.response.data.errors}`);
-                const message =
-                  res.response.data.errors ===
-                  "either email or password incorrect"
-                    ? "Please check your Email or Password"
-                    : "Something went wrong";
+                console.log(`Error: ${res}`);
+                const message = res.response.data.errors
+                  ? "Please check your Email or Password"
+                  : "Something went wrong";
 
                 setStatus({ success: false });
                 setErrors({ submit: message });
                 setSubmitting(false);
               });
-
           } catch (error) {
-            const message = error.message || "Couldn't send request";
+            const message = "Couldn't send request";
 
             setStatus({ success: false });
             setErrors({ submit: message });

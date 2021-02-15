@@ -2,7 +2,6 @@ import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import PropTypes from 'prop-types';
 
 import {
   Link,
@@ -25,11 +24,10 @@ import { DataGrid } from "@material-ui/data-grid";
 import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
-import AddForm from "../../../AddForm";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
-import AddPermissions from "./AddPermissions";
-import { Pagination } from "@material-ui/lab";
+import AddPermissions from "./CreateCarMade";
+import CreateCarMade from "./CreateCarMade";
 
 const Card = styled(MuiCard)(spacing);
 const CardContent = styled(MuiCardContent)(spacing);
@@ -55,7 +53,9 @@ const columns = [
             width: "100%",
           }}
         >
-          <Button variant="contained">View</Button>
+          <Button variant="contained">
+            View
+          </Button>
           <Button color="primary" variant="contained">
             Edit
           </Button>
@@ -69,9 +69,6 @@ const columns = [
 ];
 
 const useStyles = makeStyles({
-  root: {
-    display: 'flex',
-  },
   button: {
     background: "#4caf50",
     color: "#ffffff",
@@ -81,53 +78,18 @@ const useStyles = makeStyles({
   },
 });
 
-
-function CustomPagination(props) {
-  const { state, api } = props;
-  const classes = useStyles();
-
-  return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
-  );
-}
-
-CustomPagination.propTypes = {
-  /**
-   * ApiRef that let you manipulate the grid.
-   */
-  api: PropTypes.shape({
-    current: PropTypes.object.isRequired,
-  }).isRequired,
-  /**
-   * The GridState object containing the current grid state.
-   */
-  state: PropTypes.object.isRequired,
-};
-
-function Permissions() {
+function CarMade() {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [rowsCount, setRowsCount] = useState(0);
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const [rowsCount, setRowsCount] = useState(10);
+
+  const handleRowsCountChange = (event) => {
+    setRowsCount(event.target.value);
   };
 
-  const handlePageChange = (params) => {
-    setPage(params.page);
-  }
   useEffect(() => {
     axios
       .get("/permissions", {
@@ -136,31 +98,15 @@ function Permissions() {
         },
       })
       .then((res) => {
-        alert(res.data.total);
-        setRowsCount(res.data.total);
+        console.log(res);
         setRows(res.data.data);
       });
   }, []);
-
-useEffect(() => {
-  axios
-      .get(`/permissions?page=${page}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        alert(res.data.total);
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-      });
-},[page])
-
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Permissions
+        Car Made List
       </Typography>
 
       <Divider my={6} />
@@ -171,7 +117,7 @@ useEffect(() => {
         variant="contained"
         onClick={() => setOpenPopup(true)}
       >
-        Add Permission
+        Create Car Made
       </Button>
       <Card mb={6}>
         <CardContent pb={1}>
@@ -193,13 +139,13 @@ useEffect(() => {
           <Toolbar>
             <FormControl variant="outlined">
               <Select
-                value={pageSize}
-                onChange={handlePageSize}
+                value={rowsCount}
+                onChange={handleRowsCountChange}
                 // displayEmpty
                 // style={{ width: 150 }}
                 autoWidth
                 IconComponent={UnfoldLess}
-                MenuProps={{ getContentAnchorEl: () => null }}
+                MenuProps={{ getContentAnchorEl: () => null, }}
               >
                 {/* <MenuItem value="" disabled>
                   Rows Count
@@ -212,30 +158,23 @@ useEffect(() => {
           </Toolbar>
         </CardContent>
         <Paper>
-          <div style={{ width: "100%" }}>
+          <div style={{width: "100%" }}>
             <DataGrid
               rows={rows}
               columns={columns}
-              page={page}
-              pageSize={pageSize}
-              rowCount={rowsCount}
-              paginationMode="server"
-              components={{
-                Pagination: CustomPagination,
-              }}
+              pageSize={rowsCount}
               checkboxSelection
               autoHeight={true}
-              onPageChange={handlePageChange}
             />
           </div>
         </Paper>
       </Card>
       <Popup
-        title="New Permission"
+        title="Create Car Made"
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
-        <AddPermissions
+        <CreateCarMade
         //   user={userToEdit}
         //   setUsers={setUsers}
         //   setUsersCount={setUsersCount}
@@ -249,4 +188,6 @@ useEffect(() => {
   );
 }
 
-export default Permissions;
+
+
+export default CarMade;
