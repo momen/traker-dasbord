@@ -2,9 +2,10 @@ import { THEMES } from "./constants";
 
 //The initial Global State values
 export const initialState = {
-  CSRF:null,
+  CSRF: null,
   user: null,
-  theme : THEMES.DEFAULT
+  userPermissions: null,
+  theme: THEMES.DEFAULT,
 };
 
 //The function that manipulates & returns state according to the action specified.
@@ -20,6 +21,14 @@ const reducer = (state, action) => {
       return {
         ...state,
         user: action.user,
+        userPermissions: action.user.roles[0].permissions.map(permission => permission.title),
+      };
+
+    case "LOGOUT":
+      return {
+        ...state,
+        CSRF: null,
+        user: null,
       };
 
     default:

@@ -3,14 +3,13 @@ import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
 import { useStateValue } from "../../../../StateProvider";
 import axios from "../../../../axios";
 
-
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(1),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width:'30vw'
+    width: "30vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -22,10 +21,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function AddPermissions() {
+function AddPermissions({ setPage, setOpenPopup }) {
   const classes = useStyles();
-  const [{user}] = useStateValue();
-
+  const [{ user }] = useStateValue();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
@@ -34,18 +32,21 @@ function AddPermissions() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Permission Created");
-    axios.post('/permissions',formData, {
+    axios
+      .post("/permissions", formData, {
         headers: {
-          Authorization: `Bearer ${user.token}`
-        }
+          Authorization: `Bearer ${user.token}`,
+        },
       })
-      .then(res => {
+      .then((res) => {
         console.log(res);
+        alert("Permission Created");
+        setPage(1);
+        setOpenPopup(false)
       })
-      .catch(res => {
+      .catch((res) => {
         console.log(res.response.data.errors);
-      })
+      });
   };
 
   const handleChange = (e) => {
@@ -78,19 +79,18 @@ function AddPermissions() {
         <Grid container justify="center">
           <Button
             className={classes.button}
-            variant="contained"
-            onClick={handleReset}
-          >
-            Reset
-          </Button>
-
-          <Button
-            className={classes.button}
             type="submit"
             variant="contained"
             color="primary"
           >
             Submit
+          </Button>
+          <Button
+            className={classes.button}
+            variant="contained"
+            onClick={handleReset}
+          >
+            Reset
           </Button>
         </Grid>
       </form>

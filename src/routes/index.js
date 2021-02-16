@@ -208,7 +208,7 @@ const changePasswordRoute = {
 
 const logoutRoute = {
   id: "Logout",
-  path: "/",
+  path: "/sign-in",
   icon: <LogOut />,
   component: Dashborad,
   children: null,

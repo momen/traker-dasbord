@@ -17,10 +17,13 @@ import {
   Paper,
   TextField as MuiTextField,
   Typography,
+  InputAdornment,
+  IconButton,
 } from "@material-ui/core";
 import { spacing } from "@material-ui/system";
 import { Alert as MuiAlert } from "@material-ui/lab";
 import { useStateValue } from "../../../StateProvider";
+import { Visibility, VisibilityOff } from "@material-ui/icons";
 
 const Alert = styled(MuiAlert)(spacing);
 
@@ -41,9 +44,9 @@ const BigAvatar = styled(Avatar)`
 `;
 
 function SignIn() {
-  //   const dispatch = useDispatch();
   const history = useHistory();
   const [{ user, CSRF }, dispatch] = useStateValue();
+  const [showPassword, setShowPassword] = useState(false);
 
   // useEffect(() => {
   //   axios.get("/login").then(async (res) => {
@@ -57,6 +60,14 @@ function SignIn() {
   //     });
   //   });
   // }, []);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
 
   return (
     <Wrapper>
@@ -74,7 +85,7 @@ function SignIn() {
         initialValues={{
           email: "",
           password: "",
-          _token: "",
+          // _token: "",
           //   submit: false,
         }}
         validationSchema={Yup.object().shape({
@@ -88,14 +99,8 @@ function SignIn() {
             .required("Password is required"),
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-          values._token = CSRF;
+          // values._token = CSRF;
           try {
-            // await dispatch(
-            //   signIn({ email: values.email, password: values.password })
-            // );
-
-            // console.log(`Form Data: ${values}`);
-            // console.log(values);
             axios
               .post("/login", values, {
                 headers: {
@@ -119,7 +124,7 @@ function SignIn() {
                   : "Something went wrong";
 
                 setStatus({ success: false });
-                setErrors({ submit: message });
+                setErrors({ submit: res.response.data.errors });
                 setSubmitting(false);
               });
           } catch (error) {
@@ -164,7 +169,7 @@ function SignIn() {
               required
             />
             <TextField
-              type="password"
+              type={showPassword?"text":"password"}
               name="password"
               label="Password"
               value={values.password}
@@ -175,8 +180,21 @@ function SignIn() {
               onChange={handleChange}
               my={2}
               required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                    >
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
-            <input type="hidden" name="_token" value={CSRF} />
+            {/* <input type="hidden" name="_token" value={CSRF} /> */}
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"

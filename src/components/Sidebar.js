@@ -5,6 +5,7 @@ import { NavLink, withRouter } from "react-router-dom";
 import { darken } from "polished";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "../vendor/perfect-scrollbar.css";
+import axios from "../axios";
 
 import { spacing } from "@material-ui/system";
 
@@ -29,6 +30,7 @@ import { green } from "@material-ui/core/colors";
 import { sidebarRoutes as routes } from "../routes/index";
 
 import { ReactComponent as Logo } from "../vendor/logo.svg";
+import { useStateValue } from "../StateProvider";
 
 const Box = styled(MuiBox)(spacing);
 
@@ -160,8 +162,8 @@ const Link = styled(ListItem)`
     width: 20px;
     height: 20px;
     opacity: 0.5;
-    margin-right:15px;
-  } 
+    margin-right: 15px;
+  }
 
   &:hover span {
     color: ${(props) => rgba(props.theme.sidebar.color, 0.9)};
@@ -287,7 +289,8 @@ const SidebarLink = ({ name, to, badge, icon }) => {
       exact
       to={to}
       activeClassName="active"
-    >{icon}
+    >
+      {icon}
       <LinkText>{name}</LinkText>
       {badge ? <LinkBadge label={badge} /> : ""}
     </Link>
@@ -295,6 +298,8 @@ const SidebarLink = ({ name, to, badge, icon }) => {
 };
 
 const Sidebar = ({ classes, staticContext, location, ...rest }) => {
+  const [{ user }, dispatch] = useStateValue();
+
   const initOpenRoutes = () => {
     /* Open collapse element that matches current url */
     const pathName = location.pathname;
@@ -309,7 +314,6 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
       _routes = Object.assign({}, _routes, {
         [index]: isActive || isOpen || isHome,
       });
-      console.log(_routes);
     });
 
     return _routes;
@@ -331,6 +335,23 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
     setOpenRoutes((openRoutes) =>
       Object.assign({}, openRoutes, { [index]: !openRoutes[index] })
     );
+  };
+
+  const handleLogout = () => {
+    axios
+      .post("/logout",null, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+      .then(async(res) => {
+        dispatch({
+          type: "LOGOUT",
+        });
+      })
+      .catch((err) => {
+        alert("Failed to Logout, please try again.")
+      });
   };
 
   return (
@@ -388,6 +409,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                     exact
                     button
                     badge={category.badge}
+                    onClick={category.id === "Logout" ? handleLogout : null}
                   />
                 ) : null}
               </React.Fragment>

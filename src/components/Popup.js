@@ -32,7 +32,7 @@ function Popup({ title, children, openPopup, setOpenPopup }) {
           </Typography>
           <Button
             className={classes.dialogTitle}
-            variant="contained"
+            // variant="contained"
             color="secondary"
             onClick={() => setOpenPopup(false)}
           >

@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 import {
   Link,
@@ -19,8 +19,9 @@ import {
   FormControl,
   InputLabel,
   makeStyles,
+  LinearProgress,
 } from "@material-ui/core";
-import { DataGrid } from "@material-ui/data-grid";
+import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
@@ -70,7 +71,7 @@ const columns = [
 
 const useStyles = makeStyles({
   root: {
-    display: 'flex',
+    display: "flex",
   },
   button: {
     background: "#4caf50",
@@ -80,7 +81,6 @@ const useStyles = makeStyles({
     },
   },
 });
-
 
 function CustomPagination(props) {
   const { state, api } = props;
@@ -112,14 +112,25 @@ CustomPagination.propTypes = {
   state: PropTypes.object.isRequired,
 };
 
+function CustomLoadingOverlay() {
+  return (
+    <GridOverlay>
+      <div style={{ position: "absolute", top: 0, width: "100%" }}>
+        <LinearProgress />
+      </div>
+    </GridOverlay>
+  );
+}
+
 function Permissions() {
   const classes = useStyles();
-  const [{ user }] = useStateValue();
+  const [{ user, userPermissions }] = useStateValue();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const handlePageSize = (event) => {
     setPageSize(event.target.value);
@@ -127,34 +138,26 @@ function Permissions() {
 
   const handlePageChange = (params) => {
     setPage(params.page);
-  }
-  useEffect(() => {
-    axios
-      .get("/permissions", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        alert(res.data.total);
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-      });
-  }, []);
+  };
 
-useEffect(() => {
-  axios
+  //Request the page records either on the initial render, or whenever the page changes
+  useEffect(() => {
+    console.log("In Effect");
+    console.log(userPermissions);
+    setLoading(true);
+    axios
       .get(`/permissions?page=${page}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        alert(res.data.total);
+        // alert(res.data.total);
         setRowsCount(res.data.total);
         setRows(res.data.data);
+        setLoading(false);
       });
-},[page])
+  }, [page]);
 
   return (
     <React.Fragment>
@@ -175,35 +178,15 @@ useEffect(() => {
       </Button>
       <Card mb={6}>
         <CardContent pb={1}>
-          {/* <Typography variant="h6" gutterBottom>
-          Data Grid
-        </Typography>
-        <Typography variant="body2" gutterBottom>
-          A fast and extendable data table and data grid for React, made by
-          Material-UI.{" "}
-          <Link
-            href="https://material-ui.com/components/data-grid/"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            Official docs
-          </Link>
-          .
-        </Typography> */}
           <Toolbar>
             <FormControl variant="outlined">
               <Select
                 value={pageSize}
                 onChange={handlePageSize}
-                // displayEmpty
-                // style={{ width: 150 }}
                 autoWidth
                 IconComponent={UnfoldLess}
                 MenuProps={{ getContentAnchorEl: () => null }}
               >
-                {/* <MenuItem value="" disabled>
-                  Rows Count
-                </MenuItem> */}
                 <MenuItem value={10}>10</MenuItem>
                 <MenuItem value={25}>25</MenuItem>
                 <MenuItem value={100}>100</MenuItem>
@@ -222,8 +205,11 @@ useEffect(() => {
               paginationMode="server"
               components={{
                 Pagination: CustomPagination,
+                LoadingOverlay: CustomLoadingOverlay,
               }}
+              loading={loading}
               checkboxSelection
+              disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
             />
@@ -236,13 +222,15 @@ useEffect(() => {
         setOpenPopup={setOpenPopup}
       >
         <AddPermissions
-        //   user={userToEdit}
-        //   setUsers={setUsers}
-        //   setUsersCount={setUsersCount}
-        //   rowsPerPage={rowsPerPage}
-        //   page={page}
-        //   order={order}
-        //   orderBy={orderBy}
+          setPage={setPage}
+          setOpenPopup={setOpenPopup}
+          //   user={userToEdit}
+          //   setUsers={setUsers}
+          //   setUsersCount={setUsersCount}
+          //   rowsPerPage={rowsPerPage}
+          //   page={page}
+          //   order={order}
+          //   orderBy={orderBy}
         />
       </Popup>
     </React.Fragment>
