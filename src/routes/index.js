@@ -35,25 +35,25 @@ const AuditLogs = async(() =>
 );
 
 const Categories = async(() =>
-  import("../components/pages/ProductManagement/Categories")
+  import("../components/pages/ProductManagement/Categories/Categories")
 );
 const CarMade = async(() =>
   import("../components/pages/ProductManagement/CarMade/CarMade.js")
 );
 const CarModel = async(() =>
-  import("../components/pages/ProductManagement/CarModel")
+  import("../components/pages/ProductManagement/CarModel/CarModel.js")
 );
 const PartCategory = async(() =>
-  import("../components/pages/ProductManagement/PartCategory")
+  import("../components/pages/ProductManagement/PartCategory/PartCategory.js")
 );
 const CarYear = async(() =>
-  import("../components/pages/ProductManagement/CarYear")
+  import("../components/pages/ProductManagement/CarYear/CarYear.js")
 );
 const Tags = async(() =>
-  import("../components/pages/ProductManagement/Tags")
+  import("../components/pages/ProductManagement/Tags/Tags.js")
 );
 const Products = async(() =>
-  import("../components/pages/ProductManagement/Products")
+  import("../components/pages/ProductManagement/Products/Products.js")
 );
 
 const AddVendor = async(() =>
@@ -140,7 +140,7 @@ const productManagementRoutes = {
     {
       path: "/product/categories",
       name: "Categories",
-      component: Permissions,
+      component: Categories,
       icon: <Folder />,
     },
     {
@@ -152,31 +152,31 @@ const productManagementRoutes = {
     {
       path: "/product/car-model",
       name: "Car Model",
-      component: Permissions,
+      component: CarModel,
       icon: <LockOpen />,
     },
     {
       path: "/product/part-category",
       name: "Part Category",
-      component: Permissions,
+      component: PartCategory,
       icon: <LockOpen />,
     },
     {
       path: "/product/car-year",
       name: "Car Year",
-      component: Permissions,
+      component: CarYear,
       icon: <Calendar />,
     },
     {
       path: "/product/tags",
       name: "Tags",
-      component: Permissions,
+      component: Tags,
       icon: <Tag />,
     },
     {
       path: "/product/products",
       name: "Products",
-      component: Permissions,
+      component: Products,
       icon: <LockOpen />,
     },
   ],

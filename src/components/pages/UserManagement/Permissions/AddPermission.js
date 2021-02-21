@@ -1,7 +1,12 @@
 import React, { useRef, useState } from "react";
-import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
-import { useStateValue } from "../../../../StateProvider";
+import {
+  Button,
+  Grid,
+  makeStyles,
+  TextField,
+} from "@material-ui/core";
 import axios from "../../../../axios";
+import { useStateValue } from "../../../../StateProvider";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -9,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "30vw",
+    width: "40vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -19,45 +24,69 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
+  uploadInput: {
+    display: "none",
+  },
 }));
 
-function AddPermissions({ setPage, setOpenPopup }) {
+function AddPermission({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
 
   const formRef = useRef();
+  //Customize
   const [formData, updateFormData] = useState({
-    title: "",
+    title: itemToEdit ? itemToEdit.title : "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    axios
-      .post("/permissions", formData, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        console.log(res);
-        alert("Permission Created");
-        setPage(1);
-        setOpenPopup(false)
-      })
-      .catch((res) => {
-        console.log(res.response.data.errors);
-      });
+    
+    if (itemToEdit) {
+      //Customize
+      await axios
+        .put(`/permissions/${itemToEdit.id}`, formData, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        })
+        .then((res) => {
+          // setPage(1);
+          setOpenPopup(false);
+        })
+        .catch((res) => {
+          console.log(res.response.data.errors);
+        });
+    } else {
+      //Customize
+      await axios
+        .post("/permissions", formData, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        })
+        .then((res) => {
+          setPage(1);
+          setOpenPopup(false);
+        })
+        .catch((res) => {
+          console.log(res.response.data.errors);
+        });
+    }
   };
 
   const handleChange = (e) => {
     updateFormData({
       ...formData,
-      [e.target.name]: e.target.value.toLowerCase(),
+      [e.target.name]: e.target.value,
     });
   };
 
+
   const handleReset = () => {
-    formRef.current.reset();
+    updateFormData({
+      title: "", //Customize
+    });
   };
   return (
     <div className={classes.paper}>
@@ -65,16 +94,18 @@ function AddPermissions({ setPage, setOpenPopup }) {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
-              name="title"
+              name="title" //Customize
               variant="outlined"
               required
               fullWidth
-              id="title"
-              label="Title"
+              id="title" //Customize
+              label="Title" //Customize
+              value={formData.title} //Customize
               autoFocus
               onChange={handleChange}
             />
           </Grid>
+
         </Grid>
         <Grid container justify="center">
           <Button
@@ -98,4 +129,4 @@ function AddPermissions({ setPage, setOpenPopup }) {
   );
 }
 
-export default AddPermissions;
+export default AddPermission;

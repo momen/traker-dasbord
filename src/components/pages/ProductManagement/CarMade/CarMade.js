@@ -22,6 +22,11 @@ import {
   LinearProgress,
   Grid,
   TextField,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Dialog,
 } from "@material-ui/core";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
@@ -99,23 +104,38 @@ function CarMade() {
   const [{ user, userPermissions }] = useStateValue();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Car Made");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
+  const [userIsSearching, setuserIsSearching] = useState(false);
+  const [carMade, setCarMade] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState("");
+
 
   const columns = [
     { field: "id", headerName: "ID", width: 50 },
-    { field: "catName", headerName: "Category", width: 200, flex: 1 },
     { field: "car_made", headerName: "Car Made", width: 200, flex: 1 },
+    { field: "catName", headerName: "Category", width: 200, flex: 1 },
+    // {
+    //   field: "categoryid",
+    //   headerName: "Category",
+    //   width: 200,
+    //   flex: 1,
+    //   renderCell: (params) => params.getValue("id"),
+    // },
     {
       field: "actions",
       headerName: "Actions",
       width: 250,
       sortable: false,
       disableClickEventBubbling: true,
-      renderCell: () => {
+      renderCell: (params) => {
+        // let carMade = params.getValue("id");
         return (
           <div
             style={{
@@ -125,7 +145,11 @@ function CarMade() {
               // padding: "5px"
             }}
           >
-            <Button style={{ marginRight: "5px" }} variant="contained">
+            <Button
+              style={{ marginRight: "5px" }}
+              variant="contained"
+              onClick={() => setCarMade(carMade)}
+            >
               View
             </Button>
             {userPermissions.includes("car_made_edit") ? (
@@ -133,6 +157,11 @@ function CarMade() {
                 style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
+                onClick={() => {
+                  setCarMade(params.row);
+                  setOpenPopup(true);
+                  setOpenPopupTitle("Edit Car Made");
+                }}
               >
                 Edit
               </Button>
@@ -140,9 +169,9 @@ function CarMade() {
 
             {userPermissions.includes("car_made_delete") ? (
               <Button
-                style={{ marginRight: "5px" }}
                 color="secondary"
                 variant="contained"
+                onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
               </Button>
@@ -157,46 +186,105 @@ function CarMade() {
     setPageSize(event.target.value);
   };
 
-  const handlePageChange = (params) => {
-    setPage(params.page);
+  const handlePageChange = ({ page }) => {
+    setPage(page);
   };
 
   const handleSearchInput = (e) => {
-    // setSearchValue(e.target.value);
-    console.log(e.target.value);
-    axios.post(
-      "/car-mades/search/name",
-      {
-        search_index: e.target.value,
-      },
-      {
+    let search = e.target.value;
+    if (!search || search.trim() === "") {
+      setuserIsSearching(false);
+      setSearchValue(search);
+    } else {
+      if (!userIsSearching) {
+        setuserIsSearching(true);
+      }
+      setSearchValue(search);
+    }
+  };
+
+  const openDeleteConfirmation = (id) => {
+    setOpenDeleteDialog(true);
+    setItemToDelete(id);
+  };
+
+  const DeleteCarMade = async() => {
+    await axios
+      .delete(`/car-mades/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
-      }
-    )
-    .then(res => {
-      console.log(res);
-    })
-  };
+      })
+      .then((res) => {
+        setCategories(res.data.data);
+      });
 
-  //Request the page records either on the initial render, or whenever the page changes
-  useEffect(() => {
-    console.log("In Effect");
-    setLoading(true);
-    axios
+    await axios
       .get(`/car-mades?page=${page}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        // alert(res.data.total);
         setRowsCount(res.data.total);
         setRows(res.data.data);
         setLoading(false);
       });
-  }, [page]);
+  };
+
+  /*-Get categories only on the initial render to pass it to the pop-up form 
+    when adding or editing, to prevent repeating the request each time the
+    pop-up is opened-*/
+  useEffect(() => {
+    axios
+      .get("/product-categories", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+      .then((res) => {
+        setCategories(res.data.data);
+      });
+  }, []);
+
+  //Request the page records either on the initial render, or whenever the page changes
+  useEffect(() => {
+    console.log("In Effect");
+    if (openPopup) return;
+    setLoading(true);
+    console.log("Passed");
+    if (!userIsSearching) {
+      axios
+        .get(`/car-mades?page=${page}`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        })
+        .then((res) => {
+          setRowsCount(res.data.total);
+          setRows(res.data.data);
+          setLoading(false);
+        });
+    } else {
+      axios
+        .post(
+          "/car-mades/search/name",
+          {
+            search_index: searchValue,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        )
+        .then((res) => {
+          setRowsCount(res.data.total);
+          setRows(res.data.data);
+          setLoading(false);
+        });
+    }
+  }, [page, searchValue, openPopup]);
 
   return (
     <React.Fragment>
@@ -212,7 +300,10 @@ function CarMade() {
           mb={3}
           className={classes.button}
           variant="contained"
-          onClick={() => setOpenPopup(true)}
+          onClick={() => {
+            setOpenPopup(true);
+            setCarMade("");
+          }}
         >
           Add Car Made
         </Button>
@@ -282,22 +373,45 @@ function CarMade() {
         </Paper>
       </Card>
       <Popup
-        title="New Car Made"
+        title={openPopupTitle}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
         <CreateCarMade
           setPage={setPage}
           setOpenPopup={setOpenPopup}
-          //   user={userToEdit}
-          //   setUsers={setUsers}
-          //   setUsersCount={setUsersCount}
-          //   rowsPerPage={rowsPerPage}
-          //   page={page}
-          //   order={order}
-          //   orderBy={orderBy}
+          itemToEdit={carMade}
+          categories={categories}
         />
       </Popup>
+
+      <Dialog
+        open={openDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Confirmation"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this Category? <br />
+            If this was by accident please press Back
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setOpenDeleteDialog(false); DeleteCarMade();}} color="secondary">
+            Yes, delete
+          </Button>
+          <Button
+            onClick={() => setOpenDeleteDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            Back
+          </Button>
+        </DialogActions>
+      </Dialog>
     </React.Fragment>
   );
 }

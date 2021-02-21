@@ -20,6 +20,8 @@ import {
   InputLabel,
   makeStyles,
   LinearProgress,
+  Grid,
+  TextField,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -29,13 +31,14 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import { AccountCircle, TextFields, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import AddForm from "../../../AddForm";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
-import AddPermission from "./AddPermission";
+import CategoriesForm from "./CategoriesForm";
 import { Pagination } from "@material-ui/lab";
+import { Search } from "react-feather";
 
 const Card = styled(MuiCard)(spacing);
 const CardContent = styled(MuiCardContent)(spacing);
@@ -96,23 +99,39 @@ function CustomLoadingOverlay() {
   );
 }
 
-function Permissions() {
+function Categories() {
   const classes = useStyles();
   const [{ user, userPermissions }] = useStateValue();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Permission");
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Category");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState("");
+  const [searchValue, setSearchValue] = useState();
+  const [userIsSearching, setuserIsSearching] = useState(false);
+  const [carMade, setCarMade] = useState(""); /****** Customize ******/
+  const [itemAddedOrEdited, setItemAddedOrEdited] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
 
+
   const columns = [
     { field: "id", headerName: "ID", width: 50 },
-    { field: "title", headerName: "Title", width: 200, flex: 1 },
+    { field: "name", headerName: "Name", width: 200, flex: 1 },
+    { field: "description", headerName: "Description", width: 200, flex: 1 },
+    {
+      field: "photo",
+      headerName: "Photo",
+      width: 200,
+      flex: 1,
+      renderCell: (params) => {
+        if (params.value) {
+          return <img src={params.value.image} alt="ph" />;
+        }
+      },
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -120,6 +139,7 @@ function Permissions() {
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
+        // let carMade = params.getValue("id");
         return (
           <div
             style={{
@@ -129,31 +149,31 @@ function Permissions() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("permission_show") ? (
+            {userPermissions.includes("product_category_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
-                onClick={() => setSelectedItem(params.row)}
+                onClick={() => setCarMade(carMade)}
               >
                 View
               </Button>
             ) : null}
-            {userPermissions.includes("permission_edit") ? (
+            {userPermissions.includes("product_category_edit") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
                 onClick={() => {
-                  setSelectedItem(params.row);
+                  setCarMade(params.row);
                   setOpenPopup(true);
-                  setOpenPopupTitle("Edit Permission");
+                  setOpenPopupTitle("Edit Category"); /****** Customize ******/
                 }}
               >
                 Edit
               </Button>
             ) : null}
 
-            {userPermissions.includes("permission_delete") ? (
+            {userPermissions.includes("product_category_delete") ? (
               <Button
                 color="secondary"
                 variant="contained"
@@ -162,7 +182,6 @@ function Permissions() {
                 Delete
               </Button>
             ) : null}
-            
           </div>
         );
       },
@@ -177,24 +196,38 @@ function Permissions() {
     setPage(page);
   };
 
+  const handleSearchInput = (e) => {
+    let search = e.target.value;
+    if (!search || search.trim() === "") {
+      setuserIsSearching(false);
+      setSearchValue(search);
+    } else {
+      if (!userIsSearching) {
+        setuserIsSearching(true);
+      }
+      setSearchValue(search);
+    }
+  };
+
   const openDeleteConfirmation = (id) => {
     setOpenDeleteDialog(true);
     setItemToDelete(id);
   };
 
-  const DeleteItem = async () => {
-    await axios
-      .delete(`/permissions/${itemToDelete}`, {
+  const DeleteCategory = async() => {
+    console.log(itemToDelete);
+        await axios
+      .delete(`/product-categories/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        // setCategories(res.data.data);
+        // alert("Deleted")
       });
 
     await axios
-      .get(`/permissions?page=${page}`, {
+      .get(`/product-categories?page=${page}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -204,52 +237,83 @@ function Permissions() {
         setRows(res.data.data);
         setLoading(false);
       });
-  };
+  }
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
     console.log("In Effect");
-    if (!openPopup) {
-      setLoading(true);
+    if (openPopup) return;
+    setLoading(true);
+    console.log("Passed");
+    if (!userIsSearching) {
       axios
-        .get(`/permissions?page=${page}`, {
+        .get(`/product-categories?page=${page}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         })
         .then((res) => {
-          // alert(res.data.total);
+          setRowsCount(res.data.total);
+          setRows(res.data.data);
+          setLoading(false);
+        });
+    } else {
+      axios
+        .post(
+          "/categories/search/name",
+          {
+            search_index: searchValue,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        )
+        .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
         });
     }
-  }, [page, openPopup]);
+    // setItemAddedOrEdited(false);
+  }, [page, searchValue, openPopup]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Permissions
+        Categories
       </Typography>
 
       <Divider my={6} />
 
-      <Button
-        mb={3}
-        className={classes.button}
-        variant="contained"
-        onClick={() => {
-          setSelectedItem("")
-          setOpenPopup(true);
-          setOpenPopupTitle("New Permission");
-        }}
-      >
-        Add Permission
-      </Button>
+      {userPermissions.includes("product_category_create") ? (
+        <Button
+          mb={3}
+          className={classes.button}
+          variant="contained"
+          onClick={() => {
+            setOpenPopupTitle("New Category");
+            setOpenPopup(true);
+            setCarMade("");
+          }}
+        >
+          Add Category
+        </Button>
+      ) : null}
+
       <Card mb={6}>
-        <CardContent pb={1}>
-          <Toolbar>
+        <CardContent pb={3}>
+          <Toolbar
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              backgroundColor: "lightgray",
+              borderRadius: "6px",
+            }}
+          >
             <FormControl variant="outlined">
               <Select
                 value={pageSize}
@@ -263,6 +327,21 @@ function Permissions() {
                 <MenuItem value={100}>100</MenuItem>
               </Select>
             </FormControl>
+
+            <div>
+              <Grid container spacing={1} alignItems="flex-end">
+                <Grid item>
+                  <Search />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    id="input-with-icon-grid"
+                    label="Search"
+                    onChange={handleSearchInput}
+                  />
+                </Grid>
+              </Grid>
+            </div>
           </Toolbar>
         </CardContent>
         <Paper>
@@ -273,6 +352,7 @@ function Permissions() {
               page={page}
               pageSize={pageSize}
               rowCount={rowsCount}
+              columnBuffer={pageSize}
               paginationMode="server"
               components={{
                 Pagination: CustomPagination,
@@ -292,10 +372,11 @@ function Permissions() {
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
-        <AddPermission
+        <CategoriesForm
           setPage={setPage}
           setOpenPopup={setOpenPopup}
-          itemToEdit={selectedItem}
+          itemToEdit={carMade}
+          setItemAddedOrEdited={setItemAddedOrEdited}
         />
       </Popup>
 
@@ -309,18 +390,12 @@ function Permissions() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Permission? <br />
+            Are you sure you want to delete this Category? <br />
             If this was by accident please press Back
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => {
-              setOpenDeleteDialog(false);
-              DeleteItem();
-            }}
-            color="secondary"
-          >
+          <Button onClick={() => { setOpenDeleteDialog(false); DeleteCategory();}} color="secondary">
             Yes, delete
           </Button>
           <Button
@@ -336,4 +411,4 @@ function Permissions() {
   );
 }
 
-export default Permissions;
+export default Categories;

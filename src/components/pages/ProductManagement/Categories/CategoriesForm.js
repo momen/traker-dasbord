@@ -1,13 +1,14 @@
 import React, { useRef, useState } from "react";
 import {
   Button,
-  FormControl,
   Grid,
+  IconButton,
   makeStyles,
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
+import { PhotoCamera } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -15,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "30vw",
+    width: "40vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -25,46 +26,58 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
+  uploadInput: {
+    display: "none",
+  },
 }));
 
-function CreateCarMade({
-  setPage,
-  setOpenPopup,
-  itemToEdit,
-  categories,
-}) {
+function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
-    car_made: itemToEdit ? itemToEdit.car_made : "",
-    categoryid_id: itemToEdit ? itemToEdit.categoryid_id : "",
+    name: itemToEdit ? itemToEdit.name : "",
+    description: itemToEdit ? itemToEdit.description : "",
+    photo: "",
   });
 
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    let data = new FormData();
+    data.append("name", formData.name);
+    if (formData.description) {
+      data.append("description", formData.description);
+    }
+    if (formData.photo) {
+      data.append("photo", formData.photo, formData.photo.name);
+    }
+
     console.log(itemToEdit.id);
     if (itemToEdit) {
-      axios
-        .put(`/car-mades/${itemToEdit.id}`, formData, {
+      await axios
+        .put(`/product-categories/${itemToEdit.id}`, data, {
           headers: {
             Authorization: `Bearer ${user.token}`,
+            "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
           },
         })
         .then((res) => {
-          setPage(1);
           setOpenPopup(false);
         })
         .catch((res) => {
           console.log(res.response.data.errors);
         });
     } else {
-      axios
-        .post("/car-mades", formData, {
+      console.log("------------------------------");
+      console.log(data);
+      console.log("------------------------------");
+
+      await axios
+        .post("/product-categories", data, {
           headers: {
             Authorization: `Bearer ${user.token}`,
+            "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
           },
         })
         .then((res) => {
@@ -84,11 +97,21 @@ function CreateCarMade({
     });
   };
 
+  const handleUpload = (e) => {
+    const name = e.target.value.replace(/.*[\/\\]/, "");
+    alert(name);
+    console.log(e.target.files[0]);
+    updateFormData({
+      ...formData,
+      photo: e.target.files[0],
+    });
+  };
+
   const handleReset = () => {
     updateFormData({
-      car_made: "",
-      categoryid_id: ""
-    })
+      name: "",
+      description: "",
+    });
   };
   return (
     <div className={classes.paper}>
@@ -96,42 +119,50 @@ function CreateCarMade({
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
-              name="car_made"
+              name="name"
               variant="outlined"
               required
               fullWidth
-              id="car_made"
-              label="Car Made"
-              value={formData.car_made}
+              id="name"
+              label="Category Name"
+              value={formData.name}
               autoFocus
               onChange={handleChange}
             />
           </Grid>
 
           <Grid item xs={12}>
-            <FormControl className={classes.formControl}>
-              {
-                <TextField
-                  id="standard-select-currency-native"
-                  select
-                  label="Category"
-                  value={formData.categoryid_id}
-                  name="categoryid_id"
-                  onChange={handleChange}
-                  SelectProps={{
-                    native: true,
-                  }}
-                  helperText="Please select a Category"
-                  fullWidth
-                  required
-                >
-                  <option aria-label="None" value="" />
-                  {categories?.map((category) => (
-                    <option value={category.id}>{category.name}</option>
-                  ))}
-                </TextField>
-              }
-            </FormControl>
+            <TextField
+              id="standard-multiline-flexible"
+              name="description"
+              label="Description"
+              variant="outlined"
+              multiline
+              rowsMax={8}
+              value={formData.description}
+              fullWidth
+              onChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <input
+              accept="image/*"
+              className={classes.uploadInput}
+              id="icon-button-file"
+              type="file"
+              onChange={handleUpload}
+            />
+            <label htmlFor="icon-button-file">
+              <IconButton
+                color="primary"
+                aria-label="upload picture"
+                component="span"
+              >
+                <PhotoCamera />
+                Upload
+              </IconButton>
+            </label>
           </Grid>
         </Grid>
         <Grid container justify="center">
@@ -156,4 +187,4 @@ function CreateCarMade({
   );
 }
 
-export default CreateCarMade;
+export default CategoriesForm;
