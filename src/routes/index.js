@@ -56,8 +56,8 @@ const Products = async(() =>
   import("../components/pages/ProductManagement/Products/Products.js")
 );
 
-const AddVendor = async(() =>
-  import("../components/pages/Vendor/AddVendor")
+const Vendors = async(() =>
+  import("../components/pages/Vendor/Vendors")
 );
 // Protected routes
 // const ProtectedPage = async(() => import("../pages/protected/ProtectedPage"));
@@ -192,7 +192,7 @@ const vendorRoutes = {
     {
       path: "/vendor/add",
       name: "Add Vendor",
-      component: AddVendor,
+      component: Vendors,
       icon: <GroupAdd />,
     },
   ],

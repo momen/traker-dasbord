@@ -133,7 +133,7 @@ function Permissions() {
                 View
               </Button>
             ) : null}
-            {userPermissions.includes("permission_edit") ? (
+            {/* {userPermissions.includes("permission_edit") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 color="primary"
@@ -146,7 +146,7 @@ function Permissions() {
               >
                 Edit
               </Button>
-            ) : null}
+            ) : null} */}
 
             {userPermissions.includes("permission_delete") ? (
               <Button
