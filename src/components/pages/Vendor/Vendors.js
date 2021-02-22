@@ -34,6 +34,7 @@ import { useStateValue } from "../../../StateProvider";
 import VendorsForm from "./VendorsForm";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
+import { useHistory } from "react-router-dom";
 
 const Card = styled(MuiCard)(spacing);
 const CardContent = styled(MuiCardContent)(spacing);
@@ -96,6 +97,7 @@ function CustomLoadingOverlay() {
 
 function Vendors() {
   const classes = useStyles();
+  const history = useHistory();
   const [{ user, userPermissions }] = useStateValue();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -113,15 +115,14 @@ function Vendors() {
   const [users, setUsers] = useState("");
 
   const columns = [
-    { field: "id", headerName: "ID", width: 50 },
-    { field: "serial", headerName: "Serial", width: 200, flex: 1 },
+    { field: "id", headerName: "ID", width: 30 },
+    { field: "serial", headerName: "Serial", width: 70 },
     { field: "vendor_name", headerName: "Vendor Name", width: 200, flex: 1 },
     { field: "email", headerName: "Email", width: 200, flex: 1 },
     {
       field: "userid",
       headerName: "Username",
-      width: 200,
-      flex: 1,
+      width: 70,
       renderCell: (params) => {
         return params.value.name;
       },
@@ -129,8 +130,7 @@ function Vendors() {
     {
       field: "images",
       headerName: "Logo",
-      width: 200,
-      flex: 1,
+      width: 50,
       renderCell: (params) => {
         if (params.value) {
           return <img src={params.value.image} alt="ph" />;
@@ -140,7 +140,7 @@ function Vendors() {
     {
       field: "actions",
       headerName: "Actions",
-      width: 250,
+      width: 220,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -158,7 +158,8 @@ function Vendors() {
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
-                onClick={() => setCarMade(carMade)}
+                size="small"
+                onClick={() => history.push(`/vendor/add/${params.row.id}`)}
               >
                 View
               </Button>
@@ -168,10 +169,13 @@ function Vendors() {
                 style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
+                size="small"
                 onClick={() => {
                   setCarMade(params.row);
                   setOpenPopup(true);
-                  setOpenPopupTitle("Update Vendor Details"); /****** Customize ******/
+                  setOpenPopupTitle(
+                    "Update Vendor Details"
+                  ); /****** Customize ******/
                 }}
               >
                 Edit
@@ -182,6 +186,7 @@ function Vendors() {
               <Button
                 color="secondary"
                 variant="contained"
+                size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
@@ -222,7 +227,7 @@ function Vendors() {
   const DeleteCategory = async () => {
     console.log(itemToDelete);
     await axios
-      .delete(`/product-categories/${itemToDelete}`, {
+      .delete(`/add-vendors/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -232,7 +237,7 @@ function Vendors() {
       });
 
     await axios
-      .get(`/product-categories?page=${page}`, {
+      .get(`/add-vendors?page=${page}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -247,20 +252,20 @@ function Vendors() {
   /*-Get Users only on the initial render to pass it to the pop-up form 
     when adding or editing, to prevent repeating the request each time the
     pop-up is opened-*/
-    useEffect(() => {
-      axios
-        .post("/add-vendors/get/userid_id", null, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
-        .then((res) => {
-          setUsers(res.data.data);
-        })
-        .catch((err) => {
-          console.log("Error");
-        })
-    }, []);
+  useEffect(() => {
+    axios
+      .post("/add-vendors/get/userid_id", null, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+      .then((res) => {
+        setUsers(res.data.data);
+      })
+      .catch((err) => {
+        console.log("Error");
+      });
+  }, []);
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
@@ -283,7 +288,7 @@ function Vendors() {
     } else {
       axios
         .post(
-          "/categories/search/name",
+          "/add-vendors/search/name",
           {
             search_index: searchValue,
           },
@@ -327,14 +332,14 @@ function Vendors() {
       ) : null}
 
       <Card mb={6}>
-        <CardContent pb={3}>
+        <Paper mb={2}>
           <Toolbar
             style={{
               display: "flex",
               justifyContent: "space-between",
               width: "100%",
-              backgroundColor: "lightgray",
-              borderRadius: "6px",
+              backgroundColor: "#f8f8ff",
+              borderRadius: "3px",
             }}
           >
             <FormControl variant="outlined">
@@ -343,7 +348,17 @@ function Vendors() {
                 onChange={handlePageSize}
                 autoWidth
                 IconComponent={UnfoldLess}
-                MenuProps={{ getContentAnchorEl: () => null }}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: "bottom",
+                    horizontal: "center",
+                  },
+                  transformOrigin: {
+                    vertical: "top",
+                    horizontal: "center",
+                  },
+                  getContentAnchorEl: () => null,
+                }}
               >
                 <MenuItem value={10}>10</MenuItem>
                 <MenuItem value={25}>25</MenuItem>
@@ -366,7 +381,7 @@ function Vendors() {
               </Grid>
             </div>
           </Toolbar>
-        </CardContent>
+        </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
             <DataGrid
@@ -413,7 +428,7 @@ function Vendors() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Category? <br />
+            Are you sure you want to delete this Vendor? <br />
             If this was by accident please press Back
           </DialogContentText>
         </DialogContent>

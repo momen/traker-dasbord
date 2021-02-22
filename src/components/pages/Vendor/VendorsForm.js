@@ -52,16 +52,17 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
     email: itemToEdit ? itemToEdit.email : "",
     type: itemToEdit ? itemToEdit.type : "",
     userid_id: itemToEdit ? itemToEdit.userid_id : "",
-    serial: itemToEdit ? itemToEdit.serial : "",
     photo: "",
   });
   const [openAlert, setOpenAlert] = useState(false);
   const [imgName, setImgName] = useState("");
 
+console.log(itemToEdit);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     // alert("هخه");
-    if (!formData.photo) {
+    if (!formData.photo && !itemToEdit) {
       setOpenAlert(true);
     } else {
       let data = new FormData();
@@ -69,19 +70,19 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
       data.append("email", formData.email);
       data.append("type", formData.type);
       data.append("userid_id", formData.userid_id);
-      data.append("images", formData.photo, formData.photo.name);
+      // data.append("images", formData.photo, formData.photo.name);
 
-      if (formData.serial) {
-        data.append("serial", formData.serial);
-      }
+      // if (formData.serial) {
+      //   data.append("serial", formData.serial);
+      // }
 
-      console.log(itemToEdit.id);
+      console.log(data);
       if (itemToEdit) {
         await axios
-          .put(`/add-vendors/${itemToEdit.id}`, data, {
+          .put(`/add-vendors/${itemToEdit.id}`, formData, {
             headers: {
               Authorization: `Bearer ${user.token}`,
-              "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
+              // "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })
           .then((res) => {
@@ -140,7 +141,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
     <div className={classes.paper}>
       <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <TextField
               name="vendor_name"
               variant="outlined"
@@ -148,19 +149,8 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
               fullWidth
               id="vendor_name"
               label="Vendor Name"
-              value={formData.name}
+              value={formData.vendor_name}
               autoFocus
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              name="serial"
-              variant="outlined"
-              fullWidth
-              id="serial"
-              label="Serial"
-              value={formData.serial}
               onChange={handleChange}
             />
           </Grid>
@@ -182,25 +172,25 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
             <FormControl component="fieldset">
               <FormLabel component="legend">Type</FormLabel>
               <RadioGroup
-                aria-label="gender"
+                aria-label="type"
                 name="type"
                 value={formData.type}
                 onChange={handleChange}
               >
                 <FormControlLabel
-                  value="female"
+                  value="1"
                   control={<Radio />}
-                  label="Female"
+                  label="Vendor"
                 />
                 <FormControlLabel
-                  value="male"
+                  value="2"
                   control={<Radio />}
-                  label="Male"
+                  label="Hot Sale"
                 />
                 <FormControlLabel
-                  value="other"
+                  value="3"
                   control={<Radio />}
-                  label="Other"
+                  label="Both"
                 />
               </RadioGroup>
             </FormControl>
@@ -226,7 +216,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
                   <option aria-label="None" value="" />
 
                   {Object.entries(users)?.map(([key, value]) => (
-                    <option value={key}>{value}</option>
+                    <option key={key} value={key}>{value}</option>
                   ))}
                 </TextField>
               }

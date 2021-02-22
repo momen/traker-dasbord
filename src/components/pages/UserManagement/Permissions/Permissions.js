@@ -148,7 +148,7 @@ function Permissions() {
               </Button>
             ) : null} */}
 
-            {userPermissions.includes("permission_delete") ? (
+            {/* {userPermissions.includes("permission_delete") ? (
               <Button
                 color="secondary"
                 variant="contained"
@@ -156,8 +156,7 @@ function Permissions() {
               >
                 Delete
               </Button>
-            ) : null}
-            
+            ) : null} */}
           </div>
         );
       },
@@ -230,20 +229,9 @@ function Permissions() {
 
       <Divider my={6} />
 
-      <Button
-        mb={3}
-        className={classes.button}
-        variant="contained"
-        onClick={() => {
-          setSelectedItem("")
-          setOpenPopup(true);
-          setOpenPopupTitle("New Permission");
-        }}
-      >
-        Add Permission
-      </Button>
+      
       <Card mb={6}>
-        <CardContent pb={1}>
+        <Paper mb={2}>
           <Toolbar>
             <FormControl variant="outlined">
               <Select
@@ -251,7 +239,17 @@ function Permissions() {
                 onChange={handlePageSize}
                 autoWidth
                 IconComponent={UnfoldLess}
-                MenuProps={{ getContentAnchorEl: () => null }}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: "bottom",
+                    horizontal: "center",
+                  },
+                  transformOrigin: {
+                    vertical: "top",
+                    horizontal: "center",
+                  },
+                  getContentAnchorEl: () => null,
+                }}
               >
                 <MenuItem value={10}>10</MenuItem>
                 <MenuItem value={25}>25</MenuItem>
@@ -259,7 +257,7 @@ function Permissions() {
               </Select>
             </FormControl>
           </Toolbar>
-        </CardContent>
+        </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
             <DataGrid

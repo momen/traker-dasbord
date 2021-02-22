@@ -53,14 +53,14 @@ const useStyles = makeStyles({
       background: "#388e3c",
     },
   },
-  roleBadge:{
+  roleBadge: {
     background: "#FFBF00",
     fontWeight: "bold",
     borderRadius: "6px",
     padding: "5px",
-    marginRight:"5px",
-    userSelect: "none"
-  }
+    marginRight: "5px",
+    userSelect: "none",
+  },
 });
 
 function CustomPagination(props) {
@@ -119,25 +119,28 @@ function Users() {
 
   const columns = [
     { field: "id", headerName: "ID", width: 50 },
-    { field: "title", headerName: "Title", width: 100},
+    { field: "name", headerName: "Name", width: 150 },
+    { field: "email", headerName: "Email", width: 200, flex: 1},
+    { field: "email_verified_at", headerName: "Email Verification Date", width: 100 },
     {
-      field: "permissions",
-      headerName: "Permissions",
+      field: "roles",
+      headerName: "Roles",
       width: 300,
       flex: 1,
       renderCell: (params) => (
         <div>
           {params.value.map((permission) => (
-            <span className={classes.roleBadge}>{permission.title}</span>
+            <span key={permission.id} className={classes.roleBadge}>
+              {permission.title}
+            </span>
           ))}
         </div>
       ),
     },
-
     {
       field: "actions",
       headerName: "Actions",
-      width: 250,
+      width: 220,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -154,6 +157,7 @@ function Users() {
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
+                size="small"
                 onClick={() => setSelectedItem(params.row)}
               >
                 View
@@ -164,6 +168,7 @@ function Users() {
                 style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
+                size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
                   setOpenPopup(true);
@@ -178,6 +183,7 @@ function Users() {
               <Button
                 color="secondary"
                 variant="contained"
+                size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
@@ -204,7 +210,7 @@ function Users() {
 
   const DeleteItem = async () => {
     await axios
-      .delete(`/roles/${itemToDelete}`, {
+      .delete(`/users/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -214,7 +220,7 @@ function Users() {
       });
 
     await axios
-      .get(`/roles?page=${page}`, {
+      .get(`/users?page=${page}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -232,7 +238,7 @@ function Users() {
     if (!openPopup) {
       setLoading(true);
       axios
-        .get(`/roles?page=${page}`, {
+        .get(`/users?page=${page}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -265,10 +271,10 @@ function Users() {
           setOpenPopupTitle("New Permission");
         }}
       >
-        Add Role
+        Add User
       </Button>
       <Card mb={6}>
-        <CardContent pb={1}>
+        <Paper mb={2}>
           <Toolbar>
             <FormControl variant="outlined">
               <Select
@@ -276,7 +282,17 @@ function Users() {
                 onChange={handlePageSize}
                 autoWidth
                 IconComponent={UnfoldLess}
-                MenuProps={{ getContentAnchorEl: () => null }}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: "bottom",
+                    horizontal: "center",
+                  },
+                  transformOrigin: {
+                    vertical: "top",
+                    horizontal: "center",
+                  },
+                  getContentAnchorEl: () => null,
+                }}
               >
                 <MenuItem value={10}>10</MenuItem>
                 <MenuItem value={25}>25</MenuItem>
@@ -284,7 +300,7 @@ function Users() {
               </Select>
             </FormControl>
           </Toolbar>
-        </CardContent>
+        </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
             <DataGrid

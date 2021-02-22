@@ -44,6 +44,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
     description: itemToEdit ? itemToEdit.description : "",
     photo: "",
   });
+  const [imgName, setImgName] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -102,7 +103,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
 
   const handleUpload = (e) => {
     const name = e.target.value.replace(/.*[\/\\]/, "");
-    alert(name);
+    setImgName(name);
     console.log(e.target.files[0]);
     updateFormData({
       ...formData,
@@ -166,6 +167,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
               >
                 Upload
               </Button>
+              <span>{imgName}</span>
             </label>
           </Grid>
         </Grid>

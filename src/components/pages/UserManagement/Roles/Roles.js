@@ -53,14 +53,14 @@ const useStyles = makeStyles({
       background: "#388e3c",
     },
   },
-  roleBadge:{
-    background: "#FFBF00",
+  permissionBadge: {
+    background: "#00b3b3",
     fontWeight: "bold",
     borderRadius: "6px",
     padding: "5px",
-    marginRight:"5px",
-    userSelect: "none"
-  }
+    marginRight: "5px",
+    userSelect: "none",
+  },
 });
 
 function CustomPagination(props) {
@@ -119,7 +119,7 @@ function Roles() {
 
   const columns = [
     { field: "id", headerName: "ID", width: 50 },
-    { field: "title", headerName: "Title", width: 100},
+    { field: "title", headerName: "Title", width: 100 },
     {
       field: "permissions",
       headerName: "Permissions",
@@ -128,7 +128,9 @@ function Roles() {
       renderCell: (params) => (
         <div>
           {params.value.map((permission) => (
-            <span className={classes.roleBadge}>{permission.title}</span>
+            <span key={permission.id} className={classes.permissionBadge}>
+              {permission.title}
+            </span>
           ))}
         </div>
       ),
@@ -226,6 +228,10 @@ function Roles() {
       });
   };
 
+  // useEffect(()=>{
+
+  // })
+
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
     console.log("In Effect");
@@ -262,13 +268,13 @@ function Roles() {
         onClick={() => {
           setSelectedItem("");
           setOpenPopup(true);
-          setOpenPopupTitle("New Permission");
+          setOpenPopupTitle("New Role");
         }}
       >
         Add Role
       </Button>
       <Card mb={6}>
-        <CardContent pb={1}>
+        <Paper mb={2}>
           <Toolbar>
             <FormControl variant="outlined">
               <Select
@@ -276,7 +282,17 @@ function Roles() {
                 onChange={handlePageSize}
                 autoWidth
                 IconComponent={UnfoldLess}
-                MenuProps={{ getContentAnchorEl: () => null }}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: "bottom",
+                    horizontal: "center",
+                  },
+                  transformOrigin: {
+                    vertical: "top",
+                    horizontal: "center",
+                  },
+                  getContentAnchorEl: () => null,
+                }}
               >
                 <MenuItem value={10}>10</MenuItem>
                 <MenuItem value={25}>25</MenuItem>
@@ -284,7 +300,7 @@ function Roles() {
               </Select>
             </FormControl>
           </Toolbar>
-        </CardContent>
+        </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
             <DataGrid

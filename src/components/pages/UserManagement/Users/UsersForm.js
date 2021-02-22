@@ -36,7 +36,8 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit }) {
   const formRef = useRef();
   //Customize
   const [formData, updateFormData] = useState({
-    title: itemToEdit ? itemToEdit.title : "",
+    name: itemToEdit ? itemToEdit.name : "",
+    email: itemToEdit ? itemToEdit.email : "",
   });
 
   const handleSubmit = async (e) => {
@@ -45,7 +46,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit }) {
     if (itemToEdit) {
       //Customize
       await axios
-        .put(`/permissions/${itemToEdit.id}`, formData, {
+        .put(`/users/${itemToEdit.id}`, formData, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -60,7 +61,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit }) {
     } else {
       //Customize
       await axios
-        .post("/permissions", formData, {
+        .post("/users", formData, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -94,14 +95,27 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit }) {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
-              name="title" //Customize
+              name="name" //Customize
               variant="outlined"
               required
               fullWidth
-              id="title" //Customize
-              label="Title" //Customize
-              value={formData.title} //Customize
+              id="name" //Customize
+              label="Name" //Customize
+              value={formData.name} //Customize
               autoFocus
+              onChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              name="email" //Customize
+              variant="outlined"
+              required
+              fullWidth
+              id="email" //Customize
+              label="Email" //Customize
+              value={formData.email} //Customize
               onChange={handleChange}
             />
           </Grid>

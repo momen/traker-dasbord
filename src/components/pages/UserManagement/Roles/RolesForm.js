@@ -7,6 +7,7 @@ import {
 } from "@material-ui/core";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
+import { Autocomplete } from "@material-ui/lab";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -105,6 +106,24 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit }) {
               onChange={handleChange}
             />
           </Grid>
+
+          {/* <Grid>
+          <Autocomplete
+        multiple
+        id="tags-standard"
+        options={top100Films}
+        getOptionLabel={(option) => option.title}
+        defaultValue={[top100Films[13]]}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant="standard"
+            label="Multiple values"
+            placeholder="Favorites"
+          />
+        )}
+      />
+          </Grid> */}
 
         </Grid>
         <Grid container justify="center">

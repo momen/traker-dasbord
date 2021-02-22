@@ -434,12 +434,12 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
               />
             </SidebarFooterBadge>
           </Grid>
-          <Grid item>
+          {/* <Grid item>
             <SidebarFooterText variant="body2">Lucy Lavender</SidebarFooterText>
             <SidebarFooterSubText variant="caption">
               UX Designer
             </SidebarFooterSubText>
-          </Grid>
+          </Grid> */}
         </Grid>
       </SidebarFooter>
     </Drawer>

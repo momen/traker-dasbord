@@ -53,14 +53,14 @@ const useStyles = makeStyles({
       background: "#388e3c",
     },
   },
-  roleBadge:{
+  roleBadge: {
     background: "#FFBF00",
     fontWeight: "bold",
     borderRadius: "6px",
     padding: "5px",
-    marginRight:"5px",
-    userSelect: "none"
-  }
+    marginRight: "5px",
+    userSelect: "none",
+  },
 });
 
 function CustomPagination(props) {
@@ -119,7 +119,7 @@ function AuditLogs() {
 
   const columns = [
     { field: "id", headerName: "ID", width: 50 },
-    { field: "title", headerName: "Title", width: 100},
+    { field: "title", headerName: "Title", width: 100 },
     {
       field: "permissions",
       headerName: "Permissions",
@@ -128,7 +128,9 @@ function AuditLogs() {
       renderCell: (params) => (
         <div>
           {params.value.map((permission) => (
-            <span className={classes.roleBadge}>{permission.title}</span>
+            <span key={permission.id} className={classes.roleBadge}>
+              {permission.title}
+            </span>
           ))}
         </div>
       ),
@@ -204,7 +206,7 @@ function AuditLogs() {
 
   const DeleteItem = async () => {
     await axios
-      .delete(`/roles/${itemToDelete}`, {
+      .delete(`/audit-logs/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -214,7 +216,7 @@ function AuditLogs() {
       });
 
     await axios
-      .get(`/roles?page=${page}`, {
+      .get(`/audit-logs?page=${page}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -222,8 +224,8 @@ function AuditLogs() {
       .then((res) => {
         setRowsCount(res.data.total);
         setRows(res.data.data);
-        setLoading(false);
       });
+      setLoading(false);
   };
 
   //Request the page records either on the initial render, or whenever the page changes
@@ -232,7 +234,7 @@ function AuditLogs() {
     if (!openPopup) {
       setLoading(true);
       axios
-        .get(`/roles?page=${page}`, {
+        .get(`/audit-logs?page=${page}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -241,8 +243,8 @@ function AuditLogs() {
           // alert(res.data.total);
           setRowsCount(res.data.total);
           setRows(res.data.data);
-          setLoading(false);
         });
+        setLoading(false);
     }
   }, [page, openPopup]);
 
@@ -268,7 +270,7 @@ function AuditLogs() {
         Add Audit Log
       </Button> */}
       <Card mb={6}>
-        <CardContent pb={1}>
+        <Paper mb={2}>
           <Toolbar>
             <FormControl variant="outlined">
               <Select
@@ -276,7 +278,17 @@ function AuditLogs() {
                 onChange={handlePageSize}
                 autoWidth
                 IconComponent={UnfoldLess}
-                MenuProps={{ getContentAnchorEl: () => null }}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: "bottom",
+                    horizontal: "center",
+                  },
+                  transformOrigin: {
+                    vertical: "top",
+                    horizontal: "center",
+                  },
+                  getContentAnchorEl: () => null,
+                }}
               >
                 <MenuItem value={10}>10</MenuItem>
                 <MenuItem value={25}>25</MenuItem>
@@ -284,7 +296,7 @@ function AuditLogs() {
               </Select>
             </FormControl>
           </Toolbar>
-        </CardContent>
+        </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
             <DataGrid
@@ -329,7 +341,7 @@ function AuditLogs() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Role? <br />
+            Are you sure you want to delete this Log? <br />
             If this was by accident please press Back
           </DialogContentText>
         </DialogContent>

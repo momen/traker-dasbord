@@ -116,7 +116,6 @@ function CarMade() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
 
-
   const columns = [
     { field: "id", headerName: "ID", width: 50 },
     { field: "car_made", headerName: "Car Made", width: 200, flex: 1 },
@@ -208,7 +207,7 @@ function CarMade() {
     setItemToDelete(id);
   };
 
-  const DeleteCarMade = async() => {
+  const DeleteCarMade = async () => {
     await axios
       .delete(`/car-mades/${itemToDelete}`, {
         headers: {
@@ -310,13 +309,13 @@ function CarMade() {
       ) : null}
 
       <Card mb={6}>
-        <CardContent pb={3}>
+        <Paper mb={2}>
           <Toolbar
             style={{
               display: "flex",
               justifyContent: "space-between",
               width: "100%",
-              backgroundColor: "lightgray",
+              backgroundColor: "#f8f8ff",
               borderRadius: "6px",
             }}
           >
@@ -326,7 +325,17 @@ function CarMade() {
                 onChange={handlePageSize}
                 autoWidth
                 IconComponent={UnfoldLess}
-                MenuProps={{ getContentAnchorEl: () => null }}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: "bottom",
+                    horizontal: "center",
+                  },
+                  transformOrigin: {
+                    vertical: "top",
+                    horizontal: "center",
+                  },
+                  getContentAnchorEl: () => null,
+                }}
               >
                 <MenuItem value={10}>10</MenuItem>
                 <MenuItem value={25}>25</MenuItem>
@@ -349,7 +358,7 @@ function CarMade() {
               </Grid>
             </div>
           </Toolbar>
-        </CardContent>
+        </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
             <DataGrid
@@ -400,7 +409,13 @@ function CarMade() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setOpenDeleteDialog(false); DeleteCarMade();}} color="secondary">
+          <Button
+            onClick={() => {
+              setOpenDeleteDialog(false);
+              DeleteCarMade();
+            }}
+            color="secondary"
+          >
             Yes, delete
           </Button>
           <Button

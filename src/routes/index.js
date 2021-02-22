@@ -2,21 +2,43 @@ import React from "react";
 
 import async from "../components/Async";
 
-import { Briefcase, Calendar, FileText, Folder, LogOut, ShoppingCart, Tag, Unlock, User, Users } from "react-feather";
-import SignIn from "../components/pages/SignIn/SignIn";
-import AuthGuard from "../components/AuthGuard";
-import { BusinessCenter, Dashboard, Group, GroupAdd, GroupWork, LockOpen, TimeToLeave, VpnKey, VpnLock } from "@material-ui/icons";
-import ChangePassword from "../components/pages/ChangePassword/ChangePassword";
+import {
+  Briefcase,
+  Calendar,
+  FileText,
+  Folder,
+  LogOut,
+  ShoppingCart,
+  Tag,
+  Unlock,
+  User,
+  Users,
+} from "react-feather";
+import {
+  BusinessCenter,
+  Dashboard,
+  Group,
+  GroupAdd,
+  GroupWork,
+  LockOpen,
+  TimeToLeave,
+  VpnKey,
+  VpnLock,
+} from "@material-ui/icons";
 
 // Guards
 // const AuthGuard = async(() => import("../components/AuthGuard"));
 const AppGuard = async(() => import("../components/AppGuard"));
 
-
 // Dashboards components
 // const Default = async(() => import("../pages/dashboards/Default"));
 // const Analytics = async(() => import("../pages/dashboards/Analytics"));
 // const SaaS = async(() => import("../pages/dashboards/SaaS"));
+
+const AuthGuard = async(() => import("../components/AuthGuard"));
+
+const SignIn = async(() => import("../components/pages/SignIn/SignIn"));
+
 const Dashborad = async(() =>
   import("../components/pages/Dashboard/Dashboard")
 );
@@ -56,8 +78,12 @@ const Products = async(() =>
   import("../components/pages/ProductManagement/Products/Products.js")
 );
 
-const Vendors = async(() =>
-  import("../components/pages/Vendor/Vendors")
+const Vendors = async(() => import("../components/pages/Vendor/Vendors"));
+
+const ViewVendor = async(() => import("../components/pages/Vendor/ViewVendor"));
+
+const ChangePassword = async(() =>
+  import("../components/pages/ChangePassword/ChangePassword")
 );
 // Protected routes
 // const ProtectedPage = async(() => import("../pages/protected/ProtectedPage"));
@@ -130,7 +156,6 @@ const userManagementRoutes = {
   ],
 };
 
-
 const productManagementRoutes = {
   id: "Product Management",
   path: "/product",
@@ -182,7 +207,6 @@ const productManagementRoutes = {
   ],
 };
 
-
 const vendorRoutes = {
   id: "Vendor",
   path: "/vendor",
@@ -196,6 +220,12 @@ const vendorRoutes = {
       icon: <GroupAdd />,
     },
   ],
+};
+
+const viewVendor = {
+  path: "/vendor/add/:id",
+  component: ViewVendor,
+  children: null,
 };
 
 const changePasswordRoute = {
@@ -223,7 +253,7 @@ const authRoutes = {
       path: "/sign-in",
       name: "Sign In",
       component: SignIn,
-      guard: AppGuard
+      // guard: AppGuard,
     },
     // {
     //   path: "/auth/sign-up",
@@ -250,7 +280,14 @@ const authRoutes = {
 };
 
 // Routes using the Dashboard layout
-export const dashboardLayoutRoutes = [dashboardRoutes, userManagementRoutes, productManagementRoutes, vendorRoutes, changePasswordRoute];
+export const dashboardLayoutRoutes = [
+  dashboardRoutes,
+  userManagementRoutes,
+  productManagementRoutes,
+  vendorRoutes,
+  viewVendor,
+  changePasswordRoute,
+];
 
 // Routes using the Auth layout
 export const authLayoutRoutes = [authRoutes, logoutRoute];
@@ -259,4 +296,11 @@ export const authLayoutRoutes = [authRoutes, logoutRoute];
 // export const protectedRoutes = [protectedPageRoutes];
 
 // Routes visible in the sidebar
-export const sidebarRoutes = [dashboardRoutes, userManagementRoutes, productManagementRoutes, vendorRoutes, changePasswordRoute, logoutRoute];
+export const sidebarRoutes = [
+  dashboardRoutes,
+  userManagementRoutes,
+  productManagementRoutes,
+  vendorRoutes,
+  changePasswordRoute,
+  logoutRoute,
+];
