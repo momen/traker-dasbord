@@ -286,7 +286,7 @@ const SidebarLink = ({ name, to, badge, icon }) => {
       button
       dense
       component={NavLink}
-      exact
+      // exact
       to={to}
       activeClassName="active"
     >
@@ -308,8 +308,11 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
 
     routes.forEach((route, index) => {
       const isActive = pathName.indexOf(route.path) === 0;
+      // const isActive = route.path.startsWith(pathName);
       const isOpen = route.open;
       const isHome = route.containsHome && pathName === "/";
+
+      console.log(route);
 
       _routes = Object.assign({}, _routes, {
         [index]: isActive || isOpen || isHome,
@@ -339,18 +342,18 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
 
   const handleLogout = () => {
     axios
-      .post("/logout",null, {
+      .post("/logout", null, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
-      .then(async(res) => {
+      .then(async (res) => {
         dispatch({
           type: "LOGOUT",
         });
       })
       .catch((err) => {
-        alert("Failed to Logout, please try again.")
+        alert("Failed to Logout, please try again.");
       });
   };
 

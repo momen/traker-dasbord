@@ -8,7 +8,6 @@ function AuthGuard({ children }) {
   const [{ user }] = useStateValue();
 
   if (!user) {
-    console.log("A7a");
     return <Redirect to="/sign-in" />;
   }
 

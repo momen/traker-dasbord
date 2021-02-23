@@ -81,6 +81,8 @@ const Products = async(() =>
 const Vendors = async(() => import("../components/pages/Vendor/Vendors"));
 
 const ViewVendor = async(() => import("../components/pages/Vendor/ViewVendor"));
+// const ViewRoles = async(() => import("../components/pages/UserManagement/Roles/ViewRoles"));
+// const ViewUser = async(() => import("../components/pages/UserManagement/Users/ViewUsers"));
 
 const ChangePassword = async(() =>
   import("../components/pages/ChangePassword/ChangePassword")
@@ -121,6 +123,7 @@ const dashboardRoutes = {
   badge: "8",
   component: Dashborad,
   children: null,
+  containsHome: true
 };
 
 const userManagementRoutes = {
@@ -227,6 +230,18 @@ const viewVendor = {
   component: ViewVendor,
   children: null,
 };
+const viewRole = {
+  path: "/vendor/add/:id",
+  component: ViewVendor,
+  children: null,
+};
+
+const viewUsers = {
+  path: "/vendor/add/:id",
+  component: ViewVendor,
+  children: null,
+};
+
 
 const changePasswordRoute = {
   id: "Change Password",

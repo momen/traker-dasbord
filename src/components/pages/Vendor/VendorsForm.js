@@ -40,6 +40,13 @@ const useStyles = makeStyles((theme) => ({
   uploadInput: {
     display: "none",
   },
+  errorsContainer: {
+    marginBottom: theme.spacing(1),
+  },
+  errorMsg: {
+    color: "#ff0000",
+    fontWeight: "500",
+  },
 }));
 
 function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
@@ -52,17 +59,18 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
     email: itemToEdit ? itemToEdit.email : "",
     type: itemToEdit ? itemToEdit.type : "",
     userid_id: itemToEdit ? itemToEdit.userid_id : "",
-    photo: "",
+    images: [],
   });
   const [openAlert, setOpenAlert] = useState(false);
   const [imgName, setImgName] = useState("");
+  const [responseErrors, setResponseErrors] = useState("");
 
-console.log(itemToEdit);
+  console.log(itemToEdit);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     // alert("هخه");
-    if (!formData.photo && !itemToEdit) {
+    if (!formData.images && !itemToEdit) {
       setOpenAlert(true);
     } else {
       let data = new FormData();
@@ -70,7 +78,6 @@ console.log(itemToEdit);
       data.append("email", formData.email);
       data.append("type", formData.type);
       data.append("userid_id", formData.userid_id);
-      // data.append("images", formData.photo, formData.photo.name);
 
       // if (formData.serial) {
       //   data.append("serial", formData.serial);
@@ -89,12 +96,17 @@ console.log(itemToEdit);
             setOpenPopup(false);
           })
           .catch((res) => {
+            setResponseErrors(res.response.data.errors);
             console.log(res.response.data.errors);
           });
       } else {
-        console.log("------------------------------");
-        console.log(data);
-        console.log("------------------------------");
+        // console.log("------------------------------");
+        // console.log(data);
+        // console.log("------------------------------");
+        data.append("images", formData.images);
+
+        // data.append("images", formData.images[0].name, formData.images);
+        console.log(formData.images);
 
         await axios
           .post("/add-vendors", data, {
@@ -108,6 +120,7 @@ console.log(itemToEdit);
             setOpenPopup(false);
           })
           .catch((res) => {
+            setResponseErrors(res.response.data.errors);
             console.log(res.response.data.errors);
           });
       }
@@ -127,7 +140,7 @@ console.log(itemToEdit);
     console.log(e.target.files[0]);
     updateFormData({
       ...formData,
-      photo: e.target.files[0],
+      images: [...formData.images, e.target.files[0]]
     });
   };
 
@@ -155,6 +168,16 @@ console.log(itemToEdit);
             />
           </Grid>
 
+          {responseErrors ? (
+            <Grid item xs={12}>
+              {responseErrors.vendor_name?.map((msg) => (
+                <span key={msg} className={classes.errorMsg}>
+                  {msg}
+                </span>
+              ))}
+            </Grid>
+          ) : null}
+
           <Grid item xs={12}>
             <TextField
               name="email"
@@ -167,6 +190,18 @@ console.log(itemToEdit);
               onChange={handleChange}
             />
           </Grid>
+
+          {responseErrors ? (
+            <Grid item xs={12}>
+              {responseErrors.email?.map((msg) => (
+                <div className={classes.errorsContainer}>
+                  <span key={msg} className={classes.errorMsg}>
+                    {msg}
+                  </span>
+                </div>
+              ))}
+            </Grid>
+          ) : null}
 
           <Grid>
             <FormControl component="fieldset">
@@ -187,14 +222,20 @@ console.log(itemToEdit);
                   control={<Radio />}
                   label="Hot Sale"
                 />
-                <FormControlLabel
-                  value="3"
-                  control={<Radio />}
-                  label="Both"
-                />
+                <FormControlLabel value="3" control={<Radio />} label="Both" />
               </RadioGroup>
             </FormControl>
           </Grid>
+
+          {responseErrors ? (
+            <Grid item xs={12}>
+              {responseErrors.type?.map((msg) => (
+                <span key={msg} className={classes.errorMsg}>
+                  {msg}
+                </span>
+              ))}
+            </Grid>
+          ) : null}
 
           <Grid item xs={12}>
             <FormControl>
@@ -216,12 +257,24 @@ console.log(itemToEdit);
                   <option aria-label="None" value="" />
 
                   {Object.entries(users)?.map(([key, value]) => (
-                    <option key={key} value={key}>{value}</option>
+                    <option key={key} value={key}>
+                      {value}
+                    </option>
                   ))}
                 </TextField>
               }
             </FormControl>
           </Grid>
+
+          {responseErrors ? (
+            <Grid item xs={12}>
+              {responseErrors.userid_id?.map((msg) => (
+                <span key={msg} className={classes.errorMsg}>
+                  {msg}
+                </span>
+              ))}
+            </Grid>
+          ) : null}
 
           <FormControl className={classes.formControl}>
             <Grid item xs={12}>
@@ -249,6 +302,16 @@ console.log(itemToEdit);
               </label>
             </Grid>
           </FormControl>
+
+          {responseErrors ? (
+            <Grid item xs={12}>
+              {responseErrors.images?.map((msg) => (
+                <span key={msg} className={classes.errorMsg}>
+                  {msg}
+                </span>
+              ))}
+            </Grid>
+          ) : null}
 
           <Grid item xs={12}>
             <FormControl>

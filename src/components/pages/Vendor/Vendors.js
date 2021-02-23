@@ -115,7 +115,7 @@ function Vendors() {
   const [users, setUsers] = useState("");
 
   const columns = [
-    { field: "id", headerName: "ID", width: 30 },
+    { field: "id", headerName: "ID", width: 45 },
     { field: "serial", headerName: "Serial", width: 70 },
     { field: "vendor_name", headerName: "Vendor Name", width: 200, flex: 1 },
     { field: "email", headerName: "Email", width: 200, flex: 1 },
