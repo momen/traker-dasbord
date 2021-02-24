@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
-import { NavLink } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import PropTypes from "prop-types";
 
@@ -105,6 +105,7 @@ function CustomLoadingOverlay() {
 
 function Roles() {
   const classes = useStyles();
+  const history = useHistory();
   const [{ user, userPermissions }] = useStateValue();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -116,6 +117,7 @@ function Roles() {
   const [selectedItem, setSelectedItem] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
+  const [permissionsList, setPermissionsList] = useState("");
 
   const columns = [
     { field: "id", headerName: "ID", width: 50 },
@@ -156,7 +158,7 @@ function Roles() {
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
-                onClick={() => setSelectedItem(params.row)}
+                onClick={() => history.push(`/user-mgt/roles/${params.row.id}`)}
               >
                 View
               </Button>
@@ -228,9 +230,17 @@ function Roles() {
       });
   };
 
-  // useEffect(()=>{
-
-  // })
+  useEffect(()=>{
+    axios
+      .get('/permissionslist', {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+      .then((res) => {
+        setPermissionsList(res.data.data);
+      });
+  },[])
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
@@ -332,6 +342,7 @@ function Roles() {
           setPage={setPage}
           setOpenPopup={setOpenPopup}
           itemToEdit={selectedItem}
+          permissionsList={permissionsList}
         />
       </Popup>
 

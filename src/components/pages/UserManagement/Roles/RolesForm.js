@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import {
   Button,
+  Checkbox,
   Grid,
   makeStyles,
   TextField,
@@ -8,6 +9,8 @@ import {
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
 import { Autocomplete } from "@material-ui/lab";
+import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -15,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "40vw",
+    width: "60vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -30,19 +33,28 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function RolesForm({ setPage, setOpenPopup, itemToEdit }) {
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
+function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
 
   const formRef = useRef();
+
   //Customize
   const [formData, updateFormData] = useState({
     title: itemToEdit ? itemToEdit.title : "",
+    permissions: itemToEdit ? itemToEdit.permissions : [],
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    formData.permissions = JSON.stringify(formData.permissions); //VI
+
+    console.log(formData.permissions);
+
     if (itemToEdit) {
       //Customize
       await axios
@@ -59,9 +71,10 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit }) {
           console.log(res.response.data.errors);
         });
     } else {
+      console.log(formData);
       //Customize
       await axios
-        .post("/permissions", formData, {
+        .post("/roles", formData, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -83,6 +96,13 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit }) {
     });
   };
 
+  const updateAutoComplete = (e, val) => {
+    // console.log(val);
+    updateFormData({
+      ...formData,
+      permissions: [...formData.permissions, val[val.length - 1].id],
+    });
+  };
 
   const handleReset = () => {
     updateFormData({
@@ -107,24 +127,42 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit }) {
             />
           </Grid>
 
-          {/* <Grid>
-          <Autocomplete
-        multiple
-        id="tags-standard"
-        options={top100Films}
-        getOptionLabel={(option) => option.title}
-        defaultValue={[top100Films[13]]}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="standard"
-            label="Multiple values"
-            placeholder="Favorites"
-          />
-        )}
-      />
-          </Grid> */}
-
+          <Grid item xs={12}>
+            <Autocomplete
+              required
+              multiple
+              // filterSelectedOptions
+              id="checkboxes-tags-demo"
+              options={permissionsList ? permissionsList : []}
+              // value={formData.permissions}
+              getOptionSelected={(option, value) => option.id === value.id}
+              // setSelectedItem={formData.permissions}
+              disableCloseOnSelect
+              getOptionLabel={(option) => option.title}
+              renderOption={(option, { selected }) => (
+                <React.Fragment>
+                  <Checkbox
+                    icon={icon}
+                    checkedIcon={checkedIcon}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option.title}
+                </React.Fragment>
+              )}
+              fullWidth
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Permissions"
+                  placeholder="Select permissions for this role"
+                  fullWidth
+                />
+              )}
+              onChange={updateAutoComplete}
+            />
+          </Grid>
         </Grid>
         <Grid container justify="center">
           <Button

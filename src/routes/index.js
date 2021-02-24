@@ -81,8 +81,10 @@ const Products = async(() =>
 const Vendors = async(() => import("../components/pages/Vendor/Vendors"));
 
 const ViewVendor = async(() => import("../components/pages/Vendor/ViewVendor"));
-// const ViewRoles = async(() => import("../components/pages/UserManagement/Roles/ViewRoles"));
-// const ViewUser = async(() => import("../components/pages/UserManagement/Users/ViewUsers"));
+const ViewPermission = async(() => import("../components/pages/UserManagement/Permissions/ViewPermission"));
+const ViewRole = async(() => import("../components/pages/UserManagement/Roles/ViewRole"));
+const ViewUser = async(() => import("../components/pages/UserManagement/Users/ViewUser"));
+const ViewLog = async(() => import("../components/pages/UserManagement/AuditLogs/ViewLog"));
 
 const ChangePassword = async(() =>
   import("../components/pages/ChangePassword/ChangePassword")
@@ -230,15 +232,28 @@ const viewVendor = {
   component: ViewVendor,
   children: null,
 };
-const viewRole = {
-  path: "/vendor/add/:id",
-  component: ViewVendor,
+const viewPermission = {
+  path: "/user-mgt/permissions/:id",
+  component: ViewPermission,
   children: null,
 };
 
-const viewUsers = {
-  path: "/vendor/add/:id",
-  component: ViewVendor,
+const viewRole = {
+  path: "/user-mgt/roles/:id",
+  component: ViewRole,
+  children: null,
+};
+
+const viewUser = {
+  path: "/user-mgt/users/:id",
+  component: ViewUser,
+  children: null,
+};
+
+
+const viewLog = {
+  path: "/user-mgt/logs/:id",
+  component: ViewLog,
   children: null,
 };
 
@@ -300,6 +315,10 @@ export const dashboardLayoutRoutes = [
   userManagementRoutes,
   productManagementRoutes,
   vendorRoutes,
+  viewPermission,
+  viewRole,
+  viewUser,
+  viewLog,
   viewVendor,
   changePasswordRoute,
 ];
