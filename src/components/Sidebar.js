@@ -312,8 +312,6 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
       const isOpen = route.open;
       const isHome = route.containsHome && pathName === "/";
 
-      console.log(route);
-
       _routes = Object.assign({}, _routes, {
         [index]: isActive || isOpen || isHome,
       });

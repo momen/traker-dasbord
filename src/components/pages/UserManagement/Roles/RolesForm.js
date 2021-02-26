@@ -28,8 +28,12 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
-  uploadInput: {
-    display: "none",
+  errorsContainer: {
+    marginBottom: theme.spacing(1),
+  },
+  errorMsg: {
+    color: "#ff0000",
+    fontWeight: "500",
   },
 }));
 
@@ -45,20 +49,38 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
   //Customize
   const [formData, updateFormData] = useState({
     title: itemToEdit ? itemToEdit.title : "",
-    permissions: itemToEdit ? itemToEdit.permissions : [],
+    permissions: itemToEdit
+      ? itemToEdit.permissions.map(({ id, title }) => ({ id, title }))
+      : [],
   });
+
+  const [autoSelectError, setAutoSelectError] = useState(false);
+  const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    formData.permissions = JSON.stringify(formData.permissions); //VI
+    if (formData.permissions.length === 0) {
+      setAutoSelectError(true);
+      return;
+    }
+
+    setAutoSelectError(false);
+
+    const data = {
+      title: formData.title,
+      permissions: formData.permissions,
+    };
+
+    data.permissions = data.permissions.map((permission) => permission.id);
+    data.permissions = JSON.stringify(data.permissions); //VI
 
     console.log(formData.permissions);
 
     if (itemToEdit) {
       //Customize
       await axios
-        .put(`/permissions/${itemToEdit.id}`, formData, {
+        .put(`/roles/${itemToEdit.id}`, data, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -67,14 +89,14 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
           // setPage(1);
           setOpenPopup(false);
         })
-        .catch((res) => {
-          console.log(res.response.data.errors);
+        .catch(({ response }) => {
+          setResponseErrors(response.data.errors);
         });
     } else {
       console.log(formData);
       //Customize
       await axios
-        .post("/roles", formData, {
+        .post("/roles", data, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -83,8 +105,8 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
           setPage(1);
           setOpenPopup(false);
         })
-        .catch((res) => {
-          console.log(res.response.data.errors);
+        .catch(({ response }) => {
+          setResponseErrors(response.data.errors);
         });
     }
   };
@@ -94,19 +116,22 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    setResponseErrors("");
   };
 
   const updateAutoComplete = (e, val) => {
     // console.log(val);
     updateFormData({
       ...formData,
-      permissions: [...formData.permissions, val[val.length - 1].id],
+      permissions: val,
     });
   };
 
+  //Customize
   const handleReset = () => {
     updateFormData({
-      title: "", //Customize
+      title: "", 
+      permissions: []
     });
   };
   return (
@@ -116,7 +141,6 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
           <Grid item xs={12}>
             <TextField
               name="title" //Customize
-              variant="outlined"
               required
               fullWidth
               id="title" //Customize
@@ -124,17 +148,27 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
               value={formData.title} //Customize
               autoFocus
               onChange={handleChange}
+              error={responseErrors?.title}
             />
           </Grid>
 
+          {responseErrors ? (
+            <Grid item xs={12}>
+              {responseErrors.title?.map((msg) => (
+                <span key={msg} className={classes.errorMsg}>
+                  {msg}
+                </span>
+              ))}
+            </Grid>
+          ) : null}
+
           <Grid item xs={12}>
             <Autocomplete
-              required
               multiple
               // filterSelectedOptions
               id="checkboxes-tags-demo"
               options={permissionsList ? permissionsList : []}
-              // value={formData.permissions}
+              value={formData.permissions}
               getOptionSelected={(option, value) => option.id === value.id}
               // setSelectedItem={formData.permissions}
               disableCloseOnSelect
@@ -155,14 +189,26 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                 <TextField
                   {...params}
                   variant="outlined"
-                  label="Permissions"
+                  label="Permissions *"
                   placeholder="Select permissions for this role"
                   fullWidth
+                  helperText="At least one permission must be selected."
+                  error={autoSelectError}
                 />
               )}
               onChange={updateAutoComplete}
             />
           </Grid>
+
+          {responseErrors ? (
+            <Grid item xs={12}>
+              {responseErrors.permissions?.map((msg) => (
+                <span key={msg} className={classes.errorMsg}>
+                  {msg}
+                </span>
+              ))}
+            </Grid>
+          ) : null}
         </Grid>
         <Grid container justify="center">
           <Button

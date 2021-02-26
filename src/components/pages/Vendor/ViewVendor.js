@@ -37,6 +37,19 @@ const useStyles = makeStyles({
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
     },
   },
+  attributeName: {
+    width: "15%",
+  },
+  rowContent: {
+    // display: "inline-block",
+    width: "100%",
+    // whiteSpace: "normal",
+    wordBreak: "break-word",
+  },
+  media: {
+    width: "25%",
+    objectFit: "contain",
+  },
 });
 
 const vendorTypes = {
@@ -94,7 +107,7 @@ function ViewVendor({ match }) {
               <StyledTableCell
                 component="th"
                 scope="row"
-                style={{ width: "20%" }}
+                className={classes.attributeName}
               >
                 ID
               </StyledTableCell>
@@ -111,14 +124,16 @@ function ViewVendor({ match }) {
                 Vendor
               </StyledTableCell>
               <StyledTableCell align="left">
-                {vendor.vendor_name}
+                <span className={classes.rowContent}>{vendor.vendor_name}</span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={vendor.email}>
               <StyledTableCell component="th" scope="row">
                 Email
               </StyledTableCell>
-              <StyledTableCell align="left">{vendor.email}</StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{vendor.email}</span>
+              </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={vendor.type}>
               <StyledTableCell component="th" scope="row">
@@ -136,6 +151,16 @@ function ViewVendor({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">
                 {vendor.userid?.name}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={user.userid_id}>
+              <StyledTableCell component="th" scope="row">
+                Logo
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {vendor.media?.map(({ image, file_name }) => (
+                  <img src={image} alt={file_name} className={classes.media} />
+                ))}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>

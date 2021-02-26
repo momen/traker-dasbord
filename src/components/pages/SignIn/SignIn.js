@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-// import { useDispatch } from "react-redux";
+import { useStateValue } from "../../../StateProvider";
 import { Redirect, useHistory } from "react-router-dom";
 import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
-// import { signIn } from "../../redux/actions/authActions";
 import axios from "../../../axios";
 
 import {
@@ -22,7 +21,6 @@ import {
 } from "@material-ui/core";
 import { spacing } from "@material-ui/system";
 import { Alert as MuiAlert } from "@material-ui/lab";
-import { useStateValue } from "../../../StateProvider";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
 
 const Alert = styled(MuiAlert)(spacing);
@@ -167,6 +165,7 @@ function SignIn() {
               onChange={handleChange}
               my={2}
               required
+              autoFocus
             />
             <TextField
               type={showPassword?"text":"password"}

@@ -40,8 +40,8 @@ const useStyles = makeStyles({
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
     },
   },
-  attributeName:{
-    width:"15%",
+  attributeName: {
+    width: "15%",
   },
   permissionBadge: {
     background: "#00b3b3",
@@ -55,32 +55,31 @@ const useStyles = makeStyles({
   },
 });
 
-function ViewRole({ match }) {
+function ViewCarMade({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [role, setRole] = useState(""); //Customize
+  const [carMade, setCarMade] = useState(""); //Customize
 
   //Customize
   useEffect(() => {
     axios
-      .get(`/roles/${match.params.id}`, {
+      .get(`/car-mades/${match.params.id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setRole(res.data.data);
+        setCarMade(res.data.data);
       });
   }, []);
-
 
   return (
     <Fragment>
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/user-mgt/roles")}
+        onClick={() => history.push("/product/car-made")}
         mb={3}
       >
         Back to list
@@ -88,7 +87,7 @@ function ViewRole({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={role.id}>
+            <StyledTableRow key={carMade.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
@@ -96,30 +95,28 @@ function ViewRole({ match }) {
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{role.id}</StyledTableCell>
+              <StyledTableCell align="left">{carMade.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={role.title}>
-              <StyledTableCell
-                component="th"
-                scope="row"
-              >
-                Title
+            <StyledTableRow key={carMade.car_made}>
+              <StyledTableCell component="th" scope="row">
+                Car Made
               </StyledTableCell>
-              <StyledTableCell align="left">{role.title}</StyledTableCell>
+              <StyledTableCell align="left">{carMade.car_made}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`${role.id} ${role.title}`}>
-              <StyledTableCell
-                component="th"
-                scope="row"
-              >
-                Permissions
+            <StyledTableRow key={`${carMade.id} ${carMade.catName}`}>
+              <StyledTableCell component="th" scope="row">
+                Category
               </StyledTableCell>
               <StyledTableCell align="left">
-                {role.permissions?.map((permission) => (
-                  <span key={permission.id} className={classes.permissionBadge}>
-                    {permission.title}
-                  </span>
-                ))}
+                {carMade.categoryid?.name}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`${carMade.id} ${carMade.created_at}`}>
+              <StyledTableCell component="th" scope="row">
+                Created At
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {carMade.created_at}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>
@@ -129,4 +126,4 @@ function ViewRole({ match }) {
   );
 }
 
-export default ViewRole;
+export default ViewCarMade;

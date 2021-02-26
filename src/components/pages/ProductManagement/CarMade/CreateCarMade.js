@@ -25,14 +25,16 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
+  errorsContainer: {
+    marginBottom: theme.spacing(1),
+  },
+  errorMsg: {
+    color: "#ff0000",
+    fontWeight: "500",
+  },
 }));
 
-function CreateCarMade({
-  setPage,
-  setOpenPopup,
-  itemToEdit,
-  categories,
-}) {
+function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
 
@@ -42,6 +44,7 @@ function CreateCarMade({
     categoryid_id: itemToEdit ? itemToEdit.categoryid_id : "",
   });
 
+  const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -57,8 +60,8 @@ function CreateCarMade({
           setPage(1);
           setOpenPopup(false);
         })
-        .catch((res) => {
-          console.log(res.response.data.errors);
+        .catch(({ response }) => {
+          setResponseErrors(response.data.errors);
         });
     } else {
       axios
@@ -71,8 +74,8 @@ function CreateCarMade({
           setPage(1);
           setOpenPopup(false);
         })
-        .catch((res) => {
-          console.log(res.response.data.errors);
+        .catch(({ response }) => {
+          setResponseErrors(response.data.errors);
         });
     }
   };
@@ -87,8 +90,9 @@ function CreateCarMade({
   const handleReset = () => {
     updateFormData({
       car_made: "",
-      categoryid_id: ""
-    })
+      categoryid_id: "",
+    });
+    setResponseErrors("");
   };
   return (
     <div className={classes.paper}>
@@ -97,7 +101,6 @@ function CreateCarMade({
           <Grid item xs={12}>
             <TextField
               name="car_made"
-              variant="outlined"
               required
               fullWidth
               id="car_made"
@@ -105,8 +108,18 @@ function CreateCarMade({
               value={formData.car_made}
               autoFocus
               onChange={handleChange}
+              error={responseErrors?.car_made}
             />
           </Grid>
+          {responseErrors ? (
+            <Grid item xs={12}>
+              {responseErrors.car_made?.map((msg) => (
+                <span key={msg} className={classes.errorMsg}>
+                  {msg}
+                </span>
+              ))}
+            </Grid>
+          ) : null}
 
           <Grid item xs={12}>
             <FormControl className={classes.formControl}>
@@ -124,6 +137,7 @@ function CreateCarMade({
                   helperText="Please select a Category"
                   fullWidth
                   required
+                  error={responseErrors?.categoryid_id}
                 >
                   <option aria-label="None" value="" />
                   {categories?.map((category) => (
@@ -133,6 +147,15 @@ function CreateCarMade({
               }
             </FormControl>
           </Grid>
+          {responseErrors ? (
+            <Grid item xs={12}>
+              {responseErrors.categoryid_id?.map((msg) => (
+                <span key={msg} className={classes.errorMsg}>
+                  {msg}
+                </span>
+              ))}
+            </Grid>
+          ) : null}
         </Grid>
         <Grid container justify="center">
           <Button

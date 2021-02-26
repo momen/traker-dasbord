@@ -1,5 +1,6 @@
 import React from "react";
 // import { useSelector } from "react-redux";
+import './App.css'
 import { Helmet } from "react-helmet";
 import DateFnsUtils from "@date-io/date-fns";
 

@@ -130,10 +130,10 @@ function Vendors() {
     {
       field: "images",
       headerName: "Logo",
-      width: 50,
+      width: 70,
       renderCell: (params) => {
         if (params.value) {
-          return <img src={params.value.image} alt="ph" />;
+          return <img src={params.value.image} alt="logo" style={{objectFit:"contain", width:50, borderRadius:"50%"}}/>;
         }
       },
     },
@@ -243,6 +243,9 @@ function Vendors() {
         },
       })
       .then((res) => {
+        if (Math.ceil(res.data.total / pageSize) < page) {
+          setPage(page - 1);
+        }
         setRowsCount(res.data.total);
         setRows(res.data.data);
         setLoading(false);
@@ -338,7 +341,6 @@ function Vendors() {
               display: "flex",
               justifyContent: "space-between",
               width: "100%",
-              backgroundColor: "#f8f8ff",
               borderRadius: "3px",
             }}
           >

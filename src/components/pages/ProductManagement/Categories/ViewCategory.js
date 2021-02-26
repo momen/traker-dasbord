@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
-import { Button, Grid, Typography } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -19,7 +19,6 @@ const StyledTableCell = withStyles((theme) => ({
   },
   body: {
     fontSize: 14,
-    maxWidth: 700,
   },
 }))(TableCell);
 
@@ -28,8 +27,6 @@ const StyledTableRow = withStyles((theme) => ({
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
-    whiteSpace: "normal",
-    wordWrap: "break-word",
   },
 }))(TableRow);
 
@@ -40,47 +37,47 @@ const useStyles = makeStyles({
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
     },
   },
-  attributeName:{
-    width:"15%",
+  attributeName: {
+    width: "20%",
   },
-  permissionBadge: {
-    background: "#00b3b3",
-    fontWeight: "bold",
-    borderRadius: "6px",
-    padding: "5px",
-    marginRight: "5px",
-    marginBottom: "5px",
-    userSelect: "none",
-    display: "inline-block",
+  rowContent: {
+    // display: "inline-block",
+    width: "100%",
+    // whiteSpace: "normal",
+    wordBreak: "break-word",
+  },
+
+  media: {
+    width: "25%",
+    objectFit: "contain",
   },
 });
 
-function ViewRole({ match }) {
+function ViewCategory({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [role, setRole] = useState(""); //Customize
+  const [category, setCategory] = useState(""); //Customize
 
   //Customize
   useEffect(() => {
     axios
-      .get(`/roles/${match.params.id}`, {
+      .get(`/product-categories/${match.params.id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setRole(res.data.data);
+        setCategory(res.data.data);
       });
   }, []);
-
 
   return (
     <Fragment>
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/user-mgt/roles")}
+        onClick={() => history.push("/product/categories")} //Customize
         mb={3}
       >
         Back to list
@@ -88,7 +85,7 @@ function ViewRole({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={role.id}>
+            <StyledTableRow key={category.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
@@ -96,30 +93,34 @@ function ViewRole({ match }) {
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{role.id}</StyledTableCell>
+              <StyledTableCell align="left">{category.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={role.title}>
-              <StyledTableCell
-                component="th"
-                scope="row"
-              >
-                Title
-              </StyledTableCell>
-              <StyledTableCell align="left">{role.title}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`${role.id} ${role.title}`}>
-              <StyledTableCell
-                component="th"
-                scope="row"
-              >
-                Permissions
+            <StyledTableRow key={category.name}>
+              <StyledTableCell component="th" scope="row">
+                Category Name
               </StyledTableCell>
               <StyledTableCell align="left">
-                {role.permissions?.map((permission) => (
-                  <span key={permission.id} className={classes.permissionBadge}>
-                    {permission.title}
-                  </span>
-                ))}
+                <span className={classes.rowContent}>{category.name}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={category.description}>
+              <StyledTableCell component="th" scope="row">
+                Description
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <p className={classes.rowContent}>{category.description}</p>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={user.userid_id}>
+              <StyledTableCell component="th" scope="row">
+                Photo
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <img
+                  className={`${classes.media} ${classes.rowContent}`}
+                  src={category.photo?.image}
+                  alt={category.photo?.file_name}
+                />
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>
@@ -129,4 +130,4 @@ function ViewRole({ match }) {
   );
 }
 
-export default ViewRole;
+export default ViewCategory;

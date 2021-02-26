@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
-import { NavLink } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import PropTypes from "prop-types";
 
@@ -102,6 +102,7 @@ function CustomLoadingOverlay() {
 function CarMade() {
   const classes = useStyles();
   const [{ user, userPermissions }] = useStateValue();
+  const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState("New Car Made");
@@ -144,13 +145,18 @@ function CarMade() {
               // padding: "5px"
             }}
           >
-            <Button
-              style={{ marginRight: "5px" }}
-              variant="contained"
-              onClick={() => setCarMade(carMade)}
-            >
-              View
-            </Button>
+            {userPermissions.includes("car_made_show") ? (
+              <Button
+                style={{ marginRight: "5px" }}
+                variant="contained"
+                onClick={() =>
+                  history.push(`/product/car-made/${params.row.id}`)
+                }
+              >
+                View
+              </Button>
+            ) : null}
+
             {userPermissions.includes("car_made_edit") ? (
               <Button
                 style={{ marginRight: "5px" }}
@@ -225,6 +231,9 @@ function CarMade() {
         },
       })
       .then((res) => {
+        if (Math.ceil(res.data.total / pageSize) < page) {
+          setPage(page - 1);
+        }
         setRowsCount(res.data.total);
         setRows(res.data.data);
         setLoading(false);
@@ -236,13 +245,14 @@ function CarMade() {
     pop-up is opened-*/
   useEffect(() => {
     axios
-      .get("/product-categories", {
+      .get("/categorieslist", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setCategories(res.data.data);
+        let _categories = res.data.data.map(({ id, name }) => ({ id, name }));
+        setCategories(_categories);
       });
   }, []);
 
@@ -315,7 +325,6 @@ function CarMade() {
               display: "flex",
               justifyContent: "space-between",
               width: "100%",
-              backgroundColor: "#f8f8ff",
               borderRadius: "6px",
             }}
           >
@@ -404,7 +413,7 @@ function CarMade() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Category? <br />
+            Are you sure you want to delete this Car Made? <br />
             If this was by accident please press Back
           </DialogContentText>
         </DialogContent>

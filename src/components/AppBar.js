@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled, { withTheme } from "styled-components/macro";
 import { darken } from "polished";
 import { Search as SearchIcon } from "react-feather";
@@ -10,6 +10,7 @@ import {
   AppBar as MuiAppBar,
   IconButton as MuiIconButton,
   Toolbar,
+  Switch,
 } from "@material-ui/core";
 
 import { Menu as MenuIcon } from "@material-ui/icons";
@@ -17,6 +18,7 @@ import { Menu as MenuIcon } from "@material-ui/icons";
 import NotificationsDropdown from "./NotificationsDropdown";
 import MessagesDropdown from "./MessagesDropdown";
 import LanguagesDropdown from "./LanguagesDropdown";
+import { useStateValue } from "../StateProvider";
 // import UserDropdown from "./UserDropdown";
 
 const AppBar = styled(MuiAppBar)`
@@ -72,41 +74,70 @@ const Input = styled(InputBase)`
   }
 `;
 
-const AppBarComponent = ({ onDrawerToggle }) => (
-  <React.Fragment>
-    <AppBar position="sticky" elevation={0}>
-      <Toolbar>
-        <Grid container alignItems="center">
-          <Hidden mdUp>
+const AppBarComponent = ({ onDrawerToggle }) => {
+  const [{ theme }, dispatch] = useStateValue();
+  const [currentTheme, setCurrentTheme] = useState({
+    darkTheme: true,
+  });
+
+  const handleChange = (event) => {
+    setCurrentTheme({
+      ...currentTheme,
+      [event.target.name]: event.target.checked,
+    });
+    // console.log(event.target.checked);
+    dispatch({
+      type: "CHANGE_THEME",
+      theme: event.target.checked ? "dark" : "default",
+    });
+  };
+  return (
+    <React.Fragment>
+      <AppBar position="sticky" elevation={0}>
+        <Toolbar>
+          <Grid container alignItems="center">
+            <Hidden mdUp>
+              <Grid item>
+                <IconButton
+                  color="inherit"
+                  aria-label="Open drawer"
+                  onClick={onDrawerToggle}
+                >
+                  <MenuIcon />
+                </IconButton>
+              </Grid>
+            </Hidden>
             <Grid item>
-              <IconButton
-                color="inherit"
-                aria-label="Open drawer"
-                onClick={onDrawerToggle}
-              >
-                <MenuIcon />
-              </IconButton>
+              <Search>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <Input placeholder="Search topics" />
+              </Search>
             </Grid>
-          </Hidden>
-          <Grid item>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <Input placeholder="Search topics" />
-            </Search>
+            <Grid item xs />
+            <Grid item>
+              {currentTheme.darkTheme ? (
+                <span>Dark Theme</span>
+              ) : (
+                <span>Light Theme</span>
+              )}
+              <Switch
+                checked={currentTheme.darkTheme}
+                onChange={handleChange}
+                name="darkTheme"
+                inputProps={{ "aria-label": "secondary checkbox" }}
+              />
+              <MessagesDropdown />
+              <NotificationsDropdown />
+              <LanguagesDropdown />
+              {/* <UserDropdown /> */}
+            </Grid>
           </Grid>
-          <Grid item xs />
-          <Grid item>
-            <MessagesDropdown />
-            <NotificationsDropdown />
-            <LanguagesDropdown />
-            {/* <UserDropdown /> */}
-          </Grid>
-        </Grid>
-      </Toolbar>
-    </AppBar>
-  </React.Fragment>
-);
+        </Toolbar>
+      </AppBar>
+    </React.Fragment>
+  );
+};
 
 export default withTheme(AppBarComponent);

@@ -31,6 +31,7 @@ import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
 import AddPermission from "./AddPermission";
 import { Pagination } from "@material-ui/lab";
+import { useHistory } from "react-router-dom";
 
 const Card = styled(MuiCard)(spacing);
 const CardContent = styled(MuiCardContent)(spacing);
@@ -94,6 +95,7 @@ function CustomLoadingOverlay() {
 function Permissions() {
   const classes = useStyles();
   const [{ user, userPermissions }] = useStateValue();
+  const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState("New Permission");
@@ -128,7 +130,7 @@ function Permissions() {
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
-                onClick={() => setSelectedItem(params.row)}
+                onClick={() => history.push(`/user-mgt/permissions/${params.row.id}`)}
               >
                 View
               </Button>
@@ -194,6 +196,9 @@ function Permissions() {
         },
       })
       .then((res) => {
+        if((Math.ceil(res.data.total/pageSize) < page)){
+          setPage(page-1);
+        }
         setRowsCount(res.data.total);
         setRows(res.data.data);
         setLoading(false);

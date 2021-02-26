@@ -5,7 +5,7 @@ export const initialState = {
   CSRF: null,
   user: null,
   userPermissions: null,
-  theme: THEMES.DEFAULT,
+  theme: THEMES.DARK,
 };
 
 //The function that manipulates & returns state according to the action specified.
@@ -21,7 +21,15 @@ const reducer = (state, action) => {
       return {
         ...state,
         user: action.user,
-        userPermissions: action.user.roles[0].permissions.map(permission => permission.title),
+        userPermissions: action.user.roles[0].permissions.map(
+          (permission) => permission.title
+        ),
+      };
+
+    case "CHANGE_THEME":
+      return {
+        ...state,
+        theme: action.theme === "dark"? THEMES.DARK: THEMES.DEFAULT,
       };
 
     case "LOGOUT":

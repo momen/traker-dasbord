@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
-import { NavLink } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import PropTypes from "prop-types";
 
@@ -39,6 +39,7 @@ import { useStateValue } from "../../../../StateProvider";
 import CategoriesForm from "./CategoriesForm";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
+import { withStyles } from "@material-ui/styles";
 
 const Card = styled(MuiCard)(spacing);
 const CardContent = styled(MuiCardContent)(spacing);
@@ -46,7 +47,7 @@ const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
@@ -57,7 +58,13 @@ const useStyles = makeStyles({
       background: "#388e3c",
     },
   },
-});
+  toolBar: {
+    display: "flex",
+    justifyContent: "space-between",
+    width: "100%",
+    borderRadius: "6px",
+  },
+}));
 
 function CustomPagination(props) {
   const { state, api } = props;
@@ -102,6 +109,7 @@ function CustomLoadingOverlay() {
 function Categories() {
   const classes = useStyles();
   const [{ user, userPermissions }] = useStateValue();
+  const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState("New Category");
@@ -117,24 +125,29 @@ function Categories() {
   const [itemToDelete, setItemToDelete] = useState("");
 
   const columns = [
-    { field: "id", headerName: "ID", width: 50 },
-    { field: "name", headerName: "Name", width: 200, flex: 1 },
+    { field: "id", headerName: "ID", width: 60 },
+    { field: "name", headerName: "Name", width: 150 },
     { field: "description", headerName: "Description", width: 200, flex: 1 },
     {
       field: "photo",
       headerName: "Photo",
-      width: 200,
-      flex: 1,
+      width: 100,
       renderCell: (params) => {
         if (params.value) {
-          return <img src={params.value.image} alt="ph" />;
+          return (
+            <img
+              src={params.value.image}
+              alt="ph"
+              style={{ objectFit: "contain", width: 50 }}
+            />
+          );
         }
       },
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 250,
+      width: 220,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -152,7 +165,10 @@ function Categories() {
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
-                onClick={() => setCarMade(carMade)}
+                size="small"
+                onClick={() =>
+                  history.push(`/product/categories/${params.row.id}`)
+                }
               >
                 View
               </Button>
@@ -162,6 +178,7 @@ function Categories() {
                 style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
+                size="small"
                 onClick={() => {
                   setCarMade(params.row);
                   setOpenPopup(true);
@@ -176,6 +193,7 @@ function Categories() {
               <Button
                 color="secondary"
                 variant="contained"
+                size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
@@ -232,6 +250,9 @@ function Categories() {
         },
       })
       .then((res) => {
+        if (Math.ceil(res.data.total / pageSize) < page) {
+          setPage(page - 1);
+        }
         setRowsCount(res.data.total);
         setRows(res.data.data);
         setLoading(false);
@@ -304,15 +325,7 @@ function Categories() {
 
       <Card mb={6}>
         <Paper mb={2}>
-          <Toolbar
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              backgroundColor: "#f8f8ff",
-              borderRadius: "6px",
-            }}
-          >
+          <Toolbar className={classes.toolBar}>
             <FormControl variant="outlined">
               <Select
                 value={pageSize}

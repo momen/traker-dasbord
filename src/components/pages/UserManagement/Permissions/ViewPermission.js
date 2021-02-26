@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
-import { Button } from "@material-ui/core";
+import { Button, Grid, Typography } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -19,6 +19,7 @@ const StyledTableCell = withStyles((theme) => ({
   },
   body: {
     fontSize: 14,
+    maxWidth: 700,
   },
 }))(TableCell);
 
@@ -27,6 +28,8 @@ const StyledTableRow = withStyles((theme) => ({
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
+    whiteSpace: "normal",
+    wordWrap: "break-word",
   },
 }))(TableRow);
 
@@ -37,52 +40,48 @@ const useStyles = makeStyles({
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
     },
   },
+  attributeName:{
+    width:"15%",
+  },
+  permissionBadge: {
+    background: "#00b3b3",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    marginBottom: "5px",
+    userSelect: "none",
+    display: "inline-block",
+  },
 });
 
-const vendorTypes = {
-  1: "Vendor",
-  2: "Hot Sale",
-  3: "Both",
-};
 
-function ViewVendor({ match }) {
+function ViewPermission({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [vendor, setVendor] = useState("");
-  const [vendorTypes, setVendorTypes] = useState("");
+  const [permission, setPermission] = useState(""); //Customize
 
+  //Customize
   useEffect(() => {
     axios
-      .get(`/add-vendors/${match.params.id}`, {
+      .get(`/permissions/${match.params.id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setVendor(res.data.data);
-      });
-
-    axios
-      .get(`/add-vendors/get/types`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        setVendorTypes(res.data.data);
+        setPermission(res.data.data);
       });
   }, []);
 
-  const uppercaseWords = (str) =>
-    str.replace(/^(.)|\s+(.)/g, (c) => c.toUpperCase());
 
   return (
     <Fragment>
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/vendor/add")}
+        onClick={() => history.push("/user-mgt/permissions")}
         mb={3}
       >
         Back to list
@@ -90,52 +89,34 @@ function ViewVendor({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={vendor.id}>
+            <StyledTableRow key={permission.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
-                style={{ width: "20%" }}
+                className={classes.attributeName}
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{vendor.id}</StyledTableCell>
+              <StyledTableCell align="left">{permission.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.serial}>
-              <StyledTableCell component="th" scope="row">
-                Serial
+            <StyledTableRow key={permission.title}>
+              <StyledTableCell
+                component="th"
+                scope="row"
+              >
+                Permission Title
               </StyledTableCell>
-              <StyledTableCell align="left">{vendor.serial}</StyledTableCell>
+              <StyledTableCell align="left">{permission.title}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.vendor_name}>
-              <StyledTableCell component="th" scope="row">
-                Vendor
+            <StyledTableRow key={`${permission.id}`}>
+              <StyledTableCell
+                component="th"
+                scope="row"
+              >
+                Created At
               </StyledTableCell>
               <StyledTableCell align="left">
-                {vendor.vendor_name}
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.email}>
-              <StyledTableCell component="th" scope="row">
-                Email
-              </StyledTableCell>
-              <StyledTableCell align="left">{vendor.email}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.type}>
-              <StyledTableCell component="th" scope="row">
-                Type
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {vendor.type && vendorTypes
-                  ? uppercaseWords(vendorTypes[vendor.type])
-                  : null}
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.userid?.name}>
-              <StyledTableCell component="th" scope="row">
-                Username
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {vendor.userid?.name}
+                {permission.created_at}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>
@@ -145,4 +126,4 @@ function ViewVendor({ match }) {
   );
 }
 
-export default ViewVendor;
+export default ViewPermission;

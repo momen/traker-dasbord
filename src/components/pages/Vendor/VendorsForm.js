@@ -59,7 +59,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
     email: itemToEdit ? itemToEdit.email : "",
     type: itemToEdit ? itemToEdit.type : "",
     userid_id: itemToEdit ? itemToEdit.userid_id : "",
-    images: [],
+    images: "",
   });
   const [openAlert, setOpenAlert] = useState(false);
   const [imgName, setImgName] = useState("");
@@ -69,7 +69,6 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // alert("هخه");
     if (!formData.images && !itemToEdit) {
       setOpenAlert(true);
     } else {
@@ -79,6 +78,10 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
       data.append("type", formData.type);
       data.append("userid_id", formData.userid_id);
 
+      data.append("images", formData.images);
+      // formData.images.map(image => {
+      // })
+
       // if (formData.serial) {
       //   data.append("serial", formData.serial);
       // }
@@ -86,10 +89,10 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
       console.log(data);
       if (itemToEdit) {
         await axios
-          .put(`/add-vendors/${itemToEdit.id}`, formData, {
+          .post(`/add-vendors/${itemToEdit.id}`, data, {
             headers: {
               Authorization: `Bearer ${user.token}`,
-              // "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
+              "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })
           .then((res) => {
@@ -97,13 +100,12 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
           })
           .catch((res) => {
             setResponseErrors(res.response.data.errors);
-            console.log(res.response.data.errors);
           });
       } else {
         // console.log("------------------------------");
         // console.log(data);
         // console.log("------------------------------");
-        data.append("images", formData.images);
+        // data.append("images", formData.images);
 
         // data.append("images", formData.images[0].name, formData.images);
         console.log(formData.images);
@@ -121,7 +123,6 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
           })
           .catch((res) => {
             setResponseErrors(res.response.data.errors);
-            console.log(res.response.data.errors);
           });
       }
     }
@@ -140,15 +141,23 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
     console.log(e.target.files[0]);
     updateFormData({
       ...formData,
-      images: [...formData.images, e.target.files[0]]
+      images: e.target.files[0],
     });
+    setOpenAlert(false);
   };
 
+  //Customize
   const handleReset = () => {
     updateFormData({
-      name: "",
-      description: "",
+      vendor_name: "",
+      email: "",
+      type:"",
+      userid_id:"",
+      images:"",
     });
+    setResponseErrors("");
+    setImgName("");
+    setOpenAlert(false);
   };
   return (
     <div className={classes.paper}>
@@ -157,7 +166,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
           <Grid item xs={12}>
             <TextField
               name="vendor_name"
-              variant="outlined"
+              // variant="outlined"
               required
               fullWidth
               id="vendor_name"
@@ -165,6 +174,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
               value={formData.vendor_name}
               autoFocus
               onChange={handleChange}
+              error={responseErrors?.vendor_name}
             />
           </Grid>
 
@@ -182,12 +192,13 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
             <TextField
               name="email"
               label="Email"
-              variant="outlined"
+              // variant="outlined"
               type="email"
               required
               value={formData.email}
               fullWidth
               onChange={handleChange}
+              error={responseErrors?.email}
             />
           </Grid>
 
@@ -253,6 +264,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
                   helperText="Please select a User"
                   fullWidth
                   required
+                  error={responseErrors?.userid_id}
                 >
                   <option aria-label="None" value="" />
 
@@ -278,6 +290,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
 
           <FormControl className={classes.formControl}>
             <Grid item xs={12}>
+              <div style={{display:'flex'}}>
               <div>
                 <input
                   accept="image/*"
@@ -297,18 +310,31 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
                 >
                   Upload
                 </Button>
-
-                <span>{imgName}</span>
               </label>
+              <span
+                style={{
+                  alignSelf: "center",
+                  // width: "350px",
+                  // display: "block",
+                  // overflow: "hidden",
+                  // whiteSpace: "noWarp",
+                  // lineHeight: 1,
+                  // textOverflow: "ellipsis",
+                  // textDecoration: "none",
+                }}
+              >
+                {imgName}
+              </span>
+              </div>
             </Grid>
           </FormControl>
 
           {responseErrors ? (
             <Grid item xs={12}>
               {responseErrors.images?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
+                <p key={msg} className={classes.errorMsg}>
                   {msg}
-                </span>
+                </p>
               ))}
             </Grid>
           ) : null}

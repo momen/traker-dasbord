@@ -224,15 +224,18 @@ function Roles() {
         },
       })
       .then((res) => {
+        if (Math.ceil(res.data.total / pageSize) < page) {
+          setPage(page - 1);
+        }
         setRowsCount(res.data.total);
         setRows(res.data.data);
         setLoading(false);
       });
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     axios
-      .get('/permissionslist', {
+      .get("/permissionslist", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -240,7 +243,7 @@ function Roles() {
       .then((res) => {
         setPermissionsList(res.data.data);
       });
-  },[])
+  }, []);
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {

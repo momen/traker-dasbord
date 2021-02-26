@@ -222,8 +222,12 @@ function AuditLogs() {
         },
       })
       .then((res) => {
+        if((Math.ceil(res.data.total/pageSize) < page)){
+          setPage(page-1);
+        }
         setRowsCount(res.data.total);
         setRows(res.data.data);
+        setLoading(false);
       });
       setLoading(false);
   };

@@ -27,6 +27,8 @@ const StyledTableRow = withStyles((theme) => ({
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
+    whiteSpace: "normal",
+    wordWrap: "break-word",
   },
 }))(TableRow);
 
@@ -37,52 +39,46 @@ const useStyles = makeStyles({
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
     },
   },
+  attributeName:{
+    width:"15%",
+  },
+  roleBadge: {
+    background: "#FFBF00",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    marginBottom: "5px",
+    userSelect: "none",
+    display: "inline-block",
+  },
 });
 
-const vendorTypes = {
-  1: "Vendor",
-  2: "Hot Sale",
-  3: "Both",
-};
-
-function ViewVendor({ match }) {
+function ViewUser({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [vendor, setVendor] = useState("");
-  const [vendorTypes, setVendorTypes] = useState("");
+  const [singleUser, setSingleUser] = useState("");  //Customize
 
+  //Customize
   useEffect(() => {
     axios
-      .get(`/add-vendors/${match.params.id}`, {
+      .get(`/users/${match.params.id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setVendor(res.data.data);
-      });
-
-    axios
-      .get(`/add-vendors/get/types`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        setVendorTypes(res.data.data);
+        setSingleUser(res.data.data);
       });
   }, []);
-
-  const uppercaseWords = (str) =>
-    str.replace(/^(.)|\s+(.)/g, (c) => c.toUpperCase());
 
   return (
     <Fragment>
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/vendor/add")}
+        onClick={() => history.push("/user-mgt/users")} //Customize
         mb={3}
       >
         Back to list
@@ -90,52 +86,56 @@ function ViewVendor({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={vendor.id}>
+            <StyledTableRow key={singleUser.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
-                style={{ width: "20%" }}
+                className={classes.attributeName}
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{vendor.id}</StyledTableCell>
+              <StyledTableCell align="left">{singleUser.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.serial}>
-              <StyledTableCell component="th" scope="row">
-                Serial
-              </StyledTableCell>
-              <StyledTableCell align="left">{vendor.serial}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.vendor_name}>
-              <StyledTableCell component="th" scope="row">
-                Vendor
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {vendor.vendor_name}
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.email}>
-              <StyledTableCell component="th" scope="row">
-                Email
-              </StyledTableCell>
-              <StyledTableCell align="left">{vendor.email}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.type}>
-              <StyledTableCell component="th" scope="row">
-                Type
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {vendor.type && vendorTypes
-                  ? uppercaseWords(vendorTypes[vendor.type])
-                  : null}
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.userid?.name}>
-              <StyledTableCell component="th" scope="row">
+            <StyledTableRow key={singleUser.name}>
+              <StyledTableCell
+                component="th"
+                scope="row"
+              >
                 Username
               </StyledTableCell>
+              <StyledTableCell align="left">{singleUser.name}</StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={singleUser.email}>
+              <StyledTableCell
+                component="th"
+                scope="row"
+              >
+                Email
+              </StyledTableCell>
+              <StyledTableCell align="left">{singleUser.email}</StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={singleUser.email_verified_at}>
+              <StyledTableCell
+                component="th"
+                scope="row"
+              >
+                Email Verified At
+              </StyledTableCell>
+              <StyledTableCell align="left">{singleUser.email_verified_at}</StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`${singleUser.id} ${singleUser.title}`}>
+              <StyledTableCell
+                component="th"
+                scope="row"
+              >
+                Roles
+              </StyledTableCell>
               <StyledTableCell align="left">
-                {vendor.userid?.name}
+                {singleUser.roles?.map((role) => (
+                  <span key={role.id} className={classes.roleBadge}>
+                    {role.title}
+                  </span>
+                ))}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>
@@ -145,4 +145,4 @@ function ViewVendor({ match }) {
   );
 }
 
-export default ViewVendor;
+export default ViewUser;

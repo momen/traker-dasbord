@@ -80,11 +80,15 @@ const Products = async(() =>
 
 const Vendors = async(() => import("../components/pages/Vendor/Vendors"));
 
-const ViewVendor = async(() => import("../components/pages/Vendor/ViewVendor"));
 const ViewPermission = async(() => import("../components/pages/UserManagement/Permissions/ViewPermission"));
 const ViewRole = async(() => import("../components/pages/UserManagement/Roles/ViewRole"));
 const ViewUser = async(() => import("../components/pages/UserManagement/Users/ViewUser"));
 const ViewLog = async(() => import("../components/pages/UserManagement/AuditLogs/ViewLog"));
+
+const ViewCategory = async(() => import("../components/pages/ProductManagement/Categories/ViewCategory"));
+const ViewCarMade = async(() => import("../components/pages/ProductManagement/CarMade/ViewCarMade"));
+
+const ViewVendor = async(() => import("../components/pages/Vendor/ViewVendor"));
 
 const ChangePassword = async(() =>
   import("../components/pages/ChangePassword/ChangePassword")
@@ -161,6 +165,31 @@ const userManagementRoutes = {
   ],
 };
 
+const viewPermission = {
+  path: "/user-mgt/permissions/:id",
+  component: ViewPermission,
+  children: null,
+};
+
+const viewRole = {
+  path: "/user-mgt/roles/:id",
+  component: ViewRole,
+  children: null,
+};
+
+const viewUser = {
+  path: "/user-mgt/users/:id",
+  component: ViewUser,
+  children: null,
+};
+
+
+const viewLog = {
+  path: "/user-mgt/logs/:id",
+  component: ViewLog,
+  children: null,
+};
+
 const productManagementRoutes = {
   id: "Product Management",
   path: "/product",
@@ -212,6 +241,18 @@ const productManagementRoutes = {
   ],
 };
 
+const viewCategory = {
+  path: "/product/categories/:id",
+  component: ViewCategory,
+  children: null,
+};
+const viewCarMade = {
+  path: "/product/car-made/:id",
+  component: ViewCarMade,
+  children: null,
+};
+
+
 const vendorRoutes = {
   id: "Vendor",
   path: "/vendor",
@@ -230,30 +271,6 @@ const vendorRoutes = {
 const viewVendor = {
   path: "/vendor/add/:id",
   component: ViewVendor,
-  children: null,
-};
-const viewPermission = {
-  path: "/user-mgt/permissions/:id",
-  component: ViewPermission,
-  children: null,
-};
-
-const viewRole = {
-  path: "/user-mgt/roles/:id",
-  component: ViewRole,
-  children: null,
-};
-
-const viewUser = {
-  path: "/user-mgt/users/:id",
-  component: ViewUser,
-  children: null,
-};
-
-
-const viewLog = {
-  path: "/user-mgt/logs/:id",
-  component: ViewLog,
   children: null,
 };
 
@@ -319,6 +336,8 @@ export const dashboardLayoutRoutes = [
   viewRole,
   viewUser,
   viewLog,
+  viewCategory,
+  viewCarMade,
   viewVendor,
   changePasswordRoute,
 ];
