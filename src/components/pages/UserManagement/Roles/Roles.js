@@ -214,7 +214,7 @@ function Roles() {
         },
       })
       .then((res) => {
-        // setCategories(res.data.data);
+        setOpenDeleteDialog(false);
       });
 
     await axios
@@ -366,7 +366,6 @@ function Roles() {
         <DialogActions>
           <Button
             onClick={() => {
-              setOpenDeleteDialog(false);
               DeleteItem();
             }}
             color="secondary"

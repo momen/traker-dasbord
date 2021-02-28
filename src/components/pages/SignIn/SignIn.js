@@ -108,7 +108,6 @@ function SignIn() {
                 },
               })
               .then(async (res) => {
-                console.log(res.data.data);
                 await dispatch({
                   type: "LOGIN",
                   user: res.data.data,
@@ -122,7 +121,7 @@ function SignIn() {
                   : "Something went wrong";
 
                 setStatus({ success: false });
-                setErrors({ submit: res.response.data.errors });
+                setErrors({ submit: message });
                 setSubmitting(false);
               });
           } catch (error) {

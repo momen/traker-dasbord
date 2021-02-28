@@ -108,7 +108,7 @@ function Vendors() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [carMade, setCarMade] = useState(""); /****** Customize ******/
+  const [vendor, setVendor] = useState(""); /****** Customize ******/
   const [itemAddedOrEdited, setItemAddedOrEdited] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
@@ -171,7 +171,7 @@ function Vendors() {
                 variant="contained"
                 size="small"
                 onClick={() => {
-                  setCarMade(params.row);
+                  setVendor(params.row);
                   setOpenPopup(true);
                   setOpenPopupTitle(
                     "Update Vendor Details"
@@ -233,7 +233,7 @@ function Vendors() {
         },
       })
       .then((res) => {
-        // alert("Deleted")
+        setOpenDeleteDialog(false);
       });
 
     await axios
@@ -327,7 +327,7 @@ function Vendors() {
           onClick={() => {
             setOpenPopupTitle("New Vendor");
             setOpenPopup(true);
-            setCarMade("");
+            setVendor("");
           }}
         >
           Add Vendor
@@ -415,7 +415,7 @@ function Vendors() {
         <VendorsForm
           setPage={setPage}
           setOpenPopup={setOpenPopup}
-          itemToEdit={carMade}
+          itemToEdit={vendor}
           users={users}
         />
       </Popup>
@@ -437,7 +437,6 @@ function Vendors() {
         <DialogActions>
           <Button
             onClick={() => {
-              setOpenDeleteDialog(false);
               DeleteCategory();
             }}
             color="secondary"

@@ -43,16 +43,6 @@ const useStyles = makeStyles({
   attributeName: {
     width: "15%",
   },
-  permissionBadge: {
-    background: "#00b3b3",
-    fontWeight: "bold",
-    borderRadius: "6px",
-    padding: "5px",
-    marginRight: "5px",
-    marginBottom: "5px",
-    userSelect: "none",
-    display: "inline-block",
-  },
 });
 
 function ViewCarMade({ match }) {
@@ -103,7 +93,7 @@ function ViewCarMade({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">{carMade.car_made}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`${carMade.id} ${carMade.catName}`}>
+            <StyledTableRow key={`carMade-${carMade.catName}`}>
               <StyledTableCell component="th" scope="row">
                 Category
               </StyledTableCell>

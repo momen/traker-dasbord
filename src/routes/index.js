@@ -16,11 +16,14 @@ import {
 } from "react-feather";
 import {
   BusinessCenter,
+  Category,
   Dashboard,
   Group,
   GroupAdd,
   GroupWork,
   LockOpen,
+  NewReleases,
+  Store,
   TimeToLeave,
   VpnKey,
   VpnLock,
@@ -87,40 +90,16 @@ const ViewLog = async(() => import("../components/pages/UserManagement/AuditLogs
 
 const ViewCategory = async(() => import("../components/pages/ProductManagement/Categories/ViewCategory"));
 const ViewCarMade = async(() => import("../components/pages/ProductManagement/CarMade/ViewCarMade"));
+const ViewCarModel = async(() => import("../components/pages/ProductManagement/CarModel/ViewCarModel"));
+const ViewPartCategory = async(() => import("../components/pages/ProductManagement/PartCategory/ViewPartCategory"));
+const ViewCarYear = async(() => import("../components/pages/ProductManagement/CarYear/ViewCarYear"));
+const ViewProductTag = async(() => import("../components/pages/ProductManagement/Tags/ViewTag"));
 
 const ViewVendor = async(() => import("../components/pages/Vendor/ViewVendor"));
 
 const ChangePassword = async(() =>
   import("../components/pages/ChangePassword/ChangePassword")
 );
-// Protected routes
-// const ProtectedPage = async(() => import("../pages/protected/ProtectedPage"));
-
-// const dashboardsRoutes = {
-//   id: "Dashboard",
-//   path: "/dashboard",
-//   header: "Pages",
-//   icon: <Sliders />,
-//   containsHome: true,
-//   children: [
-//     {
-//       path: "/dashboard/default",
-//       name: "Default",
-//       component: Default,
-//     },
-//     {
-//       path: "/dashboard/analytics",
-//       name: "Analytics",
-//       component: Analytics,
-//     },
-//     {
-//       path: "/dashboard/saas",
-//       name: "SaaS",
-//       component: SaaS,
-//     },
-//   ],
-//   component: null,
-// };
 
 const dashboardRoutes = {
   id: "Dashborad",
@@ -212,13 +191,13 @@ const productManagementRoutes = {
       path: "/product/car-model",
       name: "Car Model",
       component: CarModel,
-      icon: <LockOpen />,
+      icon: <NewReleases />,
     },
     {
       path: "/product/part-category",
       name: "Part Category",
       component: PartCategory,
-      icon: <LockOpen />,
+      icon: <Category/>,
     },
     {
       path: "/product/car-year",
@@ -236,7 +215,7 @@ const productManagementRoutes = {
       path: "/product/products",
       name: "Products",
       component: Products,
-      icon: <LockOpen />,
+      icon: <Store />,
     },
   ],
 };
@@ -249,6 +228,26 @@ const viewCategory = {
 const viewCarMade = {
   path: "/product/car-made/:id",
   component: ViewCarMade,
+  children: null,
+};
+const viewCarModel = {
+  path: "/product/car-model/:id",
+  component: ViewCarModel,
+  children: null,
+};
+const viewPartCategory = {
+  path: "/product/part-category/:id",
+  component: ViewPartCategory,
+  children: null,
+};
+const viewCarYear = {
+  path: "/product/car-year/:id",
+  component: ViewCarYear,
+  children: null,
+};
+const viewProductTag = {
+  path: "/product/tags/:id",
+  component: ViewProductTag,
   children: null,
 };
 
@@ -307,21 +306,6 @@ const authRoutes = {
     //   name: "Sign Up",
     //   component: SignUp,
     // },
-    // {
-    //   path: "/auth/reset-password",
-    //   name: "Reset Password",
-    //   component: ResetPassword,
-    // },
-    // {
-    //   path: "/auth/404",
-    //   name: "404 Page",
-    //   component: Page404,
-    // },
-    // {
-    //   path: "/auth/500",
-    //   name: "500 Page",
-    //   component: Page500,
-    // },
   ],
   component: null,
 };
@@ -338,6 +322,10 @@ export const dashboardLayoutRoutes = [
   viewLog,
   viewCategory,
   viewCarMade,
+  viewCarModel,
+  viewPartCategory,
+  viewCarYear,
+  viewProductTag,
   viewVendor,
   changePasswordRoute,
 ];

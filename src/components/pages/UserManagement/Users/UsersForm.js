@@ -99,8 +99,8 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
       //Customize
       data = {
         ...data,
-        password: formData.password
-      }
+        password: formData.password,
+      };
       await axios
         .post("/users", data, {
           headers: {
@@ -125,6 +125,9 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
   };
 
   const updateAutoComplete = (e, val) => {
+    setAutoSelectError(false);
+    console.log("here!");
+
     updateFormData({
       ...formData,
       roles: val,
@@ -134,10 +137,10 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
   //Customize
   const handleReset = () => {
     updateFormData({
-      name: "", 
-      password:"",
-      email:"",
-      roles:[]
+      name: "",
+      password: "",
+      email: "",
+      roles: [],
     });
     setResponseErrors("");
   };
@@ -181,7 +184,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
               <Grid item xs={12}>
                 <TextField
                   name="password" //Customize
-                  type={showPassword?"text":"password"}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   required
                   fullWidth
@@ -218,17 +221,18 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
           ) : null}
 
           <Grid item xs={12}>
-            <TextField
-              name="email" //Customize
-              autoComplete="new-password"
-              required
-              fullWidth
-              id="email" //Customize
-              label="Email" //Customize
-              value={formData.email} //Customize
-              onChange={handleChange}
-              error={responseErrors?.email}
-            />
+              <TextField
+                name="email" //Customize
+                type="email"
+                // autoComplete="new-password"
+                required
+                fullWidth
+                id="email" //Customize
+                label="Email" //Customize
+                value={formData.email} //Customize
+                onChange={handleChange}
+                error={responseErrors?.email}
+              />
           </Grid>
           {responseErrors ? (
             <Grid item xs={12}>

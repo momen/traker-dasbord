@@ -221,7 +221,7 @@ function CarMade() {
         },
       })
       .then((res) => {
-        setCategories(res.data.data);
+        setOpenDeleteDialog(false);
       });
 
     await axios
@@ -420,7 +420,6 @@ function CarMade() {
         <DialogActions>
           <Button
             onClick={() => {
-              setOpenDeleteDialog(false);
               DeleteCarMade();
             }}
             color="secondary"

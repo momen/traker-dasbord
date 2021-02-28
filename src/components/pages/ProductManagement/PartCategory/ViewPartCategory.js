@@ -53,22 +53,22 @@ const useStyles = makeStyles({
   },
 });
 
-function ViewCategory({ match }) {
+function ViewPartCategory({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [category, setCategory] = useState(""); //Customize
+  const [partCategory, setPartCategory] = useState(""); //Customize
 
   //Customize
   useEffect(() => {
     axios
-      .get(`/product-categories/${match.params.id}`, {
+      .get(`/part-categories/${match.params.id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setCategory(res.data.data);
+        setPartCategory(res.data.data);
       });
   }, []);
 
@@ -77,7 +77,7 @@ function ViewCategory({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/product/categories")} //Customize
+        onClick={() => history.push("/product/part-category")} //Customize
         mb={3}
       >
         Back to list
@@ -85,7 +85,7 @@ function ViewCategory({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={`cat ${category.id}`}>
+            <StyledTableRow key={`cat ${partCategory.id}`}>
               <StyledTableCell
                 component="th"
                 scope="row"
@@ -93,33 +93,25 @@ function ViewCategory({ match }) {
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{category.id}</StyledTableCell>
+              <StyledTableCell align="left">{partCategory.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={category.name}>
+            <StyledTableRow key={partCategory.category_name}>
               <StyledTableCell component="th" scope="row">
-                Category Name
+                Part Category Name
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{category.name}</span>
+                <span className={classes.rowContent}>{partCategory.category_name}</span>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={category.description}>
-              <StyledTableCell component="th" scope="row">
-                Description
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <p className={classes.rowContent}>{category.description}</p>
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={user.userid_id}>
+            <StyledTableRow key={`part ${partCategory.id}`}>
               <StyledTableCell component="th" scope="row">
                 Photo
               </StyledTableCell>
               <StyledTableCell align="left">
                 <img
                   className={`${classes.media} ${classes.rowContent}`}
-                  src={category.photo?.image}
-                  alt={category.photo?.file_name}
+                  src={partCategory.photo?.image}
+                  alt={partCategory.photo?.file_name}
                 />
               </StyledTableCell>
             </StyledTableRow>
@@ -130,4 +122,4 @@ function ViewCategory({ match }) {
   );
 }
 
-export default ViewCategory;
+export default ViewPartCategory;

@@ -17,7 +17,6 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
   makeStyles,
   LinearProgress,
   Grid,
@@ -31,18 +30,15 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { AccountCircle, TextFields, UnfoldLess } from "@material-ui/icons";
+import { UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
-import AddForm from "../../../AddForm";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
 import CategoriesForm from "./CategoriesForm";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
-import { withStyles } from "@material-ui/styles";
 
 const Card = styled(MuiCard)(spacing);
-const CardContent = styled(MuiCardContent)(spacing);
 const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
@@ -119,7 +115,7 @@ function Categories() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [carMade, setCarMade] = useState(""); /****** Customize ******/
+  const [selectedItem, setSelectedItem] = useState(""); /****** Customize ******/
   const [itemAddedOrEdited, setItemAddedOrEdited] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
@@ -180,7 +176,7 @@ function Categories() {
                 variant="contained"
                 size="small"
                 onClick={() => {
-                  setCarMade(params.row);
+                  setSelectedItem(params.row);
                   setOpenPopup(true);
                   setOpenPopupTitle("Edit Category"); /****** Customize ******/
                 }}
@@ -240,7 +236,7 @@ function Categories() {
         },
       })
       .then((res) => {
-        // alert("Deleted")
+        setOpenDeleteDialog(false);
       });
 
     await axios
@@ -316,7 +312,7 @@ function Categories() {
           onClick={() => {
             setOpenPopupTitle("New Category");
             setOpenPopup(true);
-            setCarMade("");
+            setSelectedItem("");
           }}
         >
           Add Category
@@ -397,7 +393,7 @@ function Categories() {
         <CategoriesForm
           setPage={setPage}
           setOpenPopup={setOpenPopup}
-          itemToEdit={carMade}
+          itemToEdit={selectedItem}
           setItemAddedOrEdited={setItemAddedOrEdited}
         />
       </Popup>
@@ -419,7 +415,6 @@ function Categories() {
         <DialogActions>
           <Button
             onClick={() => {
-              setOpenDeleteDialog(false);
               DeleteCategory();
             }}
             color="secondary"

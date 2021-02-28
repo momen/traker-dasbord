@@ -244,7 +244,7 @@ function Users() {
         },
       })
       .then((res) => {
-        // setCategories(res.data.data);
+        setOpenDeleteDialog(false);
       });
 
     await axios
@@ -432,7 +432,6 @@ function Users() {
         <DialogActions>
           <Button
             onClick={() => {
-              setOpenDeleteDialog(false);
               DeleteItem();
             }}
             color="secondary"

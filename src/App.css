@@ -1,13 +1,41 @@
 
-input:-webkit-autofill,
-input:-webkit-autofill:enabled,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
+/* input:-webkit-autofill, */
+/* input:-webkit-autofill:enabled */
+/* input:-webkit-autofill:hover,
+input:-webkit-autofill:focus, */
+/* input:-webkit-autofill:active */
+ /* {
     -webkit-animation: autofill 0s forwards;
     animation: autofill 0s forwards;
+} */
+
+
+/* @-webkit-keyframes autofill {
+    0%,100% {
+        color: inherit;
+        background: inherit;
+    }
 }
 
+input:-webkit-autofill {
+    -webkit-animation-delay: 1s; Safari support - any positive time runs instantly
+    -webkit-animation-name: autofill;
+    -webkit-animation-fill-mode: both;
+} */
+
+/* input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active,
+input:-webkit-autofill:enabled
+ {
+    -webkit-box-shadow: 0 0 0px 1000px #233044 inset;
+}
+
+input:-webkit-autofill:first-line {
+    color: #F4F1F0;
+} */
+/* 
 @keyframes autofill {
     100% {
         background: transparent;
@@ -20,4 +48,4 @@ input:-webkit-autofill:active {
         background: transparent;
         color: inherit;
     }
-}
+} */

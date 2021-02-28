@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
-import { Button } from "@material-ui/core";
+import { Button, Grid, Typography } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -19,6 +19,7 @@ const StyledTableCell = withStyles((theme) => ({
   },
   body: {
     fontSize: 14,
+    maxWidth: 700,
   },
 }))(TableCell);
 
@@ -27,48 +28,39 @@ const StyledTableRow = withStyles((theme) => ({
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
+    whiteSpace: "normal",
+    wordWrap: "break-word",
   },
 }))(TableRow);
 
 const useStyles = makeStyles({
   table: {
-    minWidth: 700,
+    minWidth: 200,
     "& .MuiTableCell-root": {
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
     },
   },
   attributeName: {
-    width: "20%",
-  },
-  rowContent: {
-    // display: "inline-block",
-    width: "100%",
-    // whiteSpace: "normal",
-    wordBreak: "break-word",
-  },
-
-  media: {
-    width: "25%",
-    objectFit: "contain",
+    width: "50%",
   },
 });
 
-function ViewCategory({ match }) {
+function ViewCarYear({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [category, setCategory] = useState(""); //Customize
+  const [carYear, setCarYear] = useState(""); //Customize
 
   //Customize
   useEffect(() => {
     axios
-      .get(`/product-categories/${match.params.id}`, {
+      .get(`/car-years/${match.params.id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setCategory(res.data.data);
+        setCarYear(res.data.data);
       });
   }, []);
 
@@ -77,15 +69,15 @@ function ViewCategory({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/product/categories")} //Customize
+        onClick={() => history.push("/product/car-year")}
         mb={3}
       >
         Back to list
       </Button>
-      <TableContainer component={Paper} style={{ marginTop: "20px" }}>
+      <TableContainer component={Paper} style={{ marginTop: "20px", width:200 }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={`cat ${category.id}`}>
+            <StyledTableRow key={carYear.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
@@ -93,35 +85,13 @@ function ViewCategory({ match }) {
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{category.id}</StyledTableCell>
+              <StyledTableCell align="center">{carYear.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={category.name}>
+            <StyledTableRow key={carYear.year}>
               <StyledTableCell component="th" scope="row">
-                Category Name
+                Car Year
               </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>{category.name}</span>
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={category.description}>
-              <StyledTableCell component="th" scope="row">
-                Description
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <p className={classes.rowContent}>{category.description}</p>
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={user.userid_id}>
-              <StyledTableCell component="th" scope="row">
-                Photo
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <img
-                  className={`${classes.media} ${classes.rowContent}`}
-                  src={category.photo?.image}
-                  alt={category.photo?.file_name}
-                />
-              </StyledTableCell>
+              <StyledTableCell align="center">{carYear.year}</StyledTableCell>
             </StyledTableRow>
           </TableBody>
         </Table>
@@ -130,4 +100,4 @@ function ViewCategory({ match }) {
   );
 }
 
-export default ViewCategory;
+export default ViewCarYear;

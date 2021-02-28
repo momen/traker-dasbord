@@ -120,6 +120,9 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
   };
 
   const updateAutoComplete = (e, val) => {
+    if(autoSelectError){
+      setAutoSelectError(false);
+    }
     // console.log(val);
     updateFormData({
       ...formData,
