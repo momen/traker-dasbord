@@ -120,7 +120,7 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
   };
 
   const updateAutoComplete = (e, val) => {
-    if(autoSelectError){
+    if (autoSelectError) {
       setAutoSelectError(false);
     }
     // console.log(val);
@@ -133,8 +133,8 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
   //Customize
   const handleReset = () => {
     updateFormData({
-      title: "", 
-      permissions: []
+      title: "",
+      permissions: [],
     });
   };
   return (

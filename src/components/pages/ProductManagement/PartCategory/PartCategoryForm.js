@@ -51,23 +51,24 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
   const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = async (e) => {
+    let data = new FormData();
     e.preventDefault();
     if (!formData.photo && !itemToEdit) {
       setOpenAlert(true);
     } else {
-      let data = new FormData();
       data.append("category_name", formData.category_name);
       if (formData.photo) {
         data.append("photo", formData.photo, formData.photo.name);
       }
 
-      console.log(itemToEdit.id);
+      // To be edited if an image will be added
       if (itemToEdit) {
+        console.log(itemToEdit.id);
         await axios
-          .put(`/part-categories/${itemToEdit.id}`, data, {
+          .put(`/part-categories/${itemToEdit.id}`, formData, {
             headers: {
               Authorization: `Bearer ${user.token}`,
-              "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
+              // "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })
           .then((res) => {

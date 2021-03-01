@@ -53,7 +53,7 @@ const useStyles = makeStyles({
   },
 });
 
-function ViewCategory({ match }) {
+function ViewProduct({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
@@ -130,4 +130,4 @@ function ViewCategory({ match }) {
   );
 }
 
-export default ViewCategory;
+export default ViewProduct;

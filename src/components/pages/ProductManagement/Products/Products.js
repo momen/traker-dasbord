@@ -60,6 +60,17 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     borderRadius: "6px",
   },
+
+  permissionBadge: {
+    background: "#e5c08b",
+    color: "#000000",
+    fontSize: "12px",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
+  },
 }));
 
 function CustomPagination(props) {
@@ -108,7 +119,7 @@ function Products() {
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Category");
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Product");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
@@ -123,35 +134,67 @@ function Products() {
   const [carModels, setCarModels] = useState([]);
   const [partCategories, setPartCategories] = useState([]);
   const [carYears, setCarYears] = useState([]);
+  const [stores, setStores] = useState([]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
-    { field: "name", headerName: "Name", width: 120 },
-    { field: "description", headerName: "Description", width: 120,},
-    { field: "price", headerName: "Price", width: 80,},
-    { field: "discount", headerName: "Discount", width: 80,},
-    { field: "car_model_id", headerName: "Car Model", width: 80,},
-    { field: "year", headerName: "Year", width: 60,},
+    { field: "name", headerName: "Name", width: 80 },
+    { field: "description", headerName: "Description", width: 80 },
+    {
+      field: "car_model",
+      headerName: "Car Model",
+      width: 80,
+      renderCell: (params) => params.value?.carmodel,
+    },
+    {
+      field: "year",
+      headerName: "Year",
+      width: 50,
+      renderCell: (params) => params.value?.year,
+    },
+    { field: "price", headerName: "Price", width: 70 },
+    {
+      field: "discount",
+      headerName: "Discount",
+      width: 70,
+      renderCell: (params) => `%${params.value}`,
+      align: "center",
+    },
+    {
+      field: "categories",
+      headerName: "Categories",
+      width: 100,
+      flex: 1,
+      renderCell: (params) => (
+        <div>
+          {params.value?.map((category) => (
+            <span key={category.id} className={classes.permissionBadge}>
+              {category.name}
+            </span>
+          ))}
+        </div>
+      ),
+    },
     {
       field: "photo",
-      headerName: "Photo",
-      width: 100,
-      renderCell: (params) => {
-        if (params.value) {
-          return (
+      headerName: "Photos",
+      width: 60,
+      renderCell: (params) => (
+        <Fragment>
+          {params.value?.map((img) => (
             <img
-              src={params.value.image}
+              src={img.image}
               alt="ph"
               style={{ objectFit: "contain", width: 50 }}
             />
-          );
-        }
-      },
+          ))}
+        </Fragment>
+      ),
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 220,
+      width: 170,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -166,7 +209,11 @@ function Products() {
           >
             {userPermissions.includes("product_show") ? (
               <Button
-                style={{ marginRight: "5px" }}
+                style={{
+                  marginRight: "5px",
+                  minWidth: "50px",
+                  maxWidth: "50px",
+                }}
                 variant="contained"
                 size="small"
                 onClick={() => history.push(`/products/${params.row.id}`)}
@@ -176,7 +223,11 @@ function Products() {
             ) : null}
             {userPermissions.includes("product_edit") ? (
               <Button
-                style={{ marginRight: "5px" }}
+                style={{
+                  marginRight: "5px",
+                  minWidth: "50px",
+                  maxWidth: "50px",
+                }}
                 color="primary"
                 variant="contained"
                 size="small"
@@ -192,6 +243,7 @@ function Products() {
 
             {userPermissions.includes("product_delete") ? (
               <Button
+                style={{ minWidth: "50px", maxWidth: "50px" }}
                 color="secondary"
                 variant="contained"
                 size="small"
@@ -204,8 +256,18 @@ function Products() {
         );
       },
     },
-    { field: "car_made_id", headerName: "Car Made", width: 80,},
-    { field: "part_category_id", headerName: "Part Category", width: 80,},
+    {
+      field: "car_made",
+      headerName: "Car Made",
+      width: 80,
+      renderCell: (params) => params.value.car_made,
+    },
+    {
+      field: "part_category",
+      headerName: "Part Category",
+      width: 80,
+      renderCell: (params) => params.value?.category_name,
+    },
   ];
 
   const handlePageSize = (event) => {
@@ -273,7 +335,7 @@ function Products() {
         },
       })
       .then((res) => {
-        let _categories = res.data.data.map(({ id, name }) => ({ id, name }));
+        const _categories = res.data.data.map(({ id, name }) => ({ id, name }));
         setCategories(_categories);
       });
 
@@ -284,7 +346,7 @@ function Products() {
         },
       })
       .then((res) => {
-        let _carMades = res.data.data.map(({ id, car_made }) => ({
+        const _carMades = res.data.data.map(({ id, car_made }) => ({
           id,
           car_made,
         })); // Customize
@@ -298,43 +360,44 @@ function Products() {
         },
       })
       .then((res) => {
-        let _carModels = res.data.data.map(({ id, carmodel }) => ({
+        const _carModels = res.data.data.map(({ id, carmodel }) => ({
           id,
           carmodel,
         })); // Customize
         setCarModels(_carModels);
       });
 
-    // axios
-    //   .get("/part-categorieslist", {
-    //     headers: {
-    //       Authorization: `Bearer ${user.token}`,
-    //     },
-    //   })
-    //   .then((res) => {
-    //     let _partCategories = res.data.data.map(({ id, car_made }) => ({
-    //       id,
-    //       car_made,
-    //     })); // Customize
-    //     setPartCategories(_partCategories);
-    //   });
-
     axios
-      .get("/car-madeslist", {
+      .get("/car-yearslist", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        let _carYears = res.data.data.map(({ id, year }) => ({
+        const _carYears = res.data.data.map(({ id, year }) => ({
           id,
           year,
         })); // Customize
         setCarYears(_carYears);
       });
+
+    axios
+      .get("/part-categorieslist", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+      .then((res) => {
+        const _partCategories = res.data.data.map(({ id, category_name }) => ({
+          id,
+          category_name,
+        })); // Customize
+        setPartCategories(_partCategories);
+      });
   }, []);
 
-  //Request the page records either on the initial render, or whenever the page changes
+  // Request the page records either on the initial render, data changed (added/edited/deleted)
+  // or whenever the page changes (Pagination)
   useEffect(() => {
     if (openPopup) return;
     setLoading(true);
@@ -387,7 +450,7 @@ function Products() {
           className={classes.button}
           variant="contained"
           onClick={() => {
-            setOpenPopupTitle("New Category");
+            setOpenPopupTitle("New Product");
             setOpenPopup(true);
             setSelectedItem("");
           }}
@@ -471,6 +534,11 @@ function Products() {
           setPage={setPage}
           setOpenPopup={setOpenPopup}
           itemToEdit={selectedItem}
+          categories={categories}
+          carMades={carMades}
+          carModels={carModels}
+          partCategories={partCategories}
+          carYears={carYears}
         />
       </Popup>
 

@@ -1,12 +1,10 @@
 import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
-import { NavLink } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import PropTypes from "prop-types";
 
 import {
-  Link,
-  Breadcrumbs as MuiBreadcrumbs,
   Card as MuiCard,
   CardContent as MuiCardContent,
   Divider as MuiDivider,
@@ -17,32 +15,26 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
   makeStyles,
   LinearProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
+  Grid,
+  TextField,
 } from "@material-ui/core";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
-import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
-import AuditLogsForm from "./AuditLogsForm";
 import { Pagination } from "@material-ui/lab";
+import { Search } from "react-feather";
 
 const Card = styled(MuiCard)(spacing);
-const CardContent = styled(MuiCardContent)(spacing);
 const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
@@ -53,15 +45,13 @@ const useStyles = makeStyles({
       background: "#388e3c",
     },
   },
-  roleBadge: {
-    background: "#FFBF00",
-    fontWeight: "bold",
+  toolBar: {
+    display: "flex",
+    justifyContent: "space-between",
+    width: "100%",
     borderRadius: "6px",
-    padding: "5px",
-    marginRight: "5px",
-    userSelect: "none",
   },
-});
+}));
 
 function CustomPagination(props) {
   const { state, api } = props;
@@ -106,43 +96,51 @@ function CustomLoadingOverlay() {
 function AuditLogs() {
   const classes = useStyles();
   const [{ user, userPermissions }] = useStateValue();
+  const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Permission");
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Category");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState("");
+  const [searchValue, setSearchValue] = useState();
+  const [userIsSearching, setuserIsSearching] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(
+    ""
+  ); /****** Customize ******/
+  const [itemAddedOrEdited, setItemAddedOrEdited] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
 
   const columns = [
-    { field: "id", headerName: "ID", width: 50 },
-    { field: "title", headerName: "Title", width: 100 },
+    { field: "id", headerName: "ID", width: 60 },
+    { field: "name", headerName: "Name", width: 150 },
+    { field: "description", headerName: "Description", width: 200, flex: 1 },
     {
-      field: "permissions",
-      headerName: "Permissions",
-      width: 300,
-      flex: 1,
-      renderCell: (params) => (
-        <div>
-          {params.value.map((permission) => (
-            <span key={permission.id} className={classes.roleBadge}>
-              {permission.title}
-            </span>
-          ))}
-        </div>
-      ),
+      field: "photo",
+      headerName: "Photo",
+      width: 100,
+      renderCell: (params) => {
+        if (params.value) {
+          return (
+            <img
+              src={params.value.image}
+              alt="ph"
+              style={{ objectFit: "contain", width: 50 }}
+            />
+          );
+        }
+      },
     },
-
     {
       field: "actions",
       headerName: "Actions",
-      width: 250,
+      width: 220,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
+        // let carMade = params.getValue("id");
         return (
           <div
             style={{
@@ -152,34 +150,39 @@ function AuditLogs() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("role_show") ? (
+            {userPermissions.includes("product_category_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
-                onClick={() => setSelectedItem(params.row)}
+                size="small"
+                onClick={() =>
+                  history.push(`/product/categories/${params.row.id}`)
+                }
               >
                 View
               </Button>
             ) : null}
-            {userPermissions.includes("role_edit") ? (
+            {userPermissions.includes("product_category_edit") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
+                size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
                   setOpenPopup(true);
-                  setOpenPopupTitle("Edit Role");
+                  setOpenPopupTitle("Edit Category"); /****** Customize ******/
                 }}
               >
                 Edit
               </Button>
             ) : null}
 
-            {userPermissions.includes("role_delete") ? (
+            {userPermissions.includes("product_category_delete") ? (
               <Button
                 color="secondary"
                 variant="contained"
+                size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
@@ -199,83 +202,119 @@ function AuditLogs() {
     setPage(page);
   };
 
+  const handleSearchInput = (e) => {
+    let search = e.target.value;
+    if (!search || search.trim() === "") {
+      setuserIsSearching(false);
+      setSearchValue(search);
+    } else {
+      if (!userIsSearching) {
+        setuserIsSearching(true);
+      }
+      setSearchValue(search);
+    }
+  };
+
   const openDeleteConfirmation = (id) => {
     setOpenDeleteDialog(true);
     setItemToDelete(id);
   };
 
-  const DeleteItem = async () => {
+  const DeleteCategory = async () => {
+    console.log(itemToDelete);
     await axios
-      .delete(`/audit-logs/${itemToDelete}`, {
+      .delete(`/product-categories/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        // setCategories(res.data.data);
+        setOpenDeleteDialog(false);
       });
 
     await axios
-      .get(`/audit-logs?page=${page}`, {
+      .get(`/product-categories?page=${page}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        if((Math.ceil(res.data.total/pageSize) < page)){
-          setPage(page-1);
+        if (Math.ceil(res.data.total / pageSize) < page) {
+          setPage(page - 1);
         }
         setRowsCount(res.data.total);
         setRows(res.data.data);
         setLoading(false);
       });
-      setLoading(false);
   };
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
     console.log("In Effect");
-    if (!openPopup) {
-      setLoading(true);
+    if (openPopup) return;
+    setLoading(true);
+    console.log("Passed");
+    if (!userIsSearching) {
       axios
-        .get(`/audit-logs?page=${page}`, {
+        .get(`/product-categories?page=${page}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         })
         .then((res) => {
-          // alert(res.data.total);
           setRowsCount(res.data.total);
           setRows(res.data.data);
+          setLoading(false);
         });
-        setLoading(false);
+    } else {
+      axios
+        .post(
+          "/categories/search/name",
+          {
+            search_index: searchValue,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        )
+        .then((res) => {
+          setRowsCount(res.data.total);
+          setRows(res.data.data);
+          setLoading(false);
+        });
     }
-  }, [page, openPopup]);
+    // setItemAddedOrEdited(false);
+  }, [page, searchValue, openPopup]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Audit Logs
+        Categories
       </Typography>
 
       <Divider my={6} />
 
-      {/* <Button
-        mb={3}
-        className={classes.button}
-        variant="contained"
-        onClick={() => {
-          setSelectedItem("");
-          setOpenPopup(true);
-          setOpenPopupTitle("New Permission");
-        }}
-      >
-        Add Audit Log
-      </Button> */}
+      {userPermissions.includes("product_category_create") ? (
+        <Button
+          mb={3}
+          className={classes.button}
+          variant="contained"
+          onClick={() => {
+            setOpenPopupTitle("New Category");
+            setOpenPopup(true);
+            setSelectedItem("");
+          }}
+        >
+          Add Category
+        </Button>
+      ) : null}
+
       <Card mb={6}>
         <Paper mb={2}>
-          <Toolbar>
+          <Toolbar className={classes.toolBar}>
             <FormControl variant="outlined">
               <Select
                 value={pageSize}
@@ -299,6 +338,21 @@ function AuditLogs() {
                 <MenuItem value={100}>100</MenuItem>
               </Select>
             </FormControl>
+
+            <div>
+              <Grid container spacing={1} alignItems="flex-end">
+                <Grid item>
+                  <Search />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    id="input-with-icon-grid"
+                    label="Search"
+                    onChange={handleSearchInput}
+                  />
+                </Grid>
+              </Grid>
+            </div>
           </Toolbar>
         </Paper>
         <Paper>
@@ -309,6 +363,7 @@ function AuditLogs() {
               page={page}
               pageSize={pageSize}
               rowCount={rowsCount}
+              columnBuffer={pageSize}
               paginationMode="server"
               components={{
                 Pagination: CustomPagination,
@@ -323,51 +378,6 @@ function AuditLogs() {
           </div>
         </Paper>
       </Card>
-      <Popup
-        title={openPopupTitle}
-        openPopup={openPopup}
-        setOpenPopup={setOpenPopup}
-      >
-        <AuditLogsForm
-          setPage={setPage}
-          setOpenPopup={setOpenPopup}
-          itemToEdit={selectedItem}
-        />
-      </Popup>
-
-      <Dialog
-        open={openDeleteDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Delete Confirmation"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Log? <br />
-            If this was by accident please press Back
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setOpenDeleteDialog(false);
-              DeleteItem();
-            }}
-            color="secondary"
-          >
-            Yes, delete
-          </Button>
-          <Button
-            onClick={() => setOpenDeleteDialog(false)}
-            color="primary"
-            autoFocus
-          >
-            Back
-          </Button>
-        </DialogActions>
-      </Dialog>
     </React.Fragment>
   );
 }

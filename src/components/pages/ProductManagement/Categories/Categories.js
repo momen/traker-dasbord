@@ -115,7 +115,9 @@ function Categories() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(""); /****** Customize ******/
+  const [selectedItem, setSelectedItem] = useState(
+    ""
+  ); /****** Customize ******/
   const [itemAddedOrEdited, setItemAddedOrEdited] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");

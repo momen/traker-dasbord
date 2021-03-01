@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import {
   Button,
+  Checkbox,
   Collapse,
   FormControl,
   Grid,
@@ -12,7 +13,9 @@ import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
 import { PhotoCamera } from "@material-ui/icons";
 import { CloseIcon } from "@material-ui/data-grid";
-import { Alert } from "@material-ui/lab";
+import { Alert, Autocomplete } from "@material-ui/lab";
+import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -20,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "40vw",
+    width: "60vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -36,9 +39,25 @@ const useStyles = makeStyles((theme) => ({
   uploadInput: {
     display: "none",
   },
+
+  inputMessage: {
+    wordBreak: "break-word",
+  },
 }));
 
-function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
+function ProductsForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  categories,
+  carMades,
+  carModels,
+  partCategories,
+  carYears,
+}) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
 
@@ -46,14 +65,33 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
     description: itemToEdit ? itemToEdit.description : "",
-    photo: "",
+    car_made_id: itemToEdit ? itemToEdit.car_made_id : "",
+    car_model_id: itemToEdit ? itemToEdit.car_model_id : "",
+    year_id: itemToEdit ? itemToEdit.year_id : "",
+    discount: itemToEdit ? itemToEdit.discount : "",
+    price: itemToEdit ? itemToEdit.price : "",
+    part_category_id: itemToEdit ? itemToEdit.part_category_id : "",
+    categories: itemToEdit
+      ? itemToEdit.categories.map(({ id, name }) => ({ id, name }))
+      : [],
+    store_id: itemToEdit ? itemToEdit.store_id : "",
+    quantity: itemToEdit ? itemToEdit.quantity : "",
+    serial_number: itemToEdit ? itemToEdit.serial_number : "",
+    photo: [],
   });
   const [imgName, setImgName] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
+  const [autoSelectError, setAutoSelectError] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.categories.length === 0) {
+      setAutoSelectError(true);
+      return;
+    }
+    setAutoSelectError(false);
+
     if (!formData.photo && !itemToEdit) {
       setOpenAlert(true);
     } else {
@@ -66,10 +104,9 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
         data.append("photo", formData.photo, formData.photo.name);
       }
 
-      console.log(itemToEdit.id);
       if (itemToEdit) {
         await axios
-          .post(`/product-categories/${itemToEdit.id}`, data, {
+          .post(`/products/${itemToEdit.id}`, data, {
             headers: {
               Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
@@ -82,12 +119,8 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
             setResponseErrors(res.response.data.errors);
           });
       } else {
-        console.log("------------------------------");
-        console.log(data);
-        console.log("------------------------------");
-
         await axios
-          .post("/product-categories", data, {
+          .post("/add/products", data, {
             headers: {
               Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
@@ -111,6 +144,17 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
     });
   };
 
+  const updateAutoComplete = (e, val) => {
+    if (autoSelectError) {
+      setAutoSelectError(false);
+    }
+    // console.log(val);
+    updateFormData({
+      ...formData,
+      categories: val,
+    });
+  };
+
   const handleUpload = (e) => {
     const name = e.target.value.replace(/.*[\/\\]/, "");
     setImgName(name);
@@ -126,6 +170,17 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
     updateFormData({
       name: "",
       description: "",
+      car_made_id: "",
+      car_model_id: "",
+      year_id: "",
+      discount: "",
+      price: "",
+      part_category_id: "",
+      categories: [],
+      store_id: "",
+      quantity: "",
+      serial_number: "",
+      photo: [],
     });
     setResponseErrors("");
     setImgName("");
@@ -135,53 +190,293 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
     <div className={classes.paper}>
       <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              name="name"
-              required
-              fullWidth
-              id="name"
-              label="Category Name"
-              value={formData.name}
-              autoFocus
-              onChange={handleChange}
-              error={responseErrors?.name}
-            />
+          <Grid item xs={6}>
+            <div>
+              <TextField
+                name="name"
+                required
+                fullWidth
+                id="name"
+                label="Product Name"
+                value={formData.name}
+                autoFocus
+                onChange={handleChange}
+                error={responseErrors?.name}
+              />
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </Grid>
 
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.name?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
+          <Grid item xs={6}>
+            <div>
+              <TextField
+                name="serial_number"
+                required
+                fullWidth
+                id="serial_number"
+                label="Serial Number"
+                value={formData.serial_number}
+                onChange={handleChange}
+                error={responseErrors?.serial_number}
+              />
 
-          <Grid item xs={12}>
-            <TextField
-              id="standard-multiline-flexible"
-              name="description"
-              label="Description"
-              multiline
-              rowsMax={8}
-              value={formData.description}
-              fullWidth
-              onChange={handleChange}
-              error={responseErrors?.description}
-            />
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </Grid>
 
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.description?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
+          <Grid item xs={3}>
+            <div>
+              <TextField
+                select
+                label="Car Made"
+                value={formData.car_made_id}
+                name="car_made_id"
+                onChange={handleChange}
+                SelectProps={{
+                  native: true,
+                }}
+                helperText="Please select a Car Made"
+                fullWidth
+                required
+                error={responseErrors?.car_made_id}
+              >
+                <option aria-label="None" value="" />
+                {carMades?.map((carMade) => (
+                  <option value={carMade.id}>{carMade.car_made}</option>
+                ))}
+              </TextField>
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.car_made_id?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+
+          <Grid item xs={3}>
+            <div>
+              <TextField
+                select
+                label="Car Model"
+                value={formData.car_model_id}
+                name="car_model_id"
+                onChange={handleChange}
+                SelectProps={{
+                  native: true,
+                }}
+                helperText="Please select a Car Model"
+                fullWidth
+                required
+                error={responseErrors?.car_model_id}
+              >
+                <option aria-label="None" value="" />
+                {carModels?.map((carModel) => (
+                  <option value={carModel.id}>{carModel.carmodel}</option>
+                ))}
+              </TextField>
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.car_model_id?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+
+          <Grid item xs={3}>
+            <div>
+              <TextField
+                select
+                label="Part Category"
+                value={formData.part_category_id}
+                name="part_category_id"
+                onChange={handleChange}
+                SelectProps={{
+                  native: true,
+                }}
+                helperText="Please select a Part Category"
+                fullWidth
+                required
+                error={responseErrors?.part_category_id}
+              >
+                <option aria-label="None" value="" />
+                {partCategories?.map((partCategory) => (
+                  <option value={partCategory.id}>
+                    {partCategory.category_name}
+                  </option>
+                ))}
+              </TextField>
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.part_category_id?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+
+          <Grid item xs={2}>
+            <div>
+              <TextField
+                select
+                label="Year"
+                value={formData.year_id}
+                name="year_id"
+                onChange={handleChange}
+                SelectProps={{
+                  native: true,
+                }}
+                helperText="Please select a Year"
+                fullWidth
+                required
+                error={responseErrors?.year_id}
+              >
+                <option aria-label="None" value="" />
+                {carYears?.map((carYear) => (
+                  <option value={carYear.id}>{carYear.year}</option>
+                ))}
+              </TextField>
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.year_id?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+          {/****************************** ******************************/}
+          <Grid item xs={6}>
+            <div>
+              <Autocomplete
+                multiple
+                // filterSelectedOptions
+                options={categories ? categories : []}
+                value={formData.categories}
+                getOptionSelected={(option, value) => option.id === value.id}
+                disableCloseOnSelect
+                getOptionLabel={(option) => option.name}
+                renderOption={(option, { selected }) => (
+                  <React.Fragment>
+                    <Checkbox
+                      icon={icon}
+                      checkedIcon={checkedIcon}
+                      style={{ marginRight: 8 }}
+                      checked={selected}
+                    />
+                    {option.name}
+                  </React.Fragment>
+                )}
+                fullWidth
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Categories *"
+                    placeholder="Select related Categories for this Product"
+                    fullWidth
+                    helperText="At least one category must be selected."
+                    error={autoSelectError}
+                  />
+                )}
+                onChange={updateAutoComplete}
+              />
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+
+          <Grid item xs={6}>
+            <div>
+              <TextField
+                name="name"
+                required
+                fullWidth
+                id="name"
+                label="Product Name"
+                value={formData.name}
+                onChange={handleChange}
+                error={responseErrors?.name}
+              />
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+
+          <Grid item xs={12}>
+            <div style={{ minWidth: "100%", maxWidth: "100%" }}>
+              <TextField
+                name="description"
+                required
+                label="Description"
+                multiline
+                rowsMax={8}
+                value={formData.description}
+                fullWidth
+                onChange={handleChange}
+                error={responseErrors?.description}
+              />
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.description?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
 
           <Grid item xs={12}>
             <div style={{ display: "flex" }}>
@@ -206,13 +501,6 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
               <span
                 style={{
                   alignSelf: "center",
-                  // width: "350px",
-                  // display: "block",
-                  // overflow: "hidden",
-                  // whiteSpace: "noWarp",
-                  // lineHeight: 1,
-                  // textOverflow: "ellipsis",
-                  // textDecoration: "none",
                 }}
               >
                 {imgName}
@@ -276,4 +564,4 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   );
 }
 
-export default CategoriesForm;
+export default ProductsForm;
