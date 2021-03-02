@@ -135,6 +135,7 @@ function Products() {
   const [partCategories, setPartCategories] = useState([]);
   const [carYears, setCarYears] = useState([]);
   const [stores, setStores] = useState([]);
+  const [tags, setTags] = useState([]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
@@ -329,6 +330,17 @@ function Products() {
     pop-up is opened-*/
   useEffect(() => {
     axios
+      .get("/storeslist", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+      .then((res) => {
+        const _stores = res.data.data.map(({ id, name }) => ({ id, name }));
+        setStores(_stores);
+      });
+
+    axios
       .get("/categorieslist", {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -393,6 +405,20 @@ function Products() {
           category_name,
         })); // Customize
         setPartCategories(_partCategories);
+      });
+
+      axios
+      .get("/product-tagslist", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+      .then((res) => {
+        const _tags = res.data.data.map(({ id, name }) => ({
+          id,
+          name,
+        })); // Customize
+        setTags(_tags);
       });
   }, []);
 
@@ -534,11 +560,13 @@ function Products() {
           setPage={setPage}
           setOpenPopup={setOpenPopup}
           itemToEdit={selectedItem}
+          stores={stores}
           categories={categories}
           carMades={carMades}
           carModels={carModels}
           partCategories={partCategories}
           carYears={carYears}
+          tags={tags}
         />
       </Popup>
 

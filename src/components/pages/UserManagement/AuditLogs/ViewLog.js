@@ -27,6 +27,8 @@ const StyledTableRow = withStyles((theme) => ({
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
+    whiteSpace: "normal",
+    wordWrap: "break-word",
   },
 }))(TableRow);
 
@@ -37,52 +39,38 @@ const useStyles = makeStyles({
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
     },
   },
+  rowContent: {
+    // width: "100%",
+    whiteSpace: "normal",
+    wordWrap: "break-word",
+  },
 });
 
-const vendorTypes = {
-  1: "Vendor",
-  2: "Hot Sale",
-  3: "Both",
-};
-
-function ViewVendor({ match }) {
+function ViewLog({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [vendor, setVendor] = useState("");
-  const [vendorTypes, setVendorTypes] = useState("");
+  const [auditLogs, setAuditLogs] = useState("");
 
   useEffect(() => {
     axios
-      .get(`/add-vendors/${match.params.id}`, {
+      .get(`/audit-logs/${match.params.id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setVendor(res.data.data);
-      });
-
-    axios
-      .get(`/add-vendors/get/types`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        setVendorTypes(res.data.data);
+        console.log(res.data.data);
+        setAuditLogs(res.data.data);
       });
   }, []);
-
-  const uppercaseWords = (str) =>
-    str.replace(/^(.)|\s+(.)/g, (c) => c.toUpperCase());
 
   return (
     <Fragment>
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/vendor/add")}
+        onClick={() => history.push("/user-mgt/logs")}
         mb={3}
       >
         Back to list
@@ -90,7 +78,7 @@ function ViewVendor({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={vendor.id}>
+            <StyledTableRow key={auditLogs.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
@@ -98,44 +86,62 @@ function ViewVendor({ match }) {
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{vendor.id}</StyledTableCell>
+              <StyledTableCell align="left">{auditLogs.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.serial}>
+            <StyledTableRow key={auditLogs.description}>
               <StyledTableCell component="th" scope="row">
-                Serial
-              </StyledTableCell>
-              <StyledTableCell align="left">{vendor.serial}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.vendor_name}>
-              <StyledTableCell component="th" scope="row">
-                Vendor
+                Description
               </StyledTableCell>
               <StyledTableCell align="left">
-                {vendor.vendor_name}
+                {auditLogs.description}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.email}>
+            <StyledTableRow key={auditLogs.subject_id}>
               <StyledTableCell component="th" scope="row">
-                Email
-              </StyledTableCell>
-              <StyledTableCell align="left">{vendor.email}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.type}>
-              <StyledTableCell component="th" scope="row">
-                Type
+                Subject ID
               </StyledTableCell>
               <StyledTableCell align="left">
-                {vendor.type && vendorTypes
-                  ? uppercaseWords(vendorTypes[vendor.type])
-                  : null}
+                {auditLogs.subject_id}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.userid?.name}>
+            <StyledTableRow key={auditLogs.subject_type}>
               <StyledTableCell component="th" scope="row">
-                Username
+                Subject Type
               </StyledTableCell>
               <StyledTableCell align="left">
-                {vendor.userid?.name}
+                {auditLogs.subject_type}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={auditLogs.user_id}>
+              <StyledTableCell component="th" scope="row">
+                User ID
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {auditLogs.user_id}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={auditLogs.properties}>
+              <StyledTableCell component="th" scope="row">
+                Properties
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <pre className={classes.rowContent}>
+                  {JSON.stringify(auditLogs.properties)}
+                </pre>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={auditLogs.host}>
+              <StyledTableCell component="th" scope="row">
+                Host
+              </StyledTableCell>
+              <StyledTableCell align="left">{auditLogs.host}</StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={auditLogs.created_at}>
+              <StyledTableCell component="th" scope="row">
+                Created at
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {auditLogs.created_at}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>
@@ -145,4 +151,4 @@ function ViewVendor({ match }) {
   );
 }
 
-export default ViewVendor;
+export default ViewLog;

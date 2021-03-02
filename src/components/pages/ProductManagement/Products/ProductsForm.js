@@ -6,6 +6,8 @@ import {
   FormControl,
   Grid,
   IconButton,
+  Input,
+  InputAdornment,
   makeStyles,
   TextField,
 } from "@material-ui/core";
@@ -16,6 +18,8 @@ import { CloseIcon } from "@material-ui/data-grid";
 import { Alert, Autocomplete } from "@material-ui/lab";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import CurrencyTextField from "@unicef/material-ui-currency-textfield";
+import NumberFormat from "react-number-format";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -43,6 +47,14 @@ const useStyles = makeStyles((theme) => ({
   inputMessage: {
     wordBreak: "break-word",
   },
+  
+  errorsContainer: {
+    marginBottom: theme.spacing(1),
+  },
+  errorMsg: {
+    color: "#ff0000",
+    fontWeight: "500",
+  },
 }));
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -52,11 +64,13 @@ function ProductsForm({
   setPage,
   setOpenPopup,
   itemToEdit,
+  stores,
   categories,
   carMades,
   carModels,
   partCategories,
   carYears,
+  tags,
 }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
@@ -74,6 +88,9 @@ function ProductsForm({
     categories: itemToEdit
       ? itemToEdit.categories.map(({ id, name }) => ({ id, name }))
       : [],
+    tags: itemToEdit
+      ? itemToEdit.tags.map(({ id, name }) => ({ id, name }))
+      : [],
     store_id: itemToEdit ? itemToEdit.store_id : "",
     quantity: itemToEdit ? itemToEdit.quantity : "",
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
@@ -86,6 +103,8 @@ function ProductsForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let data = new FormData();
+
     if (formData.categories.length === 0) {
       setAutoSelectError(true);
       return;
@@ -95,14 +114,16 @@ function ProductsForm({
     if (!formData.photo && !itemToEdit) {
       setOpenAlert(true);
     } else {
-      let data = new FormData();
-      data.append("name", formData.name);
-      if (formData.description) {
-        data.append("description", formData.description);
-      }
-      if (formData.photo) {
-        data.append("photo", formData.photo, formData.photo.name);
-      }
+      Object.entries(formData).forEach(
+        ([key, value]) => data.append(key,value)
+    );
+      // data.append("name", formData.name);
+      // if (formData.description) {
+      //   data.append("description", formData.description);
+      // }
+      // if (formData.photo) {
+      //   data.append("photo", formData.photo, formData.photo.name);
+      // }
 
       if (itemToEdit) {
         await axios
@@ -134,6 +155,7 @@ function ProductsForm({
             setResponseErrors(res.response.data.errors);
           });
       }
+      console.log(formData);
     }
   };
 
@@ -144,14 +166,23 @@ function ProductsForm({
     });
   };
 
-  const updateAutoComplete = (e, val) => {
+  const updateAutoCompleteCategories = (e, val) => {
     if (autoSelectError) {
       setAutoSelectError(false);
     }
-    // console.log(val);
     updateFormData({
       ...formData,
       categories: val,
+    });
+  };
+
+  const updateAutoCompleteTags = (e, val) => {
+    if (autoSelectError) {
+      setAutoSelectError(false);
+    }
+    updateFormData({
+      ...formData,
+      tags: val,
     });
   };
 
@@ -161,7 +192,7 @@ function ProductsForm({
     console.log(e.target.files[0]);
     updateFormData({
       ...formData,
-      photo: e.target.files[0],
+      photo: [...formData.photo, e.target.files[0]],
     });
     setOpenAlert(false);
   };
@@ -177,6 +208,7 @@ function ProductsForm({
       price: "",
       part_category_id: "",
       categories: [],
+      tags:[],
       store_id: "",
       quantity: "",
       serial_number: "",
@@ -232,6 +264,91 @@ function ProductsForm({
               {responseErrors ? (
                 <div className={classes.inputMessage}>
                   {responseErrors.name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+
+          <Grid item xs={4}>
+            <div>
+              <TextField
+                name="quantity"
+                type="number"
+                InputProps={{ inputProps: { min: 5 } }}
+                required
+                fullWidth
+                label="Qunatity"
+                value={formData.quantity}
+                onChange={handleChange}
+                error={responseErrors?.quantity}
+                // helperText="Min %5 ~ Max %80"
+              />
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.quantity?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+
+          <Grid item xs={4}>
+            <div>
+              <CurrencyTextField
+                // name="price"
+                // InputProps={{
+                //   inputProps: { min: 5, max: 80 },
+                // }}
+                required
+                fullWidth
+                label="Price"
+                value={formData.price}
+                onChange={(event, value) =>
+                  updateFormData({ ...formData, price: value })
+                }
+                error={responseErrors?.price}
+                // helperText="Min %5 ~ Max %80"
+              />
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.price?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+
+          <Grid item xs={4}>
+            <div>
+              <NumberFormat
+                customInput={TextField}
+                name="discount"
+                fullWidth
+                label="Discount"
+                prefix="%"
+                value={formData.discount}
+                onChange={handleChange}
+                error={responseErrors?.discount}
+                helperText="Min %5 ~ Max %80"
+                InputProps={{ inputProps: { min: 5 } }}
+                // step={0.01}
+              />
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.discount?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>
@@ -379,7 +496,7 @@ function ProductsForm({
             </div>
           </Grid>
           {/****************************** ******************************/}
-          <Grid item xs={6}>
+          <Grid item xs={8}>
             <div>
               <Autocomplete
                 multiple
@@ -412,12 +529,12 @@ function ProductsForm({
                     error={autoSelectError}
                   />
                 )}
-                onChange={updateAutoComplete}
+                onChange={updateAutoCompleteCategories}
               />
 
               {responseErrors ? (
                 <div className={classes.inputMessage}>
-                  {responseErrors.name?.map((msg) => (
+                  {responseErrors.categories?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>
@@ -427,22 +544,80 @@ function ProductsForm({
             </div>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <div>
               <TextField
-                name="name"
-                required
-                fullWidth
-                id="name"
-                label="Product Name"
-                value={formData.name}
+                select
+                label="Store"
+                value={formData.store_id}
+                name="store_id"
                 onChange={handleChange}
-                error={responseErrors?.name}
+                SelectProps={{
+                  native: true,
+                }}
+                helperText="Please select a Store"
+                fullWidth
+                required
+                error={responseErrors?.store_id}
+              >
+                <option aria-label="None" value="" />
+                {stores?.map((store) => (
+                  <option value={store.id}>{store.name}</option>
+                ))}
+              </TextField>
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.store_id?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+
+          <Grid item xs={12}>
+            <div>
+              <Autocomplete
+                multiple
+                // filterSelectedOptions
+                options={tags ? tags : []}
+                value={formData.tags}
+                getOptionSelected={(option, value) => option.id === value.id}
+                disableCloseOnSelect
+                getOptionLabel={(option) => option.name}
+                renderOption={(option, { selected }) => (
+                  <React.Fragment>
+                    <Checkbox
+                      icon={icon}
+                      checkedIcon={checkedIcon}
+                      style={{ marginRight: 8 }}
+                      checked={selected}
+                    />
+                    {option.name}
+                  </React.Fragment>
+                )}
+                fullWidth
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    name="tags"
+                    variant="outlined"
+                    label="Tags *"
+                    placeholder="Select related Tags for this Product"
+                    fullWidth
+                    helperText="At least one tag must be selected."
+                    error={autoSelectError}
+                  />
+                )}
+                onChange={updateAutoCompleteTags}
               />
 
               {responseErrors ? (
                 <div className={classes.inputMessage}>
-                  {responseErrors.name?.map((msg) => (
+                  {responseErrors.tags?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>

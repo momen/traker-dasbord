@@ -106,33 +106,18 @@ function AuditLogs() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(
-    ""
-  ); /****** Customize ******/
-  const [itemAddedOrEdited, setItemAddedOrEdited] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(""); // Customize
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
-    { field: "name", headerName: "Name", width: 150 },
-    { field: "description", headerName: "Description", width: 200, flex: 1 },
-    {
-      field: "photo",
-      headerName: "Photo",
-      width: 100,
-      renderCell: (params) => {
-        if (params.value) {
-          return (
-            <img
-              src={params.value.image}
-              alt="ph"
-              style={{ objectFit: "contain", width: 50 }}
-            />
-          );
-        }
-      },
-    },
+    { field: "description", headerName: "Description", width: 150 },
+    { field: "subject_id", headerName: "Subject ID", width: 80 },
+    { field: "subject_type", headerName: "Subject Type", width: 150 },
+    { field: "user_id", headerName: "User ID", width: 80 },
+    { field: "host", headerName: "Host", width: 120 },
+    { field: "created_at", headerName: "Created at", width: 120 },
     {
       field: "actions",
       headerName: "Actions",
@@ -140,52 +125,22 @@ function AuditLogs() {
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
-        // let carMade = params.getValue("id");
         return (
           <div
             style={{
               display: "flex",
               justifyContent: "flex-start",
               width: "100%",
-              // padding: "5px"
             }}
           >
-            {userPermissions.includes("product_category_show") ? (
+            {userPermissions.includes("audit_log_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() =>
-                  history.push(`/product/categories/${params.row.id}`)
-                }
+                onClick={() => history.push(`/user-mgt/logs/${params.row.id}`)}
               >
                 View
-              </Button>
-            ) : null}
-            {userPermissions.includes("product_category_edit") ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                color="primary"
-                variant="contained"
-                size="small"
-                onClick={() => {
-                  setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit Category"); /****** Customize ******/
-                }}
-              >
-                Edit
-              </Button>
-            ) : null}
-
-            {userPermissions.includes("product_category_delete") ? (
-              <Button
-                color="secondary"
-                variant="contained"
-                size="small"
-                onClick={() => openDeleteConfirmation(params.row.id)}
-              >
-                Delete
               </Button>
             ) : null}
           </div>
@@ -215,48 +170,12 @@ function AuditLogs() {
     }
   };
 
-  const openDeleteConfirmation = (id) => {
-    setOpenDeleteDialog(true);
-    setItemToDelete(id);
-  };
-
-  const DeleteCategory = async () => {
-    console.log(itemToDelete);
-    await axios
-      .delete(`/product-categories/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        setOpenDeleteDialog(false);
-      });
-
-    await axios
-      .get(`/product-categories?page=${page}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        if (Math.ceil(res.data.total / pageSize) < page) {
-          setPage(page - 1);
-        }
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-        setLoading(false);
-      });
-  };
-
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
-    console.log("In Effect");
-    if (openPopup) return;
     setLoading(true);
-    console.log("Passed");
     if (!userIsSearching) {
       axios
-        .get(`/product-categories?page=${page}`, {
+        .get(`/audit-logs?page=${page}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -269,7 +188,7 @@ function AuditLogs() {
     } else {
       axios
         .post(
-          "/categories/search/name",
+          "/audit-logs/search/name",
           {
             search_index: searchValue,
           },
@@ -286,31 +205,16 @@ function AuditLogs() {
         });
     }
     // setItemAddedOrEdited(false);
-  }, [page, searchValue, openPopup]);
+  }, [page, searchValue]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Categories
+        Audit Logs
       </Typography>
 
       <Divider my={6} />
-
-      {userPermissions.includes("product_category_create") ? (
-        <Button
-          mb={3}
-          className={classes.button}
-          variant="contained"
-          onClick={() => {
-            setOpenPopupTitle("New Category");
-            setOpenPopup(true);
-            setSelectedItem("");
-          }}
-        >
-          Add Category
-        </Button>
-      ) : null}
 
       <Card mb={6}>
         <Paper mb={2}>
