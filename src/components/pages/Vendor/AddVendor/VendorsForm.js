@@ -3,16 +3,20 @@ import {
   Button,
   Collapse,
   FormControl,
+  FormControlLabel,
+  FormLabel,
   Grid,
   IconButton,
   makeStyles,
+  Radio,
+  RadioGroup,
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
 import { PhotoCamera } from "@material-ui/icons";
-import { CloseIcon } from "@material-ui/data-grid";
 import { Alert } from "@material-ui/lab";
+import { CloseIcon } from "@material-ui/data-grid";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -36,40 +40,56 @@ const useStyles = makeStyles((theme) => ({
   uploadInput: {
     display: "none",
   },
+  errorsContainer: {
+    marginBottom: theme.spacing(1),
+  },
+  errorMsg: {
+    color: "#ff0000",
+    fontWeight: "500",
+  },
 }));
 
-function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
+function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
-    name: itemToEdit ? itemToEdit.name : "",
-    description: itemToEdit ? itemToEdit.description : "",
-    photo: "",
+    vendor_name: itemToEdit ? itemToEdit.vendor_name : "",
+    email: itemToEdit ? itemToEdit.email : "",
+    type: itemToEdit ? itemToEdit.type : "",
+    userid_id: itemToEdit ? itemToEdit.userid_id : "",
+    images: "",
   });
-  const [imgName, setImgName] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
+  const [imgName, setImgName] = useState("");
   const [responseErrors, setResponseErrors] = useState("");
+
+  console.log(itemToEdit);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.photo && !itemToEdit) {
-      setOpenAlert(true);  
+    if (!formData.images && !itemToEdit) {
+      setOpenAlert(true);
     } else {
       let data = new FormData();
-      data.append("name", formData.name);
-      if (formData.description) {
-        data.append("description", formData.description);
-      }
-      if (formData.photo) {
-        data.append("photo", formData.photo, formData.photo.name);
-      }
+      data.append("vendor_name", formData.vendor_name);
+      data.append("email", formData.email);
+      data.append("type", formData.type);
+      data.append("userid_id", formData.userid_id);
 
-      console.log(itemToEdit.id);
+      data.append("images", formData.images);
+      // formData.images.map(image => {
+      // })
+
+      // if (formData.serial) {
+      //   data.append("serial", formData.serial);
+      // }
+
+      console.log(data);
       if (itemToEdit) {
         await axios
-          .post(`/product-categories/${itemToEdit.id}`, data, {
+          .post(`/add-vendors/${itemToEdit.id}`, data, {
             headers: {
               Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
@@ -82,12 +102,16 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
             setResponseErrors(res.response.data.errors);
           });
       } else {
-        console.log("------------------------------");
-        console.log(data);
-        console.log("------------------------------");
+        // console.log("------------------------------");
+        // console.log(data);
+        // console.log("------------------------------");
+        // data.append("images", formData.images);
+
+        // data.append("images", formData.images[0].name, formData.images);
+        console.log(formData.images);
 
         await axios
-          .post("/product-categories", data, {
+          .post("/add-vendors", data, {
             headers: {
               Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
@@ -117,15 +141,19 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
     console.log(e.target.files[0]);
     updateFormData({
       ...formData,
-      photo: e.target.files[0],
+      images: e.target.files[0],
     });
     setOpenAlert(false);
   };
 
+  //Customize
   const handleReset = () => {
     updateFormData({
-      name: "",
-      description: "",
+      vendor_name: "",
+      email: "",
+      type:"",
+      userid_id:"",
+      images:"",
     });
     setResponseErrors("");
     setImgName("");
@@ -137,21 +165,22 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
-              name="name"
+              name="vendor_name"
+              // variant="outlined"
               required
               fullWidth
-              id="name"
-              label="Category Name"
-              value={formData.name}
+              id="vendor_name"
+              label="Vendor Name"
+              value={formData.vendor_name}
               autoFocus
               onChange={handleChange}
-              error={responseErrors?.name}
+              error={responseErrors?.vendor_name}
             />
           </Grid>
 
           {responseErrors ? (
             <Grid item xs={12}>
-              {responseErrors.name?.map((msg) => (
+              {responseErrors.vendor_name?.map((msg) => (
                 <span key={msg} className={classes.errorMsg}>
                   {msg}
                 </span>
@@ -161,21 +190,57 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
 
           <Grid item xs={12}>
             <TextField
-              id="standard-multiline-flexible"
-              name="description"
-              label="Description"
-              multiline
-              rowsMax={8}
-              value={formData.description}
+              name="email"
+              label="Email"
+              // variant="outlined"
+              type="email"
+              required
+              value={formData.email}
               fullWidth
               onChange={handleChange}
-              error={responseErrors?.description}
+              error={responseErrors?.email}
             />
           </Grid>
 
           {responseErrors ? (
             <Grid item xs={12}>
-              {responseErrors.description?.map((msg) => (
+              {responseErrors.email?.map((msg) => (
+                <div className={classes.errorsContainer}>
+                  <span key={msg} className={classes.errorMsg}>
+                    {msg}
+                  </span>
+                </div>
+              ))}
+            </Grid>
+          ) : null}
+
+          <Grid>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Type</FormLabel>
+              <RadioGroup
+                aria-label="type"
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+              >
+                <FormControlLabel
+                  value="1"
+                  control={<Radio />}
+                  label="Vendor"
+                />
+                <FormControlLabel
+                  value="2"
+                  control={<Radio />}
+                  label="Hot Sale"
+                />
+                <FormControlLabel value="3" control={<Radio />} label="Both" />
+              </RadioGroup>
+            </FormControl>
+          </Grid>
+
+          {responseErrors ? (
+            <Grid item xs={12}>
+              {responseErrors.type?.map((msg) => (
                 <span key={msg} className={classes.errorMsg}>
                   {msg}
                 </span>
@@ -184,14 +249,57 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
           ) : null}
 
           <Grid item xs={12}>
-            <div style={{ display: "flex" }}>
-              <input
-                accept="image/*"
-                className={classes.uploadInput}
-                id="icon-button-file"
-                type="file"
-                onChange={handleUpload}
-              />
+            <FormControl>
+              {
+                <TextField
+                  id="standard-select-currency-native"
+                  select
+                  label="User"
+                  value={formData.userid_id}
+                  name="userid_id"
+                  onChange={handleChange}
+                  SelectProps={{
+                    native: true,
+                  }}
+                  helperText="Please select a User"
+                  fullWidth
+                  required
+                  error={responseErrors?.userid_id}
+                >
+                  <option aria-label="None" value="" />
+
+                  {Object.entries(users)?.map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value}
+                    </option>
+                  ))}
+                </TextField>
+              }
+            </FormControl>
+          </Grid>
+
+          {responseErrors ? (
+            <Grid item xs={12}>
+              {responseErrors.userid_id?.map((msg) => (
+                <span key={msg} className={classes.errorMsg}>
+                  {msg}
+                </span>
+              ))}
+            </Grid>
+          ) : null}
+
+          <FormControl className={classes.formControl}>
+            <Grid item xs={12}>
+              <div style={{display:'flex'}}>
+              <div>
+                <input
+                  accept="image/*"
+                  className={classes.uploadInput}
+                  id="icon-button-file"
+                  type="file"
+                  onChange={handleUpload}
+                />
+              </div>
               <label htmlFor="icon-button-file">
                 <Button
                   variant="contained"
@@ -217,15 +325,16 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
               >
                 {imgName}
               </span>
-            </div>
-          </Grid>
+              </div>
+            </Grid>
+          </FormControl>
 
           {responseErrors ? (
             <Grid item xs={12}>
-              {responseErrors.photo?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
+              {responseErrors.images?.map((msg) => (
+                <p key={msg} className={classes.errorMsg}>
                   {msg}
-                </span>
+                </p>
               ))}
             </Grid>
           ) : null}
@@ -248,7 +357,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
                     </IconButton>
                   }
                 >
-                  Please upload an Image.
+                  At least 1 Image required!
                 </Alert>
               </Collapse>
             </FormControl>
@@ -276,4 +385,4 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   );
 }
 
-export default CategoriesForm;
+export default VendorsForm;

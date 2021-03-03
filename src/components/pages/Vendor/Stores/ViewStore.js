@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import axios from "../../../axios";
-import { useStateValue } from "../../../StateProvider";
+import axios from "../../../../axios";
+import { useStateValue } from "../../../../StateProvider";
 import { Button } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -52,50 +52,31 @@ const useStyles = makeStyles({
   },
 });
 
-const vendorTypes = {
-  1: "Vendor",
-  2: "Hot Sale",
-  3: "Both",
-};
 
-function ViewVendor({ match }) {
+function ViewStore({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [vendor, setVendor] = useState("");
-  const [vendorTypes, setVendorTypes] = useState("");
+  const [store, setStore] = useState("");
 
   useEffect(() => {
     axios
-      .get(`/add-vendors/${match.params.id}`, {
+      .get(`/stores/${match.params.id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setVendor(res.data.data);
-      });
-
-    axios
-      .get(`/add-vendors/get/types`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        setVendorTypes(res.data.data);
+        setStore(res.data.data);
       });
   }, []);
-
-  const uppercaseWords = (str) =>
-    str.replace(/^(.)|\s+(.)/g, (c) => c.toUpperCase());
 
   return (
     <Fragment>
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/vendor/add")}
+        onClick={() => history.push("/vendor/stores")}
         mb={3}
       >
         Back to list
@@ -103,7 +84,7 @@ function ViewVendor({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={vendor.id}>
+            <StyledTableRow key={store.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
@@ -111,56 +92,44 @@ function ViewVendor({ match }) {
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{vendor.id}</StyledTableCell>
+              <StyledTableCell align="left">{store.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.serial}>
+            <StyledTableRow key={store.name}>
               <StyledTableCell component="th" scope="row">
-                Serial
+                Store Name
               </StyledTableCell>
-              <StyledTableCell align="left">{vendor.serial}</StyledTableCell>
+              <StyledTableCell align="left">{store.name}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.vendor_name}>
+            <StyledTableRow key={store.address}>
               <StyledTableCell component="th" scope="row">
-                Vendor
+                Address
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{vendor.vendor_name}</span>
+                <span className={classes.rowContent}>{store.address}</span>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.email}>
+            <StyledTableRow key={store.moderator_name}>
               <StyledTableCell component="th" scope="row">
-                Email
+                Moderator Name
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{vendor.email}</span>
+                <span className={classes.rowContent}>{store.moderator_name}</span>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.type}>
+            <StyledTableRow key={store.moderator_phone}>
               <StyledTableCell component="th" scope="row">
-                Type
+                Moderator Phone
               </StyledTableCell>
               <StyledTableCell align="left">
-                {vendor.type && vendorTypes
-                  ? uppercaseWords(vendorTypes[vendor.type])
-                  : null}
+                <span className={classes.rowContent}>{store.moderator_phone}</span>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.userid?.name}>
+            <StyledTableRow key={store.moderator_alt_phone}>
               <StyledTableCell component="th" scope="row">
-                Username
+                Moderator Alternative Phone
               </StyledTableCell>
               <StyledTableCell align="left">
-                {vendor.userid?.name}
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={user.userid_id}>
-              <StyledTableCell component="th" scope="row">
-                Logo
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {vendor.media?.map(({ image, file_name }) => (
-                  <img src={image} alt={file_name} className={classes.media} />
-                ))}
+                <span className={classes.rowContent}>{store.moderator_alt_phone}</span>
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>
@@ -170,4 +139,4 @@ function ViewVendor({ match }) {
   );
 }
 
-export default ViewVendor;
+export default ViewStore;

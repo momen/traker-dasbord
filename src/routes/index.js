@@ -81,21 +81,51 @@ const Products = async(() =>
   import("../components/pages/ProductManagement/Products/Products.js")
 );
 
-const Vendors = async(() => import("../components/pages/Vendor/Vendors"));
+const Vendors = async(() => import("../components/pages/Vendor/AddVendor/Vendors"));
+const Stores = async(() => import("../components/pages/Vendor/Stores/Stores"));
 
-const ViewPermission = async(() => import("../components/pages/UserManagement/Permissions/ViewPermission"));
-const ViewRole = async(() => import("../components/pages/UserManagement/Roles/ViewRole"));
-const ViewUser = async(() => import("../components/pages/UserManagement/Users/ViewUser"));
-const ViewLog = async(() => import("../components/pages/UserManagement/AuditLogs/ViewLog"));
+const ViewPermission = async(() =>
+  import("../components/pages/UserManagement/Permissions/ViewPermission")
+);
+const ViewRole = async(() =>
+  import("../components/pages/UserManagement/Roles/ViewRole")
+);
+const ViewUser = async(() =>
+  import("../components/pages/UserManagement/Users/ViewUser")
+);
+const ViewLog = async(() =>
+  import("../components/pages/UserManagement/AuditLogs/ViewLog")
+);
 
-const ViewCategory = async(() => import("../components/pages/ProductManagement/Categories/ViewCategory"));
-const ViewCarMade = async(() => import("../components/pages/ProductManagement/CarMade/ViewCarMade"));
-const ViewCarModel = async(() => import("../components/pages/ProductManagement/CarModel/ViewCarModel"));
-const ViewPartCategory = async(() => import("../components/pages/ProductManagement/PartCategory/ViewPartCategory"));
-const ViewCarYear = async(() => import("../components/pages/ProductManagement/CarYear/ViewCarYear"));
-const ViewProductTag = async(() => import("../components/pages/ProductManagement/Tags/ViewTag"));
+const ViewCategory = async(() =>
+  import("../components/pages/ProductManagement/Categories/ViewCategory")
+);
+const ViewCarMade = async(() =>
+  import("../components/pages/ProductManagement/CarMade/ViewCarMade")
+);
+const ViewCarModel = async(() =>
+  import("../components/pages/ProductManagement/CarModel/ViewCarModel")
+);
+const ViewPartCategory = async(() =>
+  import("../components/pages/ProductManagement/PartCategory/ViewPartCategory")
+);
+const ViewCarYear = async(() =>
+  import("../components/pages/ProductManagement/CarYear/ViewCarYear")
+);
+const ViewProductTag = async(() =>
+  import("../components/pages/ProductManagement/Tags/ViewTag")
+);
+const ViewProduct = async(() =>
+  import("../components/pages/ProductManagement/Products/ViewProduct")
+);
 
-const ViewVendor = async(() => import("../components/pages/Vendor/ViewVendor"));
+
+const ViewVendor = async(() =>
+  import("../components/pages/Vendor/AddVendor/ViewVendor")
+);
+const ViewStore = async(() =>
+  import("../components/pages/Vendor/Stores/ViewStore")
+);
 
 const ChangePassword = async(() =>
   import("../components/pages/ChangePassword/ChangePassword")
@@ -108,7 +138,7 @@ const dashboardRoutes = {
   badge: "8",
   component: Dashborad,
   children: null,
-  containsHome: true
+  containsHome: true,
 };
 
 const userManagementRoutes = {
@@ -162,7 +192,6 @@ const viewUser = {
   children: null,
 };
 
-
 const viewLog = {
   path: "/user-mgt/logs/:id",
   component: ViewLog,
@@ -197,7 +226,7 @@ const productManagementRoutes = {
       path: "/product/part-category",
       name: "Part Category",
       component: PartCategory,
-      icon: <Category/>,
+      icon: <Category />,
     },
     {
       path: "/product/car-year",
@@ -251,6 +280,11 @@ const viewProductTag = {
   children: null,
 };
 
+const viewProduct = {
+  path: "/product/products/:id",
+  component: ViewProduct,
+  children: null,
+};
 
 const vendorRoutes = {
   id: "Vendor",
@@ -264,6 +298,12 @@ const vendorRoutes = {
       component: Vendors,
       icon: <GroupAdd />,
     },
+    {
+      path: "/vendor/stores",
+      name: "Stores",
+      component: Stores,
+      icon: <Store />,
+    },
   ],
 };
 
@@ -272,7 +312,11 @@ const viewVendor = {
   component: ViewVendor,
   children: null,
 };
-
+const viewStore = {
+  path: "/vendor/stores/:id",
+  component: ViewStore,
+  children: null,
+};
 
 const changePasswordRoute = {
   id: "Change Password",
@@ -326,7 +370,9 @@ export const dashboardLayoutRoutes = [
   viewPartCategory,
   viewCarYear,
   viewProductTag,
+  viewProduct,
   viewVendor,
+  viewStore,
   changePasswordRoute,
 ];
 

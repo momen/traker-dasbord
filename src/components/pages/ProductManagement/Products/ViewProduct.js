@@ -11,6 +11,8 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
+import CurrencyFormat from 'react-currency-format';
+
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -27,6 +29,8 @@ const StyledTableRow = withStyles((theme) => ({
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
+    whiteSpace: "normal",
+    wordWrap: "break-word",
   },
 }))(TableRow);
 
@@ -48,8 +52,29 @@ const useStyles = makeStyles({
   },
 
   media: {
-    width: "25%",
+    width: "24%",
     objectFit: "contain",
+    marginRight: "5px",
+  },
+  categoriesBadge: {
+    background: "#e5c08b",
+    color: "#000000",
+    fontSize: "12px",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
+  },
+  tagsBadge: {
+    background: "#e5c08b",
+    color: "#000000",
+    fontSize: "12px",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
   },
 });
 
@@ -57,18 +82,18 @@ function ViewProduct({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [category, setCategory] = useState(""); //Customize
+  const [product, setProduct] = useState(""); //Customize
 
   //Customize
   useEffect(() => {
     axios
-      .get(`/product-categories/${match.params.id}`, {
+      .get(`/products/${match.params.id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setCategory(res.data.data);
+        setProduct(res.data.data);
       });
   }, []);
 
@@ -77,7 +102,7 @@ function ViewProduct({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/product/categories")} //Customize
+        onClick={() => history.push("/product/products")} //Customize
         mb={3}
       >
         Back to list
@@ -85,7 +110,7 @@ function ViewProduct({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={`cat ${category.id}`}>
+            <StyledTableRow key={`product ${product.id}`}>
               <StyledTableCell
                 component="th"
                 scope="row"
@@ -93,34 +118,141 @@ function ViewProduct({ match }) {
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{category.id}</StyledTableCell>
+              <StyledTableCell align="left">{product.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={category.name}>
+            <StyledTableRow key={product.name}>
               <StyledTableCell component="th" scope="row">
-                Category Name
+                Product Name
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{category.name}</span>
+                <span className={classes.rowContent}>{product.name}</span>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={category.description}>
+            <StyledTableRow key={`store-${product.store_id}`}>
+              <StyledTableCell component="th" scope="row">
+                Store
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.store?.name}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={product.description}>
               <StyledTableCell component="th" scope="row">
                 Description
               </StyledTableCell>
               <StyledTableCell align="left">
-                <p className={classes.rowContent}>{category.description}</p>
+                <p className={classes.rowContent}>{product.description}</p>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={user.userid_id}>
               <StyledTableCell component="th" scope="row">
-                Photo
+                Images
               </StyledTableCell>
               <StyledTableCell align="left">
-                <img
-                  className={`${classes.media} ${classes.rowContent}`}
-                  src={category.photo?.image}
-                  alt={category.photo?.file_name}
-                />
+                {product.photo?.map((img) => (
+                  <Fragment>
+                  <img
+                    className={classes.media}
+                    src={img.image}
+                    alt={img.file_name}
+                  />
+                  </Fragment>
+                ))}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`quantity-${product.quantity}`}>
+              <StyledTableCell component="th" scope="row">
+                Quantity
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.quantity}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`price-${product.price}`}>
+              <StyledTableCell component="th" scope="row">
+                Price
+              </StyledTableCell>
+              <StyledTableCell align="left">
+              <CurrencyFormat value={product.price} displayType={'text'} thousandSeparator={true} prefix={'$'} renderText={value => <span className={classes.rowContent}>{value}</span>}/>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`discount-${product.discount}`}>
+              <StyledTableCell component="th" scope="row">
+                Discount
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.discount}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`serial-${product.serial_number}`}>
+              <StyledTableCell component="th" scope="row">
+                Serial Number
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.serial_number}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`product-cat-${product.id}`}>
+              <StyledTableCell
+                component="th"
+                scope="row"
+              >
+                Categories
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {product.categories?.map((category) => (
+                  <span key={category.id} className={classes.categoriesBadge}>
+                    {category.name}
+                  </span>
+                ))}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`product-tags-${product.id}`}>
+              <StyledTableCell
+                component="th"
+                scope="row"
+              >
+                Tags
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {product.tags?.map((tag) => (
+                  <span key={tag.id} className={classes.tagsBadge}>
+                    {tag.name}
+                  </span>
+                ))}
+              </StyledTableCell>
+            </StyledTableRow>
+
+            <StyledTableRow key={`model-${product.car_model_id}`}>
+              <StyledTableCell component="th" scope="row">
+                Car Model
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.car_model?.carmodel}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`year-${product.year_id}`}>
+              <StyledTableCell component="th" scope="row">
+                Car Year
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.year?.year}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`made-${product.car_made_id}`}>
+              <StyledTableCell component="th" scope="row">
+                Car Made
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.car_made?.car_made}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`part-${product.part_category_id}`}>
+              <StyledTableCell component="th" scope="row">
+                Part Category
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.part_category?.category_name}</span>
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>

@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
   inputMessage: {
     wordBreak: "break-word",
   },
-  
+
   errorsContainer: {
     marginBottom: theme.spacing(1),
   },
@@ -70,7 +70,7 @@ function ProductsForm({
   carModels,
   partCategories,
   carYears,
-  tags,
+  productTags,
 }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
@@ -98,32 +98,58 @@ function ProductsForm({
   });
   const [imgName, setImgName] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
-  const [autoSelectError, setAutoSelectError] = useState(false);
+  const [autoSelectCategoryError, setAutoSelectCategoryError] = useState(false);
+  const [autoSelectTagError, setAutoSelectTagError] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
+
+  let data = new FormData();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let data = new FormData();
 
     if (formData.categories.length === 0) {
-      setAutoSelectError(true);
+      setAutoSelectCategoryError(true);
       return;
     }
-    setAutoSelectError(false);
+    if (formData.tags.length === 0) {
+      setAutoSelectTagError(true);
+      return;
+    }
+
+    if (formData.photo.length === 0) {
+      setOpenAlert(true);
+      return;
+    }
+
+    setAutoSelectCategoryError(false);
+    setAutoSelectTagError(false);
 
     if (!formData.photo && !itemToEdit) {
       setOpenAlert(true);
     } else {
-      Object.entries(formData).forEach(
-        ([key, value]) => data.append(key,value)
-    );
-      // data.append("name", formData.name);
-      // if (formData.description) {
-      //   data.append("description", formData.description);
-      // }
-      // if (formData.photo) {
-      //   data.append("photo", formData.photo, formData.photo.name);
-      // }
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "photo") return;
+        if (key === "categories") {
+          data.append(
+            key,
+            value.map((val) => val.id)
+          );
+        } else if (key === "tags") {
+          data.append(
+            key,
+            value.map((val) => val.id)
+          );
+        } else {
+          data.append(key, value);
+        }
+      });
+
+      formData.photo.forEach((file) => {
+        data.append("photo[]", file, file.name);
+        console.log(file);
+      });
+
+      JSON.stringify(data);
 
       if (itemToEdit) {
         await axios
@@ -167,8 +193,8 @@ function ProductsForm({
   };
 
   const updateAutoCompleteCategories = (e, val) => {
-    if (autoSelectError) {
-      setAutoSelectError(false);
+    if (autoSelectCategoryError) {
+      setAutoSelectCategoryError(false);
     }
     updateFormData({
       ...formData,
@@ -177,8 +203,8 @@ function ProductsForm({
   };
 
   const updateAutoCompleteTags = (e, val) => {
-    if (autoSelectError) {
-      setAutoSelectError(false);
+    if (autoSelectTagError) {
+      setAutoSelectTagError(false);
     }
     updateFormData({
       ...formData,
@@ -189,10 +215,15 @@ function ProductsForm({
   const handleUpload = (e) => {
     const name = e.target.value.replace(/.*[\/\\]/, "");
     setImgName(name);
-    console.log(e.target.files[0]);
+    console.log(e.target.files);
+    let filesList = [];
+    Object.entries(e.target.files).forEach(([key, value]) => {
+      filesList.push(value);
+    });
+    console.log(filesList);
     updateFormData({
       ...formData,
-      photo: [...formData.photo, e.target.files[0]],
+      photo: [...formData.photo, ...filesList],
     });
     setOpenAlert(false);
   };
@@ -208,7 +239,7 @@ function ProductsForm({
       price: "",
       part_category_id: "",
       categories: [],
-      tags:[],
+      tags: [],
       store_id: "",
       quantity: "",
       serial_number: "",
@@ -337,9 +368,14 @@ function ProductsForm({
                 name="discount"
                 fullWidth
                 label="Discount"
-                prefix="%"
+                // prefix="%"
                 value={formData.discount}
-                onChange={handleChange}
+                onChange={(e) =>
+                  updateFormData({
+                    ...formData,
+                    discount: parseFloat(e.target.value),
+                  })
+                }
                 error={responseErrors?.discount}
                 helperText="Min %5 ~ Max %80"
                 InputProps={{ inputProps: { min: 5 } }}
@@ -526,7 +562,7 @@ function ProductsForm({
                     placeholder="Select related Categories for this Product"
                     fullWidth
                     helperText="At least one category must be selected."
-                    error={autoSelectError}
+                    error={autoSelectCategoryError}
                   />
                 )}
                 onChange={updateAutoCompleteCategories}
@@ -583,7 +619,7 @@ function ProductsForm({
               <Autocomplete
                 multiple
                 // filterSelectedOptions
-                options={tags ? tags : []}
+                options={productTags ? productTags : []}
                 value={formData.tags}
                 getOptionSelected={(option, value) => option.id === value.id}
                 disableCloseOnSelect
@@ -609,7 +645,7 @@ function ProductsForm({
                     placeholder="Select related Tags for this Product"
                     fullWidth
                     helperText="At least one tag must be selected."
-                    error={autoSelectError}
+                    error={autoSelectTagError}
                   />
                 )}
                 onChange={updateAutoCompleteTags}
@@ -661,6 +697,7 @@ function ProductsForm({
                 id="icon-button-file"
                 type="file"
                 onChange={handleUpload}
+                multiple
               />
               <label htmlFor="icon-button-file">
                 <Button
@@ -711,7 +748,7 @@ function ProductsForm({
                     </IconButton>
                   }
                 >
-                  Please upload an Image.
+                  Please upload at least one Image.
                 </Alert>
               </Collapse>
             </FormControl>

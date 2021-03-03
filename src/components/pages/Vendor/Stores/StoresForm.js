@@ -12,8 +12,8 @@ import {
   RadioGroup,
   TextField,
 } from "@material-ui/core";
-import axios from "../../../axios";
-import { useStateValue } from "../../../StateProvider";
+import axios from "../../../../axios";
+import { useStateValue } from "../../../../StateProvider";
 import { PhotoCamera } from "@material-ui/icons";
 import { Alert } from "@material-ui/lab";
 import { CloseIcon } from "@material-ui/data-grid";
@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
+function StoresForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
 
@@ -385,4 +385,4 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   );
 }
 
-export default VendorsForm;
+export default StoresForm;

@@ -1,12 +1,9 @@
 import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
-import { NavLink, useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import PropTypes from "prop-types";
 
 import {
-  Link,
-  Breadcrumbs as MuiBreadcrumbs,
   Card as MuiCard,
   CardContent as MuiCardContent,
   Divider as MuiDivider,
@@ -34,16 +31,18 @@ import { UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
-import ProductsForm from "./ProductsForm";
+import VendorsForm from "./VendorsForm";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
+import { useHistory } from "react-router-dom";
 
 const Card = styled(MuiCard)(spacing);
+const CardContent = styled(MuiCardContent)(spacing);
 const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles({
   root: {
     display: "flex",
   },
@@ -54,24 +53,7 @@ const useStyles = makeStyles((theme) => ({
       background: "#388e3c",
     },
   },
-  toolBar: {
-    display: "flex",
-    justifyContent: "space-between",
-    width: "100%",
-    borderRadius: "6px",
-  },
-
-  categoriesBadge: {
-    background: "#e5c08b",
-    color: "#000000",
-    fontSize: "12px",
-    fontWeight: "bold",
-    borderRadius: "6px",
-    padding: "5px",
-    marginRight: "5px",
-    userSelect: "none",
-  },
-}));
+});
 
 function CustomPagination(props) {
   const { state, api } = props;
@@ -113,92 +95,62 @@ function CustomLoadingOverlay() {
   );
 }
 
-function Products() {
+function Vendors() {
   const classes = useStyles();
-  const [{ user, userPermissions }] = useStateValue();
   const history = useHistory();
+  const [{ user, userPermissions }] = useStateValue();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Product");
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Category");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(""); // Customize
+  const [vendor, setVendor] = useState(""); /****** Customize ******/
+  const [itemAddedOrEdited, setItemAddedOrEdited] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [carMades, setCarMades] = useState([]);
-  const [carModels, setCarModels] = useState([]);
-  const [partCategories, setPartCategories] = useState([]);
-  const [carYears, setCarYears] = useState([]);
-  const [stores, setStores] = useState([]);
-  const [productTags, setProductTags] = useState([]);
+  const [users, setUsers] = useState("");
 
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
-    { field: "name", headerName: "Name", width: 80 },
-    { field: "description", headerName: "Description", width: 80 },
+    { field: "serial", headerName: "Serial", width: 70 },
+    { field: "vendor_name", headerName: "Vendor Name", width: 200, flex: 1 },
+    { field: "email", headerName: "Email", width: 200, flex: 1 },
     {
-      field: "car_model",
-      headerName: "Car Model",
-      width: 80,
-      renderCell: (params) => params.value?.carmodel,
-    },
-    {
-      field: "year",
-      headerName: "Year",
-      width: 50,
-      renderCell: (params) => params.value?.year,
-    },
-    { field: "price", headerName: "Price", width: 70 },
-    {
-      field: "discount",
-      headerName: "Discount",
+      field: "userid",
+      headerName: "Username",
       width: 70,
-      renderCell: (params) => `%${params.value}`,
-      align: "center",
+      renderCell: (params) => {
+        return params.value.name;
+      },
     },
     {
-      field: "categories",
-      headerName: "Categories",
-      width: 100,
-      flex: 1,
-      renderCell: (params) => (
-        <div>
-          {params.value?.map((category) => (
-            <span key={category.id} className={classes.categoriesBadge}>
-              {category.name}
-            </span>
-          ))}
-        </div>
-      ),
-    },
-    {
-      field: "photo",
-      headerName: "Photos",
-      width: 80,
-      renderCell: (params) => (
-        <Fragment>
-          {params.value?.map((img) => (
+      field: "images",
+      headerName: "Logo",
+      width: 70,
+      renderCell: (params) => {
+        if (params.value) {
+          return (
             <img
-              src={img.image}
-              alt="ph"
-              style={{ objectFit: "contain", width: 50 }}
+              src={params.value.image}
+              alt="logo"
+              style={{ objectFit: "contain", width: 50, borderRadius: "50%" }}
             />
-          ))}
-        </Fragment>
-      ),
+          );
+        }
+      },
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 170,
+      width: 220,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
+        // let carMade = params.getValue("id");
         return (
           <div
             style={{
@@ -208,45 +160,36 @@ function Products() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("product_show") ? (
+            {userPermissions.includes("add_vendor_show") ? (
               <Button
-                style={{
-                  marginRight: "5px",
-                  minWidth: "50px",
-                  maxWidth: "50px",
-                }}
+                style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() =>
-                  history.push(`/product/products/${params.row.id}`)
-                }
+                onClick={() => history.push(`/vendor/add/${params.row.id}`)}
               >
                 View
               </Button>
             ) : null}
-            {userPermissions.includes("product_edit") ? (
+            {userPermissions.includes("add_vendor_edit") ? (
               <Button
-                style={{
-                  marginRight: "5px",
-                  minWidth: "50px",
-                  maxWidth: "50px",
-                }}
+                style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
                 size="small"
                 onClick={() => {
-                  setSelectedItem(params.row);
+                  setVendor(params.row);
                   setOpenPopup(true);
-                  setOpenPopupTitle("Edit Product"); /****** Customize ******/
+                  setOpenPopupTitle(
+                    "Update Vendor Details"
+                  ); /****** Customize ******/
                 }}
               >
                 Edit
               </Button>
             ) : null}
 
-            {userPermissions.includes("product_delete") ? (
+            {userPermissions.includes("add_vendor_delete") ? (
               <Button
-                style={{ minWidth: "50px", maxWidth: "50px" }}
                 color="secondary"
                 variant="contained"
                 size="small"
@@ -258,18 +201,6 @@ function Products() {
           </div>
         );
       },
-    },
-    {
-      field: "car_made",
-      headerName: "Car Made",
-      width: 80,
-      renderCell: (params) => params.value.car_made,
-    },
-    {
-      field: "part_category",
-      headerName: "Part Category",
-      width: 80,
-      renderCell: (params) => params.value?.category_name,
     },
   ];
 
@@ -302,7 +233,7 @@ function Products() {
   const DeleteCategory = async () => {
     console.log(itemToDelete);
     await axios
-      .delete(`/products/${itemToDelete}`, {
+      .delete(`/add-vendors/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -312,7 +243,7 @@ function Products() {
       });
 
     await axios
-      .get(`/products?page=${page}`, {
+      .get(`/add-vendors?page=${page}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -327,114 +258,33 @@ function Products() {
       });
   };
 
-  /*-Get car mades only on the initial render to pass it to the pop-up form 
+  /*-Get Users only on the initial render to pass it to the pop-up form 
     when adding or editing, to prevent repeating the request each time the
     pop-up is opened-*/
   useEffect(() => {
     axios
-      .get("/storeslist", {
+      .post("/add-vendors/get/userid_id", null, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        const _stores = res.data.data.map(({ id, name }) => ({ id, name }));
-        setStores(_stores);
-      });
-
-    axios
-      .get("/categorieslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
+        setUsers(res.data.data);
       })
-      .then((res) => {
-        const _categories = res.data.data.map(({ id, name }) => ({ id, name }));
-        setCategories(_categories);
-      });
-
-    axios
-      .get("/car-madeslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        const _carMades = res.data.data.map(({ id, car_made }) => ({
-          id,
-          car_made,
-        })); // Customize
-        setCarMades(_carMades);
-      });
-
-    axios
-      .get("/car-modelslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        const _carModels = res.data.data.map(({ id, carmodel }) => ({
-          id,
-          carmodel,
-        })); // Customize
-        setCarModels(_carModels);
-      });
-
-    axios
-      .get("/car-yearslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        const _carYears = res.data.data.map(({ id, year }) => ({
-          id,
-          year,
-        })); // Customize
-        setCarYears(_carYears);
-      });
-
-    axios
-      .get("/part-categorieslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        const _partCategories = res.data.data.map(({ id, category_name }) => ({
-          id,
-          category_name,
-        })); // Customize
-        setPartCategories(_partCategories);
-      });
-
-    axios
-      .get("/product-tagslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        const _tags = res.data.data.map(({ id, name }) => ({
-          id,
-          name,
-        })); // Customize
-        console.log("*****Tags*****");
-        console.log(_tags);
-        console.log("*****Tags*****");
-        setProductTags(_tags);
+      .catch((err) => {
+        console.log("Error");
       });
   }, []);
 
-  // Request the page records either on the initial render, data changed (added/edited/deleted)
-  // or whenever the page changes (Pagination)
+  //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
+    console.log("In Effect");
     if (openPopup) return;
     setLoading(true);
+    console.log("Passed");
     if (!userIsSearching) {
       axios
-        .get(`/products?page=${page}`, {
+        .get(`/add-vendors?page=${page}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -447,7 +297,7 @@ function Products() {
     } else {
       axios
         .post(
-          "/products/search/name",
+          "/add-vendors/search/name",
           {
             search_index: searchValue,
           },
@@ -470,29 +320,36 @@ function Products() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Products
+        Vendors
       </Typography>
 
       <Divider my={6} />
 
-      {userPermissions.includes("product_create") ? (
+      {userPermissions.includes("add_vendor_create") ? (
         <Button
           mb={3}
           className={classes.button}
           variant="contained"
           onClick={() => {
-            setOpenPopupTitle("New Product");
+            setOpenPopupTitle("New Vendor");
             setOpenPopup(true);
-            setSelectedItem("");
+            setVendor("");
           }}
         >
-          Add Product
+          Add Vendor
         </Button>
       ) : null}
 
       <Card mb={6}>
         <Paper mb={2}>
-          <Toolbar className={classes.toolBar}>
+          <Toolbar
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              borderRadius: "3px",
+            }}
+          >
             <FormControl variant="outlined">
               <Select
                 value={pageSize}
@@ -561,17 +418,11 @@ function Products() {
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
-        <ProductsForm
+        <VendorsForm
           setPage={setPage}
           setOpenPopup={setOpenPopup}
-          itemToEdit={selectedItem}
-          stores={stores}
-          categories={categories}
-          carMades={carMades}
-          carModels={carModels}
-          partCategories={partCategories}
-          carYears={carYears}
-          productTags={productTags}
+          itemToEdit={vendor}
+          users={users}
         />
       </Popup>
 
@@ -585,7 +436,7 @@ function Products() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Product? <br />
+            Are you sure you want to delete this Vendor? <br />
             If this was by accident please press Back
           </DialogContentText>
         </DialogContent>
@@ -611,4 +462,4 @@ function Products() {
   );
 }
 
-export default Products;
+export default Vendors;

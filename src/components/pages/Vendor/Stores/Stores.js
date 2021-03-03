@@ -28,10 +28,10 @@ import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
-import Popup from "../../Popup";
-import axios from "../../../axios";
-import { useStateValue } from "../../../StateProvider";
-import VendorsForm from "./VendorsForm";
+import Popup from "../../../Popup";
+import axios from "../../../../axios";
+import { useStateValue } from "../../../../StateProvider";
+import StoresForm from "./StoresForm";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
 import { useHistory } from "react-router-dom";
@@ -95,48 +95,31 @@ function CustomLoadingOverlay() {
   );
 }
 
-function Vendors() {
+function Stores() {
   const classes = useStyles();
   const history = useHistory();
   const [{ user, userPermissions }] = useStateValue();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Category");
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Store");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [vendor, setVendor] = useState(""); /****** Customize ******/
-  const [itemAddedOrEdited, setItemAddedOrEdited] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(""); /****** Customize ******/
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [users, setUsers] = useState("");
 
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
-    { field: "serial", headerName: "Serial", width: 70 },
-    { field: "vendor_name", headerName: "Vendor Name", width: 200, flex: 1 },
-    { field: "email", headerName: "Email", width: 200, flex: 1 },
-    {
-      field: "userid",
-      headerName: "Username",
-      width: 70,
-      renderCell: (params) => {
-        return params.value.name;
-      },
-    },
-    {
-      field: "images",
-      headerName: "Logo",
-      width: 70,
-      renderCell: (params) => {
-        if (params.value) {
-          return <img src={params.value.image} alt="logo" style={{objectFit:"contain", width:50, borderRadius:"50%"}}/>;
-        }
-      },
-    },
+    { field: "name", headerName: "Name", width: 70 },
+    { field: "address", headerName: "Address", width: 200, flex: 1 },
+    { field: "moderator_name", headerName: "Moderator Name", width: 200, flex: 1 },
+    { field: "moderator_phone", headerName: "Moderator Phone", width: 200, flex: 1 },
+    { field: "moderator_alt_phone", headerName: "Moderator Alt Phone", width: 200, flex: 1 },
     {
       field: "actions",
       headerName: "Actions",
@@ -154,27 +137,27 @@ function Vendors() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("add_vendor_show") ? (
+            {userPermissions.includes("stores_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/add/${params.row.id}`)}
+                onClick={() => history.push(`/vendor/stores/${params.row.id}`)}
               >
                 View
               </Button>
             ) : null}
-            {userPermissions.includes("add_vendor_edit") ? (
+            {userPermissions.includes("stores_edit") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
                 size="small"
                 onClick={() => {
-                  setVendor(params.row);
+                  setSelectedItem(params.row);
                   setOpenPopup(true);
                   setOpenPopupTitle(
-                    "Update Vendor Details"
+                    "Update Store Details"
                   ); /****** Customize ******/
                 }}
               >
@@ -182,7 +165,7 @@ function Vendors() {
               </Button>
             ) : null}
 
-            {userPermissions.includes("add_vendor_delete") ? (
+            {userPermissions.includes("stores_delete") ? (
               <Button
                 color="secondary"
                 variant="contained"
@@ -227,7 +210,7 @@ function Vendors() {
   const DeleteCategory = async () => {
     console.log(itemToDelete);
     await axios
-      .delete(`/add-vendors/${itemToDelete}`, {
+      .delete(`/stores/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -237,7 +220,7 @@ function Vendors() {
       });
 
     await axios
-      .get(`/add-vendors?page=${page}`, {
+      .get(`/stores?page=${page}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -252,33 +235,14 @@ function Vendors() {
       });
   };
 
-  /*-Get Users only on the initial render to pass it to the pop-up form 
-    when adding or editing, to prevent repeating the request each time the
-    pop-up is opened-*/
-  useEffect(() => {
-    axios
-      .post("/add-vendors/get/userid_id", null, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        setUsers(res.data.data);
-      })
-      .catch((err) => {
-        console.log("Error");
-      });
-  }, []);
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
-    console.log("In Effect");
     if (openPopup) return;
     setLoading(true);
-    console.log("Passed");
     if (!userIsSearching) {
       axios
-        .get(`/add-vendors?page=${page}`, {
+        .get(`/stores?page=${page}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -291,7 +255,7 @@ function Vendors() {
     } else {
       axios
         .post(
-          "/add-vendors/search/name",
+          "/stores/search/name",
           {
             search_index: searchValue,
           },
@@ -314,23 +278,23 @@ function Vendors() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Vendors
+        Stores
       </Typography>
 
       <Divider my={6} />
 
-      {userPermissions.includes("add_vendor_create") ? (
+      {userPermissions.includes("stores_create") ? (
         <Button
           mb={3}
           className={classes.button}
           variant="contained"
           onClick={() => {
-            setOpenPopupTitle("New Vendor");
+            setOpenPopupTitle("New Store");
             setOpenPopup(true);
-            setVendor("");
+            setSelectedItem("");
           }}
         >
-          Add Vendor
+          Add Store
         </Button>
       ) : null}
 
@@ -412,10 +376,10 @@ function Vendors() {
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
-        <VendorsForm
+        <StoresForm
           setPage={setPage}
           setOpenPopup={setOpenPopup}
-          itemToEdit={vendor}
+          itemToEdit={selectedItem}
           users={users}
         />
       </Popup>
@@ -456,4 +420,4 @@ function Vendors() {
   );
 }
 
-export default Vendors;
+export default Stores;
