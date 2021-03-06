@@ -235,7 +235,8 @@ function ChangePassword() {
         <Grid item md={6}>
           <EmailForm />
         </Grid>
-        <Grid item md={6}>
+        <Grid item md={1}></Grid>
+        <Grid item md={5}>
           <ChangePasswordForm />
         </Grid>
       </Grid>

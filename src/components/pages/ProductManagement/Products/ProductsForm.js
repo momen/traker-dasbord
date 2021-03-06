@@ -294,7 +294,7 @@ function ProductsForm({
 
               {responseErrors ? (
                 <div className={classes.inputMessage}>
-                  {responseErrors.name?.map((msg) => (
+                  {responseErrors.serial_number?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>

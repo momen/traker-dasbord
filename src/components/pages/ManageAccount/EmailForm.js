@@ -1,6 +1,7 @@
 import * as Yup from "yup";
 import styled from "styled-components/macro";
 import { Formik } from "formik";
+import axios from "../../../axios";
 
 import {
   Box,
@@ -8,8 +9,8 @@ import {
   Card as MuiCard,
   CardContent,
   CircularProgress,
-  Divider as MuiDivider,
   Grid,
+  Divider as MuiDivider,
   TextField as MuiTextField,
   Typography,
 } from "@material-ui/core";
@@ -17,9 +18,9 @@ import {
 import { Alert as MuiAlert } from "@material-ui/lab";
 
 import { spacing } from "@material-ui/system";
+import { useStateValue } from "../../../StateProvider";
 
 const Divider = styled(MuiDivider)(spacing);
-
 
 const Card = styled(MuiCard)(spacing);
 
@@ -31,40 +32,39 @@ const Button = styled(MuiButton)(spacing);
 
 const timeOut = (time) => new Promise((res) => setTimeout(res, time));
 
-const initialValues = {
-  password: "",
-  confirmPassword: "",
-};
-
 const validationSchema = Yup.object().shape({
-  password: Yup.string()
-    .min(8, "Must be at least 8 characters")
-    .max(255)
-    .required("Required"),
-  confirmPassword: Yup.string().when("password", {
-    is: (val) => (val && val.length > 0 ? true : false),
-    then: Yup.string().oneOf(
-      [Yup.ref("password")],
-      "Both password need to be the same"
-    ),
-  }),
+  name: Yup.string().required("Required"),
+  email: Yup.string().email().required("Required"),
 });
 
 export default function BasicForm() {
+  const [{ user }] = useStateValue();
+
+  const initialValues = {
+    name: user.name,
+    email: user.email,
+  };
+
   const handleSubmit = async (
     values,
     { resetForm, setErrors, setStatus, setSubmitting }
   ) => {
-    try {
-      await timeOut(1500);
-      resetForm();
-      setStatus({ sent: true });
-      setSubmitting(false);
-    } catch (error) {
-      setStatus({ sent: false });
-      setErrors({ submit: error.message });
-      setSubmitting(false);
-    }
+    axios
+      .post("edit/profile", values, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+      .then((response) => {
+        resetForm();
+        setStatus({ sent: true });
+        setSubmitting(false);
+      })
+      .catch(({ response }) => {
+        setStatus({ sent: false });
+        setErrors({ submit: response.data.errors });
+        setSubmitting(false);
+      });
   };
 
   return (
@@ -86,13 +86,13 @@ export default function BasicForm() {
         <Card mb={6}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              Change Password
+              My Profile
             </Typography>
-            <Divider my={3}/>
+            <Divider my={3} />
 
             {status && status.sent && (
               <Alert severity="success" my={3}>
-                Your password has been changed successfully!
+                Your profile has been updated successfully!
               </Alert>
             )}
 
@@ -101,34 +101,30 @@ export default function BasicForm() {
                 <CircularProgress />
               </Box>
             ) : (
-              <form onSubmit={handleSubmit}>
-
+              <form md={6} onSubmit={handleSubmit}>
                 <TextField
-                  name="password"
-                  label="Password"
-                  value={values.password}
-                  error={Boolean(touched.password && errors.password)}
+                  name="name"
+                  label="Username"
+                  value={values.name}
+                  error={Boolean(touched.name && errors.name)}
                   fullWidth
-                  helperText={touched.password && errors.password}
+                  helperText={touched.name && errors.name}
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  type="password"
                   variant="outlined"
                   my={2}
                 />
 
                 <TextField
-                  name="confirmPassword"
-                  label="Confirm password"
-                  value={values.confirmPassword}
-                  error={Boolean(
-                    touched.confirmPassword && errors.confirmPassword
-                  )}
+                  name="email"
+                  label="Email"
+                  value={values.email}
+                  error={Boolean(touched.email && errors.email)}
                   fullWidth
-                  helperText={touched.confirmPassword && errors.confirmPassword}
+                  helperText={touched.email && errors.email}
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  type="password"
+                  type="email"
                   variant="outlined"
                   my={2}
                 />
@@ -139,7 +135,7 @@ export default function BasicForm() {
                   color="primary"
                   mt={3}
                 >
-                  Change Password
+                  Update Profile
                 </Button>
               </form>
             )}

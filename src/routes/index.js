@@ -127,8 +127,8 @@ const ViewStore = async(() =>
   import("../components/pages/Vendor/Stores/ViewStore")
 );
 
-const ChangePassword = async(() =>
-  import("../components/pages/ChangePassword/ChangePassword")
+const ManageAccount = async(() =>
+  import("../components/pages/ManageAccount/ManageAccount")
 );
 
 const dashboardRoutes = {
@@ -318,11 +318,11 @@ const viewStore = {
   children: null,
 };
 
-const changePasswordRoute = {
-  id: "Change Password",
+const manageAccountRoute = {
+  id: "Manage Account",
   path: "/profile",
   icon: <VpnKey />,
-  component: ChangePassword,
+  component: ManageAccount,
   children: null,
 };
 
@@ -373,7 +373,7 @@ export const dashboardLayoutRoutes = [
   viewProduct,
   viewVendor,
   viewStore,
-  changePasswordRoute,
+  manageAccountRoute,
 ];
 
 // Routes using the Auth layout
@@ -388,6 +388,6 @@ export const sidebarRoutes = [
   userManagementRoutes,
   productManagementRoutes,
   vendorRoutes,
-  changePasswordRoute,
+  manageAccountRoute,
   logoutRoute,
 ];

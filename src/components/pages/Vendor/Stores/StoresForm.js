@@ -17,6 +17,7 @@ import { useStateValue } from "../../../../StateProvider";
 import { PhotoCamera } from "@material-ui/icons";
 import { Alert } from "@material-ui/lab";
 import { CloseIcon } from "@material-ui/data-grid";
+import Map from "../../../Map/Map";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -24,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "40vw",
+    width: "60vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -49,82 +50,54 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function StoresForm({ setPage, setOpenPopup, itemToEdit, users }) {
+function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
-    vendor_name: itemToEdit ? itemToEdit.vendor_name : "",
-    email: itemToEdit ? itemToEdit.email : "",
-    type: itemToEdit ? itemToEdit.type : "",
-    userid_id: itemToEdit ? itemToEdit.userid_id : "",
-    images: "",
+    name: itemToEdit ? itemToEdit.name : "",
+    address: itemToEdit ? itemToEdit.address : "",
+    moderator_name: itemToEdit ? itemToEdit.moderator_name : "",
+    moderator_phone: itemToEdit ? itemToEdit.moderator_phone : "",
+    moderator_alt_phone: itemToEdit ? itemToEdit.moderator_alt_phone : "",
+    lat: itemToEdit ? itemToEdit.lat : "",
+    long: itemToEdit ? itemToEdit.long : "",
   });
   const [openAlert, setOpenAlert] = useState(false);
   const [imgName, setImgName] = useState("");
   const [responseErrors, setResponseErrors] = useState("");
 
-  console.log(itemToEdit);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.images && !itemToEdit) {
-      setOpenAlert(true);
+
+    if (itemToEdit) {
+      await axios
+        .post(`/update/stores/${itemToEdit.id}`, formData, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        })
+        .then((res) => {
+          setOpenPopup(false);
+        })
+        .catch((res) => {
+          setResponseErrors(res.response.data.errors);
+        });
     } else {
-      let data = new FormData();
-      data.append("vendor_name", formData.vendor_name);
-      data.append("email", formData.email);
-      data.append("type", formData.type);
-      data.append("userid_id", formData.userid_id);
-
-      data.append("images", formData.images);
-      // formData.images.map(image => {
-      // })
-
-      // if (formData.serial) {
-      //   data.append("serial", formData.serial);
-      // }
-
-      console.log(data);
-      if (itemToEdit) {
-        await axios
-          .post(`/add-vendors/${itemToEdit.id}`, data, {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-              "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
-            },
-          })
-          .then((res) => {
-            setOpenPopup(false);
-          })
-          .catch((res) => {
-            setResponseErrors(res.response.data.errors);
-          });
-      } else {
-        // console.log("------------------------------");
-        // console.log(data);
-        // console.log("------------------------------");
-        // data.append("images", formData.images);
-
-        // data.append("images", formData.images[0].name, formData.images);
-        console.log(formData.images);
-
-        await axios
-          .post("/add-vendors", data, {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-              "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
-            },
-          })
-          .then((res) => {
-            setPage(1);
-            setOpenPopup(false);
-          })
-          .catch((res) => {
-            setResponseErrors(res.response.data.errors);
-          });
-      }
+      await axios
+        .post("/add/stores", formData, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        })
+        .then((res) => {
+          setPage(1);
+          setOpenPopup(false);
+        })
+        .catch((res) => {
+          setResponseErrors(res.response.data.errors);
+        });
     }
   };
 
@@ -135,25 +108,14 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, users }) {
     });
   };
 
-  const handleUpload = (e) => {
-    const name = e.target.value.replace(/.*[\/\\]/, "");
-    setImgName(name);
-    console.log(e.target.files[0]);
-    updateFormData({
-      ...formData,
-      images: e.target.files[0],
-    });
-    setOpenAlert(false);
-  };
-
   //Customize
   const handleReset = () => {
     updateFormData({
       vendor_name: "",
       email: "",
-      type:"",
-      userid_id:"",
-      images:"",
+      type: "",
+      userid_id: "",
+      images: "",
     });
     setResponseErrors("");
     setImgName("");
@@ -163,204 +125,139 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, users }) {
     <div className={classes.paper}>
       <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              name="vendor_name"
-              // variant="outlined"
-              required
-              fullWidth
-              id="vendor_name"
-              label="Vendor Name"
-              value={formData.vendor_name}
-              autoFocus
-              onChange={handleChange}
-              error={responseErrors?.vendor_name}
-            />
-          </Grid>
-
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.vendor_name?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
-
-          <Grid item xs={12}>
-            <TextField
-              name="email"
-              label="Email"
-              // variant="outlined"
-              type="email"
-              required
-              value={formData.email}
-              fullWidth
-              onChange={handleChange}
-              error={responseErrors?.email}
-            />
-          </Grid>
-
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.email?.map((msg) => (
-                <div className={classes.errorsContainer}>
-                  <span key={msg} className={classes.errorMsg}>
-                    {msg}
-                  </span>
-                </div>
-              ))}
-            </Grid>
-          ) : null}
-
-          <Grid>
-            <FormControl component="fieldset">
-              <FormLabel component="legend">Type</FormLabel>
-              <RadioGroup
-                aria-label="type"
-                name="type"
-                value={formData.type}
+          <Grid item xs={6}>
+            <div>
+              <TextField
+                name="name"
+                required
+                fullWidth
+                id="name"
+                label="Name"
+                value={formData.name}
                 onChange={handleChange}
-              >
-                <FormControlLabel
-                  value="1"
-                  control={<Radio />}
-                  label="Vendor"
-                />
-                <FormControlLabel
-                  value="2"
-                  control={<Radio />}
-                  label="Hot Sale"
-                />
-                <FormControlLabel value="3" control={<Radio />} label="Both" />
-              </RadioGroup>
-            </FormControl>
-          </Grid>
+                error={responseErrors?.name}
+              />
 
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.type?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
-
-          <Grid item xs={12}>
-            <FormControl>
-              {
-                <TextField
-                  id="standard-select-currency-native"
-                  select
-                  label="User"
-                  value={formData.userid_id}
-                  name="userid_id"
-                  onChange={handleChange}
-                  SelectProps={{
-                    native: true,
-                  }}
-                  helperText="Please select a User"
-                  fullWidth
-                  required
-                  error={responseErrors?.userid_id}
-                >
-                  <option aria-label="None" value="" />
-
-                  {Object.entries(users)?.map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value}
-                    </option>
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
                   ))}
-                </TextField>
-              }
-            </FormControl>
+                </div>
+              ) : null}
+            </div>
           </Grid>
 
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.userid_id?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
+          <Grid item xs={6}>
+            <div>
+              <TextField
+                name="moderator_name"
+                required
+                fullWidth
+                id="moderator_name"
+                label="Moderator Name"
+                value={formData.moderator_name}
+                onChange={handleChange}
+                error={responseErrors?.moderator_name}
+              />
 
-          <FormControl className={classes.formControl}>
-            <Grid item xs={12}>
-              <div style={{display:'flex'}}>
-              <div>
-                <input
-                  accept="image/*"
-                  className={classes.uploadInput}
-                  id="icon-button-file"
-                  type="file"
-                  onChange={handleUpload}
-                />
-              </div>
-              <label htmlFor="icon-button-file">
-                <Button
-                  variant="contained"
-                  color="default"
-                  className={classes.uploadButton}
-                  startIcon={<PhotoCamera />}
-                  component="span"
-                >
-                  Upload
-                </Button>
-              </label>
-              <span
-                style={{
-                  alignSelf: "center",
-                  // width: "350px",
-                  // display: "block",
-                  // overflow: "hidden",
-                  // whiteSpace: "noWarp",
-                  // lineHeight: 1,
-                  // textOverflow: "ellipsis",
-                  // textDecoration: "none",
-                }}
-              >
-                {imgName}
-              </span>
-              </div>
-            </Grid>
-          </FormControl>
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.moderator_name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
 
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.images?.map((msg) => (
-                <p key={msg} className={classes.errorMsg}>
-                  {msg}
-                </p>
-              ))}
-            </Grid>
-          ) : null}
+          <Grid item xs={6}>
+            <div>
+              <TextField
+                name="moderator_phone"
+                required
+                fullWidth
+                id="moderator_phone"
+                label="Moderator Phone"
+                value={formData.moderator_phone}
+                onChange={handleChange}
+                error={responseErrors?.moderator_phone}
+              />
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.moderator_phone?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+
+          <Grid item xs={6}>
+            <div>
+              <TextField
+                name="moderator_alt_phone"
+                fullWidth
+                id="moderator_alt_phone"
+                label="Moderator Alternative Phone"
+                value={formData.moderator_alt_phone}
+                onChange={handleChange}
+                error={responseErrors?.moderator_alt_phone}
+              />
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.moderator_alt_phone?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
 
           <Grid item xs={12}>
-            <FormControl>
-              <Collapse in={openAlert}>
-                <Alert
-                  severity="error"
-                  action={
-                    <IconButton
-                      aria-label="close"
-                      color="inherit"
-                      size="small"
-                      onClick={() => {
-                        setOpenAlert(false);
-                      }}
-                    >
-                      <CloseIcon fontSize="inherit" />
-                    </IconButton>
-                  }
-                >
-                  At least 1 Image required!
-                </Alert>
-              </Collapse>
-            </FormControl>
+            <div>
+              <TextField
+                name="address"
+                required
+                fullWidth
+                id="address"
+                label="Address"
+                value={formData.address}
+                onChange={handleChange}
+                error={responseErrors?.address}
+              />
+
+              {responseErrors ? (
+                <div className={classes.inputMessage}>
+                  {responseErrors.address?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Grid>
+
+          <Grid item xs={12} style={{ height: "50vh", position: "relative" }}>
+            <div style={{ height: "50vh" }}>
+              <Map
+                lattitude={ formData.lat? parseFloat(formData.lat):null}
+                longitude={formData.long?parseFloat(formData.long):null}
+                formData={formData}
+                updateFormData={updateFormData}
+              />
+            </div>
           </Grid>
         </Grid>
         <Grid container justify="center">

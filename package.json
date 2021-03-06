@@ -11,6 +11,8 @@
     "@material-ui/pickers": "^3.2.10",
     "@material-ui/styles": "^4.11.3",
     "@material-ui/system": "^4.11.3",
+    "@reach/combobox": "^0.13.2",
+    "@react-google-maps/api": "^2.1.1",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.6.3",
@@ -33,6 +35,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.2",
     "styled-components": "^5.2.1",
+    "use-places-autocomplete": "^1.9.1",
     "web-vitals": "^1.1.0",
     "yup": "^0.32.8"
   },

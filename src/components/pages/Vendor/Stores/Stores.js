@@ -37,7 +37,6 @@ import { Search } from "react-feather";
 import { useHistory } from "react-router-dom";
 
 const Card = styled(MuiCard)(spacing);
-const CardContent = styled(MuiCardContent)(spacing);
 const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
@@ -111,7 +110,6 @@ function Stores() {
   const [selectedItem, setSelectedItem] = useState(""); /****** Customize ******/
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
-  const [users, setUsers] = useState("");
 
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
@@ -380,7 +378,6 @@ function Stores() {
           setPage={setPage}
           setOpenPopup={setOpenPopup}
           itemToEdit={selectedItem}
-          users={users}
         />
       </Popup>
 
