@@ -118,6 +118,9 @@ function Roles() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [permissionsList, setPermissionsList] = useState("");
+  const [sortModel, setSortModel] = useState([
+    { field: "id", sort: "asc" },
+  ]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 50 },
@@ -201,6 +204,13 @@ function Roles() {
     setPage(page);
   };
 
+  const handleSortModelChange = (params) => {
+    console.log(params);
+    if (params.sortModel !== sortModel) {
+      setSortModel(params.sortModel);
+    }
+  };
+
   const openDeleteConfirmation = (id) => {
     setOpenDeleteDialog(true);
     setItemToDelete(id);
@@ -218,7 +228,7 @@ function Roles() {
       });
 
     await axios
-      .get(`/roles?page=${page}`, {
+      .get(`/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -247,11 +257,10 @@ function Roles() {
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
-    console.log("In Effect");
     if (!openPopup) {
       setLoading(true);
       axios
-        .get(`/roles?page=${page}`, {
+        .get(`/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -263,7 +272,7 @@ function Roles() {
           setLoading(false);
         });
     }
-  }, [page, openPopup]);
+  }, [page, openPopup, sortModel]);
 
   return (
     <React.Fragment>
@@ -316,13 +325,17 @@ function Roles() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-            <DataGrid
+          <DataGrid
               rows={rows}
               columns={columns}
               page={page}
               pageSize={pageSize}
               rowCount={rowsCount}
+              sortingOrder={["desc", "asc"]}
+              sortModel={sortModel}
+              columnBuffer={pageSize}
               paginationMode="server"
+              sortingMode="server"
               components={{
                 Pagination: CustomPagination,
                 LoadingOverlay: CustomLoadingOverlay,
@@ -332,6 +345,7 @@ function Roles() {
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
+              onSortModelChange={handleSortModelChange}
             />
           </div>
         </Paper>

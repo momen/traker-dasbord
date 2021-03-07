@@ -109,6 +109,9 @@ function AuditLogs() {
   const [selectedItem, setSelectedItem] = useState(""); // Customize
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
+  const [sortModel, setSortModel] = useState([
+    { field: "id", sort: "asc" },
+  ]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
@@ -157,6 +160,13 @@ function AuditLogs() {
     setPage(page);
   };
 
+  const handleSortModelChange = (params) => {
+    console.log(params);
+    if (params.sortModel !== sortModel) {
+      setSortModel(params.sortModel);
+    }
+  };
+
   const handleSearchInput = (e) => {
     let search = e.target.value;
     if (!search || search.trim() === "") {
@@ -175,7 +185,7 @@ function AuditLogs() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/audit-logs?page=${page}`, {
+        .get(`/audit-logs?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -188,7 +198,7 @@ function AuditLogs() {
     } else {
       axios
         .post(
-          "/audit-logs/search/name",
+          `/audit-logs/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },
@@ -204,8 +214,7 @@ function AuditLogs() {
           setLoading(false);
         });
     }
-    // setItemAddedOrEdited(false);
-  }, [page, searchValue]);
+  }, [page, searchValue, sortModel]);
 
   return (
     <React.Fragment>
@@ -261,14 +270,17 @@ function AuditLogs() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-            <DataGrid
+          <DataGrid
               rows={rows}
               columns={columns}
               page={page}
               pageSize={pageSize}
               rowCount={rowsCount}
+              sortingOrder={["desc", "asc"]}
+              sortModel={sortModel}
               columnBuffer={pageSize}
               paginationMode="server"
+              sortingMode="server"
               components={{
                 Pagination: CustomPagination,
                 LoadingOverlay: CustomLoadingOverlay,
@@ -278,6 +290,7 @@ function AuditLogs() {
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
+              onSortModelChange={handleSortModelChange}
             />
           </div>
         </Paper>

@@ -113,9 +113,12 @@ function Vendors() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [users, setUsers] = useState("");
+  const [sortModel, setSortModel] = useState([
+    { field: "id", sort: "asc" },
+  ]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 45 },
+    { field: "id", headerName: "ID", width: 55 },
     { field: "serial", headerName: "Serial", width: 70 },
     { field: "vendor_name", headerName: "Vendor Name", width: 200, flex: 1 },
     { field: "email", headerName: "Email", width: 200, flex: 1 },
@@ -212,6 +215,13 @@ function Vendors() {
     setPage(page);
   };
 
+  const handleSortModelChange = (params) => {
+    console.log(params);
+    if (params.sortModel !== sortModel) {
+      setSortModel(params.sortModel);
+    }
+  };
+
   const handleSearchInput = (e) => {
     let search = e.target.value;
     if (!search || search.trim() === "") {
@@ -243,7 +253,7 @@ function Vendors() {
       });
 
     await axios
-      .get(`/add-vendors?page=${page}`, {
+      .get(`/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -278,13 +288,11 @@ function Vendors() {
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
-    console.log("In Effect");
     if (openPopup) return;
     setLoading(true);
-    console.log("Passed");
     if (!userIsSearching) {
       axios
-        .get(`/add-vendors?page=${page}`, {
+        .get(`/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -297,7 +305,7 @@ function Vendors() {
     } else {
       axios
         .post(
-          "/add-vendors/search/name",
+          `/add-vendors/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },
@@ -313,7 +321,6 @@ function Vendors() {
           setLoading(false);
         });
     }
-    // setItemAddedOrEdited(false);
   }, [page, searchValue, openPopup]);
 
   return (
@@ -392,14 +399,17 @@ function Vendors() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-            <DataGrid
+          <DataGrid
               rows={rows}
               columns={columns}
               page={page}
               pageSize={pageSize}
               rowCount={rowsCount}
+              sortingOrder={["desc", "asc"]}
+              sortModel={sortModel}
               columnBuffer={pageSize}
               paginationMode="server"
+              sortingMode="server"
               components={{
                 Pagination: CustomPagination,
                 LoadingOverlay: CustomLoadingOverlay,
@@ -409,6 +419,7 @@ function Vendors() {
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
+              onSortModelChange={handleSortModelChange}
             />
           </div>
         </Paper>

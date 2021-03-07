@@ -102,8 +102,6 @@ function ProductsForm({
   const [autoSelectTagError, setAutoSelectTagError] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
-  let data = new FormData();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -115,14 +113,10 @@ function ProductsForm({
       setAutoSelectTagError(true);
       return;
     }
-
-    if (formData.photo.length === 0) {
-      setOpenAlert(true);
-      return;
-    }
-
     setAutoSelectCategoryError(false);
     setAutoSelectTagError(false);
+
+    let data = new FormData();
 
     if (!formData.photo && !itemToEdit) {
       setOpenAlert(true);
@@ -135,16 +129,15 @@ function ProductsForm({
             value.map((val) => val.id)
           );
         } else if (key === "tags") {
-          data.append(
-            key,
-            value.map((val) => val.id)
-          );
+          data.append(key, JSON.stringify(value.map((val) => val.id)));
         } else {
           data.append(key, value);
         }
       });
 
-      formData.photo.forEach((file) => {
+      formData.photo.forEach(async(file) => {
+        // let reader = new FileReader();
+        // await reader.readAsDataURL(file);
         data.append("photo[]", file, file.name);
         console.log(file);
       });
@@ -217,6 +210,7 @@ function ProductsForm({
     setImgName(name);
     console.log(e.target.files);
     let filesList = [];
+    var reader = new FileReader();
     Object.entries(e.target.files).forEach(([key, value]) => {
       filesList.push(value);
     });

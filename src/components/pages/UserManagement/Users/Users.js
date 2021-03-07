@@ -128,9 +128,12 @@ function Users() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [rolesList, setRolesList] = useState("");
+  const [sortModel, setSortModel] = useState([
+    { field: "id", sort: "asc" },
+  ]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 40 },
+    { field: "id", headerName: "ID", width: 55 },
     { field: "name", headerName: "Name", width: 100 },
     { field: "email", headerName: "Email", width: 150, flex: 1 },
     {
@@ -218,6 +221,13 @@ function Users() {
     setPage(page);
   };
 
+  const handleSortModelChange = (params) => {
+    console.log(params);
+    if (params.sortModel !== sortModel) {
+      setSortModel(params.sortModel);
+    }
+  };
+
   const handleSearchInput = (e) => {
     let search = e.target.value;
     if (!search || search.trim() === "") {
@@ -248,7 +258,7 @@ function Users() {
       });
 
     await axios
-      .get(`/users?page=${page}`, {
+      .get(`/users?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -278,13 +288,11 @@ function Users() {
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
-    console.log("In Effect");
     if (openPopup) return;
     setLoading(true);
-    console.log("Passed");
     if (!userIsSearching) {
       axios
-        .get(`/users?page=${page}`, {
+        .get(`/users?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -297,7 +305,7 @@ function Users() {
     } else {
       axios
         .post(
-          "/users/search/name",
+          `/users/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },
@@ -313,8 +321,7 @@ function Users() {
           setLoading(false);
         });
     }
-    // setItemAddedOrEdited(false);
-  }, [page, searchValue, openPopup]);
+  }, [page, searchValue, openPopup, sortModel]);
 
   return (
     <React.Fragment>
@@ -383,13 +390,17 @@ function Users() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-            <DataGrid
+          <DataGrid
               rows={rows}
               columns={columns}
               page={page}
               pageSize={pageSize}
               rowCount={rowsCount}
+              sortingOrder={["desc", "asc"]}
+              sortModel={sortModel}
+              columnBuffer={pageSize}
               paginationMode="server"
+              sortingMode="server"
               components={{
                 Pagination: CustomPagination,
                 LoadingOverlay: CustomLoadingOverlay,
@@ -399,6 +410,7 @@ function Users() {
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
+              onSortModelChange={handleSortModelChange}
             />
           </div>
         </Paper>

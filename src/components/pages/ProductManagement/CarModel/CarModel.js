@@ -111,6 +111,9 @@ function CarModel() {
   const [carMades, setCarMades] = useState([]); // Customize
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
+  const [sortModel, setSortModel] = useState([
+    { field: "id", sort: "asc" },
+  ]);
 
   // Customize
   const columns = [
@@ -192,6 +195,13 @@ function CarModel() {
     setPage(page);
   };
 
+  const handleSortModelChange = (params) => {
+    console.log(params);
+    if (params.sortModel !== sortModel) {
+      setSortModel(params.sortModel);
+    }
+  };
+
   const handleSearchInput = (e) => {
     let search = e.target.value;
     if (!search || search.trim() === "") {
@@ -222,7 +232,7 @@ function CarModel() {
       });
 
     await axios
-      .get(`/car-models?page=${page}`, {
+      .get(`/car-models?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -258,13 +268,11 @@ function CarModel() {
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
-    console.log("In Effect");
     if (openPopup) return;
     setLoading(true);
-    console.log("Passed");
     if (!userIsSearching) {
       axios
-        .get(`/car-models?page=${page}`, {
+        .get(`/car-models?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -277,7 +285,7 @@ function CarModel() {
     } else {
       axios
         .post(
-          "/car-models/search/name",
+          `/car-models/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },
@@ -293,7 +301,7 @@ function CarModel() {
           setLoading(false);
         });
     }
-  }, [page, searchValue, openPopup]);
+  }, [page, searchValue, openPopup, sortModel]);
 
   return (
     <React.Fragment>
@@ -370,13 +378,17 @@ function CarModel() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-            <DataGrid
+          <DataGrid
               rows={rows}
               columns={columns}
               page={page}
               pageSize={pageSize}
               rowCount={rowsCount}
+              sortingOrder={["desc", "asc"]}
+              sortModel={sortModel}
+              columnBuffer={pageSize}
               paginationMode="server"
+              sortingMode="server"
               components={{
                 Pagination: CustomPagination,
                 LoadingOverlay: CustomLoadingOverlay,
@@ -386,6 +398,7 @@ function CarModel() {
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
+              onSortModelChange={handleSortModelChange}
             />
           </div>
         </Paper>

@@ -108,6 +108,9 @@ function Tags() {
   const [selectedItem, setSelectedItem] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
+  const [sortModel, setSortModel] = useState([
+    { field: "id", sort: "asc" },
+  ]);
 
   // Customize
   const columns = [
@@ -180,6 +183,13 @@ function Tags() {
     setPage(page);
   };
 
+  const handleSortModelChange = (params) => {
+    console.log(params);
+    if (params.sortModel !== sortModel) {
+      setSortModel(params.sortModel);
+    }
+  };
+
   const openDeleteConfirmation = (id) => {
     setOpenDeleteDialog(true);
     setItemToDelete(id);
@@ -197,7 +207,7 @@ function Tags() {
       });
 
     await axios
-      .get(`/product-tags?page=${page}`, {
+      .get(`/product-tags?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -217,7 +227,7 @@ function Tags() {
     if (openPopup) return;
     setLoading(true);
     axios
-      .get(`/product-tags?page=${page}`, {
+      .get(`/product-tags??page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -227,7 +237,7 @@ function Tags() {
         setRows(res.data.data);
         setLoading(false);
       });
-  }, [page, openPopup]);
+  }, [page, openPopup, sortModel]);
 
   return (
     <React.Fragment>
@@ -282,13 +292,17 @@ function Tags() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-            <DataGrid
+          <DataGrid
               rows={rows}
               columns={columns}
               page={page}
               pageSize={pageSize}
               rowCount={rowsCount}
+              sortingOrder={["desc", "asc"]}
+              sortModel={sortModel}
+              columnBuffer={pageSize}
               paginationMode="server"
+              sortingMode="server"
               components={{
                 Pagination: CustomPagination,
                 LoadingOverlay: CustomLoadingOverlay,
@@ -298,6 +312,7 @@ function Tags() {
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
+              onSortModelChange={handleSortModelChange}
             />
           </div>
         </Paper>

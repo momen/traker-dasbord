@@ -110,6 +110,9 @@ function CarYear() {
   const [selectedItem, setSelectedItem] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
+  const [sortModel, setSortModel] = useState([
+    { field: "id", sort: "asc" },
+  ]);
 
   // Customize
   const columns = [
@@ -184,6 +187,13 @@ function CarYear() {
     setPage(page);
   };
 
+  const handleSortModelChange = (params) => {
+    console.log(params);
+    if (params.sortModel !== sortModel) {
+      setSortModel(params.sortModel);
+    }
+  };
+
   const handleSearchInput = (e) => {
     let search = e.target.value;
     if (!search || search.trim() === "") {
@@ -214,7 +224,7 @@ function CarYear() {
       });
 
     await axios
-      .get(`/car-years?page=${page}`, {
+      .get(`/car-years?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -236,7 +246,7 @@ function CarYear() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/car-years?page=${page}`, {
+        .get(`/car-years?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -249,7 +259,7 @@ function CarYear() {
     } else {
       axios
         .post(
-          "/car-years/search/name",
+          `/car-years/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },
@@ -265,7 +275,7 @@ function CarYear() {
           setLoading(false);
         });
     }
-  }, [page, searchValue, openPopup]);
+  }, [page, searchValue, openPopup, sortModel]);
 
   return (
     <React.Fragment>
@@ -342,13 +352,17 @@ function CarYear() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-            <DataGrid
+          <DataGrid
               rows={rows}
               columns={columns}
               page={page}
               pageSize={pageSize}
               rowCount={rowsCount}
+              sortingOrder={["desc", "asc"]}
+              sortModel={sortModel}
+              columnBuffer={pageSize}
               paginationMode="server"
+              sortingMode="server"
               components={{
                 Pagination: CustomPagination,
                 LoadingOverlay: CustomLoadingOverlay,
@@ -358,6 +372,7 @@ function CarYear() {
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
+              onSortModelChange={handleSortModelChange}
             />
           </div>
         </Paper>

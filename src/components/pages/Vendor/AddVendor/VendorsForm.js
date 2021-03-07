@@ -78,14 +78,8 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
       data.append("type", formData.type);
       data.append("userid_id", formData.userid_id);
 
+      
       data.append("images", formData.images);
-      // formData.images.map(image => {
-      // })
-
-      // if (formData.serial) {
-      //   data.append("serial", formData.serial);
-      // }
-
       console.log(data);
       if (itemToEdit) {
         await axios
@@ -102,12 +96,6 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
             setResponseErrors(res.response.data.errors);
           });
       } else {
-        // console.log("------------------------------");
-        // console.log(data);
-        // console.log("------------------------------");
-        // data.append("images", formData.images);
-
-        // data.append("images", formData.images[0].name, formData.images);
         console.log(formData.images);
 
         await axios

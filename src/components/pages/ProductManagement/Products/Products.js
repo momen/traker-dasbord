@@ -136,6 +136,9 @@ function Products() {
   const [carYears, setCarYears] = useState([]);
   const [stores, setStores] = useState([]);
   const [productTags, setProductTags] = useState([]);
+  const [sortModel, setSortModel] = useState([
+    { field: "quantity", sort: "desc" },
+  ]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
@@ -153,6 +156,7 @@ function Products() {
       width: 50,
       renderCell: (params) => params.value?.year,
     },
+    { field: "quantity", headerName: "Quantity", width: 70 },
     { field: "price", headerName: "Price", width: 70 },
     {
       field: "discount",
@@ -182,8 +186,9 @@ function Products() {
       width: 80,
       renderCell: (params) => (
         <Fragment>
-          {params.value?.map((img) => (
+          {params.value?.map((img, index) => (
             <img
+            key={img.uuid}
               src={img.image}
               alt="ph"
               style={{ objectFit: "contain", width: 50 }}
@@ -263,7 +268,7 @@ function Products() {
       field: "car_made",
       headerName: "Car Made",
       width: 80,
-      renderCell: (params) => params.value.car_made,
+      renderCell: (params) => params.value?.car_made,
     },
     {
       field: "part_category",
@@ -279,6 +284,13 @@ function Products() {
 
   const handlePageChange = ({ page }) => {
     setPage(page);
+  };
+
+  const handleSortModelChange = (params) => {
+    console.log(params);
+    if (params.sortModel !== sortModel) {
+      setSortModel(params.sortModel);
+    }
   };
 
   const handleSearchInput = (e) => {
@@ -312,7 +324,7 @@ function Products() {
       });
 
     await axios
-      .get(`/products?page=${page}`, {
+      .get(`/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -420,9 +432,6 @@ function Products() {
           id,
           name,
         })); // Customize
-        console.log("*****Tags*****");
-        console.log(_tags);
-        console.log("*****Tags*****");
         setProductTags(_tags);
       });
   }, []);
@@ -434,7 +443,7 @@ function Products() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/products?page=${page}`, {
+        .get(`/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -447,7 +456,7 @@ function Products() {
     } else {
       axios
         .post(
-          "/products/search/name",
+          `/products/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },
@@ -463,8 +472,7 @@ function Products() {
           setLoading(false);
         });
     }
-    // setItemAddedOrEdited(false);
-  }, [page, searchValue, openPopup]);
+  }, [page, searchValue, openPopup, sortModel]);
 
   return (
     <React.Fragment>
@@ -541,8 +549,11 @@ function Products() {
               page={page}
               pageSize={pageSize}
               rowCount={rowsCount}
+              sortingOrder={["desc", "asc"]}
+              sortModel={sortModel}
               columnBuffer={pageSize}
               paginationMode="server"
+              sortingMode="server"
               components={{
                 Pagination: CustomPagination,
                 LoadingOverlay: CustomLoadingOverlay,
@@ -552,6 +563,7 @@ function Products() {
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
+              onSortModelChange={handleSortModelChange}
             />
           </div>
         </Paper>

@@ -107,17 +107,37 @@ function Stores() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(""); /****** Customize ******/
+  const [selectedItem, setSelectedItem] = useState(
+    ""
+  ); /****** Customize ******/
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
+  const [sortModel, setSortModel] = useState([
+    { field: "id", sort: "asc" },
+  ]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 45 },
+    { field: "id", headerName: "ID", width: 55 },
     { field: "name", headerName: "Name", width: 70 },
     { field: "address", headerName: "Address", width: 200, flex: 1 },
-    { field: "moderator_name", headerName: "Moderator Name", width: 200, flex: 1 },
-    { field: "moderator_phone", headerName: "Moderator Phone", width: 200, flex: 1 },
-    { field: "moderator_alt_phone", headerName: "Moderator Alt Phone", width: 200, flex: 1 },
+    {
+      field: "moderator_name",
+      headerName: "Moderator Name",
+      width: 200,
+      flex: 1,
+    },
+    {
+      field: "moderator_phone",
+      headerName: "Moderator Phone",
+      width: 200,
+      flex: 1,
+    },
+    {
+      field: "moderator_alt_phone",
+      headerName: "Moderator Alt Phone",
+      width: 200,
+      flex: 1,
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -187,6 +207,13 @@ function Stores() {
     setPage(page);
   };
 
+  const handleSortModelChange = (params) => {
+    console.log(params);
+    if (params.sortModel !== sortModel) {
+      setSortModel(params.sortModel);
+    }
+  };
+
   const handleSearchInput = (e) => {
     let search = e.target.value;
     if (!search || search.trim() === "") {
@@ -218,7 +245,7 @@ function Stores() {
       });
 
     await axios
-      .get(`/stores?page=${page}`, {
+      .get(`/stores?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -233,14 +260,13 @@ function Stores() {
       });
   };
 
-
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
     if (openPopup) return;
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/stores?page=${page}`, {
+        .get(`/stores?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -253,7 +279,7 @@ function Stores() {
     } else {
       axios
         .post(
-          "/stores/search/name",
+          `/stores/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },
@@ -269,8 +295,7 @@ function Stores() {
           setLoading(false);
         });
     }
-    // setItemAddedOrEdited(false);
-  }, [page, searchValue, openPopup]);
+  }, [page, searchValue, openPopup, sortModel]);
 
   return (
     <React.Fragment>
@@ -354,8 +379,11 @@ function Stores() {
               page={page}
               pageSize={pageSize}
               rowCount={rowsCount}
+              sortingOrder={["desc", "asc"]}
+              sortModel={sortModel}
               columnBuffer={pageSize}
               paginationMode="server"
+              sortingMode="server"
               components={{
                 Pagination: CustomPagination,
                 LoadingOverlay: CustomLoadingOverlay,
@@ -365,6 +393,7 @@ function Stores() {
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
+              onSortModelChange={handleSortModelChange}
             />
           </div>
         </Paper>

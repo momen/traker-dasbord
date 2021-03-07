@@ -249,11 +249,18 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
             </div>
           </Grid>
 
-          <Grid item xs={12} style={{ height: "50vh", position: "relative" }}>
-            <div style={{ height: "50vh" }}>
+          <Grid item>
+            <label htmlFor="stores-map" style={{ marginTop: "10px" }}>
+              Select your store location
+            </label>
+          </Grid>
+
+          <Grid item xs={12} style={{ height: "60vh", position: "relative", marginBottom: "10px"}}>
+            <div style={{ height: "60vh" }}>
               <Map
-                lattitude={ formData.lat? parseFloat(formData.lat):null}
-                longitude={formData.long?parseFloat(formData.long):null}
+                id="stores-map"
+                lattitude={formData.lat ? parseFloat(formData.lat) : null}
+                longitude={formData.long ? parseFloat(formData.long) : null}
                 formData={formData}
                 updateFormData={updateFormData}
               />

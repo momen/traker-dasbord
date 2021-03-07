@@ -35,18 +35,17 @@ const options = {
   zoomControl: true,
 };
 
-
-function Map({lattitude,longitude, formData, updateFormData}) {
-  const { lat, lng, isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "AIzaSyB1sgDLvJrwxyeZn4Y7vgvPLcl-uppATHs",
+function Map({ lattitude, longitude, formData, updateFormData }) {
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries,
   });
   const [markers, setMarkers] = React.useState([]);
   const [selected, setSelected] = React.useState(null);
 
   const center = {
-    lat: lattitude? lattitude : 43.6532,
-    lng: longitude? longitude: -79.3832,
+    lat: lattitude ? lattitude : 43.6532,
+    lng: longitude ? longitude : -79.3832,
   };
   const onMapClick = React.useCallback((e) => {
     setMarkers((current) => [
@@ -58,9 +57,9 @@ function Map({lattitude,longitude, formData, updateFormData}) {
     ]);
     updateFormData({
       ...formData,
-      lat:e.latLng.lat(),
-      long: e.latLng.lng()
-    })
+      lat: e.latLng.lat(),
+      long: e.latLng.lng(),
+    });
   }, []);
 
   const mapRef = React.useRef();
@@ -84,7 +83,7 @@ function Map({lattitude,longitude, formData, updateFormData}) {
       <GoogleMap
         id="map"
         mapContainerStyle={mapContainerStyle}
-        zoom={8}
+        zoom={11}
         center={center}
         options={options}
         onClick={onMapClick}
@@ -96,12 +95,6 @@ function Map({lattitude,longitude, formData, updateFormData}) {
             position={{ lat: marker.lat, lng: marker.lng }}
             onClick={() => {
               setSelected(marker);
-            }}
-            icon={{
-              url: `/bear.svg`,
-              origin: new window.google.maps.Point(0, 0),
-              anchor: new window.google.maps.Point(15, 15),
-              scaledSize: new window.google.maps.Size(30, 30),
             }}
           />
         ))}
@@ -115,7 +108,7 @@ function Map({lattitude,longitude, formData, updateFormData}) {
           >
             <div>
               <h2>
-                <Store/>
+                <Store />
                 Alert
               </h2>
               <p>Spotted {formatRelative(selected.time, new Date())}</p>
@@ -131,6 +124,7 @@ function Locate({ panTo }) {
   return (
     <button
       className="locate"
+      type="button"
       onClick={() => {
         navigator.geolocation.getCurrentPosition(
           (position) => {
