@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import {
   Button,
   Checkbox,
+  Chip,
   Collapse,
   FormControl,
   Grid,
@@ -20,6 +21,8 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
 import NumberFormat from "react-number-format";
+import imageToBase64 from "image-to-base64";
+import toBase64 from "../../../../Services/toBase64";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -47,7 +50,10 @@ const useStyles = makeStyles((theme) => ({
   inputMessage: {
     wordBreak: "break-word",
   },
-
+  chip: {
+    margin: theme.spacing(0.5),
+    maxWidth: "100%",
+  },
   errorsContainer: {
     marginBottom: theme.spacing(1),
   },
@@ -76,6 +82,7 @@ function ProductsForm({
   const [{ user }] = useStateValue();
 
   const formRef = useRef();
+  const uploadRef = useRef();
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
     description: itemToEdit ? itemToEdit.description : "",
@@ -96,7 +103,6 @@ function ProductsForm({
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
     photo: [],
   });
-  const [imgName, setImgName] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
   const [autoSelectCategoryError, setAutoSelectCategoryError] = useState(false);
   const [autoSelectTagError, setAutoSelectTagError] = useState(false);
@@ -105,6 +111,7 @@ function ProductsForm({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log(formData.photo);
     if (formData.categories.length === 0) {
       setAutoSelectCategoryError(true);
       return;
@@ -124,10 +131,7 @@ function ProductsForm({
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "photo") return;
         if (key === "categories") {
-          data.append(
-            key,
-            value.map((val) => val.id)
-          );
+          data.append(key, JSON.stringify(value.map((val) => val.id)));
         } else if (key === "tags") {
           data.append(key, JSON.stringify(value.map((val) => val.id)));
         } else {
@@ -135,11 +139,10 @@ function ProductsForm({
         }
       });
 
-      formData.photo.forEach(async(file) => {
-        // let reader = new FileReader();
-        // await reader.readAsDataURL(file);
+      formData.photo.forEach(async (file) => {
+        const currentFile = await toBase64(file);
         data.append("photo[]", file, file.name);
-        console.log(file);
+        console.log(currentFile);
       });
 
       JSON.stringify(data);
@@ -206,20 +209,36 @@ function ProductsForm({
   };
 
   const handleUpload = (e) => {
-    const name = e.target.value.replace(/.*[\/\\]/, "");
-    setImgName(name);
     console.log(e.target.files);
-    let filesList = [];
-    var reader = new FileReader();
-    Object.entries(e.target.files).forEach(([key, value]) => {
-      filesList.push(value);
+    let filesList = []; //The arrary of new file to be added to the state
+
+    //Loop on all files saved in the File Input, find if the image was already added to the state
+    // & append only the new images to avoid duplication.
+    Object.entries(e.target.files).forEach(([key, file]) => {
+      if (!formData.photo.find((img) => img.name === file.name))
+        filesList.push(file);
     });
-    console.log(filesList);
+
     updateFormData({
       ...formData,
       photo: [...formData.photo, ...filesList],
     });
     setOpenAlert(false);
+  };
+
+  //The name of selected image to delete is passed so we can update the state with the filtered remaining ones
+  const handleDeleteImage = (imgToDelete) => {
+    let inputFiles = uploadRef.current.files;
+    updateFormData({
+      ...formData,
+      photo: formData.photo.filter((img) => img.name !== imgToDelete),
+    });
+    
+    for(let file in inputFiles) {
+      if(inputFiles.hasOwnProperty(file) && inputFiles[file].name === imgToDelete) {
+          delete uploadRef.current.files[file];
+      }
+  }
   };
 
   const handleReset = () => {
@@ -240,7 +259,6 @@ function ProductsForm({
       photo: [],
     });
     setResponseErrors("");
-    setImgName("");
     setOpenAlert(false);
   };
   return (
@@ -388,7 +406,7 @@ function ProductsForm({
             </div>
           </Grid>
 
-          <Grid item xs={3}>
+          <Grid item xs={4} sm={3}>
             <div>
               <TextField
                 select
@@ -422,7 +440,7 @@ function ProductsForm({
             </div>
           </Grid>
 
-          <Grid item xs={3}>
+          <Grid item xs={4} sm={3}>
             <div>
               <TextField
                 select
@@ -456,7 +474,7 @@ function ProductsForm({
             </div>
           </Grid>
 
-          <Grid item xs={3}>
+          <Grid item xs={4} sm={3}>
             <div>
               <TextField
                 select
@@ -526,7 +544,7 @@ function ProductsForm({
             </div>
           </Grid>
           {/****************************** ******************************/}
-          <Grid item xs={8}>
+          <Grid item xs={6} sm={8}>
             <div>
               <Autocomplete
                 multiple
@@ -683,35 +701,39 @@ function ProductsForm({
             </div>
           </Grid>
 
-          <Grid item xs={12}>
-            <div style={{ display: "flex" }}>
-              <input
-                accept="image/*"
-                className={classes.uploadInput}
-                id="icon-button-file"
-                type="file"
-                onChange={handleUpload}
-                multiple
-              />
-              <label htmlFor="icon-button-file">
-                <Button
-                  variant="contained"
-                  color="default"
-                  className={classes.uploadButton}
-                  startIcon={<PhotoCamera />}
-                  component="span"
-                >
-                  Upload
-                </Button>
-              </label>
-              <span
-                style={{
-                  alignSelf: "center",
-                }}
+          <Grid item xs={12} lg={2}>
+            <input
+              ref={uploadRef}
+              accept="image/*"
+              className={classes.uploadInput}
+              id="icon-button-file"
+              type="file"
+              onChange={handleUpload}
+              multiple
+            />
+            <label htmlFor="icon-button-file">
+              <Button
+                variant="contained"
+                color="default"
+                className={classes.uploadButton}
+                startIcon={<PhotoCamera />}
+                component="span"
               >
-                {imgName}
-              </span>
-            </div>
+                Upload
+              </Button>
+            </label>
+          </Grid>
+
+          <Grid item xs>
+            {formData.photo?.map((img) => (
+              <Chip
+                className={classes.chip}
+                // icon={<FaceIcon/>}
+                label={img.name}
+                onDelete={() => handleDeleteImage(img.name)}
+                variant="outlined"
+              />
+            ))}
           </Grid>
 
           {responseErrors ? (

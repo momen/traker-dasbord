@@ -169,7 +169,6 @@ function Products() {
       field: "categories",
       headerName: "Categories",
       width: 100,
-      flex: 1,
       renderCell: (params) => (
         <div>
           {params.value?.map((category) => (
@@ -188,7 +187,7 @@ function Products() {
         <Fragment>
           {params.value?.map((img, index) => (
             <img
-            key={img.uuid}
+              key={img.uuid}
               src={img.image}
               alt="ph"
               style={{ objectFit: "contain", width: 50 }}
@@ -324,11 +323,14 @@ function Products() {
       });
 
     await axios
-      .get(`/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(
+        `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      )
       .then((res) => {
         if (Math.ceil(res.data.total / pageSize) < page) {
           setPage(page - 1);
@@ -443,11 +445,14 @@ function Products() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .get(
+          `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
