@@ -298,7 +298,7 @@ const SidebarLink = ({ name, to, badge, icon }) => {
 };
 
 const Sidebar = ({ classes, staticContext, location, ...rest }) => {
-  const [{ user }, dispatch] = useStateValue();
+  const [{ user, userPermissions }, dispatch] = useStateValue();
 
   const initOpenRoutes = () => {
     /* Open collapse element that matches current url */
@@ -372,7 +372,9 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                   <SidebarSection>{category.header}</SidebarSection>
                 ) : null}
 
-                {category.children && category.icon ? (
+                {category.children &&
+                category.icon &&
+                userPermissions?.includes(category.permission) ? (
                   <React.Fragment key={index}>
                     <SidebarCategory
                       isOpen={!openRoutes[index]}
@@ -389,17 +391,34 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                       unmountOnExit
                     >
                       {category.children.map((route, index) => (
+                        userPermissions?.includes(route.permission)?
                         <SidebarLink
                           key={index}
                           name={route.name}
                           to={route.path}
                           icon={route.icon}
                           badge={route.badge}
-                        />
+                        /> : null
                       ))}
                     </Collapse>
                   </React.Fragment>
-                ) : category.icon ? (
+                ) : category.icon &&
+                  !category.children &&
+                  (category.noPermissionRequired ||
+                    userPermissions?.includes(category.permission)) &&
+                  category.id !== "Logout" ? (
+                  <SidebarCategory
+                    isCollapsable={false}
+                    name={category.id}
+                    to={category.path}
+                    activeClassName="active"
+                    component={NavLink}
+                    icon={category.icon}
+                    exact
+                    button
+                    badge={category.badge}
+                  />
+                ) : category.id == "Logout" ? (
                   <SidebarCategory
                     isCollapsable={false}
                     name={category.id}

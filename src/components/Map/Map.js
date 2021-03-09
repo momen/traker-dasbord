@@ -83,7 +83,7 @@ function Map({ lattitude, longitude, formData, updateFormData }) {
       <GoogleMap
         id="map"
         mapContainerStyle={mapContainerStyle}
-        zoom={11}
+        zoom={14}
         center={center}
         options={options}
         onClick={onMapClick}

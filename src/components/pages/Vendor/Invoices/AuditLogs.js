@@ -1,12 +1,10 @@
 import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
-import { NavLink, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import PropTypes from "prop-types";
 
 import {
-  Link,
-  Breadcrumbs as MuiBreadcrumbs,
   Card as MuiCard,
   CardContent as MuiCardContent,
   Divider as MuiDivider,
@@ -17,32 +15,26 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
   makeStyles,
   LinearProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
+  Grid,
+  TextField,
 } from "@material-ui/core";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
-import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
-import RolesForm from "./RolesForm";
 import { Pagination } from "@material-ui/lab";
+import { Search } from "react-feather";
 
 const Card = styled(MuiCard)(spacing);
-const CardContent = styled(MuiCardContent)(spacing);
 const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
@@ -53,15 +45,13 @@ const useStyles = makeStyles({
       background: "#388e3c",
     },
   },
-  permissionBadge: {
-    background: "#00b3b3",
-    fontWeight: "bold",
+  toolBar: {
+    display: "flex",
+    justifyContent: "space-between",
+    width: "100%",
     borderRadius: "6px",
-    padding: "5px",
-    marginRight: "5px",
-    userSelect: "none",
   },
-});
+}));
 
 function CustomPagination(props) {
   const { state, api } = props;
@@ -103,49 +93,38 @@ function CustomLoadingOverlay() {
   );
 }
 
-function Roles() {
+function AuditLogs() {
   const classes = useStyles();
-  const history = useHistory();
   const [{ user, userPermissions }] = useStateValue();
+  const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Permission");
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Category");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState("");
+  const [searchValue, setSearchValue] = useState();
+  const [userIsSearching, setuserIsSearching] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(""); // Customize
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
-  const [permissionsList, setPermissionsList] = useState("");
   const [sortModel, setSortModel] = useState([
     { field: "id", sort: "asc" },
   ]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 50 },
-    { field: "title", headerName: "Title", width: 100 },
-    {
-      field: "permissions",
-      headerName: "Permissions",
-      width: 300,
-      sortable: false,
-      flex: 1,
-      renderCell: (params) => (
-        <div>
-          {params.value.map((permission) => (
-            <span key={permission.id} className={classes.permissionBadge}>
-              {permission.title}
-            </span>
-          ))}
-        </div>
-      ),
-    },
-
+    { field: "id", headerName: "ID", width: 60 },
+    { field: "description", headerName: "Description", width: 150 },
+    { field: "subject_id", headerName: "Subject ID", width: 80 },
+    { field: "subject_type", headerName: "Subject Type", width: 150 },
+    { field: "user_id", headerName: "User ID", width: 80 },
+    { field: "host", headerName: "Host", width: 120 },
+    { field: "created_at", headerName: "Created at", width: 120 },
     {
       field: "actions",
       headerName: "Actions",
-      width: 250,
+      width: 220,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -155,40 +134,16 @@ function Roles() {
               display: "flex",
               justifyContent: "flex-start",
               width: "100%",
-              // padding: "5px"
             }}
           >
-            {userPermissions.includes("role_show") ? (
+            {userPermissions.includes("audit_log_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
-                onClick={() => history.push(`/user-mgt/roles/${params.row.id}`)}
+                size="small"
+                onClick={() => history.push(`/user-mgt/logs/${params.row.id}`)}
               >
                 View
-              </Button>
-            ) : null}
-            {userPermissions.includes("role_edit") ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                color="primary"
-                variant="contained"
-                onClick={() => {
-                  setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit Role");
-                }}
-              >
-                Edit
-              </Button>
-            ) : null}
-
-            {userPermissions.includes("role_delete") ? (
-              <Button
-                color="secondary"
-                variant="contained"
-                onClick={() => openDeleteConfirmation(params.row.id)}
-              >
-                Delete
               </Button>
             ) : null}
           </div>
@@ -212,93 +167,67 @@ function Roles() {
     }
   };
 
-  const openDeleteConfirmation = (id) => {
-    setOpenDeleteDialog(true);
-    setItemToDelete(id);
+  const handleSearchInput = (e) => {
+    let search = e.target.value;
+    if (!search || search.trim() === "") {
+      setuserIsSearching(false);
+      setSearchValue(search);
+    } else {
+      if (!userIsSearching) {
+        setuserIsSearching(true);
+      }
+      setSearchValue(search);
+    }
   };
-
-  const DeleteItem = async () => {
-    await axios
-      .delete(`/roles/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        setOpenDeleteDialog(false);
-      });
-
-    await axios
-      .get(`/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        if (Math.ceil(res.data.total / pageSize) < page) {
-          setPage(page - 1);
-        }
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    axios
-      .get("/permissionslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        setPermissionsList(res.data.data);
-      });
-  }, []);
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
-    if (!openPopup) {
-      setLoading(true);
+    setLoading(true);
+    if (!userIsSearching) {
       axios
-        .get(`/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
+        .get(`/audit-logs?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         })
         .then((res) => {
-          // alert(res.data.total);
+          setRowsCount(res.data.total);
+          setRows(res.data.data);
+          setLoading(false);
+        });
+    } else {
+      axios
+        .post(
+          `/audit-logs/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          {
+            search_index: searchValue,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        )
+        .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
         });
     }
-  }, [page, openPopup, sortModel]);
+  }, [page, searchValue, sortModel]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Roles
+        Audit Logs
       </Typography>
 
       <Divider my={6} />
 
-      <Button
-        mb={3}
-        className={classes.button}
-        variant="contained"
-        onClick={() => {
-          setSelectedItem("");
-          setOpenPopup(true);
-          setOpenPopupTitle("New Role");
-        }}
-      >
-        Add Role
-      </Button>
       <Card mb={6}>
         <Paper mb={2}>
-          <Toolbar>
+          <Toolbar className={classes.toolBar}>
             <FormControl variant="outlined">
               <Select
                 value={pageSize}
@@ -322,6 +251,21 @@ function Roles() {
                 <MenuItem value={100}>100</MenuItem>
               </Select>
             </FormControl>
+
+            <div>
+              <Grid container spacing={1} alignItems="flex-end">
+                <Grid item>
+                  <Search />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    id="input-with-icon-grid"
+                    label="Search"
+                    onChange={handleSearchInput}
+                  />
+                </Grid>
+              </Grid>
+            </div>
           </Toolbar>
         </Paper>
         <Paper>
@@ -351,53 +295,8 @@ function Roles() {
           </div>
         </Paper>
       </Card>
-      <Popup
-        title={openPopupTitle}
-        openPopup={openPopup}
-        setOpenPopup={setOpenPopup}
-      >
-        <RolesForm
-          setPage={setPage}
-          setOpenPopup={setOpenPopup}
-          itemToEdit={selectedItem}
-          permissionsList={permissionsList}
-        />
-      </Popup>
-
-      <Dialog
-        open={openDeleteDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Delete Confirmation"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Role? <br />
-            If this was by accident please press Back
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              DeleteItem();
-            }}
-            color="secondary"
-          >
-            Yes, delete
-          </Button>
-          <Button
-            onClick={() => setOpenDeleteDialog(false)}
-            color="primary"
-            autoFocus
-          >
-            Back
-          </Button>
-        </DialogActions>
-      </Dialog>
     </React.Fragment>
   );
 }
 
-export default Roles;
+export default AuditLogs;

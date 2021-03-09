@@ -21,7 +21,6 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
 import NumberFormat from "react-number-format";
-import imageToBase64 from "image-to-base64";
 import toBase64 from "../../../../Services/toBase64";
 
 const useStyles = makeStyles((theme) => ({
@@ -139,13 +138,17 @@ function ProductsForm({
         }
       });
 
-      formData.photo.forEach(async (file) => {
-        const currentFile = await toBase64(file);
+      formData.photo.forEach((file) => {
+        // const currentFile = await toBase64(file);
         data.append("photo[]", file, file.name);
-        console.log(currentFile);
+        // console.log(currentFile);
       });
 
       JSON.stringify(data);
+
+      // formData.categories = formData.categories.map(category => category.id)
+      // formData.tags = formData.tags.map(tag => tag.id)
+      // formData.photo= formData.photo.map(async (img) => await toBase64(img));
 
       if (itemToEdit) {
         await axios
@@ -228,17 +231,14 @@ function ProductsForm({
 
   //The name of selected image to delete is passed so we can update the state with the filtered remaining ones
   const handleDeleteImage = (imgToDelete) => {
-    let inputFiles = uploadRef.current.files;
     updateFormData({
       ...formData,
       photo: formData.photo.filter((img) => img.name !== imgToDelete),
     });
-    
-    for(let file in inputFiles) {
-      if(inputFiles.hasOwnProperty(file) && inputFiles[file].name === imgToDelete) {
-          delete uploadRef.current.files[file];
-      }
-  }
+
+    uploadRef.current.value = "";
+    // Empty the FileList of the input file, to be able to add the file again to avoid bad user experience
+    // as we can't manipulate the FileList directly.
   };
 
   const handleReset = () => {

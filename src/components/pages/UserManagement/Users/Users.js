@@ -145,6 +145,7 @@ function Users() {
       field: "roles",
       headerName: "Roles",
       width: 150,
+      sortable: false,
       renderCell: (params) => (
         <div>
           {params.value?.map((role) => (

@@ -129,6 +129,7 @@ function PartCategory() {
       field: "photo",
       headerName: "Photo",
       width: 200,
+      sortable: false,
       renderCell: (params) => {
         if (params.value) {
           return (

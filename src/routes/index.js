@@ -3,7 +3,6 @@ import React from "react";
 import async from "../components/Async";
 
 import {
-  Briefcase,
   Calendar,
   FileText,
   Folder,
@@ -21,24 +20,21 @@ import {
   Group,
   GroupAdd,
   GroupWork,
-  LockOpen,
   NewReleases,
+  ShoppingBasket,
   Store,
   TimeToLeave,
   VpnKey,
-  VpnLock,
 } from "@material-ui/icons";
 
 // Guards
-// const AuthGuard = async(() => import("../components/AuthGuard"));
-const AppGuard = async(() => import("../components/AppGuard"));
+const PermissionGuard = async(() => import("../Permissions Guard/PermissionGuard"));
+const UserManagementGuard = async(() => import("../Permissions Guard/UserManagementGuard"));
+const ProductManagementGuard = async(() => import("../Permissions Guard/ProductManagementGuard"));
+const VendorsGuard = async(() => import("../Permissions Guard/VendorsGuard"));
+const ManageAccountGuard = async(() => import("../Permissions Guard/ManageAccountGuard"));
 
-// Dashboards components
-// const Default = async(() => import("../pages/dashboards/Default"));
-// const Analytics = async(() => import("../pages/dashboards/Analytics"));
-// const SaaS = async(() => import("../pages/dashboards/SaaS"));
 
-const AuthGuard = async(() => import("../components/AuthGuard"));
 
 const SignIn = async(() => import("../components/pages/SignIn/SignIn"));
 
@@ -83,6 +79,7 @@ const Products = async(() =>
 
 const Vendors = async(() => import("../components/pages/Vendor/AddVendor/Vendors"));
 const Stores = async(() => import("../components/pages/Vendor/Stores/Stores"));
+const Orders = async(() => import("../components/pages/Vendor/Orders/Orders"));
 
 const ViewPermission = async(() =>
   import("../components/pages/UserManagement/Permissions/ViewPermission")
@@ -126,6 +123,9 @@ const ViewVendor = async(() =>
 const ViewStore = async(() =>
   import("../components/pages/Vendor/Stores/ViewStore")
 );
+const ViewOrder = async(() =>
+  import("../components/pages/Vendor/Orders/ViewOrder")
+);
 
 const ManageAccount = async(() =>
   import("../components/pages/ManageAccount/ManageAccount")
@@ -139,6 +139,7 @@ const dashboardRoutes = {
   component: Dashborad,
   children: null,
   containsHome: true,
+  noPermissionRequired: true
 };
 
 const userManagementRoutes = {
@@ -152,26 +153,36 @@ const userManagementRoutes = {
       name: "Permissions",
       component: Permissions,
       icon: <Unlock />,
+      guard:PermissionGuard,
+      permission: "permission_access"
     },
     {
       path: "/user-mgt/roles",
       name: "Roles",
       component: Roles,
       icon: <BusinessCenter />,
+      guard:PermissionGuard,
+      permission: "role_access"
     },
     {
       path: "/user-mgt/users",
       name: "Users",
       component: UsersComponent,
       icon: <User />,
+      guard:PermissionGuard,
+      permission: "user_access"
     },
     {
       path: "/user-mgt/logs",
       name: "Audit Logs",
       component: AuditLogs,
       icon: <FileText />,
+      guard:PermissionGuard,
+      permission: "audit_log_access"
     },
   ],
+  guard:UserManagementGuard,
+  permission: "user_management_access"
 };
 
 const viewPermission = {
@@ -209,44 +220,60 @@ const productManagementRoutes = {
       name: "Categories",
       component: Categories,
       icon: <Folder />,
+      guard:PermissionGuard,
+      permission: "product_category_access"
     },
     {
       path: "/product/car-made",
       name: "Car Made",
       component: CarMade,
       icon: <TimeToLeave />,
+      guard:PermissionGuard,
+      permission: "car_made_access"
     },
     {
       path: "/product/car-model",
       name: "Car Model",
       component: CarModel,
       icon: <NewReleases />,
+      guard:PermissionGuard,
+      permission: "car_model_access"
     },
     {
       path: "/product/part-category",
       name: "Part Category",
       component: PartCategory,
       icon: <Category />,
+      guard:PermissionGuard,
+      permission: "part_category_access"
     },
     {
       path: "/product/car-year",
       name: "Car Year",
       component: CarYear,
       icon: <Calendar />,
+      guard:PermissionGuard,
+      permission: "car_year_access"
     },
     {
       path: "/product/tags",
       name: "Tags",
       component: Tags,
       icon: <Tag />,
+      guard:PermissionGuard,
+      permission: "product_tag_access"
     },
     {
       path: "/product/products",
       name: "Products",
       component: Products,
       icon: <Store />,
+      guard:PermissionGuard,
+      permission: "product_access"
     },
   ],
+  guard:ProductManagementGuard,
+  permission: "product_management_access"
 };
 
 const viewCategory = {
@@ -297,14 +324,28 @@ const vendorRoutes = {
       name: "Add Vendor",
       component: Vendors,
       icon: <GroupAdd />,
+      guard:PermissionGuard,
+      permission: "add_vendor_access"
     },
     {
       path: "/vendor/stores",
       name: "Stores",
       component: Stores,
       icon: <Store />,
+      guard:PermissionGuard,
+      permission: "stores_access"
+    },
+    {
+      path: "/vendor/orders",
+      name: "Orders",
+      component: Orders,
+      icon: <ShoppingBasket />,
+      guard:PermissionGuard,
+      permission: "show_orders_access"
     },
   ],
+  guard:VendorsGuard,
+  permission: "vendor_access"
 };
 
 const viewVendor = {
@@ -317,6 +358,12 @@ const viewStore = {
   component: ViewStore,
   children: null,
 };
+const viewOrder = {
+  path: "/vendor/orders/:id",
+  component: ViewOrder,
+  children: null,
+};
+
 
 const manageAccountRoute = {
   id: "Manage Account",
@@ -324,6 +371,8 @@ const manageAccountRoute = {
   icon: <VpnKey />,
   component: ManageAccount,
   children: null,
+  guard:ManageAccountGuard,
+  permission: "profile_password_edit"
 };
 
 const logoutRoute = {
@@ -373,6 +422,7 @@ export const dashboardLayoutRoutes = [
   viewProduct,
   viewVendor,
   viewStore,
+  viewOrder,
   manageAccountRoute,
 ];
 

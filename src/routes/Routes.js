@@ -7,7 +7,7 @@ import AuthLayout from "../layouts/Auth";
 import Error404 from "../components/pages/Error404/Error404";
 
 const childRoutes = (Layout, routes) =>
-  routes.map(({ component: Component, guard, children, path }, index) => {
+  routes.map(({ component: Component, guard, children, path, permission }, index) => {
     const Guard = guard || React.Fragment;
 
     return children ? (
@@ -20,11 +20,11 @@ const childRoutes = (Layout, routes) =>
             path={element.path}
             exact
             render={(props) => (
-              <Guard>
-                <Layout>
+              <Layout>
+                <Guard permission={element.permission}>
                   <element.component {...props} />
-                </Layout>
-              </Guard>
+                </Guard>
+              </Layout>
             )}
           />
         );
@@ -35,11 +35,11 @@ const childRoutes = (Layout, routes) =>
         path={path}
         exact
         render={(props) => (
-          <Guard>
-            <Layout>
+          <Layout>
+            <Guard permission={permission}>
               <Component {...props} />
-            </Layout>
-          </Guard>
+            </Guard>
+          </Layout>
         )}
       />
     ) : null;

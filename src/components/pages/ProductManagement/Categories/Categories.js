@@ -133,6 +133,7 @@ function Categories() {
       field: "photo",
       headerName: "Photo",
       width: 100,
+      sortable: false,
       renderCell: (params) => {
         if (params.value) {
           return (

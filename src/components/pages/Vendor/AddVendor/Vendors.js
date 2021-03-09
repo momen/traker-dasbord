@@ -113,19 +113,17 @@ function Vendors() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [users, setUsers] = useState("");
-  const [sortModel, setSortModel] = useState([
-    { field: "id", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
     { field: "serial", headerName: "Serial", width: 70 },
-    { field: "vendor_name", headerName: "Vendor Name", width: 200, flex: 1 },
+    { field: "vendor_name", headerName: "Vendor Name", width: 150 },
     { field: "email", headerName: "Email", width: 200, flex: 1 },
     {
       field: "userid",
       headerName: "Username",
-      width: 70,
+      width: 100,
       renderCell: (params) => {
         return params.value.name;
       },
@@ -134,6 +132,7 @@ function Vendors() {
       field: "images",
       headerName: "Logo",
       width: 70,
+      sortable: false,
       renderCell: (params) => {
         if (params.value) {
           return (
@@ -149,7 +148,7 @@ function Vendors() {
     {
       field: "actions",
       headerName: "Actions",
-      width: 220,
+      width: 350,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -190,7 +189,6 @@ function Vendors() {
                 Edit
               </Button>
             ) : null}
-
             {userPermissions.includes("add_vendor_delete") ? (
               <Button
                 color="secondary"
@@ -199,6 +197,26 @@ function Vendors() {
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
+              </Button>
+            ) : null}
+            {userPermissions.includes("admin_access_vendor_orders") ? (
+              <Button
+                color="secondary"
+                variant="contained"
+                size="small"
+                onClick={() => history.push(`/vendor/add/${params.row.id}`)}
+              >
+                View Orders
+              </Button>
+            ) : null}
+            {userPermissions.includes("admin_access_vendor_invoices") ? (
+              <Button
+                color="secondary"
+                variant="contained"
+                size="small"
+                onClick={() => history.push(`/vendor/add/${params.row.id}`)}
+              >
+                View Invoices
               </Button>
             ) : null}
           </div>
@@ -253,11 +271,14 @@ function Vendors() {
       });
 
     await axios
-      .get(`/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(
+        `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      )
       .then((res) => {
         if (Math.ceil(res.data.total / pageSize) < page) {
           setPage(page - 1);
@@ -292,11 +313,14 @@ function Vendors() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .get(
+          `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
@@ -399,7 +423,7 @@ function Vendors() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-          <DataGrid
+            <DataGrid
               rows={rows}
               columns={columns}
               page={page}

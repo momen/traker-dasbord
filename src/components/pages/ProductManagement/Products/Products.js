@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
-import { NavLink, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import PropTypes from "prop-types";
 
@@ -124,6 +124,7 @@ function Products() {
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [columnToFilter, setColumnToFilter] = useState("");
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
   const [selectedItem, setSelectedItem] = useState(""); // Customize
@@ -169,6 +170,7 @@ function Products() {
       field: "categories",
       headerName: "Categories",
       width: 100,
+      sortable: false,
       renderCell: (params) => (
         <div>
           {params.value?.map((category) => (
@@ -183,6 +185,7 @@ function Products() {
       field: "photo",
       headerName: "Photos",
       width: 80,
+      sortable: false,
       renderCell: (params) => (
         <Fragment>
           {params.value?.map((img, index) => (
@@ -279,6 +282,10 @@ function Products() {
 
   const handlePageSize = (event) => {
     setPageSize(event.target.value);
+  };
+
+  const handleColumnToFilter = (event) => {
+    setColumnToFilter(event.target.value);
   };
 
   const handlePageChange = ({ page }) => {
@@ -461,7 +468,7 @@ function Products() {
     } else {
       axios
         .post(
-          `/products/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/products/hole/search?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },
@@ -530,7 +537,60 @@ function Products() {
               </Select>
             </FormControl>
 
-            <div>
+            <Grid style={{ display: "flex" }}>
+              <Grid
+                container
+                spacing={1}
+                alignItems="flex-end"
+                style={{ marginRight: "5px" }}
+              >
+                <Grid item>
+                  <Search />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    id="input-with-icon-grid"
+                    label="Search by column"
+                    onChange={handleSearchInput}
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid style={{ marginRight: "20px", alignSelf: "flex-end" }}>
+                <FormControl variant="outlined" size="small">
+                  <Select
+                    value={columnToFilter}
+                    onChange={handleColumnToFilter}
+                    autoWidth
+                    displayEmpty
+                    size="small"
+                    IconComponent={UnfoldLess}
+                    MenuProps={{
+                      anchorOrigin: {
+                        vertical: "bottom",
+                        horizontal: "center",
+                      },
+                      transformOrigin: {
+                        vertical: "top",
+                        horizontal: "center",
+                      },
+                      getContentAnchorEl: () => null,
+                    }}
+                  >
+                    <MenuItem value="" disabled>
+                      Select a column to filter by
+                    </MenuItem>
+                    <MenuItem value={"name"}>Product Name</MenuItem>
+                    <MenuItem value={"price"}>Price</MenuItem>
+                    <MenuItem value={"car_made"}>Car Made</MenuItem>
+                    <MenuItem value={"car_model"}>Car Model</MenuItem>
+                    <MenuItem value={"year"}>Car Year</MenuItem>
+                    <MenuItem value={"categories"}>Category</MenuItem>
+                    <MenuItem value={"part_category"}>Part Category</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
               <Grid container spacing={1} alignItems="flex-end">
                 <Grid item>
                   <Search />
@@ -538,12 +598,12 @@ function Products() {
                 <Grid item>
                   <TextField
                     id="input-with-icon-grid"
-                    label="Search"
+                    label="Generic Search"
                     onChange={handleSearchInput}
                   />
                 </Grid>
               </Grid>
-            </div>
+            </Grid>
           </Toolbar>
         </Paper>
         <Paper>
