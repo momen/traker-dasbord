@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
+import { useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import PropTypes from "prop-types";
 
@@ -18,30 +19,22 @@ import {
   LinearProgress,
   Grid,
   TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
 } from "@material-ui/core";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
-import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
-import StoresForm from "./StoresForm";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
-import { useHistory } from "react-router-dom";
 
 const Card = styled(MuiCard)(spacing);
 const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
@@ -52,7 +45,13 @@ const useStyles = makeStyles({
       background: "#388e3c",
     },
   },
-});
+  toolBar: {
+    display: "flex",
+    justifyContent: "space-between",
+    width: "100%",
+    borderRadius: "6px",
+  },
+}));
 
 function CustomPagination(props) {
   const { state, api } = props;
@@ -94,50 +93,25 @@ function CustomLoadingOverlay() {
   );
 }
 
-function Stores() {
+function VendorOrders({ match }) {
   const classes = useStyles();
-  const history = useHistory();
   const [{ user, userPermissions }] = useStateValue();
+  const history = useHistory();
   const [rows, setRows] = useState([]);
-  const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Store");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(
-    ""
-  ); /****** Customize ******/
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState("");
-  const [sortModel, setSortModel] = useState([
-    { field: "id", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 55 },
-    { field: "name", headerName: "Name", width: 70 },
-    { field: "address", headerName: "Address", width: 200, flex: 1 },
-    {
-      field: "moderator_name",
-      headerName: "Moderator Name",
-      width: 200,
-      flex: 1,
-    },
-    {
-      field: "moderator_phone",
-      headerName: "Moderator Phone",
-      width: 200,
-      flex: 1,
-    },
-    {
-      field: "moderator_alt_phone",
-      headerName: "Moderator Alt Phone",
-      width: 200,
-      flex: 1,
-    },
+    { field: "id", headerName: "ID", width: 60 },
+    { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
+    { field: "orderTotal", headerName: "Order Total", width: 200 },
+    { field: "orderStatus", headerName: "Status", width: 100 },
+    { field: "paid", headerName: "Paid", width: 80 },
     {
       field: "actions",
       headerName: "Actions",
@@ -145,52 +119,22 @@ function Stores() {
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
-        // let carMade = params.getValue("id");
         return (
           <div
             style={{
               display: "flex",
               justifyContent: "flex-start",
               width: "100%",
-              // padding: "5px"
             }}
           >
-            {userPermissions.includes("stores_show") ? (
+            {userPermissions.includes("show_specific_order") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/stores/${params.row.id}`)}
+                onClick={() => history.push(`/vendor/orders/${params.row.id}`)}
               >
                 View
-              </Button>
-            ) : null}
-            {userPermissions.includes("stores_edit") ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                color="primary"
-                variant="contained"
-                size="small"
-                onClick={() => {
-                  setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle(
-                    "Update Store Details"
-                  ); /****** Customize ******/
-                }}
-              >
-                Edit
-              </Button>
-            ) : null}
-
-            {userPermissions.includes("stores_delete") ? (
-              <Button
-                color="secondary"
-                variant="contained"
-                size="small"
-                onClick={() => openDeleteConfirmation(params.row.id)}
-              >
-                Delete
               </Button>
             ) : null}
           </div>
@@ -227,50 +171,22 @@ function Stores() {
     }
   };
 
-  const openDeleteConfirmation = (id) => {
-    setOpenDeleteDialog(true);
-    setItemToDelete(id);
-  };
-
-  const DeleteCategory = async () => {
-    console.log(itemToDelete);
-    await axios
-      .delete(`/stores/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        setOpenDeleteDialog(false);
-      });
-
-    await axios
-      .get(`/stores?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        if (Math.ceil(res.data.total / pageSize) < page) {
-          setPage(page - 1);
-        }
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-        setLoading(false);
-      });
-  };
-
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
-    if (openPopup) return;
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/stores?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
+        .post(
+          `/admin/show/vendor/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          {
+              vendor_id: match.params.id
           },
-        })
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
@@ -279,7 +195,7 @@ function Stores() {
     } else {
       axios
         .post(
-          `/stores/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/orders/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },
@@ -295,42 +211,20 @@ function Stores() {
           setLoading(false);
         });
     }
-  }, [page, searchValue, openPopup, sortModel]);
+  }, [page, searchValue, sortModel]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Stores
+        Orders
       </Typography>
 
       <Divider my={6} />
 
-      {userPermissions.includes("stores_create") ? (
-        <Button
-          mb={3}
-          className={classes.button}
-          variant="contained"
-          onClick={() => {
-            setOpenPopupTitle("New Store");
-            setOpenPopup(true);
-            setSelectedItem("");
-          }}
-        >
-          Add Store
-        </Button>
-      ) : null}
-
       <Card mb={6}>
         <Paper mb={2}>
-          <Toolbar
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              borderRadius: "3px",
-            }}
-          >
+          <Toolbar className={classes.toolBar}>
             <FormControl variant="outlined">
               <Select
                 value={pageSize}
@@ -398,52 +292,8 @@ function Stores() {
           </div>
         </Paper>
       </Card>
-      <Popup
-        title={openPopupTitle}
-        openPopup={openPopup}
-        setOpenPopup={setOpenPopup}
-      >
-        <StoresForm
-          setPage={setPage}
-          setOpenPopup={setOpenPopup}
-          itemToEdit={selectedItem}
-        />
-      </Popup>
-
-      <Dialog
-        open={openDeleteDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Delete Confirmation"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Store? <br />
-            If this was by accident please press Back
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              DeleteCategory();
-            }}
-            color="secondary"
-          >
-            Yes, delete
-          </Button>
-          <Button
-            onClick={() => setOpenDeleteDialog(false)}
-            color="primary"
-            autoFocus
-          >
-            Back
-          </Button>
-        </DialogActions>
-      </Dialog>
     </React.Fragment>
   );
 }
 
-export default Stores;
+export default VendorOrders;

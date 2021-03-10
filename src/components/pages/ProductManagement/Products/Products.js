@@ -146,16 +146,16 @@ function Products() {
     { field: "name", headerName: "Name", width: 80 },
     { field: "description", headerName: "Description", width: 80 },
     {
-      field: "car_model",
+      field: "car_model_id",
       headerName: "Car Model",
       width: 80,
-      renderCell: (params) => params.value?.carmodel,
+      renderCell: (params) => params.row.car_model?.carmodel,
     },
     {
-      field: "year",
+      field: "year_d",
       headerName: "Year",
       width: 50,
-      renderCell: (params) => params.value?.year,
+      renderCell: (params) => params.row.year?.year,
     },
     { field: "quantity", headerName: "Quantity", width: 70 },
     { field: "price", headerName: "Price", width: 70 },
@@ -267,16 +267,16 @@ function Products() {
       },
     },
     {
-      field: "car_made",
+      field: "car_made_id",
       headerName: "Car Made",
       width: 80,
-      renderCell: (params) => params.value?.car_made,
+      renderCell: (params) => params.row.car_made?.car_made,
     },
     {
-      field: "part_category",
+      field: "part_category_id",
       headerName: "Part Category",
       width: 80,
-      renderCell: (params) => params.value?.category_name,
+      renderCell: (params) => params.row.part_category?.category_name,
     },
   ];
 
@@ -468,9 +468,10 @@ function Products() {
     } else {
       axios
         .post(
-          `/products/hole/search?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/products/search/dynamic?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
+            column_name: columnToFilter
           },
           {
             headers: {
@@ -513,57 +514,13 @@ function Products() {
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
-            <FormControl variant="outlined">
-              <Select
-                value={pageSize}
-                onChange={handlePageSize}
-                autoWidth
-                IconComponent={UnfoldLess}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "center",
-                  },
-                  transformOrigin: {
-                    vertical: "top",
-                    horizontal: "center",
-                  },
-                  getContentAnchorEl: () => null,
-                }}
-              >
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
-
-            <Grid style={{ display: "flex" }}>
-              <Grid
-                container
-                spacing={1}
-                alignItems="flex-end"
-                style={{ marginRight: "5px" }}
-              >
-                <Grid item>
-                  <Search />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    id="input-with-icon-grid"
-                    label="Search by column"
-                    onChange={handleSearchInput}
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid style={{ marginRight: "20px", alignSelf: "flex-end" }}>
-                <FormControl variant="outlined" size="small">
+            <Grid container style={{width:"100%", display: "flex", justifyContent:'space-between'}}>
+              <Grid item>
+                <FormControl variant="outlined">
                   <Select
-                    value={columnToFilter}
-                    onChange={handleColumnToFilter}
+                    value={pageSize}
+                    onChange={handlePageSize}
                     autoWidth
-                    displayEmpty
-                    size="small"
                     IconComponent={UnfoldLess}
                     MenuProps={{
                       anchorOrigin: {
@@ -577,31 +534,74 @@ function Products() {
                       getContentAnchorEl: () => null,
                     }}
                   >
-                    <MenuItem value="" disabled>
-                      Select a column to filter by
-                    </MenuItem>
-                    <MenuItem value={"name"}>Product Name</MenuItem>
-                    <MenuItem value={"price"}>Price</MenuItem>
-                    <MenuItem value={"car_made"}>Car Made</MenuItem>
-                    <MenuItem value={"car_model"}>Car Model</MenuItem>
-                    <MenuItem value={"year"}>Car Year</MenuItem>
-                    <MenuItem value={"categories"}>Category</MenuItem>
-                    <MenuItem value={"part_category"}>Part Category</MenuItem>
+                    <MenuItem value={10}>10</MenuItem>
+                    <MenuItem value={25}>25</MenuItem>
+                    <MenuItem value={100}>100</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
 
-              <Grid container spacing={1} alignItems="flex-end">
-                <Grid item>
-                  <Search />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    id="input-with-icon-grid"
-                    label="Generic Search"
-                    onChange={handleSearchInput}
-                  />
-                </Grid>
+              <Grid item>
+                <div style={{ display: "flex" }}>
+                  <Grid
+                    container
+                    spacing={1}
+                    alignItems="flex-end"
+                    style={{ marginRight: "5px" }}
+                  >
+                    <Grid item>
+                      <Search />
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        id="input-with-icon-grid"
+                        label="Search by column"
+                        onChange={handleSearchInput}
+                      />
+                    </Grid>
+                  </Grid>
+
+                  <Grid style={{ alignSelf: "flex-end" }}>
+                    <FormControl
+                      variant="outlined"
+                      size="small"
+                    >
+                      <Select
+                        autoWidth
+                        value={columnToFilter}
+                        onChange={handleColumnToFilter}
+                        displayEmpty
+                        size="small"
+                        IconComponent={UnfoldLess}
+                        MenuProps={{
+                          anchorOrigin: {
+                            vertical: "bottom",
+                            horizontal: "center",
+                          },
+                          transformOrigin: {
+                            vertical: "top",
+                            horizontal: "center",
+                          },
+                          getContentAnchorEl: () => null,
+                        }}
+                      >
+                        <MenuItem value="" disabled>
+                          Select a column to filter by
+                        </MenuItem>
+                        <MenuItem value={"generic"}>Generic Search</MenuItem>
+                        <MenuItem value={"name"}>Product Name</MenuItem>
+                        <MenuItem value={"price"}>Price</MenuItem>
+                        <MenuItem value={"car_made"}>Car Made</MenuItem>
+                        <MenuItem value={"car_model"}>Car Model</MenuItem>
+                        <MenuItem value={"year"}>Car Year</MenuItem>
+                        <MenuItem value={"categories"}>Category</MenuItem>
+                        <MenuItem value={"part_category"}>
+                          Part Category
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </div>
               </Grid>
             </Grid>
           </Toolbar>

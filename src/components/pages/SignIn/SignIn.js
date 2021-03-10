@@ -116,7 +116,7 @@ function SignIn() {
               })
               .catch((res) => {
                 console.log(`Error: ${res}`);
-                const message = res.response.data.errors
+                const message = res.response?.data.errors
                   ? "Please check your Email or Password"
                   : "Something went wrong";
 

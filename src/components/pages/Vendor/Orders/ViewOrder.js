@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../../axios";
 import { useStateValue } from "../../../../StateProvider";
-import { Button } from "@material-ui/core";
+import { Button, Container, Grid, Typography } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -39,6 +39,11 @@ const useStyles = makeStyles({
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
     },
   },
+  detailsTable: {
+    "& .MuiTableCell-root": {
+      borderLeft: "1px solid rgba(224, 224, 224, 1)",
+    },
+  },
   rowContent: {
     // width: "100%",
     whiteSpace: "normal",
@@ -50,7 +55,7 @@ function ViewLog({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [orders, setOrders] = useState("");
+  const [order, setOrder] = useState("");
 
   useEffect(() => {
     axios
@@ -60,24 +65,31 @@ function ViewLog({ match }) {
         },
       })
       .then((res) => {
-        setOrders(res.data.data);
+        setOrder(res.data.data);
       });
   }, []);
 
   return (
     <Fragment>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => history.push("/vendor/orders")}
-        mb={3}
+      <Container style={{ marginBottom: "20px" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => history.push("/vendor/orders")}
+        >
+          Back to list
+        </Button>
+      </Container>
+      <Typography variant="h3" gutterBottom display="inline">
+        General Information
+      </Typography>
+      <TableContainer
+        component={Paper}
+        style={{ marginTop: "20px", marginBottom: "20px" }}
       >
-        Back to list
-      </Button>
-      <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={orders.id}>
+            <StyledTableRow key={order.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
@@ -85,30 +97,28 @@ function ViewLog({ match }) {
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{orders.id}</StyledTableCell>
+              <StyledTableCell align="left">{order.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`order-number${orders.order_number}`}>
+            <StyledTableRow key={`order-number${order.order_number}`}>
               <StyledTableCell component="th" scope="row">
                 Order Number
               </StyledTableCell>
               <StyledTableCell align="left">
-                {orders.order_number}
+                {order.order_number}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`order-total${orders.orderTotal}`}>
+            <StyledTableRow key={`order-total${order.orderTotal}`}>
               <StyledTableCell component="th" scope="row">
                 Order Total
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {orders.orderTotal}
-              </StyledTableCell>
+              <StyledTableCell align="left">{order.orderTotal}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`status${orders.orderStatus}`}>
+            <StyledTableRow key={`status${order.orderStatus}`}>
               <StyledTableCell component="th" scope="row">
                 Status
               </StyledTableCell>
               <StyledTableCell align="left">
-                {orders.orderStatus}
+                {order.orderStatus}
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`paid`}>
@@ -116,12 +126,121 @@ function ViewLog({ match }) {
                 Paid
               </StyledTableCell>
               <StyledTableCell align="left">
-                {!orders? null : orders.paid? orders.paid: "No"}
+                {!order ? null : order.paid ? order.paid : "No"}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Typography variant="h3" gutterBottom display="inline">
+        Order Details - Cart
+      </Typography>
+      <Grid container spacing={3}>
+        {order.orderDetails?.map((detail) => (
+          <Grid item xs={6}>
+            <TableContainer component={Paper} style={{ marginTop: "20px" }}>
+              <Table
+                className={classes.detailsTable}
+                aria-label="customized table"
+              >
+                <TableBody>
+                  <StyledTableRow key={`detail-{detail.id}`}>
+                    <StyledTableCell
+                      component="th"
+                      scope="row"
+                      style={{ width: "40%" }}
+                    >
+                      Details ID
+                    </StyledTableCell>
+                    <StyledTableCell align="left">{detail.id}</StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`product-id-${detail.product_id}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Product ID
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.product_id}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`product-name${detail.product_name}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Product Name
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.product_name}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`detail-${detail.id}-quantity-${detail.quantity}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Quantity
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.quantity}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`detail-${detail.id}-price-${detail.price}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Price
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.price}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`detail-${detail.id}-discount-${detail.discount}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Discount
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      %{detail.discount}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`detail-${detail.id}-total-${detail.total}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Total
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.total}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`store-id${detail.store_id}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Store ID
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.store_id}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`store-name${detail.store_name}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Store Name
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.store_name}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`vendor-id${detail.vendor_id}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Vendor ID
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.vendor_id}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`vendor-name${detail.vendor_name}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Vendor Name
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.vendor_name}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+        ))}
+      </Grid>
     </Fragment>
   );
 }

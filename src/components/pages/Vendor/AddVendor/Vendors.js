@@ -148,7 +148,7 @@ function Vendors() {
     {
       field: "actions",
       headerName: "Actions",
-      width: 350,
+      width: 450,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -191,6 +191,7 @@ function Vendors() {
             ) : null}
             {userPermissions.includes("add_vendor_delete") ? (
               <Button
+                style={{ marginRight: "5px" }}
                 color="secondary"
                 variant="contained"
                 size="small"
@@ -201,20 +202,21 @@ function Vendors() {
             ) : null}
             {userPermissions.includes("admin_access_vendor_orders") ? (
               <Button
-                color="secondary"
+                style={{ marginRight: "5px", marginLeft: "auto"}}
+                // color="secondary"
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/add/${params.row.id}`)}
+                onClick={() => history.push(`/vendor/vendors/vendor-orders/${params.row.id}`)}
               >
                 View Orders
               </Button>
             ) : null}
             {userPermissions.includes("admin_access_vendor_invoices") ? (
               <Button
-                color="secondary"
+                // color="secondary"
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/add/${params.row.id}`)}
+                onClick={() => history.push(`/vendor/vendors/vendor-invoices/${params.row.id}`)}
               >
                 View Invoices
               </Button>
@@ -345,7 +347,7 @@ function Vendors() {
           setLoading(false);
         });
     }
-  }, [page, searchValue, openPopup]);
+  }, [page, searchValue, openPopup, sortModel]);
 
   return (
     <React.Fragment>

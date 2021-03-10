@@ -27,6 +27,8 @@ const StyledTableRow = withStyles((theme) => ({
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
+    whiteSpace: "normal",
+    wordWrap: "break-word",
   },
 }))(TableRow);
 
@@ -37,37 +39,28 @@ const useStyles = makeStyles({
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
     },
   },
-  attributeName: {
-    width: "15%",
-  },
   rowContent: {
-    // display: "inline-block",
-    width: "100%",
-    // whiteSpace: "normal",
-    wordBreak: "break-word",
-  },
-  media: {
-    width: "25%",
-    objectFit: "contain",
+    // width: "100%",
+    whiteSpace: "normal",
+    wordWrap: "break-word",
   },
 });
 
-
-function ViewStore({ match }) {
+function ViewLog({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [store, setStore] = useState("");
+  const [invoices, setInvoices] = useState("");
 
   useEffect(() => {
     axios
-      .get(`/stores/${match.params.id}`, {
+      .get(`/show/invoices/${match.params.id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setStore(res.data.data);
+        setInvoices(res.data.data);
       });
   }, []);
 
@@ -76,7 +69,7 @@ function ViewStore({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/vendor/stores")}
+        onClick={() => history.push("/vendor/invoices")}
         mb={3}
       >
         Back to list
@@ -84,52 +77,78 @@ function ViewStore({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={store.id}>
+            <StyledTableRow key={invoices.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
-                className={classes.attributeName}
+                style={{ width: "20%" }}
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{store.id}</StyledTableCell>
+              <StyledTableCell align="left">{invoices.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.name}>
+            <StyledTableRow key={`order-id${invoices.order_id}`}>
               <StyledTableCell component="th" scope="row">
-                Store Name
-              </StyledTableCell>
-              <StyledTableCell align="left">{store.name}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={store.address}>
-              <StyledTableCell component="th" scope="row">
-                Address
+                Order ID
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{store.address}</span>
+                {invoices.order_id}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.moderator_name}>
+            <StyledTableRow key={`order-number${invoices.order_number}`}>
               <StyledTableCell component="th" scope="row">
-                Moderator Name
+                Order Number
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{store.moderator_name}</span>
+                {invoices.order_number}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.moderator_phone}>
+            <StyledTableRow key={`vendor-id${invoices.vendor_id}`}>
               <StyledTableCell component="th" scope="row">
-                Moderator Phone
+                Vendor ID
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{store.moderator_phone}</span>
+                {invoices.vendor_id}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.moderator_alt_phone}>
+            <StyledTableRow key={`vendor-name${invoices.vendor_name}`}>
               <StyledTableCell component="th" scope="row">
-                Moderator Alternative Phone
+                Vendor Name
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{store.moderator_alt_phone}</span>
+                {invoices.vendor_name}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`vendor-email${invoices.vendor_email}`}>
+              <StyledTableCell component="th" scope="row">
+                Vendor Email
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {invoices.vendor_email}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`invoice-number${invoices.invoice_number}`}>
+              <StyledTableCell component="th" scope="row">
+                Invoice Number
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {invoices.invoice_number}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`invoice-total${invoices.invoice_total}`}>
+              <StyledTableCell component="th" scope="row">
+                Invoice Total
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {invoices.invoice_total}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`status-${invoices.status}`}>
+              <StyledTableCell component="th" scope="row">
+                Status
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {invoices.status}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>
@@ -139,4 +158,4 @@ function ViewStore({ match }) {
   );
 }
 
-export default ViewStore;
+export default ViewLog;

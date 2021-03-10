@@ -93,34 +93,29 @@ function CustomLoadingOverlay() {
   );
 }
 
-function AuditLogs() {
+function Orders() {
   const classes = useStyles();
   const [{ user, userPermissions }] = useStateValue();
   const history = useHistory();
   const [rows, setRows] = useState([]);
-  const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Category");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(""); // Customize
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState("");
   const [sortModel, setSortModel] = useState([
     { field: "id", sort: "asc" },
   ]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
-    { field: "description", headerName: "Description", width: 150 },
-    { field: "subject_id", headerName: "Subject ID", width: 80 },
-    { field: "subject_type", headerName: "Subject Type", width: 150 },
-    { field: "user_id", headerName: "User ID", width: 80 },
-    { field: "host", headerName: "Host", width: 120 },
-    { field: "created_at", headerName: "Created at", width: 120 },
+    { field: "order_number", headerName: "Order Number", width: 150 },
+    { field: "vendor_name", headerName: "Vendor Name", width: 200 },
+    { field: "vendor_email", headerName: "Vendor Email", width: 100 },
+    { field: "invoice_number", headerName: "Invoice Number", width: 80 },
+    { field: "invoice_total", headerName: "Invoice Total", width: 80 },
+    { field: "status", headerName: "Status", width: 80 },
     {
       field: "actions",
       headerName: "Actions",
@@ -136,12 +131,12 @@ function AuditLogs() {
               width: "100%",
             }}
           >
-            {userPermissions.includes("audit_log_show") ? (
+            {userPermissions.includes("show_specific_invoice") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/user-mgt/logs/${params.row.id}`)}
+                onClick={() => history.push(`/vendor/invoices/${params.row.id}`)}
               >
                 View
               </Button>
@@ -185,7 +180,7 @@ function AuditLogs() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/audit-logs?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
+        .get(`/show/invoices?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -198,7 +193,7 @@ function AuditLogs() {
     } else {
       axios
         .post(
-          `/audit-logs/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/invoices/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },
@@ -220,7 +215,7 @@ function AuditLogs() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Audit Logs
+        Invoices
       </Typography>
 
       <Divider my={6} />
@@ -299,4 +294,4 @@ function AuditLogs() {
   );
 }
 
-export default AuditLogs;
+export default Orders;
