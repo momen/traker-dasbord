@@ -7,6 +7,7 @@ import {
   MenuItem,
   IconButton as MuiIconButton,
 } from "@material-ui/core";
+import { Language } from "@material-ui/icons";
 
 const IconButton = styled(MuiIconButton)`
   svg {
@@ -41,7 +42,7 @@ function LanguagesDropdown() {
           onClick={toggleMenu}
           color="inherit"
         >
-          <Flag src="/static/img/flags/us.png" alt="En" />
+          <Language/>
         </IconButton>
       </Tooltip>
       <Menu

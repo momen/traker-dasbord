@@ -124,11 +124,11 @@ function PartCategory() {
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
-    { field: "category_name", headerName: "Part Category Name", width: 150, flex: 1 },
+    { field: "category_name", headerName: "Part Category Name", width: 250, flex: 1 },
     {
       field: "photo",
       headerName: "Photo",
-      width: 200,
+      width: 100,
       sortable: false,
       renderCell: (params) => {
         if (params.value) {

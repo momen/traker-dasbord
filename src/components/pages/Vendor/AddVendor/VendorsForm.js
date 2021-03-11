@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import {
   Button,
+  Chip,
   Collapse,
   FormControl,
   FormControlLabel,
@@ -40,6 +41,10 @@ const useStyles = makeStyles((theme) => ({
   uploadInput: {
     display: "none",
   },
+  chip: {
+    margin: theme.spacing(3, 2, 2),
+    maxWidth: "100%",
+  },
   errorsContainer: {
     marginBottom: theme.spacing(1),
   },
@@ -54,6 +59,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const [{ user }] = useStateValue();
 
   const formRef = useRef();
+  const uploadRef = useRef();
   const [formData, updateFormData] = useState({
     vendor_name: itemToEdit ? itemToEdit.vendor_name : "",
     email: itemToEdit ? itemToEdit.email : "",
@@ -64,8 +70,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const [openAlert, setOpenAlert] = useState(false);
   const [imgName, setImgName] = useState("");
   const [responseErrors, setResponseErrors] = useState("");
-
-  console.log(itemToEdit);
+  const [bigImgSize, setBigImgSize] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -78,7 +83,6 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
       data.append("type", formData.type);
       data.append("userid_id", formData.userid_id);
 
-      
       data.append("images", formData.images);
       console.log(data);
       if (itemToEdit) {
@@ -124,8 +128,17 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   };
 
   const handleUpload = (e) => {
-    const name = e.target.value.replace(/.*[\/\\]/, "");
-    setImgName(name);
+    const imgSize = e.target.files[0]?.size / 1000; //Convert Size from bytes to kilo bytes
+
+    // Maximum Size for an Image is 2MB
+    if (imgSize > 2000) {
+      setBigImgSize(true);
+      return;
+    }
+
+    setBigImgSize(false);
+
+    setImgName(e.target.files[0].name);
     console.log(e.target.files[0]);
     updateFormData({
       ...formData,
@@ -134,14 +147,27 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
     setOpenAlert(false);
   };
 
+  const handleDeleteImage = () => {
+    updateFormData({
+      ...formData,
+      images: "",
+    });
+
+    setImgName("");
+
+    uploadRef.current.value = "";
+    // Empty the FileList of the input file, to be able to add the file again to avoid bad user experience
+    // as we can't manipulate the FileList directly.
+  };
+
   //Customize
   const handleReset = () => {
     updateFormData({
       vendor_name: "",
       email: "",
-      type:"",
-      userid_id:"",
-      images:"",
+      type: "",
+      userid_id: "",
+      images: "",
     });
     setResponseErrors("");
     setImgName("");
@@ -212,14 +238,14 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
                 onChange={handleChange}
               >
                 <FormControlLabel
-                  value="1"
+                  value="vendor"
                   control={<Radio />}
                   label="Vendor"
                 />
                 <FormControlLabel
                   value="2"
                   control={<Radio />}
-                  label="Hot Sale"
+                  label="hot sale"
                 />
                 <FormControlLabel value="3" control={<Radio />} label="Both" />
               </RadioGroup>
@@ -276,46 +302,47 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
             </Grid>
           ) : null}
 
-          <FormControl className={classes.formControl}>
-            <Grid item xs={12}>
-              <div style={{display:'flex'}}>
-              <div>
-                <input
-                  accept="image/*"
-                  className={classes.uploadInput}
-                  id="icon-button-file"
-                  type="file"
-                  onChange={handleUpload}
-                />
-              </div>
-              <label htmlFor="icon-button-file">
-                <Button
-                  variant="contained"
-                  color="default"
-                  className={classes.uploadButton}
-                  startIcon={<PhotoCamera />}
-                  component="span"
-                >
-                  Upload
-                </Button>
-              </label>
-              <span
-                style={{
-                  alignSelf: "center",
-                  // width: "350px",
-                  // display: "block",
-                  // overflow: "hidden",
-                  // whiteSpace: "noWarp",
-                  // lineHeight: 1,
-                  // textOverflow: "ellipsis",
-                  // textDecoration: "none",
-                }}
+          <Grid item xs={12} md={3}>
+            <input
+              ref={uploadRef}
+              accept="image/*"
+              className={classes.uploadInput}
+              id="icon-button-file"
+              type="file"
+              onChange={handleUpload}
+            />
+            <label htmlFor="icon-button-file">
+              <Button
+                variant="contained"
+                color="default"
+                className={classes.uploadButton}
+                startIcon={<PhotoCamera />}
+                component="span"
               >
-                {imgName}
-              </span>
-              </div>
+                Upload
+              </Button>
+            </label>
+          </Grid>
+
+          {imgName ? (
+            <Grid item xs md={9}>
+              <Chip
+                className={classes.chip}
+                // icon={<FaceIcon/>}
+                label={imgName}
+                onDelete={handleDeleteImage}
+                variant="outlined"
+              />
             </Grid>
-          </FormControl>
+          ) : null}
+
+          {bigImgSize ? (
+            <Grid item xs={12}>
+                <p className={classes.errorMsg}>
+                  The uploaded image size shouldn't exceed 2MB.
+                </p>
+            </Grid>
+          ) : null}
 
           {responseErrors ? (
             <Grid item xs={12}>

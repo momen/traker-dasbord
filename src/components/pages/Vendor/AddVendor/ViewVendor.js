@@ -78,7 +78,7 @@ function ViewVendor({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/vendor/add")}
+        onClick={() => history.push("/vendor/vendors")}
         mb={3}
       >
         Back to list

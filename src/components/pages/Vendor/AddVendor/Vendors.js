@@ -167,7 +167,7 @@ function Vendors() {
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/add/${params.row.id}`)}
+                onClick={() => history.push(`/vendor/vendors/${params.row.id}`)}
               >
                 View
               </Button>
@@ -206,7 +206,7 @@ function Vendors() {
                 // color="secondary"
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/vendors/vendor-orders/${params.row.id}`)}
+                onClick={() => history.push(`/vendor/vendors/${params.row.id}/vendor-orders`)}
               >
                 View Orders
               </Button>
@@ -216,7 +216,7 @@ function Vendors() {
                 // color="secondary"
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/vendors/vendor-invoices/${params.row.id}`)}
+                onClick={() => history.push(`/vendor/vendors/${params.row.id}/vendor-invoices`)}
               >
                 View Invoices
               </Button>

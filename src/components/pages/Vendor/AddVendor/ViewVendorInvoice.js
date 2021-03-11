@@ -46,21 +46,21 @@ const useStyles = makeStyles({
   },
 });
 
-function ViewInvoice({ match }) {
+function ViewVendorInvoice({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [invoices, setInvoices] = useState("");
+  const [invoice, setInvoice] = useState("");
 
   useEffect(() => {
     axios
-      .get(`/show/invoices/${match.params.id}`, {
+      .get(`/admin/show/vendor/invoices/${match.params.id}/${match.params.invoiceId}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setInvoices(res.data.data);
+        setInvoice(res.data.data);
       });
   }, []);
 
@@ -69,15 +69,15 @@ function ViewInvoice({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/vendor/invoices")}
+        onClick={() => history.push(`/vendor/vendors/${match.params.id}/vendor-invoices`)}
         mb={3}
       >
-        Back to list
+        Back to Vendor Invoices
       </Button>
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={invoices.id}>
+            <StyledTableRow key={invoice.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
@@ -85,71 +85,67 @@ function ViewInvoice({ match }) {
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{invoices.id}</StyledTableCell>
+              <StyledTableCell align="left">{invoice.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`order-id${invoices.order_id}`}>
+            <StyledTableRow key={`order-id${invoice.order_id}`}>
               <StyledTableCell component="th" scope="row">
                 Order ID
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {invoices.order_id}
-              </StyledTableCell>
+              <StyledTableCell align="left">{invoice.order_id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`order-number${invoices.order_number}`}>
+            <StyledTableRow key={`order-number${invoice.order_number}`}>
               <StyledTableCell component="th" scope="row">
                 Order Number
               </StyledTableCell>
               <StyledTableCell align="left">
-                {invoices.order_number}
+                {invoice.order_number}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`vendor-id${invoices.vendor_id}`}>
+            <StyledTableRow key={`vendor-id${invoice.vendor_id}`}>
               <StyledTableCell component="th" scope="row">
                 Vendor ID
               </StyledTableCell>
               <StyledTableCell align="left">
-                {invoices.vendor_id}
+                {invoice.vendor_id}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`vendor-name${invoices.vendor_name}`}>
+            <StyledTableRow key={`vendor-name${invoice.vendor_name}`}>
               <StyledTableCell component="th" scope="row">
                 Vendor Name
               </StyledTableCell>
               <StyledTableCell align="left">
-                {invoices.vendor_name}
+                {invoice.vendor_name}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`vendor-email${invoices.vendor_email}`}>
+            <StyledTableRow key={`vendor-email${invoice.vendor_email}`}>
               <StyledTableCell component="th" scope="row">
                 Vendor Email
               </StyledTableCell>
               <StyledTableCell align="left">
-                {invoices.vendor_email}
+                {invoice.vendor_email}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`invoice-number${invoices.invoice_number}`}>
+            <StyledTableRow key={`invoice-number${invoice.invoice_number}`}>
               <StyledTableCell component="th" scope="row">
                 Invoice Number
               </StyledTableCell>
               <StyledTableCell align="left">
-                {invoices.invoice_number}
+                {invoice.invoice_number}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`invoice-total${invoices.invoice_total}`}>
+            <StyledTableRow key={`invoice-total${invoice.invoice_total}`}>
               <StyledTableCell component="th" scope="row">
                 Invoice Total
               </StyledTableCell>
               <StyledTableCell align="left">
-                {invoices.invoice_total}
+                {invoice.invoice_total}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`status-${invoices.status}`}>
+            <StyledTableRow key={`status-${invoice.status}`}>
               <StyledTableCell component="th" scope="row">
                 Status
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {invoices.status}
-              </StyledTableCell>
+              <StyledTableCell align="left">{invoice.status}</StyledTableCell>
             </StyledTableRow>
           </TableBody>
         </Table>
@@ -158,4 +154,4 @@ function ViewInvoice({ match }) {
   );
 }
 
-export default ViewInvoice;
+export default ViewVendorInvoice;

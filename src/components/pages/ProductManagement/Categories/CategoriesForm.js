@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import {
   Button,
+  Chip,
   Collapse,
   FormControl,
   Grid,
@@ -33,8 +34,19 @@ const useStyles = makeStyles((theme) => ({
   uploadButton: {
     margin: theme.spacing(3, 2, 2),
   },
+  chip: {
+    margin: theme.spacing(3, 2, 2),
+    maxWidth: "100%",
+  },
   uploadInput: {
     display: "none",
+  },
+  errorsContainer: {
+    marginBottom: theme.spacing(1),
+  },
+  errorMsg: {
+    color: "#ff0000",
+    fontWeight: "500",
   },
 }));
 
@@ -43,6 +55,8 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   const [{ user }] = useStateValue();
 
   const formRef = useRef();
+  const uploadRef = useRef();
+
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
     description: itemToEdit ? itemToEdit.description : "",
@@ -51,11 +65,12 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   const [imgName, setImgName] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
+  const [bigImgSize, setBigImgSize] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.photo && !itemToEdit) {
-      setOpenAlert(true);  
+      setOpenAlert(true);
     } else {
       let data = new FormData();
       data.append("name", formData.name);
@@ -112,14 +127,35 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   };
 
   const handleUpload = (e) => {
-    const name = e.target.value.replace(/.*[\/\\]/, "");
-    setImgName(name);
-    console.log(e.target.files[0]);
+    const imgSize = e.target.files[0]?.size / 1000; //Convert Size from bytes to kilo bytes
+
+    // Maximum Size for an Image is 2MB
+    if (imgSize > 2000) {
+      setBigImgSize(true);
+      return;
+    }
+
+    setBigImgSize(false);
+
+    setImgName(e.target.files[0].name);
     updateFormData({
       ...formData,
       photo: e.target.files[0],
     });
     setOpenAlert(false);
+  };
+
+  const handleDeleteImage = () => {
+    updateFormData({
+      ...formData,
+      photo: "",
+    });
+
+    setImgName("");
+
+    uploadRef.current.value = "";
+    // Empty the FileList of the input file, to be able to add the file again to avoid bad user experience
+    // as we can't manipulate the FileList directly.
   };
 
   const handleReset = () => {
@@ -183,42 +219,47 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
             </Grid>
           ) : null}
 
-          <Grid item xs={12}>
-            <div style={{ display: "flex" }}>
-              <input
-                accept="image/*"
-                className={classes.uploadInput}
-                id="icon-button-file"
-                type="file"
-                onChange={handleUpload}
-              />
-              <label htmlFor="icon-button-file">
-                <Button
-                  variant="contained"
-                  color="default"
-                  className={classes.uploadButton}
-                  startIcon={<PhotoCamera />}
-                  component="span"
-                >
-                  Upload
-                </Button>
-              </label>
-              <span
-                style={{
-                  alignSelf: "center",
-                  // width: "350px",
-                  // display: "block",
-                  // overflow: "hidden",
-                  // whiteSpace: "noWarp",
-                  // lineHeight: 1,
-                  // textOverflow: "ellipsis",
-                  // textDecoration: "none",
-                }}
+          <Grid item xs={12} md={3}>
+            <input
+              ref={uploadRef}
+              accept="image/*"
+              className={classes.uploadInput}
+              id="icon-button-file"
+              type="file"
+              onChange={handleUpload}
+            />
+            <label htmlFor="icon-button-file">
+              <Button
+                variant="contained"
+                color="default"
+                className={classes.uploadButton}
+                startIcon={<PhotoCamera />}
+                component="span"
               >
-                {imgName}
-              </span>
-            </div>
+                Upload
+              </Button>
+            </label>
           </Grid>
+
+          {imgName ? (
+            <Grid item xs md={9}>
+              <Chip
+                className={classes.chip}
+                // icon={<FaceIcon/>}
+                label={imgName}
+                onDelete={handleDeleteImage}
+                variant="outlined"
+              />
+            </Grid>
+          ) : null}
+
+          {bigImgSize ? (
+            <Grid item xs={12}>
+              <p className={classes.errorMsg}>
+                The uploaded image size shouldn't exceed 2MB.
+              </p>
+            </Grid>
+          ) : null}
 
           {responseErrors ? (
             <Grid item xs={12}>

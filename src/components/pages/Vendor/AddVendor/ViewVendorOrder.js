@@ -51,36 +51,38 @@ const useStyles = makeStyles({
   },
 });
 
-function ViewOrder({ match }) {
+function ViewVendorOrder({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [order, setOrder] = useState("");
+  const [orderDetails, setOrderDetails] = useState([]);
 
   useEffect(() => {
+    console.log(match.params);
     axios
-      .get(`/show/orders/${match.params.id}`, {
+      .get(`/admin/show/vendor/orders/${match.params.id}/${match.params.orderId}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       })
       .then((res) => {
-        setOrder(res.data.data);
+        setOrderDetails(res.data.data);
       });
   }, []);
 
   return (
     <Fragment>
       <Container style={{ marginBottom: "20px" }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => history.push("/vendor/orders")}
-        >
-          Back to list
-        </Button>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => history.push(`/vendor/vendors/${match.params.id}/vendor-orders`)}
+        mb={3}
+      >
+        Back to Vendor Orders
+      </Button>
       </Container>
-      <Typography variant="h3" gutterBottom display="inline">
+      {/* <Typography variant="h3" gutterBottom display="inline">
         General Information
       </Typography>
       <TableContainer
@@ -131,18 +133,19 @@ function ViewOrder({ match }) {
             </StyledTableRow>
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer> */}
 
       <Typography variant="h3" gutterBottom display="inline">
         Order Details - Cart
       </Typography>
       <Grid container spacing={3}>
-        {order.orderDetails?.map((detail) => (
+        {orderDetails?.map((detail) => (
           <Grid item xs={6}>
             <TableContainer component={Paper} style={{ marginTop: "20px" }}>
               <Table
                 className={classes.detailsTable}
                 aria-label="customized table"
+                size="small"
               >
                 <TableBody>
                   <StyledTableRow key={`detail-{detail.id}`}>
@@ -245,4 +248,4 @@ function ViewOrder({ match }) {
   );
 }
 
-export default ViewOrder;
+export default ViewVendorOrder;

@@ -22,6 +22,7 @@ import {
   GroupWork,
   NewReleases,
   Receipt,
+  RecentActors,
   ShoppingBasket,
   Store,
   TimeToLeave,
@@ -87,9 +88,24 @@ const Products = async(() =>
 const Vendors = async(() =>
   import("../components/pages/Vendor/AddVendor/Vendors")
 );
+const VendorOrders = async(() =>
+  import("../components/pages/Vendor/AddVendor/VendorOrders")
+);
+const ViewVendorOrder = async(() =>
+  import("../components/pages/Vendor/AddVendor/ViewVendorOrder")
+);
+const VendorInvoices = async(() =>
+  import("../components/pages/Vendor/AddVendor/VendorInvoices")
+);
+const ViewVendorInvoice = async(() =>
+  import("../components/pages/Vendor/AddVendor/ViewVendorInvoice")
+);
+
 const Stores = async(() => import("../components/pages/Vendor/Stores/Stores"));
 const Orders = async(() => import("../components/pages/Vendor/Orders/Orders"));
-const Invoices = async(() => import("../components/pages/Vendor/Invoices/Invoices"));
+const Invoices = async(() =>
+  import("../components/pages/Vendor/Invoices/Invoices")
+);
 
 
 const ViewPermission = async(() =>
@@ -136,7 +152,9 @@ const ViewStore = async(() =>
 const ViewOrder = async(() =>
   import("../components/pages/Vendor/Orders/ViewOrder")
 );
-const ViewInvoice = async(() => import("../components/pages/Vendor/Invoices/ViewInvoice"));
+const ViewInvoice = async(() =>
+  import("../components/pages/Vendor/Invoices/ViewInvoice")
+);
 
 const ManageAccount = async(() =>
   import("../components/pages/ManageAccount/ManageAccount")
@@ -331,10 +349,10 @@ const vendorRoutes = {
   component: null,
   children: [
     {
-      path: "/vendor/add",
-      name: "Add Vendor",
+      path: "/vendor/vendors",
+      name: "Vendors",
       component: Vendors,
-      icon: <GroupAdd />,
+      icon: <RecentActors />,
       guard: PermissionGuard,
       permission: "add_vendor_access",
     },
@@ -366,12 +384,40 @@ const vendorRoutes = {
   guard: VendorsGuard,
   permission: "vendor_access",
 };
-
 const viewVendor = {
-  path: "/vendor/add/:id",
+  path: "/vendor/vendors/:id",
   component: ViewVendor,
   children: null,
 };
+const vendorOrders = {
+  path: "/vendor/vendors/:id/vendor-orders",
+  component: VendorOrders,
+  children: null,
+  guard: PermissionGuard,
+  permission: "admin_access_vendor_orders",
+};
+const viewVendorOrder = {
+  path: "/vendor/vendors/:id/vendor-orders/:orderId",
+  component: ViewVendorOrder,
+  children: null,
+  guard: PermissionGuard,
+  permission: "admin_access_specific_vendor_specific_order",
+};
+const vendorInvoices = {
+  path: "/vendor/vendors/:id/vendor-invoices",
+  component: VendorInvoices,
+  children: null,
+  guard: PermissionGuard,
+  permission: "admin_access_vendor_invoices",
+};
+const viewVendorInvoice = {
+  path: "/vendor/vendors/:id/vendor-invoices/:invoiceId",
+  component: ViewVendorInvoice,
+  children: null,
+  guard: PermissionGuard,
+  permission: "admin_access_specific_vendor_specific_invoice",
+};
+
 const viewStore = {
   path: "/vendor/stores/:id",
   component: ViewStore,
@@ -444,6 +490,10 @@ export const dashboardLayoutRoutes = [
   viewProductTag,
   viewProduct,
   viewVendor,
+  vendorOrders,
+  vendorInvoices,
+  viewVendorOrder,
+  viewVendorInvoice,
   viewStore,
   viewOrder,
   viewInvoice,

@@ -138,7 +138,7 @@ function Locate({ panTo }) {
       }}
     >
       <IconButton>
-        <Explore />
+        <Explore style={{color:"green"}}/>
       </IconButton>
     </button>
   );

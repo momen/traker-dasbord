@@ -449,17 +449,17 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
               variant="dot"
             >
               <Avatar
-                alt="Lucy Lavender"
+                alt={user.name}
                 src="/static/img/avatars/avatar-1.jpg"
               />
             </SidebarFooterBadge>
           </Grid>
-          {/* <Grid item>
-            <SidebarFooterText variant="body2">Lucy Lavender</SidebarFooterText>
+          <Grid item>
+            <SidebarFooterText variant="body2">{user.name}</SidebarFooterText>
             <SidebarFooterSubText variant="caption">
-              UX Designer
+              {user.email}
             </SidebarFooterSubText>
-          </Grid> */}
+          </Grid>
         </Grid>
       </SidebarFooter>
     </Drawer>

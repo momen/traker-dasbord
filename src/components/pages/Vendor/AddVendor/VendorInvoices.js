@@ -93,7 +93,7 @@ function CustomLoadingOverlay() {
   );
 }
 
-function VendorOrders({ match}) {
+function VendorInvoices({ match }) {
   const classes = useStyles();
   const [{ user, userPermissions }] = useStateValue();
   const history = useHistory();
@@ -108,10 +108,12 @@ function VendorOrders({ match}) {
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
-    { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
-    { field: "orderTotal", headerName: "Order Total", width: 200 },
-    { field: "orderStatus", headerName: "Status", width: 100 },
-    { field: "paid", headerName: "Paid", width: 80 },
+    { field: "order_number", headerName: "Order Number", width: 150 },
+    { field: "vendor_name", headerName: "Vendor Name", width: 200 },
+    { field: "vendor_email", headerName: "Vendor Email", width: 100 },
+    { field: "invoice_number", headerName: "Invoice Number", width: 80 },
+    { field: "invoice_total", headerName: "Invoice Total", width: 80 },
+    { field: "status", headerName: "Status", width: 80 },
     {
       field: "actions",
       headerName: "Actions",
@@ -127,12 +129,12 @@ function VendorOrders({ match}) {
               width: "100%",
             }}
           >
-            {userPermissions.includes("admin_access_specific_vendor_specific_order") ? (
+            {userPermissions.includes("admin_access_specific_vendor_specific_invoice") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/vendors/${match.params.id}/vendor-orders/${params.row.id}`)}
+                onClick={() => history.push(`/vendor/vendors/${match.params.id}/vendor-invoices/${params.row.id}`)}
               >
                 View
               </Button>
@@ -177,7 +179,7 @@ function VendorOrders({ match}) {
     if (!userIsSearching) {
       axios
         .post(
-          `/admin/show/vendor/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/admin/show/vendor/invoices?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
               vendor_id: match.params.id
           },
@@ -195,7 +197,7 @@ function VendorOrders({ match}) {
     } else {
       axios
         .post(
-          `/orders/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/invoices/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },
@@ -226,8 +228,9 @@ function VendorOrders({ match}) {
       </Button>
 
       <Divider my={3} />
+
       <Typography variant="h3" gutterBottom display="inline">
-        Orders
+        Invoices
       </Typography>
 
       <Divider my={6} />
@@ -306,4 +309,4 @@ function VendorOrders({ match}) {
   );
 }
 
-export default VendorOrders;
+export default VendorInvoices;
