@@ -13,6 +13,8 @@
     "@material-ui/system": "^4.11.3",
     "@reach/combobox": "^0.13.2",
     "@react-google-maps/api": "^2.1.1",
+    "@sentry/react": "^6.2.2",
+    "@sentry/tracing": "^6.2.2",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.6.3",

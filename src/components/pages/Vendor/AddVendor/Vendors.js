@@ -114,6 +114,7 @@ function Vendors() {
   const [itemToDelete, setItemToDelete] = useState("");
   const [users, setUsers] = useState("");
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
+  const [selectionModel, setSelectionModel] = React.useState([]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
@@ -139,7 +140,7 @@ function Vendors() {
             <img
               src={params.value.image}
               alt="logo"
-              style={{ objectFit: "contain", width: 50, borderRadius: "50%" }}
+              style={{ objectFit: "contain", width: 50, borderRadius: "999px" }}
             />
           );
         }
@@ -202,11 +203,13 @@ function Vendors() {
             ) : null}
             {userPermissions.includes("admin_access_vendor_orders") ? (
               <Button
-                style={{ marginRight: "5px", marginLeft: "auto"}}
+                style={{ marginRight: "5px", marginLeft: "auto" }}
                 // color="secondary"
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/vendors/${params.row.id}/vendor-orders`)}
+                onClick={() =>
+                  history.push(`/vendor/vendors/${params.row.id}/vendor-orders`)
+                }
               >
                 View Orders
               </Button>
@@ -216,7 +219,11 @@ function Vendors() {
                 // color="secondary"
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/vendors/${params.row.id}/vendor-invoices`)}
+                onClick={() =>
+                  history.push(
+                    `/vendor/vendors/${params.row.id}/vendor-invoices`
+                  )
+                }
               >
                 View Invoices
               </Button>
@@ -442,10 +449,15 @@ function Vendors() {
               }}
               loading={loading}
               checkboxSelection
+              selectionModel={selectionModel}
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
               onSortModelChange={handleSortModelChange}
+              onSelectionModelChange={(newSelection) => {
+                setSelectionModel(newSelection.selectionModel);
+                console.log(newSelection);
+              }}
             />
           </div>
         </Paper>

@@ -78,12 +78,11 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
 
       // To be edited if an image will be added
       if (itemToEdit) {
-        console.log(itemToEdit.id);
         await axios
-          .put(`/part-categories/${itemToEdit.id}`, formData, {
+          .post(`/part-categories/${itemToEdit.id}`, data, {
             headers: {
               Authorization: `Bearer ${user.token}`,
-              // "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
+              "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })
           .then((res) => {

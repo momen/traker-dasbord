@@ -126,7 +126,6 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
 
   const updateAutoComplete = (e, val) => {
     setAutoSelectError(false);
-    console.log("here!");
 
     updateFormData({
       ...formData,
@@ -221,18 +220,18 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
           ) : null}
 
           <Grid item xs={12}>
-              <TextField
-                name="email" //Customize
-                type="email"
-                // autoComplete="new-password"
-                required
-                fullWidth
-                id="email" //Customize
-                label="Email" //Customize
-                value={formData.email} //Customize
-                onChange={handleChange}
-                error={responseErrors?.email}
-              />
+            <TextField
+              name="email" //Customize
+              type="email"
+              // autoComplete="new-password"
+              required
+              fullWidth
+              id="email" //Customize
+              label="Email" //Customize
+              value={formData.email} //Customize
+              onChange={handleChange}
+              error={responseErrors?.email}
+            />
           </Grid>
           {responseErrors ? (
             <Grid item xs={12}>
@@ -243,6 +242,26 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
               ))}
             </Grid>
           ) : null}
+
+          <Grid item xs={12} spacing={2}>
+            <Button
+              variant="outlined"
+              color="primary"
+              style={{ marginRight: "5px" }}
+              onClick={() =>
+                updateFormData({ ...formData, roles: rolesList })
+              }
+            >
+              Select All
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => updateFormData({ ...formData, roles: [] })}
+            >
+              Unselect All
+            </Button>
+          </Grid>
 
           <Grid item xs={12}>
             <Autocomplete

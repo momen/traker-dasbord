@@ -93,7 +93,7 @@ function CustomLoadingOverlay() {
   );
 }
 
-function VendorOrders({ match}) {
+function VendorOrders({ match }) {
   const classes = useStyles();
   const [{ user, userPermissions }] = useStateValue();
   const history = useHistory();
@@ -109,9 +109,9 @@ function VendorOrders({ match}) {
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
     { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
-    { field: "orderTotal", headerName: "Order Total", width: 200 },
-    { field: "orderStatus", headerName: "Status", width: 100 },
-    { field: "paid", headerName: "Paid", width: 80 },
+    { field: "sumTotal", headerName: "Order Total", width: 200 },
+    { field: "orderStatus", headerName: "Status", width: 100, sortable: false },
+    { field: "paid", headerName: "Paid", width: 80, sortable: false },
     {
       field: "actions",
       headerName: "Actions",
@@ -127,12 +127,18 @@ function VendorOrders({ match}) {
               width: "100%",
             }}
           >
-            {userPermissions.includes("admin_access_specific_vendor_specific_order") ? (
+            {userPermissions.includes(
+              "admin_access_specific_vendor_specific_order"
+            ) ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/vendors/${match.params.id}/vendor-orders/${params.row.id}`)}
+                onClick={() =>
+                  history.push(
+                    `/vendor/vendors/${match.params.id}/vendor-orders/${params.row.id}`
+                  )
+                }
               >
                 View
               </Button>
@@ -179,7 +185,7 @@ function VendorOrders({ match}) {
         .post(
           `/admin/show/vendor/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
-              vendor_id: match.params.id
+            vendor_id: match.params.id,
           },
           {
             headers: {
@@ -195,9 +201,10 @@ function VendorOrders({ match}) {
     } else {
       axios
         .post(
-          `/orders/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/admin/search/vendor/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
+            vendor_id: match.params.id,
           },
           {
             headers: {

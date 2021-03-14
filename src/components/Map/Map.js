@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Map.css";
 import {
   GoogleMap,
@@ -40,13 +40,20 @@ function Map({ lattitude, longitude, formData, updateFormData }) {
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries,
   });
-  const [markers, setMarkers] = React.useState([]);
+  const [markers, setMarkers] = React.useState(() => [{ lat: lattitude, lng: longitude, time: new Date() }]);
   const [selected, setSelected] = React.useState(null);
 
   const center = {
     lat: lattitude ? lattitude : 43.6532,
     lng: longitude ? longitude : -79.3832,
   };
+
+  // useEffect(
+  //   () =>
+  //     setMarkers(),
+  //   []
+  // );
+
   const onMapClick = React.useCallback((e) => {
     setMarkers((current) => [
       {
@@ -55,6 +62,7 @@ function Map({ lattitude, longitude, formData, updateFormData }) {
         time: new Date(),
       },
     ]);
+
     updateFormData({
       ...formData,
       lat: e.latLng.lat(),
@@ -86,10 +94,10 @@ function Map({ lattitude, longitude, formData, updateFormData }) {
         zoom={14}
         center={center}
         options={options}
-        onClick={onMapClick}
+        onClick={formData && updateFormData ? onMapClick : null}
         onLoad={onMapLoad}
       >
-        {markers.map((marker) => (
+        {markers?.map((marker) => (
           <Marker
             key={`${marker.lat}-${marker.lng}`}
             position={{ lat: marker.lat, lng: marker.lng }}
@@ -138,7 +146,7 @@ function Locate({ panTo }) {
       }}
     >
       <IconButton>
-        <Explore style={{color:"green"}}/>
+        <Explore style={{ color: "green" }} />
       </IconButton>
     </button>
   );

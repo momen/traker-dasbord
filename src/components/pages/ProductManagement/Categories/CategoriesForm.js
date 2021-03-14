@@ -80,8 +80,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
       if (formData.photo) {
         data.append("photo", formData.photo, formData.photo.name);
       }
-
-      console.log(itemToEdit.id);
+      
       if (itemToEdit) {
         await axios
           .post(`/product-categories/${itemToEdit.id}`, data, {
@@ -97,10 +96,6 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
             setResponseErrors(res.response.data.errors);
           });
       } else {
-        console.log("------------------------------");
-        console.log(data);
-        console.log("------------------------------");
-
         await axios
           .post("/product-categories", data, {
             headers: {

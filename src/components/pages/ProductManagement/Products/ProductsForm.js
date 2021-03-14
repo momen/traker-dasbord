@@ -102,6 +102,15 @@ function ProductsForm({
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
     photo: [],
   });
+
+  const [imagesToDelete, setImagesToDelete] = useState("");
+
+  const [productImages, setProductImages] = useState(() =>
+    itemToEdit
+      ? itemToEdit.photo.map(({ id, file_name }) => ({ id, file_name }))
+      : null
+  );
+
   const [openAlert, setOpenAlert] = useState(false);
   const [autoSelectCategoryError, setAutoSelectCategoryError] = useState(false);
   const [autoSelectTagError, setAutoSelectTagError] = useState(false);
@@ -139,9 +148,7 @@ function ProductsForm({
       });
 
       formData.photo.forEach((file) => {
-        // const currentFile = await toBase64(file);
         data.append("photo[]", file, file.name);
-        // console.log(currentFile);
       });
 
       JSON.stringify(data);
@@ -159,7 +166,29 @@ function ProductsForm({
             },
           })
           .then((res) => {
-            setOpenPopup(false);
+            if (imagesToDelete) {
+              axios
+                .post(
+                  `/products/remove/checked/media`,
+                  {
+                    product_id: itemToEdit.id,
+                    media_ids: JSON.stringify(imagesToDelete),
+                  },
+                  {
+                    headers: {
+                      Authorization: `Bearer ${user.token}`,
+                    },
+                  }
+                )
+                .then((res) => {
+                  setOpenPopup(false);
+                })
+                .catch((res) => {
+                  setResponseErrors(res.response.data.errors);
+                });
+            }else{
+              setOpenPopup(false);
+            }
           })
           .catch((res) => {
             setResponseErrors(res.response.data.errors);
@@ -239,6 +268,19 @@ function ProductsForm({
     uploadRef.current.value = "";
     // Empty the FileList of the input file, to be able to add the file again to avoid bad user experience
     // as we can't manipulate the FileList directly.
+  };
+
+  const ToggleExistingImage = ({ id, file_name, deleted }) => {
+    if (deleted) {
+      setImagesToDelete(imagesToDelete.filter((img_id) => img_id !== id));
+    } else {
+      setImagesToDelete([...imagesToDelete, id]);
+    }
+    setProductImages(
+      productImages.map((img) =>
+        img.file_name === file_name ? { ...img, deleted: !img.deleted } : img
+      )
+    );
   };
 
   const handleReset = () => {
@@ -725,6 +767,19 @@ function ProductsForm({
           </Grid>
 
           <Grid item xs>
+            {productImages?.map((img) => {
+              // console.log(imagesToDelete);
+              return (
+                <Chip
+                  className={classes.chip}
+                  // icon={<FaceIcon/>}
+                  label={img.file_name}
+                  onDelete={() => ToggleExistingImage(img)}
+                  variant="outlined"
+                  color={img.deleted ? "secondary" : "primary"}
+                />
+              );
+            })}
             {formData.photo?.map((img) => (
               <Chip
                 className={classes.chip}

@@ -111,9 +111,9 @@ function Orders() {
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
     { field: "order_number", headerName: "Order Number", width: 150, flex:1 },
-    { field: "orderTotal", headerName: "Order Total", width: 200 },
-    { field: "orderStatus", headerName: "Status", width: 100 },
-    { field: "paid", headerName: "Paid", width: 80 },
+    { field: "sumTotal", headerName: "Order Total", width: 200 },
+    { field: "orderStatus", headerName: "Status", width: 100, sortable: false },
+    { field: "paid", headerName: "Paid", width: 80, sortable: false },
     {
       field: "actions",
       headerName: "Actions",

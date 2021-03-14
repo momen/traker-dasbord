@@ -113,7 +113,7 @@ function VendorInvoices({ match }) {
     { field: "vendor_email", headerName: "Vendor Email", width: 100 },
     { field: "invoice_number", headerName: "Invoice Number", width: 80 },
     { field: "invoice_total", headerName: "Invoice Total", width: 80 },
-    { field: "status", headerName: "Status", width: 80 },
+    { field: "status", headerName: "Status", width: 80, sortable: false },
     {
       field: "actions",
       headerName: "Actions",
@@ -197,9 +197,10 @@ function VendorInvoices({ match }) {
     } else {
       axios
         .post(
-          `/invoices/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/admin/search/vendor/invoices?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
+            vendor_id: match.params.id,
           },
           {
             headers: {

@@ -84,7 +84,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
       data.append("userid_id", formData.userid_id);
 
       data.append("images", formData.images);
-      console.log(data);
+      
       if (itemToEdit) {
         await axios
           .post(`/add-vendors/${itemToEdit.id}`, data, {
@@ -238,7 +238,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
                 onChange={handleChange}
               >
                 <FormControlLabel
-                  value="vendor"
+                  value="1"
                   control={<Radio />}
                   label="Vendor"
                 />

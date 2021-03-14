@@ -165,9 +165,28 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
             </Grid>
           ) : null}
 
+          <Grid item xs={12} spacing={2}>
+            <Button
+              variant="outlined"
+              color="primary"
+              style={{ marginRight: "5px" }}
+              onClick={() =>
+                updateFormData({ ...formData, permissions: permissionsList })
+              }
+            >
+              Select All
+            </Button>
+            <Button variant="contained" color="secondary" onClick={() =>
+                updateFormData({ ...formData, permissions: [] })
+              }>
+              Unselect All
+            </Button>
+          </Grid>
+
           <Grid item xs={12}>
             <Autocomplete
               multiple
+              limitTags={10}
               // filterSelectedOptions
               id="checkboxes-tags-demo"
               options={permissionsList ? permissionsList : []}

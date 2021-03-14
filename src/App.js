@@ -1,4 +1,5 @@
 import React from "react";
+import * as Sentry from "@sentry/react";
 // import { useSelector } from "react-redux";
 import './App.css'
 import { Helmet } from "react-helmet";

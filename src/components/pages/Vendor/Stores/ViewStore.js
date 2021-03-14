@@ -11,6 +11,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
+import Map from "../../../Map/Map";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -51,7 +52,6 @@ const useStyles = makeStyles({
     objectFit: "contain",
   },
 });
-
 
 function ViewStore({ match }) {
   const classes = useStyles();
@@ -113,7 +113,9 @@ function ViewStore({ match }) {
                 Moderator Name
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{store.moderator_name}</span>
+                <span className={classes.rowContent}>
+                  {store.moderator_name}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={store.moderator_phone}>
@@ -121,7 +123,9 @@ function ViewStore({ match }) {
                 Moderator Phone
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{store.moderator_phone}</span>
+                <span className={classes.rowContent}>
+                  {store.moderator_phone}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={store.moderator_alt_phone}>
@@ -129,12 +133,22 @@ function ViewStore({ match }) {
                 Moderator Alternative Phone
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{store.moderator_alt_phone}</span>
+                <span className={classes.rowContent}>
+                  {store.moderator_alt_phone}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>
         </Table>
       </TableContainer>
+      {store.lat && store.long ? (
+        <div style={{ height: "60vh" }}>
+          <Map
+            lattitude={parseFloat(store.lat)}
+            longitude={parseFloat(store.long)}
+          />
+        </div>
+      ) : null}
     </Fragment>
   );
 }

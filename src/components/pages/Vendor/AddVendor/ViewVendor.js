@@ -57,6 +57,7 @@ function ViewVendor({ match }) {
   const [{ user }] = useStateValue();
   const history = useHistory();
   const [vendor, setVendor] = useState("");
+  const [vendorTypes, setVendorTypes] = useState("");
 
   useEffect(() => {
     axios
@@ -68,10 +69,20 @@ function ViewVendor({ match }) {
       .then((res) => {
         setVendor(res.data.data);
       });
+
+      axios
+      .get(`/add-vendors/get/types`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+      .then((res) => {
+        setVendorTypes(res.data.data);
+      });
   }, []);
 
   const uppercaseWords = (str) =>
-    str.replace(/^(.)|\s+(.)/g, (c) => c.toUpperCase());
+    str?.replace(/^(.)|\s+(.)/g, (c) => c.toUpperCase());
 
   return (
     <Fragment>
@@ -123,7 +134,7 @@ function ViewVendor({ match }) {
                 Type
               </StyledTableCell>
               <StyledTableCell align="left">
-                {vendor.type ? uppercaseWords(vendor.type) : null}
+                {vendor.type && vendorTypes ? uppercaseWords(vendorTypes[vendor.type]) : null}
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={vendor.userid?.name}>

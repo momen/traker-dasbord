@@ -115,7 +115,7 @@ function Orders() {
     { field: "vendor_email", headerName: "Vendor Email", width: 100 },
     { field: "invoice_number", headerName: "Invoice Number", width: 80 },
     { field: "invoice_total", headerName: "Invoice Total", width: 80 },
-    { field: "status", headerName: "Status", width: 80 },
+    { field: "status", headerName: "Status", width: 80, sortable: false },
     {
       field: "actions",
       headerName: "Actions",
