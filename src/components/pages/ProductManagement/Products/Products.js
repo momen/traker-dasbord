@@ -53,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       background: "#388e3c",
     },
+    marginRight: "5px",
   },
   toolBar: {
     display: "flex",
@@ -129,6 +130,7 @@ function Products() {
   const [userIsSearching, setuserIsSearching] = useState(false);
   const [selectedItem, setSelectedItem] = useState(""); // Customize
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [categories, setCategories] = useState([]);
   const [carMades, setCarMades] = useState([]);
@@ -140,6 +142,7 @@ function Products() {
   const [sortModel, setSortModel] = useState([
     { field: "quantity", sort: "desc" },
   ]);
+  const [rowsToDelete, setRowsToDelete] = useState([]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
@@ -317,8 +320,7 @@ function Products() {
     setItemToDelete(id);
   };
 
-  const DeleteCategory = async () => {
-    console.log(itemToDelete);
+  const DeleteProduct = async () => {
     await axios
       .delete(`/products/${itemToDelete}`, {
         headers: {
@@ -328,6 +330,44 @@ function Products() {
       .then((res) => {
         setOpenDeleteDialog(false);
       });
+
+    await axios
+      .get(
+        `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      )
+      .then((res) => {
+        if (Math.ceil(res.data.total / pageSize) < page) {
+          setPage(page - 1);
+        }
+        setRowsCount(res.data.total);
+        setRows(res.data.data);
+        setLoading(false);
+      });
+  };
+
+  const DeleteAllProducts = async () => {
+    await axios
+      .post(
+        `/products/mass/delete`,
+        {
+          ids: JSON.stringify(rowsToDelete),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      )
+      .then((res) => {
+        setOpenMassDeleteDialog(false);
+        setRowsToDelete([]);
+      })
+      .catch((err) => {});
 
     await axios
       .get(
@@ -471,7 +511,7 @@ function Products() {
           `/products/search/dynamic?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-            column_name: columnToFilter
+            column_name: columnToFilter,
           },
           {
             headers: {
@@ -496,25 +536,46 @@ function Products() {
 
       <Divider my={6} />
 
-      {userPermissions.includes("product_create") ? (
+      <Grid container flex>
+        {userPermissions.includes("product_create") ? (
+          <Button
+            mb={3}
+            className={classes.button}
+            variant="contained"
+            onClick={() => {
+              setOpenPopupTitle("New Product");
+              setOpenPopup(true);
+              setSelectedItem("");
+            }}
+          >
+            Add Product
+          </Button>
+        ) : null}
+
         <Button
           mb={3}
-          className={classes.button}
+          color="secondary"
           variant="contained"
+          disabled={!rowsToDelete.length > 0}
           onClick={() => {
-            setOpenPopupTitle("New Product");
-            setOpenPopup(true);
-            setSelectedItem("");
+            setOpenMassDeleteDialog(true);
           }}
         >
-          Add Product
+          Delete Selected
         </Button>
-      ) : null}
+      </Grid>
 
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
-            <Grid container style={{width:"100%", display: "flex", justifyContent:'space-between'}}>
+            <Grid
+              container
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
               <Grid item>
                 <FormControl variant="outlined">
                   <Select
@@ -562,10 +623,7 @@ function Products() {
                   </Grid>
 
                   <Grid style={{ alignSelf: "flex-end" }}>
-                    <FormControl
-                      variant="outlined"
-                      size="small"
-                    >
+                    <FormControl variant="outlined" size="small">
                       <Select
                         autoWidth
                         value={columnToFilter}
@@ -629,6 +687,9 @@ function Products() {
               autoHeight={true}
               onPageChange={handlePageChange}
               onSortModelChange={handleSortModelChange}
+              onSelectionChange={(newSelection) => {
+                setRowsToDelete(newSelection.rowIds);
+              }}
             />
           </div>
         </Paper>
@@ -669,7 +730,7 @@ function Products() {
         <DialogActions>
           <Button
             onClick={() => {
-              DeleteCategory();
+              DeleteProduct();
             }}
             color="secondary"
           >
@@ -677,6 +738,39 @@ function Products() {
           </Button>
           <Button
             onClick={() => setOpenDeleteDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            Back
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openMassDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Confirmation"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete all the selected Products? <br />
+            If you wish press Yes, otherwise press Back.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              DeleteAllProducts();
+            }}
+            color="secondary"
+          >
+            Yes, delete
+          </Button>
+          <Button
+            onClick={() => setOpenMassDeleteDialog(false)}
             color="primary"
             autoFocus
           >

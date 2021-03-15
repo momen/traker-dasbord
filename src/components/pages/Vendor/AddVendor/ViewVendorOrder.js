@@ -55,7 +55,7 @@ function ViewVendorOrder({ match }) {
   const classes = useStyles();
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [orderDetails, setOrderDetails] = useState([]);
+  const [order, setOrder] = useState([]);
 
   useEffect(() => {
     console.log(match.params);
@@ -66,7 +66,7 @@ function ViewVendorOrder({ match }) {
         },
       })
       .then((res) => {
-        setOrderDetails(res.data.data);
+        setOrder(res.data.data);
       });
   }, []);
 
@@ -82,7 +82,7 @@ function ViewVendorOrder({ match }) {
         Back to Vendor Orders
       </Button>
       </Container>
-      {/* <Typography variant="h3" gutterBottom display="inline">
+      <Typography variant="h3" gutterBottom display="inline">
         General Information
       </Typography>
       <TableContainer
@@ -109,11 +109,11 @@ function ViewVendorOrder({ match }) {
                 {order.order_number}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`order-total${order.orderTotal}`}>
+            <StyledTableRow key={`order-total${order.order_total}`}>
               <StyledTableCell component="th" scope="row">
                 Order Total
               </StyledTableCell>
-              <StyledTableCell align="left">{order.orderTotal}</StyledTableCell>
+              <StyledTableCell align="left">{order.order_total}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`status${order.orderStatus}`}>
               <StyledTableCell component="th" scope="row">
@@ -133,13 +133,13 @@ function ViewVendorOrder({ match }) {
             </StyledTableRow>
           </TableBody>
         </Table>
-      </TableContainer> */}
+      </TableContainer>
 
       <Typography variant="h3" gutterBottom display="inline">
         Order Details - Cart
       </Typography>
       <Grid container spacing={3}>
-        {orderDetails?.map((detail) => (
+        {order.orderDetails?.map((detail) => (
           <Grid item xs={6}>
             <TableContainer component={Paper} style={{ marginTop: "20px" }}>
               <Table

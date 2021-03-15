@@ -121,9 +121,9 @@ function CarMade() {
   ]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 50 },
+    { field: "id", headerName: "ID", width: 70 },
     { field: "car_made", headerName: "Car Made", width: 200, flex: 1 },
-    { field: "catName", headerName: "Category", width: 200, flex: 1 },
+    { field: "categoryid_id", headerName: "Category", width: 200, flex: 1 , renderCell: params => params.row.catName},
     // {
     //   field: "categoryid",
     //   headerName: "Category",

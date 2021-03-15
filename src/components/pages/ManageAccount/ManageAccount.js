@@ -231,12 +231,11 @@ function ChangePassword() {
 
       <Divider my={6} />
 
-      <Grid container >
+      <Grid container spacing={2}>
         <Grid item md={6}>
           <EmailForm />
         </Grid>
-        <Grid item md={1}></Grid>
-        <Grid item md={5}>
+        <Grid item md={6}>
           <ChangePasswordForm />
         </Grid>
       </Grid>

@@ -120,11 +120,11 @@ function CarModel() {
     { field: "id", headerName: "ID", width: 50 },
     { field: "carmodel", headerName: "Car Model", width: 200, flex: 1 },
     {
-      field: "carmade",
+      field: "carmade_id",
       headerName: "Car Made",
       width: 200,
       flex: 1,
-      renderCell: (params) => params.value?.car_made,
+      renderCell: (params) => params.row.carmade.car_made,
     },
     {
       field: "actions",

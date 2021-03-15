@@ -30,7 +30,7 @@ const mapContainerStyle = {
   width: "100%",
 };
 const options = {
-  styles: mapStyles,
+  // styles: mapStyles,
   disableDefaultUI: true,
   zoomControl: true,
 };
@@ -47,12 +47,6 @@ function Map({ lattitude, longitude, formData, updateFormData }) {
     lat: lattitude ? lattitude : 43.6532,
     lng: longitude ? longitude : -79.3832,
   };
-
-  // useEffect(
-  //   () =>
-  //     setMarkers(),
-  //   []
-  // );
 
   const onMapClick = React.useCallback((e) => {
     setMarkers((current) => [

@@ -110,12 +110,11 @@ function Orders() {
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
+    { field: "invoice_number", headerName: "Invoice Number", width: 120 },
+    { field: "invoice_total", headerName: "Invoice Total", width: 100 },
+    { field: "vendor_name", headerName: "Vendor Name", width: 120 },
+    { field: "vendor_email", headerName: "Vendor Email", width: 150, sortable: false },
     { field: "order_number", headerName: "Order Number", width: 150 },
-    { field: "vendor_name", headerName: "Vendor Name", width: 200 },
-    { field: "vendor_email", headerName: "Vendor Email", width: 100 },
-    { field: "invoice_number", headerName: "Invoice Number", width: 80 },
-    { field: "invoice_total", headerName: "Invoice Total", width: 80 },
-    { field: "status", headerName: "Status", width: 80, sortable: false },
     {
       field: "actions",
       headerName: "Actions",

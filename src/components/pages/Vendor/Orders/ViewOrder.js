@@ -107,11 +107,11 @@ function ViewOrder({ match }) {
                 {order.order_number}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`order-total${order.orderTotal}`}>
+            <StyledTableRow key={`order-total${order.order_total}`}>
               <StyledTableCell component="th" scope="row">
                 Order Total
               </StyledTableCell>
-              <StyledTableCell align="left">{order.orderTotal}</StyledTableCell>
+              <StyledTableCell align="left">{order.order_total}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`status${order.orderStatus}`}>
               <StyledTableCell component="th" scope="row">

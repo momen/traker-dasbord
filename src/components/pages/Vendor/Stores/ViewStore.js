@@ -142,7 +142,7 @@ function ViewStore({ match }) {
         </Table>
       </TableContainer>
       {store.lat && store.long ? (
-        <div style={{ height: "60vh" }}>
+        <div style={{ height: "60vh", marginTop: "20px"}}>
           <Map
             lattitude={parseFloat(store.lat)}
             longitude={parseFloat(store.long)}

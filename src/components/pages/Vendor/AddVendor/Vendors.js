@@ -101,7 +101,7 @@ function Vendors() {
   const [{ user, userPermissions }] = useStateValue();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Category");
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Vendor");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
@@ -109,24 +109,23 @@ function Vendors() {
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
   const [vendor, setVendor] = useState(""); /****** Customize ******/
-  const [itemAddedOrEdited, setItemAddedOrEdited] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [users, setUsers] = useState("");
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
-  const [selectionModel, setSelectionModel] = React.useState([]);
+  const [selectionModel, setSelectionModel] = useState([]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
     { field: "serial", headerName: "Serial", width: 70 },
-    { field: "vendor_name", headerName: "Vendor Name", width: 150 },
-    { field: "email", headerName: "Email", width: 200, flex: 1 },
+    { field: "vendor_name", headerName: "Vendor Name", width: 100 },
+    { field: "email", headerName: "Email", width: 150},
     {
-      field: "userid",
+      field: "userid_id",
       headerName: "Username",
       width: 100,
       renderCell: (params) => {
-        return params.value.name;
+        return params.row.userid.name;
       },
     },
     {
@@ -454,7 +453,7 @@ function Vendors() {
               autoHeight={true}
               onPageChange={handlePageChange}
               onSortModelChange={handleSortModelChange}
-              onSelectionModelChange={(newSelection) => {
+              onSelectionChange={(newSelection) => {
                 setSelectionModel(newSelection.selectionModel);
                 console.log(newSelection);
               }}
