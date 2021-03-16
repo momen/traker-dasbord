@@ -2,9 +2,11 @@ import React from "react";
 import { useStateValue } from "../StateProvider";
 
 function UserManagementGuard({ children }) {
-  const [{ userPermissions }] = useStateValue();
+  const [{ user, userPermissions }] = useStateValue();
 
-  return userPermissions?.includes("vendor_access") ? children : null
+  const isAdmin = user.roles[0].title === "Admin"
+
+  return userPermissions?.includes("vendor_access") && isAdmin ? children : <h1>Unauthorized</h1>
 }
 
 export default UserManagementGuard;

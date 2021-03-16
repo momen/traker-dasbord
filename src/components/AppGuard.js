@@ -8,7 +8,7 @@ function AppGuard({ children }) {
   const [{ user }] = useStateValue();
 
   if (user) {
-    return <Redirect to="/" />;
+    return <Redirect to="/dashboard" />;
   }
 
   return children;

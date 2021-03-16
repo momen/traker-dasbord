@@ -20,7 +20,9 @@ import {
   Group,
   GroupAdd,
   GroupWork,
+  LiveHelp,
   NewReleases,
+  QuestionAnswer,
   Receipt,
   RecentActors,
   ShoppingBasket,
@@ -40,6 +42,9 @@ const ProductManagementGuard = async(() =>
   import("../Permissions Guard/ProductManagementGuard")
 );
 const VendorsGuard = async(() => import("../Permissions Guard/VendorsGuard"));
+const StoresGuard = async(() => import("../Permissions Guard/StoresGuard"));
+const OrdersGuard = async(() => import("../Permissions Guard/OrdersGuard"));
+const InvoicesGuard = async(() => import("../Permissions Guard/InvoicesGuard"));
 const ManageAccountGuard = async(() =>
   import("../Permissions Guard/ManageAccountGuard")
 );
@@ -156,9 +161,22 @@ const ViewInvoice = async(() =>
   import("../components/pages/Vendor/Invoices/ViewInvoice")
 );
 
+
+const Tickets = async(() =>
+  import("../components/pages/Support/Support")
+);
+const ViewTicket = async(() =>
+  import("../components/pages/Support/ViewTicket")
+);
+
+const Help = async(() =>
+  import("../components/pages/Help/Help")
+);
+
 const ManageAccount = async(() =>
   import("../components/pages/ManageAccount/ManageAccount")
 );
+
 
 const dashboardRoutes = {
   id: "Dashborad",
@@ -434,6 +452,63 @@ const viewInvoice = {
   children: null,
 };
 
+
+const storesRoute = {
+  id: "Stores",
+  path: "/vendor/stores",
+  icon: <Store />,
+  component: Stores,
+  children: null,
+  guard: StoresGuard,
+  permission: "stores_access",
+};
+
+const ordersRoute = {
+  id: "Orders",
+  path: "/vendor/orders",
+  icon: <ShoppingBasket />,
+  component: Orders,
+  children: null,
+  guard: OrdersGuard,
+  permission: "show_orders_access",
+};
+
+const invoicesRoute = {
+  id: "Invoices",
+  path: "/vendor/invoices",
+  icon: <Receipt />,
+  component: Invoices,
+  children: null,
+  guard: InvoicesGuard,
+  permission: "show_invoices_access",
+};
+
+
+const ticketsRoute = {
+  id: "Support",
+  path: "/support",
+  icon: <QuestionAnswer />,
+  badge: "11",
+  component: Tickets,
+  children: null,
+  noPermissionRequired: true,
+};
+const viewTicket = {
+  path: "/support/ticket/:id",
+  component: ViewTicket,
+  children: null,
+};
+
+
+const helpRoute = {
+  id: "Help",
+  path: "/help",
+  icon: <LiveHelp />,
+  component: Help,
+  children: null,
+  noPermissionRequired: true,
+};
+
 const manageAccountRoute = {
   id: "Manage Account",
   path: "/profile",
@@ -478,6 +553,9 @@ export const dashboardLayoutRoutes = [
   userManagementRoutes,
   productManagementRoutes,
   vendorRoutes,
+  storesRoute,
+  ordersRoute,
+  invoicesRoute,
   viewPermission,
   viewRole,
   viewUser,
@@ -497,6 +575,9 @@ export const dashboardLayoutRoutes = [
   viewStore,
   viewOrder,
   viewInvoice,
+  ticketsRoute,
+  viewTicket,
+  helpRoute,
   manageAccountRoute,
 ];
 
@@ -512,6 +593,11 @@ export const sidebarRoutes = [
   userManagementRoutes,
   productManagementRoutes,
   vendorRoutes,
+  storesRoute,
+  ordersRoute,
+  invoicesRoute,
+  ticketsRoute,
+  helpRoute,
   manageAccountRoute,
   logoutRoute,
 ];

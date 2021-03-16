@@ -390,16 +390,17 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                       timeout="auto"
                       unmountOnExit
                     >
-                      {category.children.map((route, index) => (
-                        userPermissions?.includes(route.permission)?
-                        <SidebarLink
-                          key={index}
-                          name={route.name}
-                          to={route.path}
-                          icon={route.icon}
-                          badge={route.badge}
-                        /> : null
-                      ))}
+                      {category.children.map((route, index) =>
+                        userPermissions?.includes(route.permission) ? (
+                          <SidebarLink
+                            key={index}
+                            name={route.name}
+                            to={route.path}
+                            icon={route.icon}
+                            badge={route.badge}
+                          />
+                        ) : null
+                      )}
                     </Collapse>
                   </React.Fragment>
                 ) : category.icon &&
@@ -414,7 +415,8 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                     activeClassName="active"
                     component={NavLink}
                     icon={category.icon}
-                    exact
+                    exact={category.containsHome ? true : false}
+                    //To make tabs other than the home page to track navigation of it's inner tabs
                     button
                     badge={category.badge}
                   />
@@ -448,10 +450,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
               }}
               variant="dot"
             >
-              <Avatar
-                alt={user.name}
-                src="/static/img/avatars/avatar-1.jpg"
-              />
+              <Avatar alt={user.name} src="/static/img/avatars/avatar-1.jpg" />
             </SidebarFooterBadge>
           </Grid>
           <Grid item>
