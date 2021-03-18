@@ -136,6 +136,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
                 value={formData.name}
                 onChange={handleChange}
                 error={responseErrors?.name}
+                autoFocus
               />
 
               {responseErrors ? (

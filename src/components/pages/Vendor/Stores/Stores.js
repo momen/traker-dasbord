@@ -51,6 +51,7 @@ const useStyles = makeStyles({
     "&:hover": {
       background: "#388e3c",
     },
+    marginRight: "5px",
   },
 });
 
@@ -113,6 +114,8 @@ function Stores() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
+  const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
+  const [rowsToDelete, setRowsToDelete] = useState([]);
 
   const location = useLocation();
 
@@ -235,9 +238,8 @@ function Stores() {
     setItemToDelete(id);
   };
 
-  const DeleteCategory = async () => {
-    console.log(itemToDelete);
-    await axios
+  const DeleteStore = () => {
+    axios
       .delete(`/stores/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -245,11 +247,40 @@ function Stores() {
       })
       .then((res) => {
         setOpenDeleteDialog(false);
+        setLoading(true);
+        axios
+          .get(
+            `/stores?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
+  };
 
-    await axios
-      .get(
-        `/stores?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+  const MassDelete = () => {
+    axios
+      .post(
+        `/stores/mass/delete`,
+        {
+          ids: JSON.stringify(rowsToDelete),
+        },
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -257,12 +288,32 @@ function Stores() {
         }
       )
       .then((res) => {
-        if (Math.ceil(res.data.total / pageSize) < page) {
-          setPage(page - 1);
-        }
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-        setLoading(false);
+        setOpenMassDeleteDialog(false);
+        setRowsToDelete([]);
+        setLoading(true);
+        axios
+          .get(
+            `/stores?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
   };
 
@@ -315,20 +366,36 @@ function Stores() {
 
       <Divider my={6} />
 
-      {userPermissions.includes("stores_create") ? (
-        <Button
-          mb={3}
-          className={classes.button}
-          variant="contained"
-          onClick={() => {
-            setOpenPopupTitle("New Store");
-            setOpenPopup(true);
-            setSelectedItem("");
-          }}
-        >
-          Add Store
-        </Button>
-      ) : null}
+      <Grid container flex>
+        {userPermissions.includes("stores_create") ? (
+          <Button
+            mb={3}
+            className={classes.button}
+            variant="contained"
+            onClick={() => {
+              setOpenPopupTitle("New Store");
+              setOpenPopup(true);
+              setSelectedItem("");
+            }}
+          >
+            Add Store
+          </Button>
+        ) : null}
+
+        {userPermissions.includes("stores_delete") ? (
+          <Button
+            mb={3}
+            color="secondary"
+            variant="contained"
+            disabled={!rowsToDelete.length > 0}
+            onClick={() => {
+              setOpenMassDeleteDialog(true);
+            }}
+          >
+            Delete Selected
+          </Button>
+        ) : null}
+      </Grid>
 
       <Card mb={6}>
         <Paper mb={2}>
@@ -403,6 +470,9 @@ function Stores() {
               autoHeight={true}
               onPageChange={handlePageChange}
               onSortModelChange={handleSortModelChange}
+              onSelectionChange={(newSelection) => {
+                setRowsToDelete(newSelection.rowIds);
+              }}
             />
           </div>
         </Paper>
@@ -436,7 +506,7 @@ function Stores() {
         <DialogActions>
           <Button
             onClick={() => {
-              DeleteCategory();
+              DeleteStore();
             }}
             color="secondary"
           >
@@ -444,6 +514,39 @@ function Stores() {
           </Button>
           <Button
             onClick={() => setOpenDeleteDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            Back
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openMassDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Confirmation"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete all the selected Stores? <br />
+            If you wish press Yes, otherwise press Back.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              MassDelete();
+            }}
+            color="secondary"
+          >
+            Yes, delete
+          </Button>
+          <Button
+            onClick={() => setOpenMassDeleteDialog(false)}
             color="primary"
             autoFocus
           >

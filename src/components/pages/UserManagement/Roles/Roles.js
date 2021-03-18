@@ -25,6 +25,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Grid,
 } from "@material-ui/core";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
@@ -52,6 +53,7 @@ const useStyles = makeStyles({
     "&:hover": {
       background: "#388e3c",
     },
+    marginRight: "5px",
   },
   permissionBadge: {
     background: "#00b3b3",
@@ -118,9 +120,9 @@ function Roles() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [permissionsList, setPermissionsList] = useState("");
-  const [sortModel, setSortModel] = useState([
-    { field: "id", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
+  const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
+  const [rowsToDelete, setRowsToDelete] = useState([]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 50 },
@@ -217,8 +219,8 @@ function Roles() {
     setItemToDelete(id);
   };
 
-  const DeleteItem = async () => {
-    await axios
+  const DeleteItem = () => {
+    axios
       .delete(`/roles/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -226,21 +228,73 @@ function Roles() {
       })
       .then((res) => {
         setOpenDeleteDialog(false);
-      });
-
-    await axios
-      .get(`/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
+        setLoading(true);
+        axios
+          .get(
+            `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
       })
-      .then((res) => {
-        if (Math.ceil(res.data.total / pageSize) < page) {
-          setPage(page - 1);
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
+  };
+
+  const MassDelete = () => {
+    axios
+      .post(
+        `/roles/mass/delete`,
+        {
+          ids: JSON.stringify(rowsToDelete),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
         }
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-        setLoading(false);
+      )
+      .then((res) => {
+        setOpenMassDeleteDialog(false);
+        setRowsToDelete([]);
+        setLoading(true);
+        axios
+          .get(
+            `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
   };
 
@@ -261,11 +315,14 @@ function Roles() {
     if (!openPopup) {
       setLoading(true);
       axios
-        .get(`/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .get(
+          `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        )
         .then((res) => {
           // alert(res.data.total);
           setRowsCount(res.data.total);
@@ -284,18 +341,37 @@ function Roles() {
 
       <Divider my={6} />
 
-      <Button
-        mb={3}
-        className={classes.button}
-        variant="contained"
-        onClick={() => {
-          setSelectedItem("");
-          setOpenPopup(true);
-          setOpenPopupTitle("New Role");
-        }}
-      >
-        Add Role
-      </Button>
+      <Grid container>
+        {userPermissions.includes("role_create") ? (
+          <Button
+            mb={3}
+            className={classes.button}
+            variant="contained"
+            onClick={() => {
+              setSelectedItem("");
+              setOpenPopup(true);
+              setOpenPopupTitle("New Role");
+            }}
+          >
+            Add Role
+          </Button>
+        ) : null}
+
+        {userPermissions.includes("role_delete") ? (
+          <Button
+            mb={3}
+            color="secondary"
+            variant="contained"
+            disabled={!rowsToDelete.length > 0}
+            onClick={() => {
+              setOpenMassDeleteDialog(true);
+            }}
+          >
+            Delete Selected
+          </Button>
+        ) : null}
+      </Grid>
+
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar>
@@ -326,7 +402,7 @@ function Roles() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-          <DataGrid
+            <DataGrid
               rows={rows}
               columns={columns}
               page={page}
@@ -347,6 +423,9 @@ function Roles() {
               autoHeight={true}
               onPageChange={handlePageChange}
               onSortModelChange={handleSortModelChange}
+              onSelectionChange={(newSelection) => {
+                setRowsToDelete(newSelection.rowIds);
+              }}
             />
           </div>
         </Paper>
@@ -389,6 +468,39 @@ function Roles() {
           </Button>
           <Button
             onClick={() => setOpenDeleteDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            Back
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openMassDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Confirmation"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete all the selected Roles? <br />
+            If you wish press Yes, otherwise press Back.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              MassDelete();
+            }}
+            color="secondary"
+          >
+            Yes, delete
+          </Button>
+          <Button
+            onClick={() => setOpenMassDeleteDialog(false)}
             color="primary"
             autoFocus
           >

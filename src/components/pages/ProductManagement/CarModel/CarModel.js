@@ -51,6 +51,7 @@ const useStyles = makeStyles({
     "&:hover": {
       background: "#388e3c",
     },
+    marginRight: "5px",
   },
 });
 
@@ -111,9 +112,9 @@ function CarModel() {
   const [carMades, setCarMades] = useState([]); // Customize
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
-  const [sortModel, setSortModel] = useState([
-    { field: "id", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
+  const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
+  const [rowsToDelete, setRowsToDelete] = useState([]);
 
   // Customize
   const columns = [
@@ -220,8 +221,8 @@ function CarModel() {
     setItemToDelete(id);
   };
 
-  const DeleteItem = async () => {
-    await axios
+  const DeleteItem = () => {
+    axios
       .delete(`/car-models/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -229,21 +230,73 @@ function CarModel() {
       })
       .then((res) => {
         setOpenDeleteDialog(false);
-      });
-
-    await axios
-      .get(`/car-models?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
+        setLoading(true);
+        axios
+          .get(
+            `/car-models?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
       })
-      .then((res) => {
-        if (Math.ceil(res.data.total / pageSize) < page) {
-          setPage(page - 1);
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
+  };
+
+  const MassDelete = () => {
+    axios
+      .post(
+        `/car-models/mass/delete`,
+        {
+          ids: JSON.stringify(rowsToDelete),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
         }
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-        setLoading(false);
+      )
+      .then((res) => {
+        setOpenMassDeleteDialog(false);
+        setRowsToDelete([]);
+        setLoading(true);
+        axios
+          .get(
+            `/car-models?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
   };
 
@@ -272,11 +325,14 @@ function CarModel() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/car-models?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .get(
+          `/car-models?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
@@ -312,19 +368,35 @@ function CarModel() {
 
       <Divider my={6} />
 
-      {userPermissions.includes("car_model_create") ? (
-        <Button
-          mb={3}
-          className={classes.button}
-          variant="contained"
-          onClick={() => {
-            setOpenPopup(true);
-            setSelectedItem("");
-          }}
-        >
-          Add Model
-        </Button>
-      ) : null}
+      <Grid container>
+        {userPermissions.includes("car_model_create") ? (
+          <Button
+            mb={3}
+            className={classes.button}
+            variant="contained"
+            onClick={() => {
+              setOpenPopup(true);
+              setSelectedItem("");
+            }}
+          >
+            Add Model
+          </Button>
+        ) : null}
+
+        {userPermissions.includes("car_model_delete") ? (
+          <Button
+            mb={3}
+            color="secondary"
+            variant="contained"
+            disabled={!rowsToDelete.length > 0}
+            onClick={() => {
+              setOpenMassDeleteDialog(true);
+            }}
+          >
+            Delete Selected
+          </Button>
+        ) : null}
+      </Grid>
 
       <Card mb={6}>
         <Paper mb={2}>
@@ -378,7 +450,7 @@ function CarModel() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-          <DataGrid
+            <DataGrid
               rows={rows}
               columns={columns}
               page={page}
@@ -399,6 +471,9 @@ function CarModel() {
               autoHeight={true}
               onPageChange={handlePageChange}
               onSortModelChange={handleSortModelChange}
+              onSelectionChange={(newSelection) => {
+                setRowsToDelete(newSelection.rowIds);
+              }}
             />
           </div>
         </Paper>
@@ -441,6 +516,39 @@ function CarModel() {
           </Button>
           <Button
             onClick={() => setOpenDeleteDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            Back
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openMassDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Confirmation"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete all the selected Models? <br />
+            If you wish press Yes, otherwise press Back.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              MassDelete();
+            }}
+            color="secondary"
+          >
+            Yes, delete
+          </Button>
+          <Button
+            onClick={() => setOpenMassDeleteDialog(false)}
             color="primary"
             autoFocus
           >

@@ -52,6 +52,7 @@ const useStyles = makeStyles({
     "&:hover": {
       background: "#388e3c",
     },
+    marginRight: "5px",
   },
 });
 
@@ -113,13 +114,14 @@ function Vendors() {
   const [itemToDelete, setItemToDelete] = useState("");
   const [users, setUsers] = useState("");
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
-  const [selectionModel, setSelectionModel] = useState([]);
+  const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
+  const [rowsToDelete, setRowsToDelete] = useState([]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
     { field: "serial", headerName: "Serial", width: 70 },
     { field: "vendor_name", headerName: "Vendor Name", width: 100 },
-    { field: "email", headerName: "Email", width: 150},
+    { field: "email", headerName: "Email", width: 150 },
     {
       field: "userid_id",
       headerName: "Username",
@@ -242,7 +244,6 @@ function Vendors() {
   };
 
   const handleSortModelChange = (params) => {
-    console.log(params);
     if (params.sortModel !== sortModel) {
       setSortModel(params.sortModel);
     }
@@ -266,9 +267,8 @@ function Vendors() {
     setItemToDelete(id);
   };
 
-  const DeleteCategory = async () => {
-    console.log(itemToDelete);
-    await axios
+  const DeleteVendor = () => {
+    axios
       .delete(`/add-vendors/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -276,11 +276,40 @@ function Vendors() {
       })
       .then((res) => {
         setOpenDeleteDialog(false);
+        setLoading(true);
+        axios
+          .get(
+            `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
+  };
 
-    await axios
-      .get(
-        `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+  const MassDelete = () => {
+    axios
+      .post(
+        `/add-vendors/mass/delete`,
+        {
+          ids: JSON.stringify(rowsToDelete),
+        },
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -288,12 +317,32 @@ function Vendors() {
         }
       )
       .then((res) => {
-        if (Math.ceil(res.data.total / pageSize) < page) {
-          setPage(page - 1);
-        }
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-        setLoading(false);
+        setOpenMassDeleteDialog(false);
+        setRowsToDelete([]);
+        setLoading(true);
+        axios
+          .get(
+            `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
   };
 
@@ -364,20 +413,36 @@ function Vendors() {
 
       <Divider my={6} />
 
-      {userPermissions.includes("add_vendor_create") ? (
-        <Button
-          mb={3}
-          className={classes.button}
-          variant="contained"
-          onClick={() => {
-            setOpenPopupTitle("New Vendor");
-            setOpenPopup(true);
-            setVendor("");
-          }}
-        >
-          Add Vendor
-        </Button>
-      ) : null}
+      <Grid container flex>
+        {userPermissions.includes("add_vendor_create") ? (
+          <Button
+            mb={3}
+            className={classes.button}
+            variant="contained"
+            onClick={() => {
+              setOpenPopupTitle("New Vendor");
+              setOpenPopup(true);
+              setVendor("");
+            }}
+          >
+            Add Vendor
+          </Button>
+        ) : null}
+
+        {userPermissions.includes("add_vendor_delete") ? (
+          <Button
+            mb={3}
+            color="secondary"
+            variant="contained"
+            disabled={!rowsToDelete.length > 0}
+            onClick={() => {
+              setOpenMassDeleteDialog(true);
+            }}
+          >
+            Delete Selected
+          </Button>
+        ) : null}
+      </Grid>
 
       <Card mb={6}>
         <Paper mb={2}>
@@ -448,14 +513,12 @@ function Vendors() {
               }}
               loading={loading}
               checkboxSelection
-              selectionModel={selectionModel}
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
               onSortModelChange={handleSortModelChange}
               onSelectionChange={(newSelection) => {
-                setSelectionModel(newSelection.selectionModel);
-                console.log(newSelection);
+                setRowsToDelete(newSelection.rowIds);
               }}
             />
           </div>
@@ -491,7 +554,7 @@ function Vendors() {
         <DialogActions>
           <Button
             onClick={() => {
-              DeleteCategory();
+              DeleteVendor();
             }}
             color="secondary"
           >
@@ -499,6 +562,39 @@ function Vendors() {
           </Button>
           <Button
             onClick={() => setOpenDeleteDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            Back
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openMassDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Confirmation"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete all the selected Vendors? <br />
+            If you wish press Yes, otherwise press Back.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              MassDelete();
+            }}
+            color="secondary"
+          >
+            Yes, delete
+          </Button>
+          <Button
+            onClick={() => setOpenMassDeleteDialog(false)}
             color="primary"
             autoFocus
           >

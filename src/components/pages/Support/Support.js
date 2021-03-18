@@ -114,7 +114,7 @@ function Support() {
     { field: "title", headerName: "Title", width: 100 },
     { field: "priority", headerName: "Priority", width: 80 },
     { field: "status", headerName: "Status", width: 80 },
-    { field: "category_name", headerName: "Category", width: 80 },
+    { field: "category_name", headerName: "Category", width: 80, sortable: false, },
     { field: "vendor_name", headerName: "Vendor Name", width: 120 },
     { field: "order_number", headerName: "Order Number", width: 120 },
     {
@@ -132,7 +132,7 @@ function Support() {
               width: "100%",
             }}
           >
-            {userPermissions.includes("show_specific_invoice") ? (
+            {userPermissions.includes("specific_ticket_access") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
@@ -194,7 +194,7 @@ function Support() {
     } else {
       axios
         .post(
-          `/invoices/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/search/tickets?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           },

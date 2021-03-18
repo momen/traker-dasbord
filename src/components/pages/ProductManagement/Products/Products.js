@@ -320,8 +320,8 @@ function Products() {
     setItemToDelete(id);
   };
 
-  const DeleteProduct = async () => {
-    await axios
+  const DeleteProduct = () => {
+    axios
       .delete(`/products/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -329,29 +329,35 @@ function Products() {
       })
       .then((res) => {
         setOpenDeleteDialog(false);
-      });
-
-    await axios
-      .get(
-        `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      )
-      .then((res) => {
-        if (Math.ceil(res.data.total / pageSize) < page) {
-          setPage(page - 1);
-        }
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-        setLoading(false);
+        setLoading(true);
+        axios
+          .get(
+            `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
   };
 
-  const DeleteAllProducts = async () => {
-    await axios
+  const MassDelete = () => {
+    axios
       .post(
         `/products/mass/delete`,
         {
@@ -366,25 +372,30 @@ function Products() {
       .then((res) => {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
+        setLoading(true);
+        axios
+          .get(
+            `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
       })
-      .catch((err) => {});
-
-    await axios
-      .get(
-        `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      )
-      .then((res) => {
-        if (Math.ceil(res.data.total / pageSize) < page) {
-          setPage(page - 1);
-        }
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-        setLoading(false);
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
   };
 
@@ -552,17 +563,19 @@ function Products() {
           </Button>
         ) : null}
 
-        <Button
-          mb={3}
-          color="secondary"
-          variant="contained"
-          disabled={!rowsToDelete.length > 0}
-          onClick={() => {
-            setOpenMassDeleteDialog(true);
-          }}
-        >
-          Delete Selected
-        </Button>
+        {userPermissions.includes("product_delete") ? (
+          <Button
+            mb={3}
+            color="secondary"
+            variant="contained"
+            disabled={!rowsToDelete.length > 0}
+            onClick={() => {
+              setOpenMassDeleteDialog(true);
+            }}
+          >
+            Delete Selected
+          </Button>
+        ) : null}
       </Grid>
 
       <Card mb={6}>
@@ -763,7 +776,7 @@ function Products() {
         <DialogActions>
           <Button
             onClick={() => {
-              DeleteAllProducts();
+              MassDelete();
             }}
             color="secondary"
           >

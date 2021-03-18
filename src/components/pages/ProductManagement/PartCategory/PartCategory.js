@@ -53,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       background: "#388e3c",
     },
+    marginRight: "5px",
   },
   toolBar: {
     display: "flex",
@@ -115,16 +116,23 @@ function PartCategory() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(""); /****** Customize ******/
+  const [selectedItem, setSelectedItem] = useState(
+    ""
+  ); /****** Customize ******/
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
-  const [sortModel, setSortModel] = useState([
-    { field: "id", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
+  const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
+  const [rowsToDelete, setRowsToDelete] = useState([]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
-    { field: "category_name", headerName: "Part Category Name", width: 250, flex: 1 },
+    {
+      field: "category_name",
+      headerName: "Part Category Name",
+      width: 250,
+      flex: 1,
+    },
     {
       field: "photo",
       headerName: "Photo",
@@ -180,7 +188,9 @@ function PartCategory() {
                 onClick={() => {
                   setSelectedItem(params.row);
                   setOpenPopup(true);
-                  setOpenPopupTitle("Edit Part Category"); /****** Customize ******/
+                  setOpenPopupTitle(
+                    "Edit Part Category"
+                  ); /****** Customize ******/
                 }}
               >
                 Edit
@@ -236,9 +246,8 @@ function PartCategory() {
     setItemToDelete(id);
   };
 
-  const DeleteCategory = async () => {
-    console.log(itemToDelete);
-    await axios
+  const DeletePartCategory = () => {
+    axios
       .delete(`/part-categories/${itemToDelete}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -246,21 +255,73 @@ function PartCategory() {
       })
       .then((res) => {
         setOpenDeleteDialog(false);
-      });
-
-    await axios
-      .get(`/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
+        setLoading(true);
+        axios
+          .get(
+            `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
       })
-      .then((res) => {
-        if (Math.ceil(res.data.total / pageSize) < page) {
-          setPage(page - 1);
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
+  };
+
+  const MassDelete = () => {
+    axios
+      .post(
+        `/part-categories/mass/delete`,
+        {
+          ids: JSON.stringify(rowsToDelete),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
         }
-        setRowsCount(res.data.total);
-        setRows(res.data.data);
-        setLoading(false);
+      )
+      .then((res) => {
+        setOpenMassDeleteDialog(false);
+        setRowsToDelete([]);
+        setLoading(true);
+        axios
+          .get(
+            `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
   };
 
@@ -270,11 +331,14 @@ function PartCategory() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .get(
+          `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
@@ -310,20 +374,36 @@ function PartCategory() {
 
       <Divider my={6} />
 
-      {userPermissions.includes("part_category_create") ? (
-        <Button
-          mb={3}
-          className={classes.button}
-          variant="contained"
-          onClick={() => {
-            setOpenPopupTitle("New Category");
-            setOpenPopup(true);
-            setSelectedItem("");
-          }}
-        >
-          Add Part Category
-        </Button>
-      ) : null}
+      <Grid container>
+        {userPermissions.includes("part_category_create") ? (
+          <Button
+            mb={3}
+            className={classes.button}
+            variant="contained"
+            onClick={() => {
+              setOpenPopupTitle("New Category");
+              setOpenPopup(true);
+              setSelectedItem("");
+            }}
+          >
+            Add Part Category
+          </Button>
+        ) : null}
+
+        {userPermissions.includes("part_category_delete") ? (
+          <Button
+            mb={3}
+            color="secondary"
+            variant="contained"
+            disabled={!rowsToDelete.length > 0}
+            onClick={() => {
+              setOpenMassDeleteDialog(true);
+            }}
+          >
+            Delete Selected
+          </Button>
+        ) : null}
+      </Grid>
 
       <Card mb={6}>
         <Paper mb={2}>
@@ -370,7 +450,7 @@ function PartCategory() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-          <DataGrid
+            <DataGrid
               rows={rows}
               columns={columns}
               page={page}
@@ -391,6 +471,9 @@ function PartCategory() {
               autoHeight={true}
               onPageChange={handlePageChange}
               onSortModelChange={handleSortModelChange}
+              onSelectionChange={(newSelection) => {
+                setRowsToDelete(newSelection.rowIds);
+              }}
             />
           </div>
         </Paper>
@@ -417,14 +500,14 @@ function PartCategory() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Category? <br />
+            Are you sure you want to delete this Part Category? <br />
             If this was by accident please press Back
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => {
-              DeleteCategory();
+              DeletePartCategory();
             }}
             color="secondary"
           >
@@ -432,6 +515,39 @@ function PartCategory() {
           </Button>
           <Button
             onClick={() => setOpenDeleteDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            Back
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openMassDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Confirmation"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete all the selected Part Categories? <br />
+            If you wish press Yes, otherwise press Back.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              MassDelete();
+            }}
+            color="secondary"
+          >
+            Yes, delete
+          </Button>
+          <Button
+            onClick={() => setOpenMassDeleteDialog(false)}
             color="primary"
             autoFocus
           >

@@ -460,7 +460,7 @@ const storesRoute = {
   component: Stores,
   children: null,
   guard: StoresGuard,
-  permission: "stores_access",
+  permission: "access_tabs_separately",
 };
 
 const ordersRoute = {
@@ -470,7 +470,7 @@ const ordersRoute = {
   component: Orders,
   children: null,
   guard: OrdersGuard,
-  permission: "show_orders_access",
+  permission: "access_tabs_separately",
 };
 
 const invoicesRoute = {
@@ -480,7 +480,7 @@ const invoicesRoute = {
   component: Invoices,
   children: null,
   guard: InvoicesGuard,
-  permission: "show_invoices_access",
+  permission: "access_tabs_separately",
 };
 
 
@@ -491,7 +491,7 @@ const ticketsRoute = {
   badge: "11",
   component: Tickets,
   children: null,
-  noPermissionRequired: true,
+  permission: "tickets_access",
 };
 const viewTicket = {
   path: "/support/ticket/:id",
@@ -506,7 +506,7 @@ const helpRoute = {
   icon: <LiveHelp />,
   component: Help,
   children: null,
-  noPermissionRequired: true,
+  permission: "help_center_access",
 };
 
 const manageAccountRoute = {
