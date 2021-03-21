@@ -40,6 +40,11 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.typography.pxToRem(15),
     fontWeight: theme.typography.fontWeightRegular,
   },
+  expanded: {
+    '&$expanded': {
+        margin: '4px 0'
+     }
+  },
   button: {
     background: "#4caf50",
     color: "#ffffff",
@@ -140,12 +145,8 @@ function Support() {
   const toggleCheckBox = (e, faq_id) => {
     e.stopPropagation();
     if (e.target.checked) {
-      console.log("Checked");
-
       setRowsToDelete([...rowsToDelete, faq_id]);
     } else {
-      console.log("Not Checked!");
-
       setRowsToDelete(rowsToDelete.filter((id) => id !== faq_id));
     }
     console.log(faq_id);
@@ -249,11 +250,12 @@ function Support() {
 
       <div className={classes.root}>
         {FAQs?.map((faq, index) => (
-          <Accordion>
+          <Accordion id={`acc-container-${faq.id}`} classes={{ expanded: classes.expanded }}>
             <AccordionSummary
               expandIcon={<ExpandMore />}
-              aria-controls={`FAQs-content-${index}`}
-              id={`FAQs-header-${index}`}
+              aria-controls={`FAQs-content-${faq.id}`}
+              id={`FAQs-header-${faq.id}`}
+              classes={{ expanded: classes.expanded }}
             >
               {userPermissions.includes("help_center_delete") ? (
                 <FormControlLabel
@@ -261,7 +263,12 @@ function Support() {
                   onClick={(event) => {
                     toggleCheckBox(event, faq.id);
                   }}
-                  control={<Checkbox />}
+                  control={<Checkbox id={`acc-checkbox-${faq.id}`} checked={rowsToDelete.filter((id) => id === faq.id).length > 0}/>}
+                  // The condition above is to fix a bug when deleting a checked question, after its removed the below one 
+                  // is checked instead, which isn't the desired behavior, so it will check if this item is really in the
+                  // to be deleted list, so it maintains it's status.
+                  // Used length > 0, as evaluating an empty array will evaluate to true, although an empty array
+                  // indicates the item wasn't found in the list.
                   label={uppercaseFirstLetter(faq.question)}
                   htmlFor={`FAQs-header-${index}`}
                 />
@@ -271,7 +278,7 @@ function Support() {
                 </Typography>
               )}
             </AccordionSummary>
-            <AccordionDetails style={{paddingLeft:"25px"}}>
+            <AccordionDetails id={`acc-details-${faq.id}`} style={{paddingLeft:"25px"}}>
               <Typography>{faq.answer}</Typography>
             </AccordionDetails>
             {/* <Divider /> */}
