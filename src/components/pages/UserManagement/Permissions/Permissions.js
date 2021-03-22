@@ -131,6 +131,7 @@ function Permissions() {
           >
             {userPermissions.includes("permission_show") ? (
               <Button
+              id="view-permissions-btn"
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 onClick={() => history.push(`/user-mgt/permissions/${params.row.id}`)}

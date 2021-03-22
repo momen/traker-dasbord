@@ -280,7 +280,7 @@ function Users() {
           });
       })
       .catch(({ response }) => {
-        alert(response.data?.errors);
+        alert(response.data?.message);
       });
   };
 
