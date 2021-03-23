@@ -126,7 +126,6 @@ function Permissions() {
               display: "flex",
               justifyContent: "flex-start",
               width: "100%",
-              // padding: "5px"
             }}
           >
             {userPermissions.includes("permission_show") ? (
@@ -139,30 +138,6 @@ function Permissions() {
                 View
               </Button>
             ) : null}
-            {/* {userPermissions.includes("permission_edit") ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                color="primary"
-                variant="contained"
-                onClick={() => {
-                  setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit Permission");
-                }}
-              >
-                Edit
-              </Button>
-            ) : null} */}
-
-            {/* {userPermissions.includes("permission_delete") ? (
-              <Button
-                color="secondary"
-                variant="contained"
-                onClick={() => openDeleteConfirmation(params.row.id)}
-              >
-                Delete
-              </Button>
-            ) : null} */}
           </div>
         );
       },
@@ -184,10 +159,6 @@ function Permissions() {
     }
   };
 
-  const openDeleteConfirmation = (id) => {
-    setOpenDeleteDialog(true);
-    setItemToDelete(id);
-  };
 
   const DeleteItem = async () => {
     await axios
@@ -227,7 +198,6 @@ function Permissions() {
           },
         })
         .then((res) => {
-          // alert(res.data.total);
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);

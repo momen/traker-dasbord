@@ -251,6 +251,7 @@ function Categories() {
       })
       .then((res) => {
         setOpenDeleteDialog(false);
+        alert("Hanhazar!")
       });
 
     await axios

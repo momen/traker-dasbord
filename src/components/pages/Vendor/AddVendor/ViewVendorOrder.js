@@ -60,11 +60,14 @@ function ViewVendorOrder({ match }) {
   useEffect(() => {
     console.log(match.params);
     axios
-      .get(`/admin/show/vendor/orders/${match.params.id}/${match.params.orderId}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(
+        `/admin/show/vendor/orders/${match.params.id}/${match.params.orderId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      )
       .then((res) => {
         setOrder(res.data.data);
       });
@@ -73,14 +76,16 @@ function ViewVendorOrder({ match }) {
   return (
     <Fragment>
       <Container style={{ marginBottom: "20px" }}>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => history.push(`/vendor/vendors/${match.params.id}/vendor-orders`)}
-        mb={3}
-      >
-        Back to Vendor Orders
-      </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() =>
+            history.push(`/vendor/vendors/${match.params.id}/vendor-orders`)
+          }
+          mb={3}
+        >
+          Back to Vendor Orders
+        </Button>
       </Container>
       <Typography variant="h3" gutterBottom display="inline">
         General Information
@@ -113,7 +118,9 @@ function ViewVendorOrder({ match }) {
               <StyledTableCell component="th" scope="row">
                 Order Total
               </StyledTableCell>
-              <StyledTableCell align="left">{order.order_total}</StyledTableCell>
+              <StyledTableCell align="left">
+                {order.order_total}
+              </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`status${order.orderStatus}`}>
               <StyledTableCell component="th" scope="row">
@@ -158,14 +165,6 @@ function ViewVendorOrder({ match }) {
                     </StyledTableCell>
                     <StyledTableCell align="left">{detail.id}</StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`product-id-${detail.product_id}`}>
-                    <StyledTableCell component="th" scope="row">
-                      Product ID
-                    </StyledTableCell>
-                    <StyledTableCell align="left">
-                      {detail.product_id}
-                    </StyledTableCell>
-                  </StyledTableRow>
                   <StyledTableRow key={`product-name${detail.product_name}`}>
                     <StyledTableCell component="th" scope="row">
                       Product Name
@@ -174,7 +173,9 @@ function ViewVendorOrder({ match }) {
                       {detail.product_name}
                     </StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`detail-${detail.id}-quantity-${detail.quantity}`}>
+                  <StyledTableRow
+                    key={`detail-${detail.id}-quantity-${detail.quantity}`}
+                  >
                     <StyledTableCell component="th" scope="row">
                       Quantity
                     </StyledTableCell>
@@ -182,7 +183,9 @@ function ViewVendorOrder({ match }) {
                       {detail.quantity}
                     </StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`detail-${detail.id}-price-${detail.price}`}>
+                  <StyledTableRow
+                    key={`detail-${detail.id}-price-${detail.price}`}
+                  >
                     <StyledTableCell component="th" scope="row">
                       Price
                     </StyledTableCell>
@@ -190,7 +193,9 @@ function ViewVendorOrder({ match }) {
                       {detail.price}
                     </StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`detail-${detail.id}-discount-${detail.discount}`}>
+                  <StyledTableRow
+                    key={`detail-${detail.id}-discount-${detail.discount}`}
+                  >
                     <StyledTableCell component="th" scope="row">
                       Discount
                     </StyledTableCell>
@@ -198,20 +203,14 @@ function ViewVendorOrder({ match }) {
                       %{detail.discount}
                     </StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`detail-${detail.id}-total-${detail.total}`}>
+                  <StyledTableRow
+                    key={`detail-${detail.id}-total-${detail.total}`}
+                  >
                     <StyledTableCell component="th" scope="row">
                       Total
                     </StyledTableCell>
                     <StyledTableCell align="left">
                       {detail.total}
-                    </StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow key={`store-id${detail.store_id}`}>
-                    <StyledTableCell component="th" scope="row">
-                      Store ID
-                    </StyledTableCell>
-                    <StyledTableCell align="left">
-                      {detail.store_id}
                     </StyledTableCell>
                   </StyledTableRow>
                   <StyledTableRow key={`store-name${detail.store_name}`}>
@@ -220,14 +219,6 @@ function ViewVendorOrder({ match }) {
                     </StyledTableCell>
                     <StyledTableCell align="left">
                       {detail.store_name}
-                    </StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow key={`vendor-id${detail.vendor_id}`}>
-                    <StyledTableCell component="th" scope="row">
-                      Vendor ID
-                    </StyledTableCell>
-                    <StyledTableCell align="left">
-                      {detail.vendor_id}
                     </StyledTableCell>
                   </StyledTableRow>
                   <StyledTableRow key={`vendor-name${detail.vendor_name}`}>

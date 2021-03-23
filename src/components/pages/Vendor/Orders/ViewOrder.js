@@ -111,7 +111,9 @@ function ViewOrder({ match }) {
               <StyledTableCell component="th" scope="row">
                 Order Total
               </StyledTableCell>
-              <StyledTableCell align="left">{order.order_total}</StyledTableCell>
+              <StyledTableCell align="left">
+                {order.order_total}
+              </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`status${order.orderStatus}`}>
               <StyledTableCell component="th" scope="row">
@@ -155,14 +157,6 @@ function ViewOrder({ match }) {
                     </StyledTableCell>
                     <StyledTableCell align="left">{detail.id}</StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`product-id-${detail.product_id}`}>
-                    <StyledTableCell component="th" scope="row">
-                      Product ID
-                    </StyledTableCell>
-                    <StyledTableCell align="left">
-                      {detail.product_id}
-                    </StyledTableCell>
-                  </StyledTableRow>
                   <StyledTableRow key={`product-name${detail.product_name}`}>
                     <StyledTableCell component="th" scope="row">
                       Product Name
@@ -171,7 +165,9 @@ function ViewOrder({ match }) {
                       {detail.product_name}
                     </StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`detail-${detail.id}-quantity-${detail.quantity}`}>
+                  <StyledTableRow
+                    key={`detail-${detail.id}-quantity-${detail.quantity}`}
+                  >
                     <StyledTableCell component="th" scope="row">
                       Quantity
                     </StyledTableCell>
@@ -179,7 +175,9 @@ function ViewOrder({ match }) {
                       {detail.quantity}
                     </StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`detail-${detail.id}-price-${detail.price}`}>
+                  <StyledTableRow
+                    key={`detail-${detail.id}-price-${detail.price}`}
+                  >
                     <StyledTableCell component="th" scope="row">
                       Price
                     </StyledTableCell>
@@ -187,7 +185,9 @@ function ViewOrder({ match }) {
                       {detail.price}
                     </StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`detail-${detail.id}-discount-${detail.discount}`}>
+                  <StyledTableRow
+                    key={`detail-${detail.id}-discount-${detail.discount}`}
+                  >
                     <StyledTableCell component="th" scope="row">
                       Discount
                     </StyledTableCell>
@@ -195,20 +195,14 @@ function ViewOrder({ match }) {
                       %{detail.discount}
                     </StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`detail-${detail.id}-total-${detail.total}`}>
+                  <StyledTableRow
+                    key={`detail-${detail.id}-total-${detail.total}`}
+                  >
                     <StyledTableCell component="th" scope="row">
                       Total
                     </StyledTableCell>
                     <StyledTableCell align="left">
                       {detail.total}
-                    </StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow key={`store-id${detail.store_id}`}>
-                    <StyledTableCell component="th" scope="row">
-                      Store ID
-                    </StyledTableCell>
-                    <StyledTableCell align="left">
-                      {detail.store_id}
                     </StyledTableCell>
                   </StyledTableRow>
                   <StyledTableRow key={`store-name${detail.store_name}`}>
@@ -217,14 +211,6 @@ function ViewOrder({ match }) {
                     </StyledTableCell>
                     <StyledTableCell align="left">
                       {detail.store_name}
-                    </StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow key={`vendor-id${detail.vendor_id}`}>
-                    <StyledTableCell component="th" scope="row">
-                      Vendor ID
-                    </StyledTableCell>
-                    <StyledTableCell align="left">
-                      {detail.vendor_id}
                     </StyledTableCell>
                   </StyledTableRow>
                   <StyledTableRow key={`vendor-name${detail.vendor_name}`}>

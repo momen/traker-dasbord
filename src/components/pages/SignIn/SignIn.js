@@ -113,6 +113,7 @@ function SignIn() {
                   user: res.data.data,
                 });
                 history.push("/");
+                console.log(res.data.data.token);
               })
               .catch((res) => {
                 console.log(`Error: ${res}`);

@@ -391,6 +391,7 @@ function Users() {
       <Grid container>
         {userPermissions.includes("user_create") ? (
           <Button
+            data-test="users-create-btn"
             mb={3}
             className={classes.button}
             variant="contained"

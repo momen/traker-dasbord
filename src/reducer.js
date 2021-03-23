@@ -9,7 +9,7 @@ export const initialState = {
 };
 
 //The function that manipulates & returns state according to the action specified.
-const reducer = (state, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case "GET_CSRF":
       return {
@@ -29,7 +29,7 @@ const reducer = (state, action) => {
     case "CHANGE_THEME":
       return {
         ...state,
-        theme: action.theme === "dark"? THEMES.DARK: THEMES.DEFAULT,
+        theme: action.theme === "dark" ? THEMES.DARK : THEMES.DEFAULT,
       };
 
     case "LOGOUT":
@@ -37,6 +37,7 @@ const reducer = (state, action) => {
         ...state,
         CSRF: null,
         user: null,
+        userPermissions: null,
       };
 
     default:

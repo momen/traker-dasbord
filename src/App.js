@@ -1,7 +1,7 @@
 import React from "react";
 import * as Sentry from "@sentry/react";
 // import { useSelector } from "react-redux";
-import './App.css'
+import "./App.css";
 import { Helmet } from "react-helmet";
 import DateFnsUtils from "@date-io/date-fns";
 
@@ -19,6 +19,8 @@ import createTheme from "./theme";
 import Routes from "./routes/Routes";
 import { THEMES } from "./constants";
 import { useStateValue } from "./StateProvider";
+import axios from "./axios";
+import { useHistory } from "react-router";
 
 const jss = create({
   ...jssPreset(),
@@ -27,7 +29,30 @@ const jss = create({
 
 function App() {
   // const theme = useSelector((state) => state.themeReducer);
-  const [{ theme }] = useStateValue();
+  const [{ theme }, dispatch] = useStateValue();
+  const history = useHistory();
+
+  // axios.interceptors.response.use(
+  //   (res) => {
+  //     if (res.data?.message === "Unauthenticated.") {
+  //       alert("Fail");
+  //       return res;
+  //     } else {
+  //       // dispatch({
+  //       //   type: "LOGOUT",
+  //       // });
+
+  //       // Promise.reject(res);
+  //       alert("Success");
+  //       return res;
+  //     }
+  //   },
+  //   (res) => {
+  //     return res;
+  //   }
+  // );
+
+  
 
   return (
     <React.Fragment>
