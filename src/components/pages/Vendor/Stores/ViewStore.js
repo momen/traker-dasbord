@@ -61,13 +61,12 @@ function ViewStore({ match }) {
 
   useEffect(() => {
     axios
-      .get(`/stores/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/stores/${match.params.id}`)
       .then((res) => {
         setStore(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

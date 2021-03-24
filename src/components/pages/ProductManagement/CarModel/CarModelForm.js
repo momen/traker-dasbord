@@ -48,14 +48,10 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(itemToEdit.id);
+    
     if (itemToEdit) {
       axios
-        .put(`/car-models/${itemToEdit.id}`, formData, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .put(`/car-models/${itemToEdit.id}`, formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);
@@ -65,11 +61,7 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
         });
     } else {
       axios
-        .post("/car-models", formData, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .post("/car-models", formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);

@@ -65,13 +65,12 @@ function ViewPermission({ match }) {
   //Customize
   useEffect(() => {
     axios
-      .get(`/permissions/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/permissions/${match.params.id}`)
       .then((res) => {
         setPermission(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

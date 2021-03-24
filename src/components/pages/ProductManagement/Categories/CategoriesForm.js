@@ -85,7 +85,6 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
         await axios
           .post(`/product-categories/${itemToEdit.id}`, data, {
             headers: {
-              Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })
@@ -99,7 +98,6 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
         await axios
           .post("/product-categories", data, {
             headers: {
-              Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })

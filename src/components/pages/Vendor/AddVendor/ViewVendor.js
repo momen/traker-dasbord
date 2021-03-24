@@ -71,13 +71,12 @@ function ViewVendor({ match }) {
       });
 
       axios
-      .get(`/add-vendors/get/types`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/add-vendors/get/types`)
       .then((res) => {
         setVendorTypes(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

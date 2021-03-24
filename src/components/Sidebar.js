@@ -340,11 +340,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
 
   const handleLogout = () => {
     axios
-      .post("/logout", null, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .post("/logout", null)
       .then(async (res) => {
         dispatch({
           type: "LOGOUT",

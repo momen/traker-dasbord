@@ -64,152 +64,6 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-function BasicForm() {
-  const handleSubmit = async (
-    values,
-    { resetForm, setErrors, setStatus, setSubmitting }
-  ) => {
-    try {
-      await timeOut(1500);
-      resetForm();
-      setStatus({ sent: true });
-      setSubmitting(false);
-    } catch (error) {
-      setStatus({ sent: false });
-      setErrors({ submit: error.message });
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={validationSchema}
-      onSubmit={handleSubmit}
-    >
-      {({
-        errors,
-        handleBlur,
-        handleChange,
-        handleSubmit,
-        isSubmitting,
-        touched,
-        values,
-        status,
-      }) => (
-        <Card mb={6}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Formik
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              Formik example with Yup validation
-            </Typography>
-
-            {status && status.sent && (
-              <Alert severity="success" my={3}>
-                [DEMO] Your data has been submitted successfully!
-              </Alert>
-            )}
-
-            {isSubmitting ? (
-              <Box display="flex" justifyContent="center" my={6}>
-                <CircularProgress />
-              </Box>
-            ) : (
-              <form md={6} onSubmit={handleSubmit}>
-                <Grid container spacing={6}>
-                  <Grid item md={6}>
-                    <TextField
-                      name="firstName"
-                      label="First Name"
-                      value={values.firstName}
-                      error={Boolean(touched.firstName && errors.firstName)}
-                      fullWidth
-                      helperText={touched.firstName && errors.firstName}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      variant="outlined"
-                      my={2}
-                    />
-                  </Grid>
-                  <Grid item md={6}>
-                    <TextField
-                      name="lastName"
-                      label="Last Name"
-                      value={values.lastName}
-                      error={Boolean(touched.lastName && errors.lastName)}
-                      fullWidth
-                      helperText={touched.lastName && errors.lastName}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      variant="outlined"
-                      my={2}
-                    />
-                  </Grid>
-                </Grid>
-
-                <TextField
-                  name="email"
-                  label="Email"
-                  value={values.email}
-                  error={Boolean(touched.email && errors.email)}
-                  fullWidth
-                  helperText={touched.email && errors.email}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  type="email"
-                  variant="outlined"
-                  my={2}
-                />
-
-                <TextField
-                  name="password"
-                  label="Password"
-                  value={values.password}
-                  error={Boolean(touched.password && errors.password)}
-                  fullWidth
-                  helperText={touched.password && errors.password}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  type="password"
-                  variant="outlined"
-                  my={2}
-                />
-
-                <TextField
-                  name="confirmPassword"
-                  label="Confirm password"
-                  value={values.confirmPassword}
-                  error={Boolean(
-                    touched.confirmPassword && errors.confirmPassword
-                  )}
-                  fullWidth
-                  helperText={touched.confirmPassword && errors.confirmPassword}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  type="password"
-                  variant="outlined"
-                  my={2}
-                />
-
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  mt={3}
-                >
-                  Change Password
-                </Button>
-              </form>
-            )}
-          </CardContent>
-        </Card>
-      )}
-    </Formik>
-  );
-}
-
 function ChangePassword() {
   return (
     <React.Fragment>
@@ -218,23 +72,13 @@ function ChangePassword() {
         Manage Account
       </Typography>
 
-      {/* <Breadcrumbs aria-label="Breadcrumb" mt={2}>
-        <Link component={NavLink} exact to="/">
-          Dashboard
-        </Link>
-        <Link component={NavLink} exact to="/">
-          Forms
-        </Link>
-        <Typography>Formik</Typography>
-      </Breadcrumbs> */}
-
       <Divider my={6} />
 
       <Grid container spacing={2}>
-        <Grid item md={6}>
+        <Grid item xs={12} sm={6}>
           <EmailForm />
         </Grid>
-        <Grid item md={6}>
+        <Grid item xs={12} sm={6}>
           <ChangePasswordForm />
         </Grid>
       </Grid>

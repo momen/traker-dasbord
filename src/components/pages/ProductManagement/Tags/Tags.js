@@ -115,7 +115,7 @@ function Tags() {
 
   // Customize
   const columns = [
-    { field: "id", headerName: "ID", width: 50 },
+    { field: "id", headerName: "ID", width: 70 },
     { field: "name", headerName: "Tag Name", width: 200, flex: 1 },
     {
       field: "actions",
@@ -185,7 +185,6 @@ function Tags() {
   };
 
   const handleSortModelChange = (params) => {
-    console.log(params);
     if (params.sortModel !== sortModel) {
       setSortModel(params.sortModel);
     }

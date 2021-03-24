@@ -50,11 +50,7 @@ export default function BasicForm() {
     { resetForm, setErrors, setStatus, setSubmitting }
   ) => {
     axios
-      .post("edit/profile", values, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .post("edit/profile", values)
       .then((response) => {
         resetForm();
         setStatus({ sent: true });

@@ -119,7 +119,6 @@ function ProductsForm({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(formData.photo);
     if (formData.categories.length === 0) {
       setAutoSelectCategoryError(true);
       return;
@@ -161,7 +160,6 @@ function ProductsForm({
         await axios
           .post(`/products/${itemToEdit.id}`, data, {
             headers: {
-              Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })
@@ -197,7 +195,6 @@ function ProductsForm({
         await axios
           .post("/add/products", data, {
             headers: {
-              Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })

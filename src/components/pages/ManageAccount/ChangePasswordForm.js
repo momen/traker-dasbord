@@ -59,11 +59,7 @@ export default function BasicForm() {
     { resetForm, setErrors, setStatus, setSubmitting }
   ) => {
     axios
-      .post("change/password", values, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .post("change/password", values)
       .then((response) => {
         resetForm();
         setStatus({ sent: true });

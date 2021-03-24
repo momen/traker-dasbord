@@ -81,7 +81,6 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
         await axios
           .post(`/part-categories/${itemToEdit.id}`, data, {
             headers: {
-              Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })
@@ -95,7 +94,6 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
         await axios
           .post("/part-categories", data, {
             headers: {
-              Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })

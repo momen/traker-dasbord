@@ -63,13 +63,12 @@ function ViewUser({ match }) {
   //Customize
   useEffect(() => {
     axios
-      .get(`/users/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/users/${match.params.id}`)
       .then((res) => {
         setSingleUser(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

@@ -75,16 +75,10 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
     data.permissions = data.permissions.map((permission) => permission.id);
     data.permissions = JSON.stringify(data.permissions); //VI
 
-    console.log(formData.permissions);
-
     if (itemToEdit) {
       //Customize
       await axios
-        .put(`/roles/${itemToEdit.id}`, data, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .put(`/roles/${itemToEdit.id}`, data)
         .then((res) => {
           // setPage(1);
           setOpenPopup(false);
@@ -93,14 +87,9 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
           setResponseErrors(response.data.errors);
         });
     } else {
-      console.log(formData);
       //Customize
       await axios
-        .post("/roles", data, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .post("/roles", data)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);

@@ -54,14 +54,12 @@ function ViewLog({ match }) {
 
   useEffect(() => {
     axios
-      .get(`/audit-logs/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/audit-logs/${match.params.id}`)
       .then((res) => {
-        console.log(res.data.data);
         setAuditLogs(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

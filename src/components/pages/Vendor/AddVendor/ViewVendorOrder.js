@@ -61,15 +61,13 @@ function ViewVendorOrder({ match }) {
     console.log(match.params);
     axios
       .get(
-        `/admin/show/vendor/orders/${match.params.id}/${match.params.orderId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
+        `/admin/show/vendor/orders/${match.params.id}/${match.params.orderId}`
       )
       .then((res) => {
         setOrder(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

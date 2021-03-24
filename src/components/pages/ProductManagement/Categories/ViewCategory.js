@@ -62,13 +62,12 @@ function ViewCategory({ match }) {
   //Customize
   useEffect(() => {
     axios
-      .get(`/product-categories/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/product-categories/${match.params.id}`)
       .then((res) => {
         setCategory(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

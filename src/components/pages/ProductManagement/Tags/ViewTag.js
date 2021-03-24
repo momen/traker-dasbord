@@ -54,13 +54,12 @@ function ViewCarYear({ match }) {
   //Customize
   useEffect(() => {
     axios
-      .get(`/product-tags/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/product-tags/${match.params.id}`)
       .then((res) => {
         setProductTag(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

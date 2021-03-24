@@ -58,11 +58,7 @@ function FAQ_Form({ setOpenPopup, itemToEdit }) {
     e.preventDefault(); 
       if (itemToEdit) {
         await axios
-          .post(`/update/question/${itemToEdit.id}`, formData, {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          })
+          .post(`/update/question/${itemToEdit.id}`, formData)
           .then((res) => {
             setOpenPopup(false);
           })
@@ -71,11 +67,7 @@ function FAQ_Form({ setOpenPopup, itemToEdit }) {
           });
       } else {
         await axios
-          .post("/add/question", formData, {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          })
+          .post("/add/question", formData)
           .then((res) => {
             setOpenPopup(false);
           })

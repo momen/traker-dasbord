@@ -117,7 +117,7 @@ function CarYear() {
 
   // Customize
   const columns = [
-    { field: "id", headerName: "ID", width: 50 },
+    { field: "id", headerName: "ID", width: 70 },
     { field: "year", headerName: "Car Year", width: 200, flex: 1 },
     {
       field: "actions",
@@ -189,7 +189,6 @@ function CarYear() {
   };
 
   const handleSortModelChange = (params) => {
-    console.log(params);
     if (params.sortModel !== sortModel) {
       setSortModel(params.sortModel);
     }

@@ -54,13 +54,12 @@ function ViewCarMade({ match }) {
   //Customize
   useEffect(() => {
     axios
-      .get(`/car-mades/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/car-mades/${match.params.id}`)
       .then((res) => {
         setCarMade(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

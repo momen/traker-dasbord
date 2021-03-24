@@ -87,13 +87,12 @@ function ViewProduct({ match }) {
   //Customize
   useEffect(() => {
     axios
-      .get(`/products/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/products/${match.params.id}`)
       .then((res) => {
         setProduct(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

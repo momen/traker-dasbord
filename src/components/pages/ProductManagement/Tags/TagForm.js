@@ -49,11 +49,7 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
     e.preventDefault();
     if (itemToEdit) {
       axios
-        .put(`/product-tags/${itemToEdit.id}`, formData, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .put(`/product-tags/${itemToEdit.id}`, formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);
@@ -63,11 +59,7 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
         });
     } else {
       axios
-        .post("/product-tags", formData, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .post("/product-tags", formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);

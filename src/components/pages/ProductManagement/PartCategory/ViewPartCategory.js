@@ -62,13 +62,12 @@ function ViewPartCategory({ match }) {
   //Customize
   useEffect(() => {
     axios
-      .get(`/part-categories/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/part-categories/${match.params.id}`)
       .then((res) => {
         setPartCategory(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

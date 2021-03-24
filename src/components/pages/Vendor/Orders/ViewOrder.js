@@ -59,13 +59,12 @@ function ViewOrder({ match }) {
 
   useEffect(() => {
     axios
-      .get(`/show/orders/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/show/orders/${match.params.id}`)
       .then((res) => {
         setOrder(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

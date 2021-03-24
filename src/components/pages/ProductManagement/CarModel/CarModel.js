@@ -118,7 +118,7 @@ function CarModel() {
 
   // Customize
   const columns = [
-    { field: "id", headerName: "ID", width: 50 },
+    { field: "id", headerName: "ID", width: 70 },
     { field: "carmodel", headerName: "Car Model", width: 200, flex: 1 },
     {
       field: "carmade_id",
@@ -197,7 +197,6 @@ function CarModel() {
   };
 
   const handleSortModelChange = (params) => {
-    console.log(params);
     if (params.sortModel !== sortModel) {
       setSortModel(params.sortModel);
     }

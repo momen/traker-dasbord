@@ -54,13 +54,12 @@ function ViewTicket({ match }) {
 
   useEffect(() => {
     axios
-      .get(`/show/ticket/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/show/ticket/${match.params.id}`)
       .then((res) => {
         setTicket(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

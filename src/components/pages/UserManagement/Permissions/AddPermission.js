@@ -45,11 +45,7 @@ function AddPermission({ setPage, setOpenPopup, itemToEdit }) {
     if (itemToEdit) {
       //Customize
       await axios
-        .put(`/permissions/${itemToEdit.id}`, formData, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .put(`/permissions/${itemToEdit.id}`, formData)
         .then((res) => {
           // setPage(1);
           setOpenPopup(false);
@@ -60,11 +56,7 @@ function AddPermission({ setPage, setOpenPopup, itemToEdit }) {
     } else {
       //Customize
       await axios
-        .post("/permissions", formData, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .post("/permissions", formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);

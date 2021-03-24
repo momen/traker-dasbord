@@ -73,11 +73,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
 
     if (itemToEdit) {
       await axios
-        .post(`/update/stores/${itemToEdit.id}`, formData, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .post(`/update/stores/${itemToEdit.id}`, formData)
         .then((res) => {
           setOpenPopup(false);
         })
@@ -86,11 +82,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
         });
     } else {
       await axios
-        .post("/add/stores", formData, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .post("/add/stores", formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);

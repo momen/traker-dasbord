@@ -83,11 +83,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
     if (itemToEdit) {
       //Customize
       await axios
-        .put(`/users/${itemToEdit.id}`, data, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .put(`/users/${itemToEdit.id}`, data)
         .then((res) => {
           // setPage(1);
           setOpenPopup(false);
@@ -103,11 +99,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
         password: formData.password,
       };
       await axios
-        .post("/users", data, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .post("/users", data)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);

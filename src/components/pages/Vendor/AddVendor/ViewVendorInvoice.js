@@ -54,13 +54,12 @@ function ViewVendorInvoice({ match }) {
 
   useEffect(() => {
     axios
-      .get(`/admin/show/vendor/invoices/${match.params.id}/${match.params.invoiceId}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/admin/show/vendor/invoices/${match.params.id}/${match.params.invoiceId}`)
       .then((res) => {
         setInvoice(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

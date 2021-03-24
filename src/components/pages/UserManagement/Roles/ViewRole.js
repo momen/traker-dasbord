@@ -64,13 +64,12 @@ function ViewRole({ match }) {
   //Customize
   useEffect(() => {
     axios
-      .get(`/roles/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/roles/${match.params.id}`)
       .then((res) => {
         setRole(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

@@ -89,7 +89,6 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
         await axios
           .post(`/add-vendors/${itemToEdit.id}`, data, {
             headers: {
-              Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })
@@ -105,7 +104,6 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
         await axios
           .post("/add-vendors", data, {
             headers: {
-              Authorization: `Bearer ${user.token}`,
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })

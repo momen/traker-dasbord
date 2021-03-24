@@ -54,13 +54,12 @@ function ViewCarModel({ match }) {
   //Customize
   useEffect(() => {
     axios
-      .get(`/car-models/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/car-models/${match.params.id}`)
       .then((res) => {
         setCarModel(res.data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 

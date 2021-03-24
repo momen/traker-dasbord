@@ -48,14 +48,10 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(itemToEdit.id);
+
     if (itemToEdit) {
       axios
-        .put(`/car-mades/${itemToEdit.id}`, formData, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .put(`/car-mades/${itemToEdit.id}`, formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);
@@ -65,18 +61,14 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
         });
     } else {
       axios
-        .post("/car-mades", formData, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .post("/car-mades", formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);
         })
         .catch(({ response }) => {
           setResponseErrors(response.data.errors);
-        });
+        })
     }
   };
 
