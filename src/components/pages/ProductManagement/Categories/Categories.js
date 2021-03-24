@@ -251,7 +251,9 @@ function Categories() {
       })
       .then((res) => {
         setOpenDeleteDialog(false);
-        alert("Hanhazar!")
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
 
     await axios
@@ -270,6 +272,9 @@ function Categories() {
         setRowsCount(res.data.total);
         setRows(res.data.data);
         setLoading(false);
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
   };
 
