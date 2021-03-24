@@ -269,22 +269,13 @@ function Vendors() {
 
   const DeleteVendor = () => {
     axios
-      .delete(`/add-vendors/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .delete(`/add-vendors/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
         setLoading(true);
         axios
           .get(
-            `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -309,11 +300,6 @@ function Vendors() {
         `/add-vendors/mass/delete`,
         {
           ids: JSON.stringify(rowsToDelete),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
         }
       )
       .then((res) => {
@@ -322,12 +308,7 @@ function Vendors() {
         setLoading(true);
         axios
           .get(
-            `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -351,16 +332,12 @@ function Vendors() {
     pop-up is opened-*/
   useEffect(() => {
     axios
-      .post("/add-vendors/get/userid_id", null, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .post("/add-vendors/get/userid_id", null)
       .then((res) => {
         setUsers(res.data.data);
       })
-      .catch((err) => {
-        console.log("Error");
+      .catch(() => {
+        alert("Failed to Fetch Users List");
       });
   }, []);
 
@@ -371,17 +348,15 @@ function Vendors() {
     if (!userIsSearching) {
       axios
         .get(
-          `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
+          `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -389,17 +364,15 @@ function Vendors() {
           `/add-vendors/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, openPopup, sortModel]);

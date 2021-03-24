@@ -104,16 +104,19 @@ function Orders() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [sortModel, setSortModel] = useState([
-    { field: "id", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
     { field: "invoice_number", headerName: "Invoice Number", width: 120 },
     { field: "invoice_total", headerName: "Invoice Total", width: 100 },
     { field: "vendor_name", headerName: "Vendor Name", width: 120 },
-    { field: "vendor_email", headerName: "Vendor Email", width: 150, sortable: false },
+    {
+      field: "vendor_email",
+      headerName: "Vendor Email",
+      width: 150,
+      sortable: false,
+    },
     { field: "order_number", headerName: "Order Number", width: 150 },
     {
       field: "actions",
@@ -135,7 +138,9 @@ function Orders() {
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/invoices/${params.row.id}`)}
+                onClick={() =>
+                  history.push(`/vendor/invoices/${params.row.id}`)
+                }
               >
                 View
               </Button>
@@ -155,7 +160,6 @@ function Orders() {
   };
 
   const handleSortModelChange = (params) => {
-    console.log(params);
     if (params.sortModel !== sortModel) {
       setSortModel(params.sortModel);
     }
@@ -179,15 +183,16 @@ function Orders() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/show/invoices?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .get(
+          `/show/invoices?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -195,17 +200,15 @@ function Orders() {
           `/invoices/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, sortModel]);
@@ -264,7 +267,7 @@ function Orders() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-          <DataGrid
+            <DataGrid
               rows={rows}
               columns={columns}
               page={page}

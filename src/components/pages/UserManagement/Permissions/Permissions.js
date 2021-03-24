@@ -106,9 +106,7 @@ function Permissions() {
   const [selectedItem, setSelectedItem] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
-  const [sortModel, setSortModel] = useState([
-    { field: "id", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
@@ -130,10 +128,12 @@ function Permissions() {
           >
             {userPermissions.includes("permission_show") ? (
               <Button
-              id="view-permissions-btn"
+                id="view-permissions-btn"
                 style={{ marginRight: "5px" }}
                 variant="contained"
-                onClick={() => history.push(`/user-mgt/permissions/${params.row.id}`)}
+                onClick={() =>
+                  history.push(`/user-mgt/permissions/${params.row.id}`)
+                }
               >
                 View
               </Button>
@@ -153,37 +153,30 @@ function Permissions() {
   };
 
   const handleSortModelChange = (params) => {
-    console.log(params);
     if (params.sortModel !== sortModel) {
       setSortModel(params.sortModel);
     }
   };
 
-
   const DeleteItem = async () => {
-    await axios
-      .delete(`/permissions/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-      .then((res) => {
-        // setCategories(res.data.data);
-      });
+    await axios.delete(`/permissions/${itemToDelete}`).then((res) => {
+      // setCategories(res.data.data);
+    });
 
     await axios
-      .get(`/permissions?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(
+        `/permissions?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+      )
       .then((res) => {
-        if((Math.ceil(res.data.total/pageSize) < page)){
-          setPage(page-1);
+        if (Math.ceil(res.data.total / pageSize) < page) {
+          setPage(page - 1);
         }
         setRowsCount(res.data.total);
         setRows(res.data.data);
         setLoading(false);
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
       });
   };
 
@@ -192,15 +185,16 @@ function Permissions() {
     if (!openPopup) {
       setLoading(true);
       axios
-        .get(`/permissions?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .get(
+          `/permissions?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, openPopup, sortModel]);
@@ -214,7 +208,6 @@ function Permissions() {
 
       <Divider my={6} />
 
-      
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar>
@@ -245,7 +238,7 @@ function Permissions() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-          <DataGrid
+            <DataGrid
               rows={rows}
               columns={columns}
               page={page}

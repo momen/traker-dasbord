@@ -41,9 +41,9 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: theme.typography.fontWeightRegular,
   },
   expanded: {
-    '&$expanded': {
-        margin: '4px 0'
-     }
+    "&$expanded": {
+      margin: "4px 0",
+    },
   },
   button: {
     background: "#4caf50",
@@ -81,11 +81,7 @@ function Support() {
 
   const DeleteQuestion = () => {
     axios
-      .delete(`/delete/question/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .delete(`/delete/question/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
         setRowsToDelete(rowsToDelete.filter((id) => id !== itemToDelete));
@@ -97,26 +93,14 @@ function Support() {
 
   const MassDelete = () => {
     axios
-      .post(
-        `/questions/mass/delete`,
-        {
-          ids: JSON.stringify(rowsToDelete),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      )
+      .post(`/questions/mass/delete`, {
+        ids: JSON.stringify(rowsToDelete),
+      })
       .then((res) => {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
         axios
-          .get(`/FAQs`, {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          })
+          .get(`/FAQs`)
           .then(({ data }) => {
             setFAQs(data.data);
           })
@@ -149,7 +133,6 @@ function Support() {
     } else {
       setRowsToDelete(rowsToDelete.filter((id) => id !== faq_id));
     }
-    console.log(faq_id);
   };
 
   useEffect(() => {
@@ -157,35 +140,23 @@ function Support() {
 
     if (!userIsSearching) {
       axios
-        .get(`/FAQs`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .get(`/FAQs`)
         .then(({ data }) => {
           setFAQs(data.data);
         })
-        .catch(({ response }) => {
-          alert(response.data?.errors);
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
-        .post(
-          `/questions/search`,
-          {
-            search_index: searchValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        )
+        .post(`/questions/search`, {
+          search_index: searchValue,
+        })
         .then(({ data }) => {
           setFAQs(data.data);
         })
-        .catch(({ response }) => {
-          alert(response.data?.errors);
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [searchValue, openPopup, openDeleteDialog]);
@@ -250,7 +221,10 @@ function Support() {
 
       <div className={classes.root}>
         {FAQs?.map((faq, index) => (
-          <Accordion id={`acc-container-${faq.id}`} classes={{ expanded: classes.expanded }}>
+          <Accordion
+            id={`acc-container-${faq.id}`}
+            classes={{ expanded: classes.expanded }}
+          >
             <AccordionSummary
               expandIcon={<ExpandMore />}
               aria-controls={`FAQs-content-${faq.id}`}
@@ -263,8 +237,15 @@ function Support() {
                   onClick={(event) => {
                     toggleCheckBox(event, faq.id);
                   }}
-                  control={<Checkbox id={`acc-checkbox-${faq.id}`} checked={rowsToDelete.filter((id) => id === faq.id).length > 0}/>}
-                  // The condition above is to fix a bug when deleting a checked question, after its removed the below one 
+                  control={
+                    <Checkbox
+                      id={`acc-checkbox-${faq.id}`}
+                      checked={
+                        rowsToDelete.filter((id) => id === faq.id).length > 0
+                      }
+                    />
+                  }
+                  // The condition above is to fix a bug when deleting a checked question, after its removed the below one
                   // is checked instead, which isn't the desired behavior, so it will check if this item is really in the
                   // to be deleted list, so it maintains it's status.
                   // Used length > 0, as evaluating an empty array will evaluate to true, although an empty array
@@ -278,7 +259,10 @@ function Support() {
                 </Typography>
               )}
             </AccordionSummary>
-            <AccordionDetails id={`acc-details-${faq.id}`} style={{paddingLeft:"25px"}}>
+            <AccordionDetails
+              id={`acc-details-${faq.id}`}
+              style={{ paddingLeft: "25px" }}
+            >
               <Typography>{faq.answer}</Typography>
             </AccordionDetails>
             {/* <Divider /> */}

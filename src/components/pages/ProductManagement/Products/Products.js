@@ -296,7 +296,6 @@ function Products() {
   };
 
   const handleSortModelChange = (params) => {
-    console.log(params);
     if (params.sortModel !== sortModel) {
       setSortModel(params.sortModel);
     }
@@ -322,22 +321,13 @@ function Products() {
 
   const DeleteProduct = () => {
     axios
-      .delete(`/products/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .delete(`/products/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
         setLoading(true);
         axios
           .get(
-            `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -358,29 +348,16 @@ function Products() {
 
   const MassDelete = () => {
     axios
-      .post(
-        `/products/mass/delete`,
-        {
-          ids: JSON.stringify(rowsToDelete),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      )
+      .post(`/products/mass/delete`, {
+        ids: JSON.stringify(rowsToDelete),
+      })
       .then((res) => {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
         setLoading(true);
         axios
           .get(
-            `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -404,95 +381,88 @@ function Products() {
     pop-up is opened-*/
   useEffect(() => {
     axios
-      .get("/storeslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get("/storeslist")
       .then((res) => {
         const _stores = res.data.data.map(({ id, name }) => ({ id, name }));
         setStores(_stores);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Stores List");
       });
 
     axios
-      .get("/categorieslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get("/categorieslist")
       .then((res) => {
         const _categories = res.data.data.map(({ id, name }) => ({ id, name }));
         setCategories(_categories);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Categories List");
       });
 
     axios
-      .get("/car-madeslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get("/car-madeslist")
       .then((res) => {
         const _carMades = res.data.data.map(({ id, car_made }) => ({
           id,
           car_made,
         })); // Customize
         setCarMades(_carMades);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Car Made List");
       });
 
     axios
-      .get("/car-modelslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get("/car-modelslist")
       .then((res) => {
         const _carModels = res.data.data.map(({ id, carmodel }) => ({
           id,
           carmodel,
         })); // Customize
         setCarModels(_carModels);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Car Model List");
       });
 
     axios
-      .get("/car-yearslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get("/car-yearslist")
       .then((res) => {
         const _carYears = res.data.data.map(({ id, year }) => ({
           id,
           year,
         })); // Customize
         setCarYears(_carYears);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Car Year List");
       });
 
     axios
-      .get("/part-categorieslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get("/part-categorieslist")
       .then((res) => {
         const _partCategories = res.data.data.map(({ id, category_name }) => ({
           id,
           category_name,
         })); // Customize
         setPartCategories(_partCategories);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Part Categories List");
       });
 
     axios
-      .get("/product-tagslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get("/product-tagslist")
       .then((res) => {
         const _tags = res.data.data.map(({ id, name }) => ({
           id,
           name,
         })); // Customize
         setProductTags(_tags);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Product Tags List");
       });
   }, []);
 
@@ -504,17 +474,15 @@ function Products() {
     if (!userIsSearching) {
       axios
         .get(
-          `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
+          `/products?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -523,17 +491,15 @@ function Products() {
           {
             search_index: searchValue,
             column_name: columnToFilter,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, openPopup, sortModel]);

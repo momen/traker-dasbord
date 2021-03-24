@@ -104,9 +104,7 @@ function Support() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [sortModel, setSortModel] = useState([
-    { field: "id", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
@@ -114,7 +112,12 @@ function Support() {
     { field: "title", headerName: "Title", width: 100 },
     { field: "priority", headerName: "Priority", width: 80 },
     { field: "status", headerName: "Status", width: 80 },
-    { field: "category_name", headerName: "Category", width: 80, sortable: false, },
+    {
+      field: "category_name",
+      headerName: "Category",
+      width: 80,
+      sortable: false,
+    },
     { field: "vendor_name", headerName: "Vendor Name", width: 120 },
     { field: "order_number", headerName: "Order Number", width: 120 },
     {
@@ -157,7 +160,6 @@ function Support() {
   };
 
   const handleSortModelChange = (params) => {
-    console.log(params);
     if (params.sortModel !== sortModel) {
       setSortModel(params.sortModel);
     }
@@ -181,15 +183,16 @@ function Support() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/all/tickets?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .get(
+          `/all/tickets?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -197,17 +200,15 @@ function Support() {
           `/search/tickets?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, sortModel]);
@@ -266,7 +267,7 @@ function Support() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-          <DataGrid
+            <DataGrid
               rows={rows}
               columns={columns}
               page={page}
@@ -295,4 +296,4 @@ function Support() {
   );
 }
 
-export default Support
+export default Support;

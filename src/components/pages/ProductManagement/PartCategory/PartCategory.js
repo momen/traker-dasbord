@@ -248,22 +248,13 @@ function PartCategory() {
 
   const DeletePartCategory = () => {
     axios
-      .delete(`/part-categories/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .delete(`/part-categories/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
         setLoading(true);
         axios
           .get(
-            `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -288,11 +279,6 @@ function PartCategory() {
         `/part-categories/mass/delete`,
         {
           ids: JSON.stringify(rowsToDelete),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
         }
       )
       .then((res) => {
@@ -301,12 +287,7 @@ function PartCategory() {
         setLoading(true);
         axios
           .get(
-            `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -332,17 +313,15 @@ function PartCategory() {
     if (!userIsSearching) {
       axios
         .get(
-          `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
+          `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -350,17 +329,15 @@ function PartCategory() {
           `/part/categories/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, openPopup, sortModel]);

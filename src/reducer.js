@@ -4,7 +4,8 @@ import { THEMES } from "./constants";
 export const initialState = {
   CSRF: null,
   user: null,
-  userPermissions: null,
+  userToken: JSON.parse(window.localStorage.getItem("trkar-token")) || null,
+  userPermissions: [],
   theme: THEMES.DARK,
 };
 

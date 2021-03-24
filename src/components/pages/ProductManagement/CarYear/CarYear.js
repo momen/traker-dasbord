@@ -215,22 +215,13 @@ function CarYear() {
 
   const DeleteItem = () => {
     axios
-      .delete(`/car-years/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .delete(`/car-years/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
         setLoading(true);
         axios
           .get(
-            `/car-years?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/car-years?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -255,11 +246,6 @@ function CarYear() {
         `/car-years/mass/delete`,
         {
           ids: JSON.stringify(rowsToDelete),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
         }
       )
       .then((res) => {
@@ -268,12 +254,7 @@ function CarYear() {
         setLoading(true);
         axios
           .get(
-            `/car-years?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/car-years?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -299,17 +280,15 @@ function CarYear() {
     if (!userIsSearching) {
       axios
         .get(
-          `/car-years?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
+          `/car-years?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -317,17 +296,15 @@ function CarYear() {
           `/car-years/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, openPopup, sortModel]);

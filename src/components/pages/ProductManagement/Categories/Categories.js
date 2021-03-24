@@ -242,13 +242,8 @@ function Categories() {
   };
 
   const DeleteCategory = async () => {
-    console.log(itemToDelete);
     await axios
-      .delete(`/product-categories/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .delete(`/product-categories/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
       })
@@ -258,12 +253,7 @@ function Categories() {
 
     await axios
       .get(
-        `/product-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
+        `/product-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
       )
       .then((res) => {
         if (Math.ceil(res.data.total / pageSize) < page) {
@@ -280,29 +270,16 @@ function Categories() {
 
   const MassDelete = () => {
     axios
-      .post(
-        `/categories/mass/delete`,
-        {
-          ids: JSON.stringify(rowsToDelete),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      )
+      .post(`/categories/mass/delete`, {
+        ids: JSON.stringify(rowsToDelete),
+      })
       .then((res) => {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
         setLoading(true);
         axios
           .get(
-            `/product-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/product-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -328,17 +305,15 @@ function Categories() {
     if (!userIsSearching) {
       axios
         .get(
-          `/product-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
+          `/product-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -346,17 +321,15 @@ function Categories() {
           `/categories/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, openPopup, sortModel]);

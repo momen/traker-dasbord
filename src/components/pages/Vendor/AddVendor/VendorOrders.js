@@ -158,7 +158,6 @@ function VendorOrders({ match }) {
   };
 
   const handleSortModelChange = (params) => {
-    console.log(params);
     if (params.sortModel !== sortModel) {
       setSortModel(params.sortModel);
     }
@@ -186,17 +185,15 @@ function VendorOrders({ match }) {
           `/admin/show/vendor/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             vendor_id: match.params.id,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -205,17 +202,15 @@ function VendorOrders({ match }) {
           {
             search_index: searchValue,
             vendor_id: match.params.id,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, sortModel]);

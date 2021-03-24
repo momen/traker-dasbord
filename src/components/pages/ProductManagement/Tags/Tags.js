@@ -198,22 +198,13 @@ function Tags() {
 
   const DeleteItem = () => {
     axios
-      .delete(`/product-tags/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .delete(`/product-tags/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
         setLoading(true);
         axios
           .get(
-            `/product-tags?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/product-tags?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -238,11 +229,6 @@ function Tags() {
         `/product-tags/mass/delete`,
         {
           ids: JSON.stringify(rowsToDelete),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
         }
       )
       .then((res) => {
@@ -251,12 +237,7 @@ function Tags() {
         setLoading(true);
         axios
           .get(
-            `/product-tags?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/product-tags?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -281,17 +262,15 @@ function Tags() {
     setLoading(true);
     axios
       .get(
-        `/product-tags??page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
+        `/product-tags??page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}` 
       )
       .then((res) => {
         setRowsCount(res.data.total);
         setRows(res.data.data);
         setLoading(false);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, [page, openPopup, sortModel]);
 

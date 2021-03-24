@@ -14,7 +14,7 @@ import {
 } from "@material-ui/core";
 
 import { isWidthUp } from "@material-ui/core/withWidth";
-import AuthGuard from "../components/AuthGuard";
+import AppGuard from "../components/AppGuard";
 
 const drawerWidth = 258;
 
@@ -77,7 +77,7 @@ const Dashboard = ({ children, routes, width }) => {
   };
 
   return (
-    <AuthGuard>
+    <AppGuard>
       <Root>
         <CssBaseline />
         <GlobalStyle />
@@ -107,7 +107,7 @@ const Dashboard = ({ children, routes, width }) => {
         </AppContent>
         {/* <Settings /> */}
       </Root>
-    </AuthGuard>
+    </AppGuard>
   );
 };
 

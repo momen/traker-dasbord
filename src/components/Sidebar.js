@@ -450,13 +450,13 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
               }}
               variant="dot"
             >
-              <Avatar alt={user.name} src="/static/img/avatars/avatar-1.jpg" />
+              <Avatar alt={user?.name} src="/static/img/avatars/avatar-1.jpg" />
             </SidebarFooterBadge>
           </Grid>
           <Grid item>
-            <SidebarFooterText variant="body2">{user.name}</SidebarFooterText>
+            <SidebarFooterText variant="body2">{user?.name}</SidebarFooterText>
             <SidebarFooterSubText variant="caption">
-              {user.email}
+              {user?.email}
             </SidebarFooterSubText>
           </Grid>
         </Grid>

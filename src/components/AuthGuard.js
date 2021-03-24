@@ -5,9 +5,10 @@ import { useStateValue } from "../StateProvider";
 // For routes that can only be accessed by authenticated users
 function AuthGuard({ children }) {
   // const auth = useSelector((state) => state.authReducer);
-  const [{ user }] = useStateValue();
+  const [{ user, userToken }] = useStateValue();
 
-  if (!user) {
+  if (userToken) {
+    alert("Here")
     return <Redirect to="/sign-in" />;
   }
 

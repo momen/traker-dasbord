@@ -221,22 +221,13 @@ function Roles() {
 
   const DeleteItem = () => {
     axios
-      .delete(`/roles/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .delete(`/roles/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
         setLoading(true);
         axios
           .get(
-            `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -257,29 +248,16 @@ function Roles() {
 
   const MassDelete = () => {
     axios
-      .post(
-        `/roles/mass/delete`,
-        {
-          ids: JSON.stringify(rowsToDelete),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      )
+      .post(`/roles/mass/delete`, {
+        ids: JSON.stringify(rowsToDelete),
+      })
       .then((res) => {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
         setLoading(true);
         axios
           .get(
-            `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -300,13 +278,12 @@ function Roles() {
 
   useEffect(() => {
     axios
-      .get("/permissionslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get("/permissionslist")
       .then((res) => {
         setPermissionsList(res.data.data);
+      })
+      .catch(({ response }) => {
+        // alert(response.data?.errors);
       });
   }, []);
 
@@ -316,18 +293,15 @@ function Roles() {
       setLoading(true);
       axios
         .get(
-          `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
+          `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
-          // alert(res.data.total);
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, openPopup, sortModel]);

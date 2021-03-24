@@ -109,9 +109,7 @@ function AuditLogs() {
   const [selectedItem, setSelectedItem] = useState(""); // Customize
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
-  const [sortModel, setSortModel] = useState([
-    { field: "id", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
@@ -185,15 +183,16 @@ function AuditLogs() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/audit-logs?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .get(
+          `/audit-logs?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(({ response }) => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -201,17 +200,15 @@ function AuditLogs() {
           `/audit-logs/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, sortModel]);
@@ -270,7 +267,7 @@ function AuditLogs() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-          <DataGrid
+            <DataGrid
               rows={rows}
               columns={columns}
               page={page}

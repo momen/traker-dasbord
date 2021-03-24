@@ -104,13 +104,11 @@ function Orders() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [sortModel, setSortModel] = useState([
-    { field: "id", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
-    { field: "order_number", headerName: "Order Number", width: 150, flex:1 },
+    { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
     { field: "order_total", headerName: "Order Total", width: 200 },
     { field: "orderStatus", headerName: "Status", width: 100, sortable: false },
     { field: "paid", headerName: "Paid", width: 80, sortable: false },
@@ -154,7 +152,6 @@ function Orders() {
   };
 
   const handleSortModelChange = (params) => {
-    console.log(params);
     if (params.sortModel !== sortModel) {
       setSortModel(params.sortModel);
     }
@@ -178,15 +175,16 @@ function Orders() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(`/show/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
+        .get(
+          `/show/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -194,17 +192,15 @@ function Orders() {
           `/orders/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, sortModel]);
@@ -263,7 +259,7 @@ function Orders() {
         </Paper>
         <Paper>
           <div style={{ width: "100%" }}>
-          <DataGrid
+            <DataGrid
               rows={rows}
               columns={columns}
               page={page}

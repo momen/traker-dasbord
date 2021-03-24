@@ -29,8 +29,9 @@ const jss = create({
 
 function App() {
   // const theme = useSelector((state) => state.themeReducer);
-  const [{ theme }, dispatch] = useStateValue();
+  const [{ userToken, theme }, dispatch] = useStateValue();
   const history = useHistory();
+
 
   // axios.interceptors.response.use(
   //   (res) => {
@@ -51,8 +52,6 @@ function App() {
   //     return res;
   //   }
   // );
-
-  
 
   return (
     <React.Fragment>

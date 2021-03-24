@@ -250,56 +250,9 @@ function Users() {
 
   const DeleteItem = () => {
     axios
-      .delete(`/users/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .delete(`/users/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
-        setLoading(true);
-        axios
-          .get(
-            `/users?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
-          )
-          .then((res) => {
-            if (Math.ceil(res.data.total / pageSize) < page) {
-              setPage(page - 1);
-            }
-            setRowsCount(res.data.total);
-            setRows(res.data.data);
-            setLoading(false);
-          })
-          .catch(({ response }) => {
-            alert(response.data?.errors);
-          });
-      })
-      .catch(({ response }) => {
-        alert(response.data?.message);
-      });
-  };
-
-  const MassDelete = () => {
-    axios
-      .post(
-        `/users/mass/delete`,
-        {
-          ids: JSON.stringify(rowsToDelete),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      )
-      .then((res) => {
-        setOpenMassDeleteDialog(false);
-        setRowsToDelete([]);
         setLoading(true);
         axios
           .get(
@@ -327,16 +280,45 @@ function Users() {
       });
   };
 
+  const MassDelete = () => {
+    axios
+      .post(`/users/mass/delete`, {
+        ids: JSON.stringify(rowsToDelete),
+      })
+      .then((res) => {
+        setOpenMassDeleteDialog(false);
+        setRowsToDelete([]);
+        setLoading(true);
+        axios
+          .get(
+            `/users?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
+  };
+
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
     axios
-      .get(`/roleslist`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/roleslist`)
       .then((res) => {
         setRolesList(res.data.data);
+      })
+      .catch(({ response }) => {
+        // alert(response.data?.errors);
       });
   }, []);
 
@@ -347,17 +329,15 @@ function Users() {
     if (!userIsSearching) {
       axios
         .get(
-          `/users?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
+          `/users?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -365,17 +345,15 @@ function Users() {
           `/users/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, openPopup, sortModel]);

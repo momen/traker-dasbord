@@ -93,8 +93,8 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
           setOpenPopup(false);
         })
         .catch(({ response }) => {
-          alert(response.data?.message)
-          setResponseErrors(response.data.message);
+          alert(response.data?.errors)
+          setResponseErrors(response.data.errors);
         });
     } else {
       //Customize

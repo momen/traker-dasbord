@@ -232,22 +232,13 @@ function CarMade() {
 
   const DeleteCarMade = () => {
     axios
-      .delete(`/car-mades/${itemToDelete}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .delete(`/car-mades/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
         setLoading(true);
         axios
           .get(
-            `/car-mades?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/car-mades?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -268,29 +259,16 @@ function CarMade() {
 
   const MassDelete = () => {
     axios
-      .post(
-        `/car-mades/mass/delete`,
-        {
-          ids: JSON.stringify(rowsToDelete),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      )
+      .post(`/car-mades/mass/delete`, {
+        ids: JSON.stringify(rowsToDelete),
+      })
       .then((res) => {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
         setLoading(true);
         axios
           .get(
-            `/car-mades?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/car-mades?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -314,14 +292,13 @@ function CarMade() {
     pop-up is opened-*/
   useEffect(() => {
     axios
-      .get("/categorieslist", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get("/categorieslist")
       .then((res) => {
         let _categories = res.data.data.map(({ id, name }) => ({ id, name }));
         setCategories(_categories);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
       });
   }, []);
 
@@ -332,17 +309,15 @@ function CarMade() {
     if (!userIsSearching) {
       axios
         .get(
-          `/car-mades?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
+          `/car-mades?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     } else {
       axios
@@ -350,17 +325,15 @@ function CarMade() {
           `/car-mades/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
           setLoading(false);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
     }
   }, [page, searchValue, openPopup, sortModel]);

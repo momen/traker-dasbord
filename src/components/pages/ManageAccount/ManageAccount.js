@@ -1,7 +1,6 @@
 import React from "react";
 import * as Yup from "yup";
 import styled from "styled-components/macro";
-import { NavLink } from "react-router-dom";
 import { Formik } from "formik";
 import EmailForm from "./EmailForm";
 import ChangePasswordForm from "./ChangePasswordForm";
