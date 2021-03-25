@@ -1,15 +1,15 @@
 import React from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import { useStateValue } from "../StateProvider";
 
 // For routes that can only be accessed by authenticated users
 function AuthGuard({ children }) {
   // const auth = useSelector((state) => state.authReducer);
-  const [{ user, userToken }] = useStateValue();
+  const [{ userToken }] = useStateValue();
+  const history = useHistory();
 
   if (userToken) {
-    alert("Here")
-    return <Redirect to="/sign-in" />;
+    return <Redirect to="/" />;
   }
 
   return children;

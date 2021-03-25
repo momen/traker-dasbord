@@ -18,10 +18,19 @@ const reducer = (state = initialState, action) => {
         CSRF: action.CSRF,
       };
 
+      case "TOKEN_EXPIRED":
+      return {
+        ...state,
+        user: null,
+        userToken: null,
+        userPermissions: null
+      };
+
     case "LOGIN":
       return {
         ...state,
         user: action.user,
+        userToken: action.user.token,
         userPermissions: action.user.roles[0].permissions.map(
           (permission) => permission.title
         ),
@@ -38,6 +47,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         CSRF: null,
         user: null,
+        userToken: null,
         userPermissions: null,
       };
 

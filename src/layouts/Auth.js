@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { createGlobalStyle } from "styled-components/macro";
 import { CssBaseline } from "@material-ui/core";
-import AppGuard from "../components/AppGuard";
+import AuthGuard from "../components/AuthGuard";
 
 const GlobalStyle = createGlobalStyle`
   html,
@@ -25,13 +25,13 @@ const Root = styled.div`
 
 const Auth = ({ children }) => {
   return (
-    <AppGuard>
+    <AuthGuard>
       <Root>
         <CssBaseline />
         <GlobalStyle />
         {children}
       </Root>
-    </AppGuard>
+    </AuthGuard>
   );
 };
 

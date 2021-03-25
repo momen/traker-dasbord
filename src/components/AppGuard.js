@@ -8,10 +8,8 @@ function AppGuard({ children }) {
   // const auth = useSelector((state) => state.authReducer);
   const [{ user, userToken }, dispatch] = useStateValue();
 
-  const history = useHistory();
-
   if (!userToken && !user) {
-    return history.push("/sign-in");
+    return <Redirect to="/sign-in" />;
   }
 
   if (!user && userToken) {
@@ -23,7 +21,6 @@ function AppGuard({ children }) {
       })
       .then(async ({ data }) => {
         axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-        console.log("Then");
 
         await dispatch({
           type: "LOGIN",
@@ -31,8 +28,11 @@ function AppGuard({ children }) {
         });
         return <Redirect to="/" />;
       })
-      .catch(({ response }) => {
-        return history.push("/sign-in");
+      .catch(async() => {
+        await dispatch({
+          type: "TOKEN_EXPIRED",
+        });
+        return <Redirect to="/sign-in" />;
       });
   }
 

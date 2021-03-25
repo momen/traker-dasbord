@@ -345,6 +345,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
         dispatch({
           type: "LOGOUT",
         });
+        delete axios.defaults.headers.common["Authorization"];
       })
       .catch((err) => {
         alert("Failed to Logout, please try again.");
