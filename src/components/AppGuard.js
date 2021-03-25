@@ -23,7 +23,7 @@ function AppGuard({ children }) {
         axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
 
         await dispatch({
-          type: "LOGIN",
+          type: "TOKEN_AVAILABLE",
           user: data.data.user,
         });
         return <Redirect to="/" />;

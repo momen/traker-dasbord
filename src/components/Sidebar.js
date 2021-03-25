@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components/macro";
 import { rgba } from "polished";
-import { NavLink, withRouter } from "react-router-dom";
+import { NavLink, Redirect, withRouter } from "react-router-dom";
 import { darken } from "polished";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "../vendor/perfect-scrollbar.css";
@@ -342,10 +342,12 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
     axios
       .post("/logout", null)
       .then(async (res) => {
-        dispatch({
+        await dispatch({
           type: "LOGOUT",
         });
         delete axios.defaults.headers.common["Authorization"];
+        localStorage.removeItem("trkar-token");
+        <Redirect to="/sign-in" />;
       })
       .catch((err) => {
         alert("Failed to Logout, please try again.");
@@ -421,14 +423,11 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                   <SidebarCategory
                     isCollapsable={false}
                     name={category.id}
-                    to={category.path}
                     activeClassName="active"
-                    component={NavLink}
                     icon={category.icon}
-                    exact
                     button
                     badge={category.badge}
-                    onClick={category.id === "Logout" ? handleLogout : null}
+                    onClick={handleLogout}
                   />
                 ) : null}
               </React.Fragment>
