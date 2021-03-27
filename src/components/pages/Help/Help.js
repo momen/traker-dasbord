@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Support() {
   const classes = useStyles();
-  const [{ user, userPermissions }] = useStateValue();
+  const [{ userPermissions }] = useStateValue();
   const [FAQs, setFAQs] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState(
@@ -144,8 +144,8 @@ function Support() {
         .then(({ data }) => {
           setFAQs(data.data);
         })
-        .catch(() => {
-          alert("Failed to Fetch data");
+        .catch((res) => {
+          alert("Y");
         });
     } else {
       axios

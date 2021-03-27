@@ -15,6 +15,7 @@ import {
 
 import { isWidthUp } from "@material-ui/core/withWidth";
 import AppGuard from "../components/AppGuard";
+import { useStateValue } from "../StateProvider";
 
 const drawerWidth = 258;
 
@@ -71,6 +72,7 @@ const MainContent = styled(Paper)`
 
 const Dashboard = ({ children, routes, width }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [{ userPermissions }] = useStateValue();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -91,11 +93,11 @@ const Dashboard = ({ children, routes, width }) => {
               onClose={handleDrawerToggle}
             />
           </Hidden>
-          <Hidden smDown implementation="css">
-            <Sidebar
-              routes={routes}
-              PaperProps={{ style: { width: drawerWidth } }}
-            />
+        <Hidden smDown implementation="css">
+              <Sidebar
+                routes={routes}
+                PaperProps={{ style: { width: drawerWidth } }}
+              />
           </Hidden>
         </Drawer>
         <AppContent>

@@ -32,7 +32,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         user: null,
         userToken: null,
-        userPermissions: null
+        userPermissions: []
       };
 
       
@@ -58,7 +58,7 @@ const reducer = (state = initialState, action) => {
         CSRF: null,
         user: null,
         userToken: null,
-        userPermissions: null,
+        userPermissions: [],
       };
 
     default:
