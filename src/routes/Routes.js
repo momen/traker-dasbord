@@ -6,6 +6,7 @@ import DashboardLayout from "../layouts/Dashboard";
 import AuthLayout from "../layouts/Auth";
 import Error404 from "../components/pages/Error404/Error404";
 
+
 const childRoutes = (Layout, routes) =>
   routes.map(({ component: Component, guard, children, path, permission }, index) => {
     const Guard = guard || React.Fragment;
@@ -45,7 +46,7 @@ const childRoutes = (Layout, routes) =>
     ) : null;
   });
 
-const Routes = () => (
+const Routes = () => 
   <Router>
     <Switch>
       {childRoutes(DashboardLayout, dashboardLayoutRoutes)}
@@ -59,6 +60,6 @@ const Routes = () => (
       />
     </Switch>
   </Router>
-);
+
 
 export default Routes;

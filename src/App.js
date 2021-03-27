@@ -46,10 +46,10 @@ function App() {
     (res) => {
       return res;
     },
-    (err) => {
+    async(err) => {
       if (err.response?.data.message === "Unauthenticated.") {
-         dispatch({
-          type: "LOGOUT",
+        await dispatch({
+          type: "TOKEN_EXPIRED",
         });
         delete axios.defaults.headers.common["Authorization"];
         localStorage.removeItem("trkar-token");
