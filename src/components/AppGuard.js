@@ -2,11 +2,16 @@ import React from "react";
 import { Redirect, useHistory } from "react-router-dom";
 import { useStateValue } from "../StateProvider";
 import axios from "../axios";
+import { useDispatch, useSelector } from "react-redux";
+import { isAuthenticated, notAuthenticated } from "../actions";
 
 // For routes that can only be accessed by authenticated users
 function AppGuard({ children }) {
   // const auth = useSelector((state) => state.authReducer);
-  const [{ user, userToken }, dispatch] = useStateValue();
+  const { user, userToken } = useSelector((state) => {
+    return { user: state.user, userToken: state.userToken };
+  });
+  const dispatch = useDispatch();
 
   if (!userToken && !user) {
     return <Redirect to="/sign-in" />;
@@ -22,16 +27,11 @@ function AppGuard({ children }) {
       .then(async ({ data }) => {
         axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
 
-        await dispatch({
-          type: "TOKEN_AVAILABLE",
-          user: data.data.user,
-        });
+        await dispatch(isAuthenticated(data.data.user));
         return <Redirect to="/" />;
       })
-      .catch(async() => {
-        await dispatch({
-          type: "TOKEN_EXPIRED",
-        });
+      .catch(async () => {
+        await dispatch(notAuthenticated());
         return <Redirect to="/sign-in" />;
       });
   }

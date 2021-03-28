@@ -18,7 +18,8 @@ import { Menu as MenuIcon } from "@material-ui/icons";
 import NotificationsDropdown from "./NotificationsDropdown";
 import MessagesDropdown from "./MessagesDropdown";
 import LanguagesDropdown from "./LanguagesDropdown";
-import { useStateValue } from "../StateProvider";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "../actions";
 // import UserDropdown from "./UserDropdown";
 
 const AppBar = styled(MuiAppBar)`
@@ -75,7 +76,8 @@ const Input = styled(InputBase)`
 `;
 
 const AppBarComponent = ({ onDrawerToggle }) => {
-  const [{ theme }, dispatch] = useStateValue();
+  const theme = useSelector((state) => state.theme);
+  const dispatch = useDispatch();
   const [currentTheme, setCurrentTheme] = useState({
     darkTheme: true,
   });
@@ -86,10 +88,7 @@ const AppBarComponent = ({ onDrawerToggle }) => {
       [event.target.name]: event.target.checked,
     });
     // console.log(event.target.checked);
-    dispatch({
-      type: "CHANGE_THEME",
-      theme: event.target.checked ? "dark" : "default",
-    });
+    dispatch(toggleTheme(event.target.checked ? "dark" : "default"));
   };
   return (
     <React.Fragment>

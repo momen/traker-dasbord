@@ -6,6 +6,9 @@ import "./index.css";
 import App from "./App";
 import { StateProvider } from "./StateProvider";
 import reducer, { initialState } from "./reducer";
+import { Provider } from "react-redux";
+import { createStore } from "redux";
+import reducers from './reducers'
 
 Sentry.init({
   dsn: "https://f496a1b07ee64765996f62ac5dc1e232@o551399.ingest.sentry.io/5674833",
@@ -17,11 +20,12 @@ Sentry.init({
   tracesSampleRate: 1.0,
 });
 
+
 ReactDOM.render(
   <React.StrictMode>
-    <StateProvider initialState={initialState} reducer={reducer}>
+    <Provider store={createStore(reducers)}>
       <App />
-    </StateProvider>
+    </Provider>
   </React.StrictMode>,
   document.getElementById("root")
 );

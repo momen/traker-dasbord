@@ -16,6 +16,7 @@ import {
 import { isWidthUp } from "@material-ui/core/withWidth";
 import AppGuard from "../components/AppGuard";
 import { useStateValue } from "../StateProvider";
+import { useSelector } from "react-redux";
 
 const drawerWidth = 258;
 
@@ -72,7 +73,8 @@ const MainContent = styled(Paper)`
 
 const Dashboard = ({ children, routes, width }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [{ userPermissions }] = useStateValue();
+  // const [{ userPermissions }] = useStateValue();
+  const userPermissions = useSelector((state) => state.userPermissions)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);

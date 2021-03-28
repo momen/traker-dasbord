@@ -31,6 +31,8 @@ import { sidebarRoutes as routes } from "../routes/index";
 
 import { ReactComponent as Logo } from "../vendor/logo.svg";
 import { useStateValue } from "../StateProvider";
+import { useDispatch, useSelector } from "react-redux";
+import {Logout} from "../actions"
 
 const Box = styled(MuiBox)(spacing);
 
@@ -298,7 +300,11 @@ const SidebarLink = ({ name, to, badge, icon }) => {
 };
 
 const Sidebar = ({ classes, staticContext, location, ...rest }) => {
-  const [{ user, userPermissions }, dispatch] = useStateValue();
+  const { user, userPermissions } = useSelector((state) => {
+    return { user: state.user, userToken: state.userPermissions };
+  });
+  const dispatch = useDispatch();
+
 
   const initOpenRoutes = () => {
     /* Open collapse element that matches current url */
@@ -342,9 +348,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
     axios
       .post("/logout", null)
       .then(async (res) => {
-        await dispatch({
-          type: "LOGOUT",
-        });
+        await dispatch(Logout());
         delete axios.defaults.headers.common["Authorization"];
         localStorage.removeItem("trkar-token");
         <Redirect to="/sign-in" />;

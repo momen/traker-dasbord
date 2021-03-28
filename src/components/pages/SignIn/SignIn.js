@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useStateValue } from "../../../StateProvider";
 import { Redirect, useHistory } from "react-router-dom";
 import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
@@ -22,6 +21,8 @@ import {
 import { spacing } from "@material-ui/system";
 import { Alert as MuiAlert } from "@material-ui/lab";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
+import { useDispatch } from "react-redux";
+import { Login } from "../../../actions";
 
 const Alert = styled(MuiAlert)(spacing);
 
@@ -43,7 +44,7 @@ const BigAvatar = styled(Avatar)`
 
 function SignIn() {
   const history = useHistory();
-  const [{ user, CSRF }, dispatch] = useStateValue();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
 
   // useEffect(() => {
@@ -108,13 +109,15 @@ function SignIn() {
                 },
               })
               .then(async (res) => {
-                await dispatch({
-                  type: "LOGIN",
-                  user: res.data.data,
-                });
+                await dispatch(Login(res.data.data));
                 history.push("/");
-                axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.data.token}`;
-                window.localStorage.setItem("trkar-token", JSON.stringify(res.data.data.token));
+                axios.defaults.headers.common[
+                  "Authorization"
+                ] = `Bearer ${res.data.data.token}`;
+                window.localStorage.setItem(
+                  "trkar-token",
+                  JSON.stringify(res.data.data.token)
+                );
               })
               .catch((res) => {
                 console.log(`Error: ${res}`);
@@ -127,7 +130,8 @@ function SignIn() {
                 setSubmitting(false);
               });
           } catch (error) {
-            const message = "Couldn't send a Login request, this is a local error";
+            const message =
+              "Couldn't send a Login request, this is a local error";
 
             setStatus({ success: false });
             setErrors({ submit: message });
@@ -169,7 +173,7 @@ function SignIn() {
               autoFocus
             />
             <TextField
-              type={showPassword?"text":"password"}
+              type={showPassword ? "text" : "password"}
               name="password"
               label="Password"
               value={values.password}

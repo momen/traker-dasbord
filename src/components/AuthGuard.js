@@ -2,11 +2,12 @@ import React from "react";
 import { Redirect, useHistory } from "react-router-dom";
 import { useStateValue } from "../StateProvider";
 import axios from "../axios";
+import { useSelector } from "react-redux";
 
 // For routes that can only be accessed by authenticated users
 function AuthGuard({ children }) {
   // const auth = useSelector((state) => state.authReducer);
-  const [{ user, userToken }] = useStateValue();
+  const userToken = useSelector((state) => state.userToken);
   const history = useHistory();
 
   if (userToken) {

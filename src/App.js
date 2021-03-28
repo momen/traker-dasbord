@@ -17,19 +17,20 @@ import {
 
 import createTheme from "./theme";
 import Routes from "./routes/Routes";
-import { THEMES } from "./constants";
 import { useStateValue } from "./StateProvider";
 import axios from "./axios";
 import { Redirect } from "react-router-dom";
+import { connect } from "react-redux";
+import { Logout } from "./actions";
 
 const jss = create({
   ...jssPreset(),
   insertionPoint: document.getElementById("jss-insertion-point"),
 });
 
-function App() {
-  // const theme = useSelector((state) => state.themeReducer);
-  const [{ userToken, theme }, dispatch] = useStateValue();
+function App({userToken, theme}) {
+  // const userToken = useSelector((state) => state.userToken);
+  // const [{ userToken, theme }, dispatch] = useStateValue();
 
   // Inject the token in the headers to be available on each request from the beginning, & this is
   // done only on the initial render.
@@ -48,9 +49,7 @@ function App() {
     },
     async(err) => {
       if (err.response?.data.message === "Unauthenticated.") {
-        await dispatch({
-          type: "TOKEN_EXPIRED",
-        });
+        Logout();
         delete axios.defaults.headers.common["Authorization"];
         localStorage.removeItem("trkar-token");
         <Redirect to="/sign-in" />;
@@ -79,4 +78,11 @@ function App() {
   );
 }
 
-export default App;
+const mapStateToProps = (state => {
+  return {
+    userToken: state.userToken,
+    theme: state.theme
+  }
+})
+
+export default connect(mapStateToProps, { Logout }) (App);
