@@ -10,7 +10,6 @@ import {
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import { PhotoCamera } from "@material-ui/icons";
 import { CloseIcon } from "@material-ui/data-grid";
 import { Alert } from "@material-ui/lab";
@@ -52,7 +51,6 @@ const useStyles = makeStyles((theme) => ({
 
 function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
-  const [{ user }] = useStateValue();
 
   const formRef = useRef();
   const uploadRef = useRef();

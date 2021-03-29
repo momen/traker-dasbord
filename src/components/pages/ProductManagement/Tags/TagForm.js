@@ -7,7 +7,6 @@ import {
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -36,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
 
 function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
-  const [{ user }] = useStateValue();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({

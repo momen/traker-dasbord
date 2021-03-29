@@ -25,9 +25,9 @@ import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
+import { useSelector } from "react-redux";
 
 const Card = styled(MuiCard)(spacing);
 const Divider = styled(MuiDivider)(spacing);
@@ -95,11 +95,9 @@ function CustomLoadingOverlay() {
 
 function AuditLogs() {
   const classes = useStyles();
-  const [{ user, userPermissions }] = useStateValue();
+  const userPermissions  = useSelector((state) =>  state.userPermissions)
   const history = useHistory();
   const [rows, setRows] = useState([]);
-  const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Category");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
@@ -112,11 +110,11 @@ function AuditLogs() {
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 60 },
+    { field: "id", headerName: "ID", width: 60, headerAlign: 'center', align:'center' },
     { field: "description", headerName: "Description", width: 150 },
-    { field: "subject_id", headerName: "Subject ID", width: 80 },
+    { field: "subject_id", headerName: "Subject ID", width: 80, headerAlign: 'center', align:'center' },
     { field: "subject_type", headerName: "Subject Type", width: 150 },
-    { field: "user_id", headerName: "User ID", width: 80 },
+    { field: "user_id", headerName: "User ID", width: 80, headerAlign: 'center', align:'center' },
     { field: "host", headerName: "Host", width: 120 },
     { field: "created_at", headerName: "Created at", width: 120 },
     {
@@ -283,7 +281,6 @@ function AuditLogs() {
                 LoadingOverlay: CustomLoadingOverlay,
               }}
               loading={loading}
-              checkboxSelection
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}

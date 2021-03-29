@@ -24,9 +24,9 @@ import {
 import { ExpandMore, Search } from "@material-ui/icons";
 import { spacing } from "@material-ui/system";
 import axios from "../../../axios";
-import { useStateValue } from "../../../StateProvider";
 import Popup from "../../Popup";
 import FAQ_Form from "./FAQ_Form";
+import { useSelector } from "react-redux";
 
 const Grid = styled(MuiGrid)(spacing);
 const Divider = styled(MuiDivider)(spacing);
@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Support() {
   const classes = useStyles();
-  const [{ userPermissions }] = useStateValue();
+  const userPermissions = useSelector((state) => state.userPermissions);
   const [FAQs, setFAQs] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState(
@@ -191,7 +191,7 @@ function Support() {
               mb={3}
               color="secondary"
               variant="contained"
-              disabled={!rowsToDelete.length > 0}
+              disabled={rowsToDelete.length < 2}
               onClick={() => {
                 setOpenMassDeleteDialog(true);
               }}

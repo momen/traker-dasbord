@@ -48,7 +48,7 @@ function Map({ lattitude, longitude, formData, updateFormData }) {
     lng: longitude ? longitude : -79.3832,
   };
 
-  const onMapClick = React.useCallback((e) => {
+  const onMapClick = (e) => {
     setMarkers((current) => [
       {
         lat: e.latLng.lat(),
@@ -57,12 +57,14 @@ function Map({ lattitude, longitude, formData, updateFormData }) {
       },
     ]);
 
+    console.log(formData);
+
     updateFormData({
       ...formData,
       lat: e.latLng.lat(),
       long: e.latLng.lng(),
     });
-  }, []);
+  };
 
   const mapRef = React.useRef();
   const onMapLoad = React.useCallback((map) => {

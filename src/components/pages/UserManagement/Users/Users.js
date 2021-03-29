@@ -34,9 +34,9 @@ import { spacing } from "@material-ui/system";
 import { Search, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import UsersForm from "./UsersForm";
 import { Pagination } from "@material-ui/lab";
+import { useSelector } from "react-redux";
 
 const Card = styled(MuiCard)(spacing);
 const CardContent = styled(MuiCardContent)(spacing);
@@ -114,7 +114,7 @@ function CustomLoadingOverlay() {
 
 function Users() {
   const classes = useStyles();
-  const [{ user, userPermissions }] = useStateValue();
+  const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -256,12 +256,7 @@ function Users() {
         setLoading(true);
         axios
           .get(
-            `/users?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-            {
-              headers: {
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
+            `/users?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -388,7 +383,7 @@ function Users() {
             mb={3}
             color="secondary"
             variant="contained"
-            disabled={!rowsToDelete.length > 0}
+            disabled={rowsToDelete.length < 2}
             onClick={() => {
               setOpenMassDeleteDialog(true);
             }}

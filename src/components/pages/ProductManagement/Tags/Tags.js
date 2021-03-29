@@ -31,10 +31,9 @@ import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import TagForm from "./TagForm";
 import { Pagination } from "@material-ui/lab";
-import { Search } from "react-feather";
+import { useSelector } from "react-redux";
 
 const Card = styled(MuiCard)(spacing);
 const Divider = styled(MuiDivider)(spacing);
@@ -97,7 +96,7 @@ function CustomLoadingOverlay() {
 
 function Tags() {
   const classes = useStyles();
-  const [{ user, userPermissions }] = useStateValue();
+  const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -302,7 +301,7 @@ function Tags() {
             mb={3}
             color="secondary"
             variant="contained"
-            disabled={!rowsToDelete.length > 0}
+            disabled={rowsToDelete.length < 2}
             onClick={() => {
               setOpenMassDeleteDialog(true);
             }}

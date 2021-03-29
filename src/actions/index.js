@@ -14,15 +14,15 @@ export const Logout = () => {
 export const isAuthenticated = (user) => {
   return {
     type: "TOKEN_AVAILABLE",
-    payload: user
+    payload: user,
   };
 };
 
 export const notAuthenticated = () => {
-    return {
-      type: "TOKEN_EXPIRED",
-    };
+  return {
+    type: "TOKEN_EXPIRED",
   };
+};
 
 export const toggleTheme = () => {
   return {

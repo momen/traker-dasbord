@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import { Button } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -55,7 +54,6 @@ const useStyles = makeStyles({
 
 function ViewCategory({ match }) {
   const classes = useStyles();
-  const [{ user }] = useStateValue();
   const history = useHistory();
   const [category, setCategory] = useState(""); //Customize
 
@@ -110,7 +108,7 @@ function ViewCategory({ match }) {
                 <p className={classes.rowContent}>{category.description}</p>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={user.userid_id}>
+            <StyledTableRow key={`cat-photo-${category.id}`}>
               <StyledTableCell component="th" scope="row">
                 Photo
               </StyledTableCell>

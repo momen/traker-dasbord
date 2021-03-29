@@ -30,11 +30,11 @@ import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import VendorsForm from "./VendorsForm";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
 import { useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Card = styled(MuiCard)(spacing);
 const CardContent = styled(MuiCardContent)(spacing);
@@ -99,7 +99,7 @@ function CustomLoadingOverlay() {
 function Vendors() {
   const classes = useStyles();
   const history = useHistory();
-  const [{ user, userPermissions }] = useStateValue();
+  const userPermissions = useSelector((state) => state.userPermissions);
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState("New Vendor");
@@ -339,6 +339,8 @@ function Vendors() {
       .catch(() => {
         alert("Failed to Fetch Users List");
       });
+
+      console.log(rowsToDelete.length);
   }, []);
 
   //Request the page records either on the initial render, or whenever the page changes
@@ -407,7 +409,7 @@ function Vendors() {
             mb={3}
             color="secondary"
             variant="contained"
-            disabled={!rowsToDelete.length > 0}
+            disabled={rowsToDelete.length < 2}
             onClick={() => {
               setOpenMassDeleteDialog(true);
             }}

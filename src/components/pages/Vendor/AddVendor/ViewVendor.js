@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import { Button } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -54,18 +53,13 @@ const useStyles = makeStyles({
 
 function ViewVendor({ match }) {
   const classes = useStyles();
-  const [{ user }] = useStateValue();
   const history = useHistory();
   const [vendor, setVendor] = useState("");
   const [vendorTypes, setVendorTypes] = useState("");
 
   useEffect(() => {
     axios
-      .get(`/add-vendors/${match.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
+      .get(`/add-vendors/${match.params.id}`)
       .then((res) => {
         setVendor(res.data.data);
       });
@@ -144,7 +138,7 @@ function ViewVendor({ match }) {
                 {vendor.userid?.name}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={user.userid_id}>
+            <StyledTableRow key={`vendor-logo`}>
               <StyledTableCell component="th" scope="row">
                 Logo
               </StyledTableCell>

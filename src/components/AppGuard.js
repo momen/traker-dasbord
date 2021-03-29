@@ -1,6 +1,5 @@
 import React from "react";
 import { Redirect, useHistory } from "react-router-dom";
-import { useStateValue } from "../StateProvider";
 import axios from "../axios";
 import { useDispatch, useSelector } from "react-redux";
 import { isAuthenticated, notAuthenticated } from "../actions";

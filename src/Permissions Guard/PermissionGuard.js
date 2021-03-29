@@ -1,8 +1,10 @@
 import React from "react";
-import { useStateValue } from "../StateProvider";
+import { useSelector } from "react-redux";
 
 function PermissionGuard({ children, permission }) {
-  const [{ user, userToken, userPermissions }] = useStateValue();
+  const { user, userToken, userPermissions } = useSelector((state) => {
+    return { user: state.user, userToken: state.userToken, userPermissions: state.userPermissions };
+  });
 
   if (!user && userToken) {
     return null;

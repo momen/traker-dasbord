@@ -1,8 +1,8 @@
 import React from "react";
-import { useStateValue } from "../StateProvider";
+import { useSelector } from "react-redux";
 
 function ManageAccountGuard({ children }) {
-  const [{ userPermissions }] = useStateValue();
+  const userPermissions = useSelector((state) => state.userPermissions);
 
   return userPermissions?.includes("profile_password_edit") ? children : <h1>Not Authorized</h1>
 }

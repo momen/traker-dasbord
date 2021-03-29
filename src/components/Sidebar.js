@@ -30,7 +30,6 @@ import { green } from "@material-ui/core/colors";
 import { sidebarRoutes as routes } from "../routes/index";
 
 import { ReactComponent as Logo } from "../vendor/logo.svg";
-import { useStateValue } from "../StateProvider";
 import { useDispatch, useSelector } from "react-redux";
 import {Logout} from "../actions"
 
@@ -301,7 +300,7 @@ const SidebarLink = ({ name, to, badge, icon }) => {
 
 const Sidebar = ({ classes, staticContext, location, ...rest }) => {
   const { user, userPermissions } = useSelector((state) => {
-    return { user: state.user, userToken: state.userPermissions };
+    return { user: state.user, userPermissions: state.userPermissions };
   });
   const dispatch = useDispatch();
 

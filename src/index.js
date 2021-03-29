@@ -4,8 +4,6 @@ import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import "./index.css";
 import App from "./App";
-import { StateProvider } from "./StateProvider";
-import reducer, { initialState } from "./reducer";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import reducers from './reducers'

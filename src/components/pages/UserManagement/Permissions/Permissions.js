@@ -28,10 +28,10 @@ import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import AddPermission from "./AddPermission";
 import { Pagination } from "@material-ui/lab";
 import { useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Card = styled(MuiCard)(spacing);
 const CardContent = styled(MuiCardContent)(spacing);
@@ -94,7 +94,7 @@ function CustomLoadingOverlay() {
 
 function Permissions() {
   const classes = useStyles();
-  const [{ user, userPermissions }] = useStateValue();
+  const userPermissions  = useSelector((state) =>  state.userPermissions) 
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -109,7 +109,7 @@ function Permissions() {
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 55 },
+    { field: "id", headerName: "ID", width: 55, headerAlign: 'center', align:'center' },
     { field: "title", headerName: "Title", width: 200, flex: 1 },
     {
       field: "actions",
@@ -254,7 +254,6 @@ function Permissions() {
                 LoadingOverlay: CustomLoadingOverlay,
               }}
               loading={loading}
-              checkboxSelection
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}

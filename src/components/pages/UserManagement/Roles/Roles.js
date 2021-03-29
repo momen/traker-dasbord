@@ -33,9 +33,9 @@ import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import RolesForm from "./RolesForm";
 import { Pagination } from "@material-ui/lab";
+import { useSelector } from "react-redux";
 
 const Card = styled(MuiCard)(spacing);
 const CardContent = styled(MuiCardContent)(spacing);
@@ -108,7 +108,7 @@ function CustomLoadingOverlay() {
 function Roles() {
   const classes = useStyles();
   const history = useHistory();
-  const [{ user, userPermissions }] = useStateValue();
+  const userPermissions  = useSelector((state) =>  state.userPermissions)
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState("New Permission");
@@ -336,7 +336,7 @@ function Roles() {
             mb={3}
             color="secondary"
             variant="contained"
-            disabled={!rowsToDelete.length > 0}
+            disabled={rowsToDelete.length < 2}
             onClick={() => {
               setOpenMassDeleteDialog(true);
             }}

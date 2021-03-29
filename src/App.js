@@ -1,6 +1,4 @@
 import React, { useEffect } from "react";
-import * as Sentry from "@sentry/react";
-// import { useSelector } from "react-redux";
 import "./App.css";
 import { Helmet } from "react-helmet";
 import DateFnsUtils from "@date-io/date-fns";
@@ -17,7 +15,6 @@ import {
 
 import createTheme from "./theme";
 import Routes from "./routes/Routes";
-import { useStateValue } from "./StateProvider";
 import axios from "./axios";
 import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";

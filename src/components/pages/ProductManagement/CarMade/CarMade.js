@@ -31,14 +31,13 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { AccountCircle, TextFields, UnfoldLess } from "@material-ui/icons";
+import { UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
-import AddForm from "../../../AddForm";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import CreateCarMade from "./CreateCarMade";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
+import { useSelector } from "react-redux";
 
 const Card = styled(MuiCard)(spacing);
 const CardContent = styled(MuiCardContent)(spacing);
@@ -102,7 +101,7 @@ function CustomLoadingOverlay() {
 
 function CarMade() {
   const classes = useStyles();
-  const [{ user, userPermissions }] = useStateValue();
+  const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -366,7 +365,7 @@ function CarMade() {
             mb={3}
             color="secondary"
             variant="contained"
-            disabled={!rowsToDelete.length > 0}
+            disabled={rowsToDelete.length < 2}
             onClick={() => {
               setOpenMassDeleteDialog(true);
             }}

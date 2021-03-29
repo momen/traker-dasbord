@@ -7,7 +7,6 @@ import {
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import { Autocomplete } from "@material-ui/lab";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
@@ -42,8 +41,6 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
   const classes = useStyles();
-  const [{ user }] = useStateValue();
-
   const formRef = useRef();
 
   //Customize

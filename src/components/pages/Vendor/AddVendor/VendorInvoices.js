@@ -25,9 +25,9 @@ import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
+import { useSelector } from "react-redux";
 
 const Card = styled(MuiCard)(spacing);
 const Divider = styled(MuiDivider)(spacing);
@@ -95,7 +95,7 @@ function CustomLoadingOverlay() {
 
 function VendorInvoices({ match }) {
   const classes = useStyles();
-  const [{ user, userPermissions }] = useStateValue();
+  const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(1);
@@ -107,7 +107,7 @@ function VendorInvoices({ match }) {
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 60 },
+    { field: "id", headerName: "ID", width: 60, headerAlign: 'center', align:'center' },
     { field: "order_number", headerName: "Order Number", width: 150 },
     { field: "vendor_name", headerName: "Vendor Name", width: 200 },
     { field: "vendor_email", headerName: "Vendor Email", width: 100 },
@@ -292,7 +292,6 @@ function VendorInvoices({ match }) {
                 LoadingOverlay: CustomLoadingOverlay,
               }}
               loading={loading}
-              checkboxSelection
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}

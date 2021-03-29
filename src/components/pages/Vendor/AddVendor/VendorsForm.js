@@ -14,7 +14,6 @@ import {
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import { PhotoCamera } from "@material-ui/icons";
 import { Alert } from "@material-ui/lab";
 import { CloseIcon } from "@material-ui/data-grid";
@@ -56,7 +55,6 @@ const useStyles = makeStyles((theme) => ({
 
 function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const classes = useStyles();
-  const [{ user }] = useStateValue();
 
   const formRef = useRef();
   const uploadRef = useRef();

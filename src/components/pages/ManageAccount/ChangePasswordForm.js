@@ -18,7 +18,6 @@ import {
 import { Alert as MuiAlert } from "@material-ui/lab";
 
 import { spacing } from "@material-ui/system";
-import { useStateValue } from "../../../StateProvider";
 
 const Divider = styled(MuiDivider)(spacing);
 
@@ -52,7 +51,6 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function BasicForm() {
-  const [{ user }] = useStateValue();
 
   const handleSubmit = async (
     values,

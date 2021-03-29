@@ -1,7 +1,7 @@
 import { Button } from "@material-ui/core";
 import React from "react";
-import { useStateValue } from "../../../StateProvider";
 import axios from "../../../axios";
+import { useSelector } from "react-redux";
 
 function Dashboard() {
   const userToken = useSelector((state) => state.userToken);

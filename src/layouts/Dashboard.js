@@ -15,7 +15,6 @@ import {
 
 import { isWidthUp } from "@material-ui/core/withWidth";
 import AppGuard from "../components/AppGuard";
-import { useStateValue } from "../StateProvider";
 import { useSelector } from "react-redux";
 
 const drawerWidth = 258;

@@ -7,13 +7,10 @@ import {
   FormControl,
   Grid,
   IconButton,
-  Input,
-  InputAdornment,
   makeStyles,
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import { PhotoCamera } from "@material-ui/icons";
 import { CloseIcon } from "@material-ui/data-grid";
 import { Alert, Autocomplete } from "@material-ui/lab";
@@ -21,7 +18,6 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
 import NumberFormat from "react-number-format";
-import toBase64 from "../../../../Services/toBase64";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -78,7 +74,6 @@ function ProductsForm({
   productTags,
 }) {
   const classes = useStyles();
-  const [{ user }] = useStateValue();
 
   const formRef = useRef();
   const uploadRef = useRef();
@@ -166,25 +161,17 @@ function ProductsForm({
           .then((res) => {
             if (imagesToDelete) {
               axios
-                .post(
-                  `/products/remove/checked/media`,
-                  {
-                    product_id: itemToEdit.id,
-                    media_ids: JSON.stringify(imagesToDelete),
-                  },
-                  {
-                    headers: {
-                      Authorization: `Bearer ${user.token}`,
-                    },
-                  }
-                )
+                .post(`/products/remove/checked/media`, {
+                  product_id: itemToEdit.id,
+                  media_ids: JSON.stringify(imagesToDelete),
+                })
                 .then((res) => {
                   setOpenPopup(false);
                 })
                 .catch((res) => {
                   setResponseErrors(res.response.data.errors);
                 });
-            }else{
+            } else {
               setOpenPopup(false);
             }
           })

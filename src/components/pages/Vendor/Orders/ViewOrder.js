@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
 import { Button, Container, Grid, Typography } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -53,7 +52,6 @@ const useStyles = makeStyles({
 
 function ViewOrder({ match }) {
   const classes = useStyles();
-  const [{ user }] = useStateValue();
   const history = useHistory();
   const [order, setOrder] = useState("");
 

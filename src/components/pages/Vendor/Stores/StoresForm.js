@@ -1,22 +1,11 @@
 import React, { useRef, useState } from "react";
 import {
   Button,
-  Collapse,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
   Grid,
-  IconButton,
   makeStyles,
-  Radio,
-  RadioGroup,
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
-import { useStateValue } from "../../../../StateProvider";
-import { PhotoCamera } from "@material-ui/icons";
-import { Alert } from "@material-ui/lab";
-import { CloseIcon } from "@material-ui/data-grid";
 import Map from "../../../Map/Map";
 
 const useStyles = makeStyles((theme) => ({
@@ -52,7 +41,6 @@ const useStyles = makeStyles((theme) => ({
 
 function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
-  const [{ user }] = useStateValue();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
