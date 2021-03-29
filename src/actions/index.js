@@ -24,8 +24,9 @@ export const notAuthenticated = () => {
   };
 };
 
-export const toggleTheme = () => {
+export const toggleTheme = (theme) => {
   return {
     type: "CHANGE_THEME",
+    payload: theme,
   };
 };

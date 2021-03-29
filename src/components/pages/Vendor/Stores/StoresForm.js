@@ -1,12 +1,8 @@
 import React, { useRef, useState } from "react";
-import {
-  Button,
-  Grid,
-  makeStyles,
-  TextField,
-} from "@material-ui/core";
+import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
 import axios from "../../../../axios";
 import Map from "../../../Map/Map";
+import NumberFormat from "react-number-format";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -158,10 +154,14 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
 
           <Grid item xs={6}>
             <div>
-              <TextField
+              <NumberFormat
                 name="moderator_phone"
                 required
                 fullWidth
+                format="+966 ### ### ###"
+                mask="_ "
+                allowEmptyFormatting
+                customInput={TextField}
                 id="moderator_phone"
                 label="Moderator Phone"
                 value={formData.moderator_phone}
@@ -183,9 +183,13 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
 
           <Grid item xs={6}>
             <div>
-              <TextField
+              <NumberFormat
                 name="moderator_alt_phone"
                 fullWidth
+                format="+966 ### ### ###"
+                mask="_ "
+                allowEmptyFormatting
+                customInput={TextField}
                 id="moderator_alt_phone"
                 label="Moderator Alternative Phone"
                 value={formData.moderator_alt_phone}
@@ -236,7 +240,15 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
             </label>
           </Grid>
 
-          <Grid item xs={12} style={{ height: "60vh", position: "relative", marginBottom: "10px"}}>
+          <Grid
+            item
+            xs={12}
+            style={{
+              height: "60vh",
+              position: "relative",
+              marginBottom: "10px",
+            }}
+          >
             <div style={{ height: "60vh" }}>
               <Map
                 id="stores-map"

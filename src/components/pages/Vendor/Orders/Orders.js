@@ -19,6 +19,11 @@ import {
   LinearProgress,
   Grid,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
 } from "@material-ui/core";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
@@ -105,6 +110,9 @@ function Orders() {
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
+  const [openApproveDialog, setOpenApproveDialog] = useState(false);
+  const [openCancelDialog, setOpenCancelDialog] = useState(false);
+  const [orderToApproveOrCancel, setOrderToApproveOrCancel] = useState();
 
   const columns = [
     {
@@ -121,7 +129,7 @@ function Orders() {
     {
       field: "actions",
       headerName: "Actions",
-      width: 220,
+      width: 280,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -141,6 +149,36 @@ function Orders() {
                 onClick={() => history.push(`/vendor/orders/${params.row.id}`)}
               >
                 View
+              </Button>
+            ) : null}
+
+            {userPermissions.includes("approve_orders") ? (
+              <Button
+                style={{ marginRight: "5px" }}
+                className={classes.button}
+                variant="contained"
+                size="small"
+                onClick={() => {
+                  setOpenApproveDialog(true);
+                  setOrderToApproveOrCancel(params.row.id);
+                }}
+              >
+                Approve Order
+              </Button>
+            ) : null}
+
+            {userPermissions.includes("cancel_orders") ? (
+              <Button
+                style={{ marginRight: "5px" }}
+                variant="contained"
+                color="secondary"
+                size="small"
+                onClick={() => {
+                  setOpenCancelDialog(true);
+                  setOrderToApproveOrCancel(params.row.id);
+                }}
+              >
+                Cancel Order
               </Button>
             ) : null}
           </div>
@@ -174,6 +212,65 @@ function Orders() {
       }
       setSearchValue(search);
     }
+  };
+
+  const approveOrder = () => {
+    axios
+      .post(`vendor/approve/orders`, {
+        order_id: orderToApproveOrCancel,
+        status: 1,
+      })
+      .then(() => {
+        setOpenApproveDialog(false);
+        setLoading(true);
+        axios
+          .get(
+            `/show/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
+  };
+
+  const cancelOrder = () => {
+    axios
+      .post(`vendor/cancel/order/${orderToApproveOrCancel}`, {
+        order_id: orderToApproveOrCancel,
+      })
+      .then(() => {
+        setOpenCancelDialog(false);
+        setLoading(true);
+        axios
+          .get(
+            `/show/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
   };
 
   //Request the page records either on the initial render, or whenever the page changes
@@ -289,6 +386,70 @@ function Orders() {
           </div>
         </Paper>
       </Card>
+
+      <Dialog
+        open={openApproveDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Order Approval"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to Approve this order?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              approveOrder();
+            }}
+            color="secondary"
+          >
+            Yes
+          </Button>
+          <Button
+            onClick={() => setOpenApproveDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openCancelDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Cancel Order"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to Cancel this order?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              cancelOrder();
+            }}
+            color="secondary"
+          >
+            Yes
+          </Button>
+          <Button
+            onClick={() => setOpenCancelDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
     </React.Fragment>
   );
 }

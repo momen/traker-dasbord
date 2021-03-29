@@ -17,7 +17,7 @@ import createTheme from "./theme";
 import Routes from "./routes/Routes";
 import axios from "./axios";
 import { Redirect } from "react-router-dom";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { Logout } from "./actions";
 
 const jss = create({
@@ -28,6 +28,7 @@ const jss = create({
 function App({userToken, theme}) {
   // const userToken = useSelector((state) => state.userToken);
   // const [{ userToken, theme }, dispatch] = useStateValue();
+  const dispatch = useDispatch();
 
   // Inject the token in the headers to be available on each request from the beginning, & this is
   // done only on the initial render.
@@ -38,23 +39,23 @@ function App({userToken, theme}) {
   // beginning as no token is provided in the headers
   useEffect(() => {
     axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-  }, []);
 
-  axios.interceptors.response.use(
-    (res) => {
-      return res;
-    },
-    async(err) => {
-      if (err.response?.data.message === "Unauthenticated.") {
-        Logout();
-        delete axios.defaults.headers.common["Authorization"];
-        localStorage.removeItem("trkar-token");
-        <Redirect to="/sign-in" />;
-        return new Promise(() => {});
+    axios.interceptors.response.use(
+      (res) => {
+        return res;
+      },
+      async(err) => {
+        if (err.response?.data.message === "Unauthenticated.") {
+          dispatch(Logout()); //Logout Action Creator
+          delete axios.defaults.headers.common["Authorization"];
+          localStorage.removeItem("trkar-token");
+          <Redirect to="/sign-in" />;
+          return new Promise(() => {});
+        }
+        return Promise.reject(err);
       }
-      return Promise.reject(err);
-    }
-  );
+    );
+  }, []);
 
   return (
     <React.Fragment>
