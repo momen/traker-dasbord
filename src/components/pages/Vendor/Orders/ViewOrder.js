@@ -10,6 +10,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
+import { useLastLocation } from "react-router-last-location";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -53,6 +54,7 @@ const useStyles = makeStyles({
 function ViewOrder({ match }) {
   const classes = useStyles();
   const history = useHistory();
+  const lastLocation = useLastLocation();
   const [order, setOrder] = useState("");
 
   useEffect(() => {
@@ -72,9 +74,12 @@ function ViewOrder({ match }) {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => history.push("/vendor/orders")}
+          onClick={() => history.goBack()}
         >
-          Back to list
+          Back to{" "}
+          {lastLocation.pathname === "/vendor/pending-orders"
+            ? "Pending Orders"
+            : "Orders History"}
         </Button>
       </Container>
       <Typography variant="h3" gutterBottom display="inline">

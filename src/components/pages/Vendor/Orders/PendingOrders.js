@@ -98,7 +98,7 @@ function CustomLoadingOverlay() {
   );
 }
 
-function Orders() {
+function PendingOrders() {
   const classes = useStyles();
   const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
@@ -216,7 +216,7 @@ function Orders() {
 
   const approveOrder = () => {
     axios
-      .post(`vendor/approve/orders`, {
+      .post(`/vendor/approve/orders`, {
         order_id: orderToApproveOrCancel,
         status: 1,
       })
@@ -225,7 +225,7 @@ function Orders() {
         setLoading(true);
         axios
           .get(
-            `/show/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/orders/need/approval?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -246,7 +246,7 @@ function Orders() {
 
   const cancelOrder = () => {
     axios
-      .post(`vendor/cancel/order/${orderToApproveOrCancel}`, {
+      .post(`/vendor/cancel/order`, {
         order_id: orderToApproveOrCancel,
       })
       .then(() => {
@@ -254,7 +254,7 @@ function Orders() {
         setLoading(true);
         axios
           .get(
-            `/show/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/orders/need/approval?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -279,7 +279,7 @@ function Orders() {
     if (!userIsSearching) {
       axios
         .get(
-          `/show/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/orders/need/approval?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -292,7 +292,7 @@ function Orders() {
     } else {
       axios
         .post(
-          `/orders/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/orders/need/approval/search?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -454,4 +454,4 @@ function Orders() {
   );
 }
 
-export default Orders;
+export default PendingOrders;

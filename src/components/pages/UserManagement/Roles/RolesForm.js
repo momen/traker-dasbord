@@ -218,6 +218,14 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
             </Grid>
           ) : null}
         </Grid>
+
+        {typeof(responseErrors) === "string" ? (
+            <Grid item xs={12}>
+                <span key={`faluire-msg`} className={classes.errorMsg}>
+                  {responseErrors}
+                </span>
+            </Grid>
+          ) : null}
         <Grid container justify="center">
           <Button
             className={classes.button}

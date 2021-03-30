@@ -20,6 +20,7 @@ import {
   Group,
   GroupAdd,
   GroupWork,
+  HourglassEmpty,
   LiveHelp,
   NewReleases,
   QuestionAnswer,
@@ -107,7 +108,8 @@ const ViewVendorInvoice = async(() =>
 );
 
 const Stores = async(() => import("../components/pages/Vendor/Stores/Stores"));
-const Orders = async(() => import("../components/pages/Vendor/Orders/Orders"));
+const PendingOrders = async(() => import("../components/pages/Vendor/Orders/PendingOrders"));
+const OrdersHistory = async(() => import("../components/pages/Vendor/Orders/OrdersHistory"));
 const Invoices = async(() =>
   import("../components/pages/Vendor/Invoices/Invoices")
 );
@@ -383,9 +385,17 @@ const vendorRoutes = {
       permission: "stores_access",
     },
     {
-      path: "/vendor/orders",
-      name: "Orders",
-      component: Orders,
+      path: "/vendor/pending-orders",
+      name: "Pending Orders",
+      component: PendingOrders,
+      icon: <HourglassEmpty />,
+      guard: PermissionGuard,
+      permission: "show_orders_access",
+    },
+    {
+      path: "/vendor/orders-history",
+      name: "Orders History",
+      component: OrdersHistory,
       icon: <ShoppingBasket />,
       guard: PermissionGuard,
       permission: "show_orders_access",
@@ -463,11 +473,21 @@ const storesRoute = {
   permission: "access_tabs_separately",
 };
 
-const ordersRoute = {
-  id: "Orders",
-  path: "/vendor/orders",
+const pendingOrdersRoute = {
+  id: "Pending Orders",
+  path: "/vendor/pending-orders",
+  icon: <HourglassEmpty />,
+  component: PendingOrders,
+  children: null,
+  guard: OrdersGuard,
+  permission: "access_tabs_separately",
+};
+
+const ordersHistoryRoute = {
+  id: "Orders History",
+  path: "/vendor/orders-history",
   icon: <ShoppingBasket />,
-  component: Orders,
+  component: OrdersHistory,
   children: null,
   guard: OrdersGuard,
   permission: "access_tabs_separately",
@@ -554,7 +574,8 @@ export const dashboardLayoutRoutes = [
   productManagementRoutes,
   vendorRoutes,
   storesRoute,
-  ordersRoute,
+  pendingOrdersRoute,
+  ordersHistoryRoute,
   invoicesRoute,
   viewPermission,
   viewRole,
@@ -594,7 +615,8 @@ export const sidebarRoutes = [
   productManagementRoutes,
   vendorRoutes,
   storesRoute,
-  ordersRoute,
+  pendingOrdersRoute,
+  ordersHistoryRoute,
   invoicesRoute,
   ticketsRoute,
   helpRoute,

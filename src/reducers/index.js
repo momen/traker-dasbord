@@ -69,9 +69,12 @@ const userPermissionsReducer = (userPermissions = [], action) => {
   }
 };
 
-const themeReducer = (theme = THEMES.DARK, action) => {
+const themeReducer = (
+  theme = JSON.parse(window.localStorage.getItem("trkar-theme")) || "dark",
+  action
+) => {
   if (action.type === "CHANGE_THEME") {
-    return action.payload === "dark" ? THEMES.DARK : THEMES.DEFAULT;
+    return action.payload;
   }
   return theme;
 };

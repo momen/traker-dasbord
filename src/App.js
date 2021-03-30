@@ -19,13 +19,14 @@ import axios from "./axios";
 import { Redirect } from "react-router-dom";
 import { connect, useDispatch } from "react-redux";
 import { Logout } from "./actions";
+import { THEMES } from "./constants";
 
 const jss = create({
   ...jssPreset(),
   insertionPoint: document.getElementById("jss-insertion-point"),
 });
 
-function App({userToken, theme}) {
+function App({ userToken, theme }) {
   // const userToken = useSelector((state) => state.userToken);
   // const [{ userToken, theme }, dispatch] = useStateValue();
   const dispatch = useDispatch();
@@ -40,11 +41,13 @@ function App({userToken, theme}) {
   useEffect(() => {
     axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
 
+    console.log(window.localStorage.getItem("trkar-theme"));
+
     axios.interceptors.response.use(
       (res) => {
         return res;
       },
-      async(err) => {
+      async (err) => {
         if (err.response?.data.message === "Unauthenticated.") {
           dispatch(Logout()); //Logout Action Creator
           delete axios.defaults.headers.common["Authorization"];
@@ -65,8 +68,16 @@ function App({userToken, theme}) {
       />
       <StylesProvider jss={jss}>
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <MuiThemeProvider theme={createTheme(theme)}>
-            <ThemeProvider theme={createTheme(theme)}>
+          <MuiThemeProvider
+            theme={createTheme(
+              theme === "light" ? THEMES.DEFAULT : THEMES.DARK
+            )}
+          >
+            <ThemeProvider
+              theme={createTheme(
+                theme === "light" ? THEMES.DEFAULT : THEMES.DARK
+              )}
+            >
               <Routes />
             </ThemeProvider>
           </MuiThemeProvider>
@@ -76,11 +87,11 @@ function App({userToken, theme}) {
   );
 }
 
-const mapStateToProps = (state => {
+const mapStateToProps = (state) => {
   return {
     userToken: state.userToken,
-    theme: state.theme
-  }
-})
+    theme: state.theme,
+  };
+};
 
-export default connect(mapStateToProps, { Logout }) (App);
+export default connect(mapStateToProps, { Logout })(App);
