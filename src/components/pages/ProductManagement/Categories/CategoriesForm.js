@@ -13,6 +13,8 @@ import axios from "../../../../axios";
 import { PhotoCamera } from "@material-ui/icons";
 import { CloseIcon } from "@material-ui/data-grid";
 import { Alert } from "@material-ui/lab";
+import * as Yup from "yup";
+import { Formik } from "formik";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -49,6 +51,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required("This field is Required"),
+  description: Yup.string()
+    .min(5, "Description must be at least 5 characters")
+    .max(255, "Description must not exceed 255 characters")
+    .required("This field is Required"),
+});
+
+
 function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
 
@@ -62,6 +73,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   });
   const [imgName, setImgName] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
 
@@ -78,7 +90,9 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
       if (formData.photo) {
         data.append("photo", formData.photo, formData.photo.name);
       }
-      
+
+      setIsSubmitting(true);
+
       if (itemToEdit) {
         await axios
           .post(`/product-categories/${itemToEdit.id}`, data, {
@@ -90,6 +104,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
             setOpenPopup(false);
           })
           .catch((res) => {
+            setIsSubmitting(false);
             setResponseErrors(res.response.data.errors);
           });
       } else {
@@ -104,13 +119,14 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
             setOpenPopup(false);
           })
           .catch((res) => {
+            setIsSubmitting(false);
             setResponseErrors(res.response.data.errors);
           });
       }
     }
   };
 
-  const handleChange = (e) => {
+  const handleStateChange = (e) => {
     updateFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -160,6 +176,20 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   };
   return (
     <div className={classes.paper}>
+      <Formik 
+        initialValues={formData}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({
+          errors,
+          handleChange,
+          handleBlur,
+          touched,
+          values,
+          status,
+          resetForm,
+        }) => (
       <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -286,24 +316,39 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
             </FormControl>
           </Grid>
         </Grid>
+
+        {typeof responseErrors === "string" ? (
+          <Grid item xs={12}>
+            <span key={`faluire-msg`} className={classes.errorMsg}>
+              {responseErrors}
+            </span>
+          </Grid>
+        ) : null}
         <Grid container justify="center">
           <Button
             className={classes.button}
             type="submit"
             variant="contained"
             color="primary"
+            disabled={isSubmitting}
           >
             Submit
           </Button>
           <Button
             className={classes.button}
             variant="contained"
-            onClick={handleReset}
+            onClick={() => {
+              handleReset();
+              resetForm();
+            }} 
+            disabled={isSubmitting}
           >
             Reset
           </Button>
         </Grid>
       </form>
+      )}
+      </Formik>
     </div>
   );
 }

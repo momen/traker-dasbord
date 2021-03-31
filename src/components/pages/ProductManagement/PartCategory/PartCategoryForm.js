@@ -13,6 +13,8 @@ import axios from "../../../../axios";
 import { PhotoCamera } from "@material-ui/icons";
 import { CloseIcon } from "@material-ui/data-grid";
 import { Alert } from "@material-ui/lab";
+import * as Yup from "yup";
+import { Formik } from "formik";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -49,6 +51,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const validationSchema = Yup.object().shape({
+  vendor_name: Yup.string().required("This field is Required"),
+  email: Yup.string().email().required("This field is Required"),
+  type: Yup.string().required("Please specify a type"),
+  userid_id: Yup.string().required(),
+});
+
 function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
 
@@ -60,6 +69,7 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
   });
   const [imgName, setImgName] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
 
@@ -74,6 +84,7 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
         data.append("photo", formData.photo, formData.photo.name);
       }
 
+      setIsSubmitting(true);
       // To be edited if an image will be added
       if (itemToEdit) {
         await axios
@@ -86,6 +97,7 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
             setOpenPopup(false);
           })
           .catch((res) => {
+            setIsSubmitting(false);
             setResponseErrors(res.response.data.errors);
           });
       } else {
@@ -100,13 +112,14 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
             setOpenPopup(false);
           })
           .catch((res) => {
+            setIsSubmitting(false);
             setResponseErrors(res.response.data.errors);
           });
       }
     }
   };
 
-  const handleChange = (e) => {
+  const handleStateChange = (e) => {
     updateFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -156,6 +169,20 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
   };
   return (
     <div className={classes.paper}>
+      <Formik 
+        initialValues={formData}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({
+          errors,
+          handleChange,
+          handleBlur,
+          touched,
+          values,
+          status,
+          resetForm,
+        }) => (
       <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -258,24 +285,39 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
             </FormControl>
           </Grid>
         </Grid>
+
+        {typeof responseErrors === "string" ? (
+              <Grid item xs={12}>
+                <span key={`faluire-msg`} className={classes.errorMsg}>
+                  {responseErrors}
+                </span>
+              </Grid>
+            ) : null}
         <Grid container justify="center">
           <Button
             className={classes.button}
             type="submit"
             variant="contained"
             color="primary"
+            disabled={isSubmitting}
           >
             Submit
           </Button>
           <Button
             className={classes.button}
             variant="contained"
-            onClick={handleReset}
+            onClick={() => {
+              handleReset();
+              resetForm();
+            }} 
+            disabled={isSubmitting}
           >
             Reset
           </Button>
         </Grid>
       </form>
+      )}
+      </Formik>
     </div>
   );
 }

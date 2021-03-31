@@ -5,6 +5,7 @@ import {
   Collapse,
   FormControl,
   FormControlLabel,
+  FormHelperText,
   FormLabel,
   Grid,
   IconButton,
@@ -17,6 +18,8 @@ import axios from "../../../../axios";
 import { PhotoCamera } from "@material-ui/icons";
 import { Alert } from "@material-ui/lab";
 import { CloseIcon } from "@material-ui/data-grid";
+import * as Yup from "yup";
+import { Formik } from "formik";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -53,6 +56,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const validationSchema = Yup.object().shape({
+  vendor_name: Yup.string().required("This field is Required"),
+  email: Yup.string().email("Please enter a valid Email").required("This field is Required"),
+  type: Yup.string().required("Please specify a type"),
+  userid_id: Yup.string().required(),
+});
+
 function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const classes = useStyles();
 
@@ -67,11 +77,11 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   });
   const [openAlert, setOpenAlert] = useState(false);
   const [imgName, setImgName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!formData.images && !itemToEdit) {
       setOpenAlert(true);
     } else {
@@ -82,6 +92,8 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
       data.append("userid_id", formData.userid_id);
 
       data.append("images", formData.images);
+
+      setIsSubmitting(true);
       
       if (itemToEdit) {
         await axios
@@ -94,11 +106,10 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
             setOpenPopup(false);
           })
           .catch((res) => {
+            setIsSubmitting(false);
             setResponseErrors(res.response.data.errors);
           });
       } else {
-        console.log(formData.images);
-
         await axios
           .post("/add-vendors", data, {
             headers: {
@@ -110,13 +121,14 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
             setOpenPopup(false);
           })
           .catch((res) => {
+            setIsSubmitting(false);
             setResponseErrors(res.response.data.errors);
           });
       }
     }
   };
 
-  const handleChange = (e) => {
+  const handleStateChange = (e) => {
     updateFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -135,7 +147,6 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
     setBigImgSize(false);
 
     setImgName(e.target.files[0].name);
-    console.log(e.target.files[0]);
     updateFormData({
       ...formData,
       images: e.target.files[0],
@@ -171,6 +182,21 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   };
   return (
     <div className={classes.paper}>
+      <Formik 
+        initialValues={formData}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({
+          errors,
+          handleSubmit,
+          handleChange,
+          handleBlur,
+          touched,
+          values,
+          status,
+          resetForm,
+        }) => (
       <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -183,8 +209,16 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
               label="Vendor Name"
               value={formData.vendor_name}
               autoFocus
-              onChange={handleChange}
-              error={responseErrors?.vendor_name}
+              onChange={(e) => {
+                handleChange(e);
+                handleStateChange(e);
+              }}
+              onBlur={handleBlur}
+              error={
+                responseErrors?.vendor_name ||
+                Boolean(touched.vendor_name && errors.vendor_name)
+              }
+              helperText={touched.vendor_name && errors.vendor_name}
             />
           </Grid>
 
@@ -207,8 +241,16 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
               required
               value={formData.email}
               fullWidth
-              onChange={handleChange}
-              error={responseErrors?.email}
+              onChange={(e) => {
+                handleChange(e);
+                handleStateChange(e);
+              }}
+              onBlur={handleBlur}
+              error={
+                responseErrors?.email ||
+                Boolean(touched.email && errors.email)
+              }
+              helperText={touched.email && errors.email}
             />
           </Grid>
 
@@ -224,14 +266,21 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
             </Grid>
           ) : null}
 
-          <Grid>
-            <FormControl component="fieldset">
+          <Grid item xs={12}>
+            <FormControl component="fieldset" error={
+                    responseErrors?.type ||
+                    Boolean(touched.type && errors.type)
+                  }>
               <FormLabel component="legend">Type</FormLabel>
               <RadioGroup
                 aria-label="type"
                 name="type"
                 value={formData.type}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  handleStateChange(e);
+                }}
+                onBlur={handleBlur}
               >
                 <FormControlLabel
                   value="1"
@@ -245,6 +294,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
                 />
                 <FormControlLabel value="3" control={<Radio />} label="Both" />
               </RadioGroup>
+              <FormHelperText>{touched.type && errors.type}</FormHelperText>
             </FormControl>
           </Grid>
 
@@ -267,14 +317,21 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
                   label="User"
                   value={formData.userid_id}
                   name="userid_id"
-                  onChange={handleChange}
                   SelectProps={{
                     native: true,
                   }}
-                  helperText="Please select a User"
                   fullWidth
                   required
-                  error={responseErrors?.userid_id}
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                    error={
+                      responseErrors?.userid_id ||
+                      Boolean(touched.userid_id && errors.userid_id)
+                    }
+                  helperText="Please select a User"
                 >
                   <option aria-label="None" value="" />
 
@@ -368,30 +425,45 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
                     </IconButton>
                   }
                 >
-                  At least 1 Image required!
+                  Please upload an Image.
                 </Alert>
               </Collapse>
             </FormControl>
           </Grid>
         </Grid>
+
+        {typeof responseErrors === "string" ? (
+              <Grid item xs={12}>
+                <span key={`faluire-msg`} className={classes.errorMsg}>
+                  {responseErrors}
+                </span>
+              </Grid>
+            ) : null}
         <Grid container justify="center">
           <Button
             className={classes.button}
             type="submit"
             variant="contained"
             color="primary"
+            disabled={isSubmitting}
           >
             Submit
           </Button>
           <Button
             className={classes.button}
             variant="contained"
-            onClick={handleReset}
+            onClick={() => {
+              handleReset();
+              resetForm();
+            }} 
+            disabled={isSubmitting}
           >
             Reset
           </Button>
         </Grid>
       </form>
+      )}
+      </Formik>
     </div>
   );
 }

@@ -1,10 +1,7 @@
 import React, { useRef, useState } from "react";
-import {
-  Button,
-  Grid,
-  makeStyles,
-  TextField,
-} from "@material-ui/core";
+import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
+import * as Yup from "yup";
+import { Formik } from "formik";
 import axios from "../../../axios";
 
 const useStyles = makeStyles((theme) => ({
@@ -35,6 +32,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const validationSchema = Yup.object().shape({
+  vendor_name: Yup.string().required("This field is Required"),
+  email: Yup.string().email().required("This field is Required"),
+  type: Yup.string().required("Please specify a type"),
+  userid_id: Yup.string().required(),
+});
+
 function FAQ_Form({ setOpenPopup, itemToEdit }) {
   const classes = useStyles();
 
@@ -43,33 +47,37 @@ function FAQ_Form({ setOpenPopup, itemToEdit }) {
     question: itemToEdit ? itemToEdit.question : "",
     answer: itemToEdit ? itemToEdit.answer : "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); 
-      if (itemToEdit) {
-        await axios
-          .post(`/update/question/${itemToEdit.id}`, formData)
-          .then((res) => {
-            setOpenPopup(false);
-          })
-          .catch((res) => {
-            setResponseErrors(res.response.data.errors);
-          });
-      } else {
-        await axios
-          .post("/add/question", formData)
-          .then((res) => {
-            setOpenPopup(false);
-          })
-          .catch((res) => {
-            setResponseErrors(res.response.data.errors);
-          });
-      }
-    
+    e.preventDefault();
+
+    setIsSubmitting(true);
+    if (itemToEdit) {
+      await axios
+        .post(`/update/question/${itemToEdit.id}`, formData)
+        .then((res) => {
+          setOpenPopup(false);
+        })
+        .catch((res) => {
+          setIsSubmitting(false);
+          setResponseErrors(res.response.data.errors);
+        });
+    } else {
+      await axios
+        .post("/add/question", formData)
+        .then((res) => {
+          setOpenPopup(false);
+        })
+        .catch((res) => {
+          setIsSubmitting(false);
+          setResponseErrors(res.response.data.errors);
+        });
+    }
   };
 
-  const handleChange = (e) => {
+  const handleStateChange = (e) => {
     updateFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -86,6 +94,20 @@ function FAQ_Form({ setOpenPopup, itemToEdit }) {
 
   return (
     <div className={classes.paper}>
+      <Formik 
+        initialValues={formData}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({
+          errors,
+          handleChange,
+          handleBlur,
+          touched,
+          values,
+          status,
+          resetForm,
+        }) => (
       <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -135,29 +157,42 @@ function FAQ_Form({ setOpenPopup, itemToEdit }) {
               ))}
             </Grid>
           ) : null}
-
-          
         </Grid>
+
+        {typeof responseErrors === "string" ? (
+          <Grid item xs={12}>
+            <span key={`faluire-msg`} className={classes.errorMsg}>
+              {responseErrors}
+            </span>
+          </Grid>
+        ) : null}
         <Grid container justify="center">
           <Button
             className={classes.button}
             type="submit"
             variant="contained"
             color="primary"
+            disabled={isSubmitting}
           >
             Submit
           </Button>
           <Button
             className={classes.button}
             variant="contained"
-            onClick={handleReset}
+            onClick={() => {
+              handleReset();
+              resetForm();
+            }} 
+            disabled={isSubmitting}
           >
             Reset
           </Button>
         </Grid>
       </form>
+      )}
+      </Formik>
     </div>
   );
 }
 
-export default FAQ_Form
+export default FAQ_Form;

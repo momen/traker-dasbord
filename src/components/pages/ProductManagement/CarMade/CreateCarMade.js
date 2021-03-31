@@ -6,6 +6,8 @@ import {
   makeStyles,
   TextField,
 } from "@material-ui/core";
+import * as Yup from "yup";
+import { Formik } from "formik";
 import axios from "../../../../axios";
 
 const useStyles = makeStyles((theme) => ({
@@ -33,6 +35,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const validationSchema = Yup.object().shape({
+  vendor_name: Yup.string().required("This field is Required"),
+  email: Yup.string().email().required("This field is Required"),
+  type: Yup.string().required("Please specify a type"),
+  userid_id: Yup.string().required(),
+});
+
 function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
   const classes = useStyles();
 
@@ -41,11 +50,13 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
     car_made: itemToEdit ? itemToEdit.car_made : "",
     categoryid_id: itemToEdit ? itemToEdit.categoryid_id : "",
   });
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    setIsSubmitting(true);
 
     if (itemToEdit) {
       axios
@@ -55,6 +66,7 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
           setOpenPopup(false);
         })
         .catch(({ response }) => {
+          setIsSubmitting(false);
           setResponseErrors(response.data.errors);
         });
     } else {
@@ -65,12 +77,13 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
           setOpenPopup(false);
         })
         .catch(({ response }) => {
+          setIsSubmitting(false);
           setResponseErrors(response.data.errors);
         })
     }
   };
 
-  const handleChange = (e) => {
+  const handleStateChange = (e) => {
     updateFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -86,6 +99,20 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
   };
   return (
     <div className={classes.paper}>
+      <Formik 
+        initialValues={formData}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({
+          errors,
+          handleChange,
+          handleBlur,
+          touched,
+          values,
+          status,
+          resetForm,
+        }) => (
       <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -147,24 +174,39 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
             </Grid>
           ) : null}
         </Grid>
+
+        {typeof responseErrors === "string" ? (
+              <Grid item xs={12}>
+                <span key={`faluire-msg`} className={classes.errorMsg}>
+                  {responseErrors}
+                </span>
+              </Grid>
+            ) : null}
         <Grid container justify="center">
           <Button
             className={classes.button}
             type="submit"
             variant="contained"
             color="primary"
+            disabled={isSubmitting}
           >
             Submit
           </Button>
           <Button
             className={classes.button}
             variant="contained"
-            onClick={handleReset}
+            onClick={() => {
+              handleReset();
+              resetForm();
+            }} 
+            disabled={isSubmitting}
           >
             Reset
           </Button>
         </Grid>
       </form>
+      )}
+      </Formik>
     </div>
   );
 }

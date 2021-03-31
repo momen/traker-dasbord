@@ -1,5 +1,4 @@
 import React, { useRef, useState } from "react";
-import * as Yup from "yup";
 import {
   Button,
   Checkbox,
@@ -19,6 +18,7 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
 import NumberFormat from "react-number-format";
+import * as Yup from "yup";
 import { Formik } from "formik";
 
 const useStyles = makeStyles((theme) => ({
@@ -66,19 +66,25 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("This field is Required"),
   description: Yup.string()
-    .min(5, "Must be at least 5 characters")
-    .max(255)
-    .required("Required"),
-  car_made_id: Yup.string().required("This field is Required"),
-  car_model_id: Yup.string().required("This field is Required"),
-  year_id: Yup.string().required("This field is Required"),
-  discount: Yup.string().required("This field is Required"),
-  price: Yup.string().required("This field is Required"),
-  part_category_id: Yup.string().required("This field is Required"),
+    .min(5, "Description must be at least 5 characters")
+    .max(255, "Description must not exceed 255 characters")
+    .required("This field is Required"),
+  car_made_id: Yup.string().required(),
+  car_model_id: Yup.string().required(),
+  year_id: Yup.string().required(),
+  discount: Yup.number()
+    .min(5, "Minimum value for discount is 5%")
+    .max(80, "Maximum value for discount is 80%"),
+  price: Yup.number()
+    .min(1, "Enter a value greater than 0")
+    .required("This field is Required"),
+  part_category_id: Yup.string().required(),
   categories: Yup.array().min(1, "At least one category must be selected."),
   tags: Yup.array().min(1, "At least one tag must be selected."),
-  store_id: Yup.string().required("This field is Required"),
-  quantity: Yup.string().required("This field is Required"),
+  store_id: Yup.string().required(),
+  quantity: Yup.number()
+    .min(5, "Minimum value should be 5")
+    .required("This field is Required"),
   serial_number: Yup.string().required("This field is Required"),
 });
 
@@ -96,7 +102,6 @@ function ProductsForm({
 }) {
   const classes = useStyles();
 
-  const formRef = useRef();
   const uploadRef = useRef();
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
@@ -130,11 +135,11 @@ function ProductsForm({
   const [openAlert, setOpenAlert] = useState(false);
   const [autoSelectCategoryError, setAutoSelectCategoryError] = useState(false);
   const [autoSelectTagError, setAutoSelectTagError] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Update on other components
   const [responseErrors, setResponseErrors] = useState("");
+  const [bigImgSize, setBigImgSize] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
 
     if (formData.categories.length === 0) {
       setAutoSelectCategoryError(true);
@@ -147,7 +152,7 @@ function ProductsForm({
     setAutoSelectCategoryError(false);
     setAutoSelectTagError(false);
 
-    setIsSubmitting(true);
+    setIsSubmitting(true); // Update on other components
     let data = new FormData();
 
     if (!formData.photo && !itemToEdit) {
@@ -199,7 +204,7 @@ function ProductsForm({
             }
           })
           .catch((res) => {
-            setIsSubmitting(false);
+            setIsSubmitting(false); // Update on other components
             setResponseErrors(res.response.data.errors);
           });
       } else {
@@ -214,14 +219,14 @@ function ProductsForm({
             setOpenPopup(false);
           })
           .catch((res) => {
-            setIsSubmitting(false);
+            setIsSubmitting(false); // Update on other components
             setResponseErrors(res.response.data.errors);
           });
       }
-      console.log(formData);
     }
   };
 
+   // Update Function Name on other components
   const handleStateChange = (e) => {
     updateFormData({
       ...formData,
@@ -251,15 +256,21 @@ function ProductsForm({
   };
 
   const handleUpload = (e) => {
-    console.log(e.target.files);
     let filesList = []; //The arrary of new file to be added to the state
 
     //Loop on all files saved in the File Input, find if the image was already added to the state
     // & append only the new images to avoid duplication.
     Object.entries(e.target.files).forEach(([key, file]) => {
-      if (!formData.photo.find((img) => img.name === file.name))
+      if (!formData.photo.find((img) => img.name === file.name)) {
+        if (file.size / 1000 > 2000) {
+          setBigImgSize(true);
+          return;
+        }
         filesList.push(file);
+      }
     });
+
+    setBigImgSize(false);
 
     updateFormData({
       ...formData,
@@ -270,6 +281,7 @@ function ProductsForm({
 
   //The name of selected image to delete is passed so we can update the state with the filtered remaining ones
   const handleDeleteImage = (imgToDelete) => {
+    setBigImgSize(false);
     updateFormData({
       ...formData,
       photo: formData.photo.filter((img) => img.name !== imgToDelete),
@@ -291,6 +303,7 @@ function ProductsForm({
         img.file_name === file_name ? { ...img, deleted: !img.deleted } : img
       )
     );
+    setBigImgSize(false);
   };
 
   const handleReset = () => {
@@ -312,16 +325,18 @@ function ProductsForm({
     });
     setResponseErrors("");
     setOpenAlert(false);
+    setBigImgSize(false);
   };
   return (
     <div className={classes.paper}>
-      <Formik
+      <Formik 
         initialValues={formData}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({
           errors,
+          handleSubmit,
           handleChange,
           handleBlur,
           touched,
@@ -523,10 +538,7 @@ function ProductsForm({
                       responseErrors?.car_made_id ||
                       Boolean(touched.car_made_id && errors.car_made_id)
                     }
-                    helperText={
-                      (touched.car_made_id && errors.car_made_id) ||
-                      "Please select a Car Made"
-                    }
+                    helperText="Please select a Car Made"
                     fullWidth
                     required
                   >
@@ -567,10 +579,7 @@ function ProductsForm({
                       responseErrors?.car_model_id ||
                       Boolean(touched.car_model_id && errors.car_model_id)
                     }
-                    helperText={
-                      (touched.car_model_id && errors.car_model_id) ||
-                      "Please select a Car Model"
-                    }
+                    helperText="Please select a Car Model"
                     fullWidth
                     required
                   >
@@ -613,10 +622,7 @@ function ProductsForm({
                         touched.part_category_id && errors.part_category_id
                       )
                     }
-                    helperText={
-                      (touched.part_category_id && errors.part_category_id) ||
-                      "Please select a Part Category"
-                    }
+                    helperText="Please select a Part Category"
                     fullWidth
                     required
                   >
@@ -659,10 +665,7 @@ function ProductsForm({
                       responseErrors?.year_id ||
                       Boolean(touched.year_id && errors.year_id)
                     }
-                    helperText={
-                      (touched.year_id && errors.year_id) ||
-                      "Please select a Year"
-                    }
+                    helperText="Please select a Year"
                     fullWidth
                     required
                   >
@@ -762,10 +765,7 @@ function ProductsForm({
                       responseErrors?.store_id ||
                       Boolean(touched.store_id && errors.store_id)
                     }
-                    helperText={
-                      (touched.store_id && errors.store_id) ||
-                      "Please select a Store"
-                    }
+                    helperText="Please select a Store"
                     fullWidth
                     required
                   >
@@ -928,6 +928,15 @@ function ProductsForm({
                 ))}
               </Grid>
 
+              {bigImgSize ? (
+                <Grid item xs={12}>
+                  <p className={classes.errorMsg}>
+                    Size has exceeded 2MB for one Image or more & have been
+                    excluded.
+                  </p>
+                </Grid>
+              ) : null}
+
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.photo?.map((msg) => (
@@ -976,14 +985,14 @@ function ProductsForm({
                 type="submit"
                 variant="contained"
                 color="primary"
-                disabled={isSubmitting}
+                disabled={isSubmitting}  // Update on other components
               >
                 Submit
               </Button>
               <Button
                 className={classes.button}
                 variant="contained"
-                disabled={isSubmitting}
+                disabled={isSubmitting}  // Update on other components
                 onClick={() => {
                   handleReset();
                   resetForm();

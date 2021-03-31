@@ -1,11 +1,12 @@
 import React, { useRef, useState } from "react";
 import {
   Button,
-  FormControl,
   Grid,
   makeStyles,
   TextField,
 } from "@material-ui/core";
+import * as Yup from "yup";
+import { Formik } from "formik";
 import axios from "../../../../axios";
 
 const useStyles = makeStyles((theme) => ({
@@ -33,6 +34,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const validationSchema = Yup.object().shape({
+  vendor_name: Yup.string().required("This field is Required"),
+  email: Yup.string().email().required("This field is Required"),
+  type: Yup.string().required("Please specify a type"),
+  userid_id: Yup.string().required(),
+});
+
 function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
 
@@ -40,12 +48,14 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
   const [formData, updateFormData] = useState({
     year: itemToEdit ? itemToEdit.year : "",
   });
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    setIsSubmitting(true);
+
     if (itemToEdit) {
       axios
         .put(`/car-years/${itemToEdit.id}`, formData)
@@ -54,6 +64,7 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
           setOpenPopup(false);
         })
         .catch(({ response }) => {
+          setIsSubmitting(false);
           setResponseErrors(response.data.errors);
         });
     } else {
@@ -64,12 +75,13 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
           setOpenPopup(false);
         })
         .catch(({ response }) => {
+          setIsSubmitting(false);
           setResponseErrors(response.data.errors);
         });
     }
   };
 
-  const handleChange = (e) => {
+  const handleStateChange = (e) => {
     let value = e.target.value;
     if((value < 0)){
       value = 1960;
@@ -93,6 +105,20 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
   };
   return (
     <div className={classes.paper}>
+      <Formik 
+        initialValues={formData}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({
+          errors,
+          handleChange,
+          handleBlur,
+          touched,
+          values,
+          status,
+          resetForm,
+        }) => (
       <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -120,24 +146,39 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
           ) : null}
 
         </Grid>
+
+        {typeof responseErrors === "string" ? (
+              <Grid item xs={12}>
+                <span key={`faluire-msg`} className={classes.errorMsg}>
+                  {responseErrors}
+                </span>
+              </Grid>
+            ) : null}
         <Grid container justify="center">
           <Button
             className={classes.button}
             type="submit"
             variant="contained"
             color="primary"
+            disabled={isSubmitting}
           >
             Submit
           </Button>
           <Button
             className={classes.button}
             variant="contained"
-            onClick={handleReset}
+            onClick={() => {
+              handleReset();
+              resetForm();
+            }} 
+            disabled={isSubmitting}
           >
             Reset
           </Button>
         </Grid>
       </form>
+      )}
+      </Formik>
     </div>
   );
 }

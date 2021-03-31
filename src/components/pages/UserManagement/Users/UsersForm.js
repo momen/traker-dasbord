@@ -14,6 +14,8 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import { Fragment } from "react";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
+import * as Yup from "yup";
+import { Formik } from "formik";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -43,6 +45,26 @@ const useStyles = makeStyles((theme) => ({
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required("This field is Required."),
+  email: Yup.string()
+    .email("Please enter a valid Email")
+    .required("This field is Required"),
+  password: Yup.string()
+    .min(8, "Password must be at least 8 characters.")
+    .required("This field is Required."),
+  confirm_password: Yup.string().when("password", {
+    is: (val) => (val && val.length > 0 ? true : false),
+    then: Yup.string()
+      .oneOf(
+        [Yup.ref("password")],
+        "Both passwords must match to be confirmed."
+      )
+      .required("This field is Required."),
+  }),
+  roles: Yup.array().min(1, "At least one role must be selected."),
+});
+
 function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
   const classes = useStyles();
 
@@ -56,17 +78,20 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
       : [],
   });
   const [autoSelectError, setAutoSelectError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (values,
+    { resetForm, setErrors, setStatus, setSubmitting }) => {
+    // e.preventDefault();
 
     if (formData.roles.length === 0) {
       setAutoSelectError(true);
       return;
     }
 
+    setIsSubmitting(true);
     setAutoSelectError(false);
 
     let data = {
@@ -87,7 +112,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
           setOpenPopup(false);
         })
         .catch(({ response }) => {
-          alert(response.data?.errors)
+          setIsSubmitting(false);
           setResponseErrors(response.data.errors);
         });
     } else {
@@ -103,12 +128,13 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
           setOpenPopup(false);
         })
         .catch(({ response }) => {
+          setIsSubmitting(false);
           setResponseErrors(response.data.errors);
         });
     }
   };
 
-  const handleChange = (e) => {
+  const handleStateChange = (e) => {
     updateFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -144,181 +170,276 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
   };
   return (
     <div className={classes.paper}>
-      <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              name="name" //Customize
-              required
-              fullWidth
-              id="name" //Customize
-              label="Name" //Customize
-              value={formData.name} //Customize
-              autoFocus
-              onChange={handleChange}
-              error={responseErrors?.name}
-            />
-          </Grid>
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.name?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
-
-          {!itemToEdit ? (
-            <Fragment>
+      <Formik
+        initialValues={formData}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({
+          errors,
+          handleChange,
+          handleSubmit,
+          handleBlur,
+          touched,
+          values,
+          status,
+          resetForm,
+        }) => (
+          <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  name="password" //Customize
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
+                  name="name" //Customize
                   required
                   fullWidth
-                  id="password" //Customize
-                  label="Password" //Customize
-                  value={formData.password} //Customize
-                  onChange={handleChange}
-                  error={responseErrors?.password}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                        >
-                          {showPassword ? <Visibility /> : <VisibilityOff />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
+                  id="name" //Customize
+                  label="Name" //Customize
+                  value={formData.name} //Customize
+                  autoFocus
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
                   }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.name || Boolean(touched.name && errors.name)
+                  }
+                  helperText={touched.name && errors.name}
                 />
               </Grid>
               {responseErrors ? (
                 <Grid item xs={12}>
-                  {responseErrors.password?.map((msg) => (
+                  {responseErrors.name?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>
                   ))}
                 </Grid>
               ) : null}
-            </Fragment>
-          ) : null}
 
-          <Grid item xs={12}>
-            <TextField
-              name="email" //Customize
-              type="email"
-              // autoComplete="new-password"
-              required
-              fullWidth
-              id="email" //Customize
-              label="Email" //Customize
-              value={formData.email} //Customize
-              onChange={handleChange}
-              error={responseErrors?.email}
-            />
-          </Grid>
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.email?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
+              {!itemToEdit ? (
+                <Fragment>
+                  <Grid item xs={12}>
+                    <TextField
+                      name="password" //Customize
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      required
+                      fullWidth
+                      id="password" //Customize
+                      label="Password" //Customize
+                      value={formData.password} //Customize
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleStateChange(e);
+                      }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.password ||
+                        Boolean(touched.password && errors.password)
+                      }
+                      helperText={touched.password && errors.password}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleClickShowPassword}
+                              onMouseDown={handleMouseDownPassword}
+                            >
+                              {showPassword ? (
+                                <Visibility />
+                              ) : (
+                                <VisibilityOff />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  {responseErrors ? (
+                    <Grid item xs={12}>
+                      {responseErrors.password?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </Grid>
+                  ) : null}
 
-          <Grid item xs={12} spacing={2}>
-            <Button
-              variant="outlined"
-              color="primary"
-              style={{ marginRight: "5px" }}
-              onClick={() =>
-                updateFormData({ ...formData, roles: rolesList })
-              }
-            >
-              Select All
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => updateFormData({ ...formData, roles: [] })}
-            >
-              Unselect All
-            </Button>
-          </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      name="confirm_password" //Customize
+                      type="password"
+                      autoComplete="new-password"
+                      required
+                      fullWidth
+                      id="confirm_password" //Customize
+                      label="Confirm Password" //Customize
+                      value={values.confirm_password} //Customize
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleStateChange(e);
+                      }}
+                      onBlur={handleBlur}
+                      error={Boolean(
+                        touched.confirm_password && errors.confirm_password
+                      )}
+                      helperText={
+                        touched.confirm_password && errors.confirm_password
+                      }
+                    />
+                  </Grid>
+                </Fragment>
+              ) : null}
 
-          <Grid item xs={12}>
-            <Autocomplete
-              multiple
-              // filterSelectedOptions
-              id="checkboxes-tags-demo"
-              options={rolesList ? rolesList : []}
-              value={formData.roles}
-              getOptionSelected={(option, value) => option.id === value.id}
-              // setSelectedItem={formData.permissions}
-              disableCloseOnSelect
-              getOptionLabel={(option) => option.title}
-              renderOption={(option, { selected }) => (
-                <React.Fragment>
-                  <Checkbox
-                    icon={icon}
-                    checkedIcon={checkedIcon}
-                    style={{ marginRight: 8 }}
-                    checked={selected}
-                  />
-                  {option.title}
-                </React.Fragment>
-              )}
-              fullWidth
-              renderInput={(params) => (
+              <Grid item xs={12}>
                 <TextField
-                  {...params}
-                  variant="outlined"
-                  label="Roles *"
-                  placeholder="Select roles for this user."
+                  name="email" //Customize
+                  type="email"
+                  // autoComplete="new-password"
+                  required
                   fullWidth
-                  helperText="At least one role must be selected."
-                  error={autoSelectError}
+                  id="email" //Customize
+                  label="Email" //Customize
+                  value={formData.email} //Customize
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.email ||
+                    Boolean(touched.email && errors.email)
+                  }
+                  helperText={touched.email && errors.email}
                 />
-              )}
-              onChange={updateAutoComplete}
-            />
-          </Grid>
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.roles?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
+              </Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.email?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12} spacing={2}>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  style={{ marginRight: "5px" }}
+                  onClick={() => {
+                    updateFormData({ ...formData, roles: rolesList });
+                    errors.roles = null;
+                    values.roles = rolesList;
+                  }}
+                >
+                  Select All
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => {
+                    updateFormData({ ...formData, roles: [] });
+                    errors.roles = true;
+                  }}
+                >
+                  Unselect All
+                </Button>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Autocomplete
+                  multiple
+                  // filterSelectedOptions
+                  id="checkboxes-tags-demo"
+                  options={rolesList ? rolesList : []}
+                  value={formData.roles}
+                  getOptionSelected={(option, value) => option.id === value.id}
+                  // setSelectedItem={formData.permissions}
+                  disableCloseOnSelect
+                  getOptionLabel={(option) => option.title}
+                  renderOption={(option, { selected }) => (
+                    <React.Fragment>
+                      <Checkbox
+                        icon={icon}
+                        checkedIcon={checkedIcon}
+                        style={{ marginRight: 8 }}
+                        checked={selected}
+                      />
+                      {option.title}
+                    </React.Fragment>
+                  )}
+                  fullWidth
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name="roles"
+                      variant="outlined"
+                      label="Roles *"
+                      placeholder="Select roles for this user."
+                      fullWidth
+                      helperText="At least one role must be selected."
+                      error={
+                        responseErrors?.roles ||
+                        autoSelectError ||
+                        Boolean(touched.roles && errors.roles)
+                      }
+                    />
+                  )}
+                  onBlur={handleBlur}
+                  onChange={(e, val) => {
+                    updateAutoComplete(e, val);
+                    handleChange(e);
+                  }}
+                />
+              </Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.roles?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
             </Grid>
-          ) : null}
-        </Grid>
-        <Grid container justify="center">
-          <Button
-            className={classes.button}
-            type="submit"
-            variant="contained"
-            color="primary"
-          >
-            Submit
-          </Button>
-          <Button
-            className={classes.button}
-            variant="contained"
-            onClick={handleReset}
-          >
-            Reset
-          </Button>
-        </Grid>
-      </form>
+
+            {typeof responseErrors === "string" ? (
+              <Grid item xs={12}>
+                <span key={`faluire-msg`} className={classes.errorMsg}>
+                  {responseErrors}
+                </span>
+              </Grid>
+            ) : null}
+            <Grid container justify="center">
+              <Button
+                className={classes.button}
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+              >
+                Submit
+              </Button>
+              <Button
+                className={classes.button}
+                variant="contained"
+                onClick={() => {
+                  handleReset();
+                  resetForm();
+                }}
+                disabled={isSubmitting}
+              >
+                Reset
+              </Button>
+            </Grid>
+          </form>
+        )}
+      </Formik>
     </div>
   );
 }

@@ -7,6 +7,8 @@ import {
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
+import * as Yup from "yup";
+import { Formik } from "formik";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -33,6 +35,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const validationSchema = Yup.object().shape({
+  vendor_name: Yup.string().required("This field is Required"),
+  email: Yup.string().email().required("This field is Required"),
+  type: Yup.string().required("Please specify a type"),
+  userid_id: Yup.string().required(),
+});
+
 function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
   const classes = useStyles();
 
@@ -41,11 +50,13 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
     carmodel: itemToEdit ? itemToEdit.carmodel : "",
     carmade_id: itemToEdit ? itemToEdit.carmade_id : "",
   });
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    setIsSubmitting(true);
     
     if (itemToEdit) {
       axios
@@ -55,6 +66,7 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
           setOpenPopup(false);
         })
         .catch(({ response }) => {
+          setIsSubmitting(false);
           setResponseErrors(response.data.errors);
         });
     } else {
@@ -65,12 +77,13 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
           setOpenPopup(false);
         })
         .catch(({ response }) => {
+          setIsSubmitting(false);
           setResponseErrors(response.data.errors);
         });
     }
   };
 
-  const handleChange = (e) => {
+  const handleStateChange = (e) => {
     updateFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -86,6 +99,20 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
   };
   return (
     <div className={classes.paper}>
+      <Formik 
+        initialValues={formData}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({
+          errors,
+          handleChange,
+          handleBlur,
+          touched,
+          values,
+          status,
+          resetForm,
+        }) => (
       <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -124,7 +151,7 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
                   SelectProps={{
                     native: true,
                   }}
-                  helperText="Please select a Category"
+                  helperText="Please select a Car Made"
                   fullWidth
                   required
                   error={responseErrors?.carmade_id}
@@ -147,24 +174,39 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
             </Grid>
           ) : null}
         </Grid>
+
+        {typeof responseErrors === "string" ? (
+              <Grid item xs={12}>
+                <span key={`faluire-msg`} className={classes.errorMsg}>
+                  {responseErrors}
+                </span>
+              </Grid>
+            ) : null}
         <Grid container justify="center">
           <Button
             className={classes.button}
             type="submit"
             variant="contained"
             color="primary"
+            disabled={isSubmitting}
           >
             Submit
           </Button>
           <Button
             className={classes.button}
             variant="contained"
-            onClick={handleReset}
+            onClick={() => {
+              handleReset();
+              resetForm();
+            }} 
+            disabled={isSubmitting}
           >
             Reset
           </Button>
         </Grid>
       </form>
+      )}
+      </Formik>
     </div>
   );
 }

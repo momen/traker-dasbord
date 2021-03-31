@@ -3,6 +3,8 @@ import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
 import axios from "../../../../axios";
 import Map from "../../../Map/Map";
 import NumberFormat from "react-number-format";
+import * as Yup from "yup";
+import { Formik } from "formik";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -35,6 +37,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required("This field is Required"),
+  address: Yup.string().required("This field is Required"),
+  moderator_name: Yup.string().required("This field is Required"),
+  moderator_phone: Yup.string()
+    .test("len", "Enter a valid phone number", (val) => val?.length === 16)
+    .required("This field is Required"),
+  moderator_alt_phone: Yup.string()
+    .notRequired()
+    .test("len", "Enter a valid phone number", (val) => {
+      if(!val){
+        return true
+      }
+      return val?.length === 16
+    }),
+  // lat: Yup.string().required("This field is Required"),
+  // long: Yup.string().required("This field is Required"),
+});
+
 function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
 
@@ -48,36 +69,67 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
     lat: itemToEdit ? itemToEdit.lat : "",
     long: itemToEdit ? itemToEdit.long : "",
   });
-  const [openAlert, setOpenAlert] = useState(false);
-  const [imgName, setImgName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [locationNotSelected, setLocationNotSelected] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    if (!formData.lat || !formData.long) {
+      setLocationNotSelected(true);
+      return;
+    }
+
+    let mod_phone = formData.moderator_phone.replace(/[^A-Z0-9]/gi, "");
+    let mod_alt_phone = formData.moderator_alt_phone.replace(/[^A-Z0-9]/gi, "");
+
+    let data = {
+      name: formData.name,
+      address: formData.address,
+      moderator_name: formData.moderator_name,
+      moderator_phone: mod_phone,
+      moderator_alt_phone: mod_alt_phone,
+      lat: formData.lat,
+      long: formData.long,
+    };
+
+    setLocationNotSelected(false);
+    setIsSubmitting(true);
 
     if (itemToEdit) {
       await axios
-        .post(`/update/stores/${itemToEdit.id}`, formData)
+        .post(`/update/stores/${itemToEdit.id}`, data)
         .then((res) => {
           setOpenPopup(false);
         })
         .catch((res) => {
+          setIsSubmitting(false);
           setResponseErrors(res.response.data.errors);
         });
     } else {
       await axios
-        .post("/add/stores", formData)
+        .post("/add/stores", data)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);
         })
         .catch((res) => {
+          setIsSubmitting(false);
           setResponseErrors(res.response.data.errors);
         });
     }
   };
 
-  const handleChange = (e) => {
+  const handleStateChange = (e) => {
+    let value = e.target.value;
+    if (
+      e.target.name === "moderator_phone" ||
+      e.target.name === "moderator_alt_phone"
+    ) {
+      value = value.replace(/[^A-Z0-9]/gi, "");
+      console.log(value);
+    }
+
+    console.log(value);
     updateFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -87,197 +139,280 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
   //Customize
   const handleReset = () => {
     updateFormData({
-      vendor_name: "",
-      email: "",
-      type: "",
-      userid_id: "",
-      images: "",
+      name: "",
+      address: "",
+      moderator_name: "",
+      moderator_phone: "",
+      moderator_alt_phone: "",
+      lat: "",
+      long: "",
     });
     setResponseErrors("");
-    setImgName("");
-    setOpenAlert(false);
   };
   return (
     <div className={classes.paper}>
-      <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <div>
-              <TextField
-                name="name"
-                required
-                fullWidth
-                id="name"
-                label="Name"
-                value={formData.name}
-                onChange={handleChange}
-                error={responseErrors?.name}
-                autoFocus
-              />
+      <Formik
+        initialValues={formData}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({
+          errors,
+          handleSubmit,
+          handleChange,
+          handleBlur,
+          touched,
+          values,
+          status,
+          resetForm,
+        }) => (
+          <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <div>
+                  <TextField
+                    name="name"
+                    required
+                    fullWidth
+                    id="name"
+                    label="Store Name"
+                    value={formData.name}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.name ||
+                      Boolean(touched.name && errors.name)
+                    }
+                    helperText={touched.name && errors.name}
+                    autoFocus
+                  />
 
-              {responseErrors ? (
-                <div className={classes.inputMessage}>
-                  {responseErrors.name?.map((msg) => (
-                    <span key={msg} className={classes.errorMsg}>
-                      {msg}
-                    </span>
-                  ))}
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.name?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </div>
-          </Grid>
+              </Grid>
 
-          <Grid item xs={6}>
-            <div>
-              <TextField
-                name="moderator_name"
-                required
-                fullWidth
-                id="moderator_name"
-                label="Moderator Name"
-                value={formData.moderator_name}
-                onChange={handleChange}
-                error={responseErrors?.moderator_name}
-              />
+              <Grid item xs={6}>
+                <div>
+                  <TextField
+                    name="moderator_name"
+                    required
+                    fullWidth
+                    id="moderator_name"
+                    label="Moderator Name"
+                    value={formData.moderator_name}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.moderator_name ||
+                      Boolean(touched.moderator_name && errors.moderator_name)
+                    }
+                    helperText={touched.moderator_name && errors.moderator_name}
+                  />
 
-              {responseErrors ? (
-                <div className={classes.inputMessage}>
-                  {responseErrors.moderator_name?.map((msg) => (
-                    <span key={msg} className={classes.errorMsg}>
-                      {msg}
-                    </span>
-                  ))}
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.moderator_name?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </div>
-          </Grid>
+              </Grid>
 
-          <Grid item xs={6}>
-            <div>
-              <NumberFormat
-                name="moderator_phone"
-                required
-                fullWidth
-                format="+966 ### ### ###"
-                mask="_ "
-                allowEmptyFormatting
-                customInput={TextField}
-                id="moderator_phone"
-                label="Moderator Phone"
-                value={formData.moderator_phone}
-                onChange={handleChange}
-                error={responseErrors?.moderator_phone}
-              />
+              <Grid item xs={6}>
+                <div>
+                  <NumberFormat
+                    name="moderator_phone"
+                    required
+                    fullWidth
+                    format="+966 ## ### ####"
+                    mask="_ "
+                    allowEmptyFormatting
+                    customInput={TextField}
+                    id="moderator_phone"
+                    label="Moderator Phone"
+                    value={formData.moderator_phone}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.moderator_phone ||
+                      Boolean(touched.moderator_phone && errors.moderator_phone)
+                    }
+                    helperText={
+                      touched.moderator_phone && errors.moderator_phone
+                    }
+                  />
 
-              {responseErrors ? (
-                <div className={classes.inputMessage}>
-                  {responseErrors.moderator_phone?.map((msg) => (
-                    <span key={msg} className={classes.errorMsg}>
-                      {msg}
-                    </span>
-                  ))}
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.moderator_phone?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </div>
-          </Grid>
+              </Grid>
 
-          <Grid item xs={6}>
-            <div>
-              <NumberFormat
-                name="moderator_alt_phone"
-                fullWidth
-                format="+966 ### ### ###"
-                mask="_ "
-                allowEmptyFormatting
-                customInput={TextField}
-                id="moderator_alt_phone"
-                label="Moderator Alternative Phone"
-                value={formData.moderator_alt_phone}
-                onChange={handleChange}
-                error={responseErrors?.moderator_alt_phone}
-              />
+              <Grid item xs={6}>
+                <div>
+                  <NumberFormat
+                    name="moderator_alt_phone"
+                    fullWidth
+                    format="+966 ## ### ####"
+                    mask="_ "
+                    customInput={TextField}
+                    id="moderator_alt_phone"
+                    label="Moderator Alternative Phone"
+                    value={formData.moderator_alt_phone}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.moderator_alt_phone ||
+                      Boolean(
+                        touched.moderator_alt_phone &&
+                          errors.moderator_alt_phone
+                      )
+                    }
+                    helperText={
+                      touched.moderator_alt_phone && errors.moderator_alt_phone
+                    }
+                  />
 
-              {responseErrors ? (
-                <div className={classes.inputMessage}>
-                  {responseErrors.moderator_alt_phone?.map((msg) => (
-                    <span key={msg} className={classes.errorMsg}>
-                      {msg}
-                    </span>
-                  ))}
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.moderator_alt_phone?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </div>
-          </Grid>
+              </Grid>
 
-          <Grid item xs={12}>
-            <div>
-              <TextField
-                name="address"
-                required
-                fullWidth
-                id="address"
-                label="Address"
-                value={formData.address}
-                onChange={handleChange}
-                error={responseErrors?.address}
-              />
+              <Grid item xs={12}>
+                <div>
+                  <TextField
+                    name="address"
+                    required
+                    fullWidth
+                    id="address"
+                    label="Address"
+                    value={formData.address}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.address ||
+                      Boolean(touched.address && errors.address)
+                    }
+                    helperText={touched.address && errors.address}
+                  />
 
-              {responseErrors ? (
-                <div className={classes.inputMessage}>
-                  {responseErrors.address?.map((msg) => (
-                    <span key={msg} className={classes.errorMsg}>
-                      {msg}
-                    </span>
-                  ))}
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.address?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
+              </Grid>
+
+              <Grid item>
+                <label htmlFor="stores-map" style={{ marginTop: "10px" }}>
+                  Select your store location
+                </label>
+              </Grid>
+
+              <Grid
+                item
+                xs={12}
+                style={{
+                  height: "60vh",
+                  position: "relative",
+                  marginBottom: "10px",
+                }}
+              >
+                <div style={{ height: "60vh" }}>
+                  <Map
+                    id="stores-map"
+                    lattitude={formData.lat ? parseFloat(formData.lat) : null}
+                    longitude={formData.long ? parseFloat(formData.long) : null}
+                    formData={formData}
+                    updateFormData={updateFormData}
+                  />
+                </div>
+              </Grid>
+              {locationNotSelected ? (
+                <Grid item xs={12}>
+                  <span key={`no-location`} className={classes.errorMsg}>
+                    Please Select a location on the map.
+                  </span>
+                </Grid>
               ) : null}
-            </div>
-          </Grid>
+            </Grid>
 
-          <Grid item>
-            <label htmlFor="stores-map" style={{ marginTop: "10px" }}>
-              Select your store location
-            </label>
-          </Grid>
-
-          <Grid
-            item
-            xs={12}
-            style={{
-              height: "60vh",
-              position: "relative",
-              marginBottom: "10px",
-            }}
-          >
-            <div style={{ height: "60vh" }}>
-              <Map
-                id="stores-map"
-                lattitude={formData.lat ? parseFloat(formData.lat) : null}
-                longitude={formData.long ? parseFloat(formData.long) : null}
-                formData={formData}
-                updateFormData={updateFormData}
-              />
-            </div>
-          </Grid>
-        </Grid>
-        <Grid container justify="center">
-          <Button
-            className={classes.button}
-            type="submit"
-            variant="contained"
-            color="primary"
-          >
-            Submit
-          </Button>
-          <Button
-            className={classes.button}
-            variant="contained"
-            onClick={handleReset}
-          >
-            Reset
-          </Button>
-        </Grid>
-      </form>
+            {typeof responseErrors === "string" ? (
+              <Grid item xs={12}>
+                <span key={`faluire-msg`} className={classes.errorMsg}>
+                  {responseErrors}
+                </span>
+              </Grid>
+            ) : null}
+            <Grid container justify="center">
+              <Button
+                className={classes.button}
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+              >
+                Submit
+              </Button>
+              <Button
+                className={classes.button}
+                variant="contained"
+                onClick={() => {
+                  handleReset();
+                  resetForm();
+                }}
+                disabled={isSubmitting}
+              >
+                Reset
+              </Button>
+            </Grid>
+          </form>
+        )}
+      </Formik>
     </div>
   );
 }

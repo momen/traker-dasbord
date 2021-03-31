@@ -485,6 +485,7 @@ function Products() {
           alert("Failed to Fetch data");
         });
     } else {
+      console.log(columnToFilter);
       axios
         .post(
           `/products/search/dynamic?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
@@ -627,6 +628,7 @@ function Products() {
                         </MenuItem>
                         <MenuItem value={"generic"}>Generic Search</MenuItem>
                         <MenuItem value={"name"}>Product Name</MenuItem>
+                        <MenuItem value={"quantity"}>Quantity</MenuItem>
                         <MenuItem value={"price"}>Price</MenuItem>
                         <MenuItem value={"car_made"}>Car Made</MenuItem>
                         <MenuItem value={"car_model"}>Car Model</MenuItem>
