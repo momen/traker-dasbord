@@ -140,7 +140,6 @@ function ProductsForm({
   const [bigImgSize, setBigImgSize] = useState(false);
 
   const handleSubmit = async () => {
-
     if (formData.categories.length === 0) {
       setAutoSelectCategoryError(true);
       return;
@@ -226,7 +225,7 @@ function ProductsForm({
     }
   };
 
-   // Update Function Name on other components
+  // Update Function Name on other components
   const handleStateChange = (e) => {
     updateFormData({
       ...formData,
@@ -329,7 +328,7 @@ function ProductsForm({
   };
   return (
     <div className={classes.paper}>
-      <Formik 
+      <Formik
         initialValues={formData}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -719,7 +718,6 @@ function ProductsForm({
                         label="Categories *"
                         placeholder="Select related Categories for this Product"
                         fullWidth
-                        onBlur={handleBlur}
                         error={
                           responseErrors?.categories ||
                           Boolean(touched.categories && errors.categories)
@@ -730,7 +728,15 @@ function ProductsForm({
                     onBlur={handleBlur}
                     onChange={(e, val) => {
                       updateAutoCompleteCategories(e, val);
-                      handleChange(e);
+                      if (val.length === 0) {
+                        errors.categories = true;
+                        touched.categories = true;
+                        values.categories = null;
+                      } else {
+                        errors.categories = false;
+                        touched.categories = false;
+                        values.categories = val;
+                      }
                     }}
                   />
 
@@ -830,7 +836,15 @@ function ProductsForm({
                     onBlur={handleBlur}
                     onChange={(e, val) => {
                       updateAutoCompleteTags(e, val);
-                      handleChange(e);
+                      if (val.length === 0) {
+                        errors.tags = true;
+                        touched.tags = true;
+                        values.tags = null;
+                      } else {
+                        errors.tags = false;
+                        touched.tags = false;
+                        values.tags = val;
+                      }
                     }}
                   />
 
@@ -985,17 +999,21 @@ function ProductsForm({
                 type="submit"
                 variant="contained"
                 color="primary"
-                disabled={isSubmitting}  // Update on other components
+                disabled={isSubmitting} // Update on other components
               >
                 Submit
               </Button>
               <Button
                 className={classes.button}
                 variant="contained"
-                disabled={isSubmitting}  // Update on other components
+                disabled={isSubmitting} // Update on other components
                 onClick={() => {
                   handleReset();
                   resetForm();
+                  errors.categories = false;
+                  touched.categories = false;
+                  errors.tags = false;
+                  touched.tags = false;
                 }} // Apply to other forms -For refactoring all forms-
               >
                 Reset

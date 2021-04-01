@@ -82,8 +82,10 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
   const [responseErrors, setResponseErrors] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (values,
-    { resetForm, setErrors, setStatus, setSubmitting }) => {
+  const handleSubmit = async (
+    values,
+    { resetForm, setErrors, setStatus, setSubmitting }
+  ) => {
     // e.preventDefault();
 
     if (formData.roles.length === 0) {
@@ -393,7 +395,15 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
                   onBlur={handleBlur}
                   onChange={(e, val) => {
                     updateAutoComplete(e, val);
-                    handleChange(e);
+                    if (val.length === 0) {
+                      errors.roles = true;
+                      touched.roles = true;
+                      values.roles = null;
+                    } else {
+                      errors.roles = false;
+                      touched.roles = false;
+                      values.roles = val;
+                    }
                   }}
                 />
               </Grid>
@@ -431,6 +441,8 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
                 onClick={() => {
                   handleReset();
                   resetForm();
+                  errors.roles = false;
+                  touched.roles = false;
                 }}
                 disabled={isSubmitting}
               >

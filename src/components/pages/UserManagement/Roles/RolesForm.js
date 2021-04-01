@@ -188,15 +188,14 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                   variant="outlined"
                   color="primary"
                   style={{ marginRight: "5px" }}
-                  onClick={() =>
-                    {updateFormData({
+                  onClick={() => {
+                    updateFormData({
                       ...formData,
                       permissions: permissionsList,
                     });
                     errors.permissions = null;
                     values.permissions = permissionsList;
-                  }
-                  }
+                  }}
                 >
                   Select All
                 </Button>
@@ -255,7 +254,15 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                   onBlur={handleBlur}
                   onChange={(e, val) => {
                     updateAutoComplete(e, val);
-                    handleChange(e);
+                    if (val.length === 0) {
+                      errors.permissions = true;
+                      touched.permissions = true;
+                      values.permissions = null;
+                    } else {
+                      errors.permissions = false;
+                      touched.permissions = false;
+                      values.permissions = val;
+                    }
                   }}
                 />
               </Grid>
@@ -294,6 +301,8 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                 onClick={() => {
                   handleReset();
                   resetForm();
+                  errors.permissions = false;
+                  touched.permissions = false;
                 }}
                 disabled={isSubmitting}
               >
