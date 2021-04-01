@@ -35,10 +35,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  vendor_name: Yup.string().required("This field is Required"),
-  email: Yup.string().email().required("This field is Required"),
-  type: Yup.string().required("Please specify a type"),
-  userid_id: Yup.string().required(),
+  year: Yup.number()
+    .min(1990, "Year should be 1990 or later")
+    .required("This field is Required"),
 });
 
 function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
@@ -51,8 +50,7 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     
     setIsSubmitting(true);
 
@@ -112,6 +110,7 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
       >
         {({
           errors,
+          handleSubmit,
           handleChange,
           handleBlur,
           touched,
@@ -131,8 +130,16 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
               label="Car Year"
               value={formData.year}
               autoFocus
-              onChange={handleChange}
-              error={responseErrors?.year}
+              onChange={(e) => {
+                handleChange(e);
+                handleStateChange(e);
+              }}
+              onBlur={handleBlur}
+              error={
+                responseErrors?.year ||
+                Boolean(touched.year && errors.year)
+              }
+              helperText={touched.year && errors.year}
             />
           </Grid>
           {responseErrors ? (

@@ -52,10 +52,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  vendor_name: Yup.string().required("This field is Required"),
-  email: Yup.string().email().required("This field is Required"),
-  type: Yup.string().required("Please specify a type"),
-  userid_id: Yup.string().required(),
+  category_name: Yup.string().required("This field is Required"),
 });
 
 function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
@@ -73,9 +70,8 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async () => {
     let data = new FormData();
-    e.preventDefault();
     if (!formData.photo && !itemToEdit) {
       setOpenAlert(true);
     } else {
@@ -176,6 +172,7 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
       >
         {({
           errors,
+          handleSubmit,
           handleChange,
           handleBlur,
           touched,
@@ -194,8 +191,16 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
               label="Part Category Name"
               value={formData.category_name}
               autoFocus
-              onChange={handleChange}
-              error={responseErrors?.category_name}
+              onChange={(e) => {
+                handleChange(e);
+                handleStateChange(e);
+              }}
+              onBlur={handleBlur}
+              error={
+                responseErrors?.category_name ||
+                Boolean(touched.category_name && errors.category_name)
+              }
+              helperText={touched.category_name && errors.category_name}
             />
           </Grid>
 

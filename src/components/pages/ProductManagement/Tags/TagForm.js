@@ -36,10 +36,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  vendor_name: Yup.string().required("This field is Required"),
-  email: Yup.string().email().required("This field is Required"),
-  type: Yup.string().required("Please specify a type"),
-  userid_id: Yup.string().required(),
+  name: Yup.string().required("This field is Required"),
 });
 
 function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
@@ -52,9 +49,7 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
+  const handleSubmit = () => {
     setIsSubmitting(true);
 
     if (itemToEdit) {
@@ -99,13 +94,14 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
   };
   return (
     <div className={classes.paper}>
-      <Formik 
+      <Formik
         initialValues={formData}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({
           errors,
+          handleSubmit,
           handleChange,
           handleBlur,
           touched,
@@ -113,64 +109,70 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
           status,
           resetForm,
         }) => (
-      <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              name="name"
-              required
-              fullWidth
-              id="name"
-              label="Product Tag"
-              value={formData.name}
-              autoFocus
-              onChange={handleChange}
-              error={responseErrors?.name}
-            />
-          </Grid>
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.name?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
+          <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  name="name"
+                  required
+                  fullWidth
+                  id="name"
+                  label="Product Tag"
+                  value={formData.name}
+                  autoFocus
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.name || Boolean(touched.name && errors.name)
+                  }
+                  helperText={touched.name && errors.name}
+                />
+              </Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
             </Grid>
-          ) : null}
 
-        </Grid>
-
-        {typeof responseErrors === "string" ? (
+            {typeof responseErrors === "string" ? (
               <Grid item xs={12}>
                 <span key={`faluire-msg`} className={classes.errorMsg}>
                   {responseErrors}
                 </span>
               </Grid>
             ) : null}
-        <Grid container justify="center">
-          <Button
-            className={classes.button}
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSubmitting}
-          >
-            Submit
-          </Button>
-          <Button
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              handleReset();
-              resetForm();
-            }} 
-            disabled={isSubmitting}
-          >
-            Reset
-          </Button>
-        </Grid>
-      </form>
-      )}
+            <Grid container justify="center">
+              <Button
+                className={classes.button}
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+              >
+                Submit
+              </Button>
+              <Button
+                className={classes.button}
+                variant="contained"
+                onClick={() => {
+                  handleReset();
+                  resetForm();
+                }}
+                disabled={isSubmitting}
+              >
+                Reset
+              </Button>
+            </Grid>
+          </form>
+        )}
       </Formik>
     </div>
   );

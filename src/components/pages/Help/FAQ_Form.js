@@ -33,10 +33,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  vendor_name: Yup.string().required("This field is Required"),
-  email: Yup.string().email().required("This field is Required"),
-  type: Yup.string().required("Please specify a type"),
-  userid_id: Yup.string().required(),
+  question: Yup.string().required("This field is Required"),
+  answer: Yup.string().required("This field is Required"),
 });
 
 function FAQ_Form({ setOpenPopup, itemToEdit }) {
@@ -50,8 +48,7 @@ function FAQ_Form({ setOpenPopup, itemToEdit }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
 
     setIsSubmitting(true);
     if (itemToEdit) {
@@ -94,13 +91,14 @@ function FAQ_Form({ setOpenPopup, itemToEdit }) {
 
   return (
     <div className={classes.paper}>
-      <Formik 
+      <Formik
         initialValues={formData}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({
           errors,
+          handleSubmit,
           handleChange,
           handleBlur,
           touched,
@@ -108,88 +106,104 @@ function FAQ_Form({ setOpenPopup, itemToEdit }) {
           status,
           resetForm,
         }) => (
-      <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              name="question"
-              required
-              fullWidth
-              id="question"
-              label="Question"
-              value={formData.question}
-              autoFocus
-              onChange={handleChange}
-              error={responseErrors?.question}
-            />
-          </Grid>
+          <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  name="question"
+                  required
+                  fullWidth
+                  id="question"
+                  label="Question"
+                  value={formData.question}
+                  autoFocus
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.question ||
+                    Boolean(touched.question && errors.question)
+                  }
+                  helperText={touched.question && errors.question}
+                />
+              </Grid>
 
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.question?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.question?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12}>
+                <TextField
+                  id="answer"
+                  name="answer"
+                  label="Answer"
+                  multiline
+                  rowsMax={10}
+                  value={formData.answer}
+                  fullWidth
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.answer ||
+                    Boolean(touched.answer && errors.answer)
+                  }
+                  helperText={touched.answer && errors.answer}
+                />
+              </Grid>
+
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.answer?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
             </Grid>
-          ) : null}
 
-          <Grid item xs={12}>
-            <TextField
-              id="answer"
-              name="answer"
-              label="Answer"
-              multiline
-              rowsMax={10}
-              value={formData.answer}
-              fullWidth
-              onChange={handleChange}
-              error={responseErrors?.answer}
-            />
-          </Grid>
-
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.answer?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
+            {typeof responseErrors === "string" ? (
+              <Grid item xs={12}>
+                <span key={`faluire-msg`} className={classes.errorMsg}>
+                  {responseErrors}
                 </span>
-              ))}
+              </Grid>
+            ) : null}
+            <Grid container justify="center">
+              <Button
+                className={classes.button}
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+              >
+                Submit
+              </Button>
+              <Button
+                className={classes.button}
+                variant="contained"
+                onClick={() => {
+                  handleReset();
+                  resetForm();
+                }}
+                disabled={isSubmitting}
+              >
+                Reset
+              </Button>
             </Grid>
-          ) : null}
-        </Grid>
-
-        {typeof responseErrors === "string" ? (
-          <Grid item xs={12}>
-            <span key={`faluire-msg`} className={classes.errorMsg}>
-              {responseErrors}
-            </span>
-          </Grid>
-        ) : null}
-        <Grid container justify="center">
-          <Button
-            className={classes.button}
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSubmitting}
-          >
-            Submit
-          </Button>
-          <Button
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              handleReset();
-              resetForm();
-            }} 
-            disabled={isSubmitting}
-          >
-            Reset
-          </Button>
-        </Grid>
-      </form>
-      )}
+          </form>
+        )}
       </Formik>
     </div>
   );

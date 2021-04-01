@@ -49,7 +49,7 @@ const validationSchema = Yup.object().shape({
   name: Yup.string().required("This field is Required."),
   email: Yup.string()
     .email("Please enter a valid Email")
-    .required("This field is Required"),
+    .required("This field is Required."),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters.")
     .required("This field is Required."),

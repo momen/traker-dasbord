@@ -89,13 +89,12 @@ function SignIn() {
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string()
-            .email("Must be a valid email")
+            .email("Please enter a valid Email.")
             .max(255)
-            .required("Email is required"),
+            .required("Email is required."),
           password: Yup.string()
-            .min(8)
-            .max(255)
-            .required("Password is required"),
+            .min(8, "Password must be at least 8 characters.")
+            .required("Password is required."),
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           // values._token = CSRF;

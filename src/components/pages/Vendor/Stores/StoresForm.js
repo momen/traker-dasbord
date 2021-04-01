@@ -47,10 +47,10 @@ const validationSchema = Yup.object().shape({
   moderator_alt_phone: Yup.string()
     .notRequired()
     .test("len", "Enter a valid phone number", (val) => {
-      if(!val){
-        return true
+      if (!val) {
+        return true;
       }
-      return val?.length === 16
+      return val?.length === 16;
     }),
   // lat: Yup.string().required("This field is Required"),
   // long: Yup.string().required("This field is Required"),
@@ -369,6 +369,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
                     longitude={formData.long ? parseFloat(formData.long) : null}
                     formData={formData}
                     updateFormData={updateFormData}
+                    setLocationNotSelected={setLocationNotSelected}
                   />
                 </div>
               </Grid>

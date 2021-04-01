@@ -33,8 +33,8 @@ const Button = styled(MuiButton)(spacing);
 const timeOut = (time) => new Promise((res) => setTimeout(res, time));
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("Required"),
-  email: Yup.string().email().required("Required"),
+  name: Yup.string().required("This field is Required"),
+  email: Yup.string().email("Please enter a valid Email").required("This field is Required"),
 });
 
 export default function BasicForm() {
@@ -99,6 +99,7 @@ export default function BasicForm() {
             ) : (
               <form md={6} onSubmit={handleSubmit}>
                 <TextField
+                  required
                   name="name"
                   label="Username"
                   value={values.name}
@@ -112,6 +113,7 @@ export default function BasicForm() {
                 />
 
                 <TextField
+                  required
                   name="email"
                   label="Email"
                   value={values.email}

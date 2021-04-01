@@ -35,12 +35,20 @@ const options = {
   zoomControl: true,
 };
 
-function Map({ lattitude, longitude, formData, updateFormData }) {
+function Map({
+  lattitude,
+  longitude,
+  formData,
+  updateFormData,
+  setLocationNotSelected,
+}) {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries,
   });
-  const [markers, setMarkers] = React.useState(() => [{ lat: lattitude, lng: longitude, time: new Date() }]);
+  const [markers, setMarkers] = React.useState(() => [
+    { lat: lattitude, lng: longitude, time: new Date() },
+  ]);
   const [selected, setSelected] = React.useState(null);
 
   const center = {
@@ -57,7 +65,7 @@ function Map({ lattitude, longitude, formData, updateFormData }) {
       },
     ]);
 
-    console.log(formData);
+    setLocationNotSelected(false);
 
     updateFormData({
       ...formData,

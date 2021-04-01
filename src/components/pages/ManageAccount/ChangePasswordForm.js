@@ -40,13 +40,14 @@ const validationSchema = Yup.object().shape({
   password: Yup.string()
     .min(8, "Must be at least 8 characters")
     .max(255)
-    .required("Required"),
+    .required("This field is Required"),
   password_confirmation: Yup.string().when("password", {
     is: (val) => (val && val.length > 0 ? true : false),
     then: Yup.string().oneOf(
       [Yup.ref("password")],
-      "Both password need to be the same"
-    ),
+      "Both passwords must match to be confirmed."
+    )
+    .required("This field is Required"),
   }),
 });
 

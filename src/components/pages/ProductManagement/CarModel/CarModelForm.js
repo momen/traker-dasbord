@@ -36,10 +36,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  vendor_name: Yup.string().required("This field is Required"),
-  email: Yup.string().email().required("This field is Required"),
-  type: Yup.string().required("Please specify a type"),
-  userid_id: Yup.string().required(),
+  carmodel: Yup.string().required("This field is Required"),
+  carmade_id: Yup.string().required(),
 });
 
 function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
@@ -53,8 +51,7 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     
     setIsSubmitting(true);
     
@@ -106,6 +103,7 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
       >
         {({
           errors,
+          handleSubmit,
           handleChange,
           handleBlur,
           touched,
@@ -124,8 +122,16 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
               label="Car Model Name"
               value={formData.carmodel}
               autoFocus
-              onChange={handleChange}
-              error={responseErrors?.carmodel}
+              onChange={(e) => {
+                handleChange(e);
+                handleStateChange(e);
+              }}
+              onBlur={handleBlur}
+              error={
+                responseErrors?.carmodel ||
+                Boolean(touched.carmodel && errors.carmodel)
+              }
+              helperText={touched.carmodel && errors.carmodel}
             />
           </Grid>
           {responseErrors ? (
@@ -147,14 +153,21 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
                   label="Select Car Made"
                   value={formData.carmade_id}
                   name="carmade_id"
-                  onChange={handleChange}
                   SelectProps={{
                     native: true,
                   }}
                   helperText="Please select a Car Made"
                   fullWidth
                   required
-                  error={responseErrors?.carmade_id}
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.carmade_id ||
+                    Boolean(touched.carmade_id && errors.carmade_id)
+                  }
                 >
                   <option aria-label="None" value="" />
                   {carMades?.map((carMade) => (
