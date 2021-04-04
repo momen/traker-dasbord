@@ -43,7 +43,7 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required("This field is Required"),
-  permissions: Yup.array().min(1, "At least one tag must be selected."),
+  permissions: Yup.array().min(1),
 });
 
 function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
@@ -149,7 +149,7 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
           status,
           resetForm,
         }) => (
-          <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField

@@ -42,7 +42,7 @@ const validationSchema = Yup.object().shape({
   address: Yup.string().required("This field is Required"),
   moderator_name: Yup.string().required("This field is Required"),
   moderator_phone: Yup.string()
-    .test("len", "Enter a valid phone number", (val) => val?.length === 16)
+    .test("len", "Enter a valid phone number", (val) => val?.replace(/[^A-Z0-9]/gi, "").length === 12)
     .required("This field is Required"),
   moderator_alt_phone: Yup.string()
     .notRequired()
@@ -50,7 +50,7 @@ const validationSchema = Yup.object().shape({
       if (!val) {
         return true;
       }
-      return val?.length === 16;
+      return val?.replace(/[^A-Z0-9]/gi, "").length === 12;
     }),
   // lat: Yup.string().required("This field is Required"),
   // long: Yup.string().required("This field is Required"),
@@ -65,7 +65,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
     address: itemToEdit ? itemToEdit.address : "",
     moderator_name: itemToEdit ? itemToEdit.moderator_name : "",
     moderator_phone: itemToEdit ? itemToEdit.moderator_phone : "",
-    moderator_alt_phone: itemToEdit ? itemToEdit.moderator_alt_phone : "",
+    moderator_alt_phone: itemToEdit?.moderator_alt_phone ? itemToEdit.moderator_alt_phone : "",
     lat: itemToEdit ? itemToEdit.lat : "",
     long: itemToEdit ? itemToEdit.long : "",
   });
@@ -120,16 +120,6 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
   };
 
   const handleStateChange = (e) => {
-    let value = e.target.value;
-    if (
-      e.target.name === "moderator_phone" ||
-      e.target.name === "moderator_alt_phone"
-    ) {
-      value = value.replace(/[^A-Z0-9]/gi, "");
-      console.log(value);
-    }
-
-    console.log(value);
     updateFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -241,7 +231,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
                     name="moderator_phone"
                     required
                     fullWidth
-                    format="+966 ## ### ####"
+                    format={itemToEdit? "+### ## ### ####":"+966 ## ### ####"}
                     mask="_ "
                     allowEmptyFormatting
                     customInput={TextField}

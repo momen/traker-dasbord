@@ -79,8 +79,8 @@ const validationSchema = Yup.object().shape({
     .min(1, "Enter a value greater than 0")
     .required("This field is Required"),
   part_category_id: Yup.string().required(),
-  categories: Yup.array().min(1, "At least one category must be selected."),
-  tags: Yup.array().min(1, "At least one tag must be selected."),
+  categories: Yup.array().min(1),
+  tags: Yup.array().min(1),
   store_id: Yup.string().required(),
   quantity: Yup.number()
     .min(5, "Minimum value should be 5")
@@ -109,7 +109,7 @@ function ProductsForm({
     car_made_id: itemToEdit ? itemToEdit.car_made_id : "",
     car_model_id: itemToEdit ? itemToEdit.car_model_id : "",
     year_id: itemToEdit ? itemToEdit.year_id : "",
-    discount: itemToEdit ? itemToEdit.discount : "",
+    discount: itemToEdit?.discount ? itemToEdit.discount : "",
     price: itemToEdit ? itemToEdit.price : "",
     part_category_id: itemToEdit ? itemToEdit.part_category_id : "",
     categories: itemToEdit
@@ -340,7 +340,6 @@ function ProductsForm({
           handleBlur,
           touched,
           values,
-          status,
           resetForm,
         }) => (
           <form onSubmit={handleSubmit}>
@@ -731,7 +730,7 @@ function ProductsForm({
                       if (val.length === 0) {
                         errors.categories = true;
                         touched.categories = true;
-                        values.categories = null;
+                        values.categories = [];
                       } else {
                         errors.categories = false;
                         touched.categories = false;
@@ -839,7 +838,7 @@ function ProductsForm({
                       if (val.length === 0) {
                         errors.tags = true;
                         touched.tags = true;
-                        values.tags = null;
+                        values.tags = [];
                       } else {
                         errors.tags = false;
                         touched.tags = false;

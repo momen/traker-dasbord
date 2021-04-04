@@ -45,28 +45,36 @@ const useStyles = makeStyles((theme) => ({
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-const validationSchema = Yup.object().shape({
-  name: Yup.string().required("This field is Required."),
-  email: Yup.string()
-    .email("Please enter a valid Email")
-    .required("This field is Required."),
-  password: Yup.string()
-    .min(8, "Password must be at least 8 characters.")
-    .required("This field is Required."),
-  confirm_password: Yup.string().when("password", {
-    is: (val) => (val && val.length > 0 ? true : false),
-    then: Yup.string()
-      .oneOf(
-        [Yup.ref("password")],
-        "Both passwords must match to be confirmed."
-      )
-      .required("This field is Required."),
-  }),
-  roles: Yup.array().min(1, "At least one role must be selected."),
-});
-
 function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
   const classes = useStyles();
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("This field is Required."),
+    email: Yup.string()
+      .email("Please enter a valid Email")
+      .required("This field is Required."),
+    password: !itemToEdit
+      ? Yup.string()
+          .matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!/@#\$%\^&\*])/,
+            "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and one Special Character"
+          )
+          .required("This field is Required.")
+      : Yup.string(),
+    confirm_password: !itemToEdit
+      ? Yup.string().when("password", {
+          is: (val) => (val && val.length > 0 ? true : false),
+          then: Yup.string()
+            .oneOf(
+              [Yup.ref("password")],
+              "Both passwords must match to be confirmed."
+            )
+            .required("This field is Required."),
+          otherwise: undefined,
+        })
+      : Yup.string(),
+    roles: Yup.array().min(1),
+  });
 
   const formRef = useRef();
   //Customize
@@ -82,10 +90,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
   const [responseErrors, setResponseErrors] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (
-    values,
-    { resetForm, setErrors, setStatus, setSubmitting }
-  ) => {
+  const handleSubmit = async () => {
     // e.preventDefault();
 
     if (formData.roles.length === 0) {
@@ -107,7 +112,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
 
     if (itemToEdit) {
       //Customize
-      await axios
+      axios
         .put(`/users/${itemToEdit.id}`, data)
         .then((res) => {
           // setPage(1);
@@ -123,7 +128,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
         ...data,
         password: formData.password,
       };
-      await axios
+      axios
         .post("/users", data)
         .then((res) => {
           setPage(1);
@@ -184,10 +189,9 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
           handleBlur,
           touched,
           values,
-          status,
           resetForm,
         }) => (
-          <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField

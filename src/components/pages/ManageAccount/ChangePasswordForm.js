@@ -38,21 +38,24 @@ const initialValues = {
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
-    .min(8, "Must be at least 8 characters")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!/@#\$%\^&\*])/,
+      "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and one Special Character"
+    )
     .max(255)
     .required("This field is Required"),
   password_confirmation: Yup.string().when("password", {
     is: (val) => (val && val.length > 0 ? true : false),
-    then: Yup.string().oneOf(
-      [Yup.ref("password")],
-      "Both passwords must match to be confirmed."
-    )
-    .required("This field is Required"),
+    then: Yup.string()
+      .oneOf(
+        [Yup.ref("password")],
+        "Both passwords must match to be confirmed."
+      )
+      .required("This field is Required"),
   }),
 });
 
 export default function BasicForm() {
-
   const handleSubmit = async (
     values,
     { resetForm, setErrors, setStatus, setSubmitting }
@@ -64,7 +67,7 @@ export default function BasicForm() {
         setStatus({ sent: true });
         setSubmitting(false);
       })
-      .catch(({response}) => {
+      .catch(({ response }) => {
         setStatus({ sent: false });
         setErrors({ submit: response.data.errors });
         setSubmitting(false);
