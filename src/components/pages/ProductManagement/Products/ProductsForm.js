@@ -163,6 +163,8 @@ function ProductsForm({
           data.append(key, JSON.stringify(value.map((val) => val.id)));
         } else if (key === "tags") {
           data.append(key, JSON.stringify(value.map((val) => val.id)));
+        } else if (key === "discount" && !value) {
+          data.append(key, 0);
         } else {
           data.append(key, value);
         }
