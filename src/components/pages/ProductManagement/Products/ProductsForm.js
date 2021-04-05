@@ -79,8 +79,6 @@ const validationSchema = Yup.object().shape({
     .min(1, "Enter a value greater than 0")
     .required("This field is Required"),
   part_category_id: Yup.string().required(),
-  categories: Yup.array().min(1),
-  tags: Yup.array().min(1),
   store_id: Yup.string().required(),
   quantity: Yup.number()
     .min(5, "Minimum value should be 5")
@@ -452,14 +450,21 @@ function ProductsForm({
 
               <Grid item xs={4}>
                 <div>
-                  <CurrencyTextField
+                  <NumberFormat
+                    allowNegative={false}
+                    customInput={TextField}
+                    thousandSeparator={true}
                     required
                     fullWidth
                     name="price"
                     label="Price"
                     value={formData.price}
+                    onValueChange={({ floatValue }) =>
+                      updateFormData({ ...formData, price: floatValue })
+                    }
                     onChange={(event, value) => {
-                      updateFormData({ ...formData, price: value });
+                      // console.log(event.target.value);
+                      // updateFormData({ ...formData, price: value });
                       handleChange(event);
                     }}
                     onBlur={handleBlur}
@@ -725,23 +730,22 @@ function ProductsForm({
                         placeholder="Select related Categories for this Product"
                         fullWidth
                         error={
-                          responseErrors?.categories ||
-                          Boolean(touched.categories && errors.categories)
+                          responseErrors?.categories || autoSelectCategoryError
                         }
                         helperText="At least one category must be selected."
                       />
                     )}
-                    onBlur={handleBlur}
+                    onBlur={() => {
+                      if (formData.categories.length === 0) {
+                        setAutoSelectCategoryError(true);
+                      }
+                    }}
                     onChange={(e, val) => {
                       updateAutoCompleteCategories(e, val);
                       if (val.length === 0) {
-                        errors.categories = true;
-                        touched.categories = true;
-                        values.categories = [];
+                        setAutoSelectCategoryError(true);
                       } else {
-                        errors.categories = false;
-                        touched.categories = false;
-                        values.categories = val;
+                        setAutoSelectCategoryError(false);
                       }
                     }}
                   />
@@ -831,25 +835,21 @@ function ProductsForm({
                         label="Tags *"
                         placeholder="Select related Tags for this Product"
                         fullWidth
-                        onBlur={handleBlur}
-                        error={
-                          responseErrors?.tags ||
-                          Boolean(touched.tags && errors.tags)
-                        }
+                        error={responseErrors?.tags || autoSelectTagError}
                         helperText="At least one tag must be selected."
                       />
                     )}
-                    onBlur={handleBlur}
+                    onBlur={() => {
+                      if (formData.tags.length === 0) {
+                        setAutoSelectTagError(true);
+                      }
+                    }}
                     onChange={(e, val) => {
                       updateAutoCompleteTags(e, val);
                       if (val.length === 0) {
-                        errors.tags = true;
-                        touched.tags = true;
-                        values.tags = [];
+                        setAutoSelectTagError(true);
                       } else {
-                        errors.tags = false;
-                        touched.tags = false;
-                        values.tags = val;
+                        setAutoSelectTagError(false);
                       }
                     }}
                   />

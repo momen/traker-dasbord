@@ -117,14 +117,18 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <NumberFormat
+                  allowLeadingZeros={false}
                   customInput={TextField}
                   name="year"
+                  decimalSeparator={null}
+                  allowNegative={false}
                   required
                   fullWidth
                   label="Car Year"
                   // prefix="%"
                   value={formData.year}
                   onChange={(e) => {
+                    console.log(e.target.value);
                     handleChange(e);
                     handleStateChange(e);
                   }}

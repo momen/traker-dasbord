@@ -43,7 +43,6 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required("This field is Required"),
-  permissions: Yup.array().min(1),
 });
 
 function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
@@ -58,18 +57,18 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
       : [],
   });
 
-  const [autoSelectError, setAutoSelectError] = useState(false);
+  const [permissionsError, setPermissionsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = async () => {
     if (formData.permissions.length === 0) {
-      setAutoSelectError(true);
+      setPermissionsError(true);
       return;
     }
 
     setIsSubmitting(true);
-    setAutoSelectError(false);
+    setPermissionsError(false);
 
     const data = {
       title: formData.title,
@@ -115,8 +114,8 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
   };
 
   const updateAutoComplete = (e, val) => {
-    if (autoSelectError) {
-      setAutoSelectError(false);
+    if (permissionsError) {
+      setPermissionsError(false);
     }
     // console.log(val);
     updateFormData({
@@ -193,8 +192,7 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                       ...formData,
                       permissions: permissionsList,
                     });
-                    errors.permissions = null;
-                    values.permissions = permissionsList;
+                    setPermissionsError(false);
                   }}
                 >
                   Select All
@@ -204,7 +202,7 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                   color="secondary"
                   onClick={() => {
                     updateFormData({ ...formData, permissions: [] });
-                    errors.permissions = true;
+                    setPermissionsError(true);
                   }}
                 >
                   Unselect All
@@ -243,25 +241,21 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                       label="Permissions *"
                       placeholder="Select permissions for this role"
                       fullWidth
-                      error={
-                        responseErrors?.permissions ||
-                        autoSelectError ||
-                        Boolean(touched.permissions && errors.permissions)
-                      }
+                      error={responseErrors?.permissions || permissionsError}
                       helperText="At least one permission must be selected."
                     />
                   )}
-                  onBlur={handleBlur}
+                  onBlur={() => {
+                    if (formData.permissions.length === 0) {
+                      setPermissionsError(true);
+                    }
+                  }}
                   onChange={(e, val) => {
                     updateAutoComplete(e, val);
                     if (val.length === 0) {
-                      errors.permissions = true;
-                      touched.permissions = true;
-                      values.permissions = null;
+                      setPermissionsError(true);
                     } else {
-                      errors.permissions = false;
-                      touched.permissions = false;
-                      values.permissions = val;
+                      setPermissionsError(false);
                     }
                   }}
                 />

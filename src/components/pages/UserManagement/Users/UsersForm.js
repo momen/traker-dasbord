@@ -73,7 +73,6 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
           otherwise: undefined,
         })
       : Yup.string(),
-    roles: Yup.array().min(1),
   });
 
   const formRef = useRef();
@@ -85,7 +84,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
       ? itemToEdit.roles.map(({ id, title }) => ({ id, title }))
       : [],
   });
-  const [autoSelectError, setAutoSelectError] = useState(false);
+  const [rolesError, setRolesError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -94,12 +93,12 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
     // e.preventDefault();
 
     if (formData.roles.length === 0) {
-      setAutoSelectError(true);
+      setRolesError(true);
       return;
     }
 
     setIsSubmitting(true);
-    setAutoSelectError(false);
+    setRolesError(false);
 
     let data = {
       name: formData.name,
@@ -149,7 +148,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
   };
 
   const updateAutoComplete = (e, val) => {
-    setAutoSelectError(false);
+    setRolesError(false);
 
     updateFormData({
       ...formData,
@@ -339,8 +338,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
                   style={{ marginRight: "5px" }}
                   onClick={() => {
                     updateFormData({ ...formData, roles: rolesList });
-                    errors.roles = null;
-                    values.roles = rolesList;
+                    setRolesError(false);
                   }}
                 >
                   Select All
@@ -350,7 +348,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
                   color="secondary"
                   onClick={() => {
                     updateFormData({ ...formData, roles: [] });
-                    errors.roles = true;
+                    setRolesError(true);
                   }}
                 >
                   Unselect All
@@ -389,24 +387,20 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
                       placeholder="Select roles for this user."
                       fullWidth
                       helperText="At least one role must be selected."
-                      error={
-                        responseErrors?.roles ||
-                        autoSelectError ||
-                        Boolean(touched.roles && errors.roles)
-                      }
+                      error={responseErrors?.roles || rolesError}
                     />
                   )}
-                  onBlur={handleBlur}
+                  onBlur={() => {
+                    if (formData.roles.length === 0) {
+                      setRolesError(true);
+                    }
+                  }}
                   onChange={(e, val) => {
                     updateAutoComplete(e, val);
                     if (val.length === 0) {
-                      errors.roles = true;
-                      touched.roles = true;
-                      values.roles = null;
+                      setRolesError(true);
                     } else {
-                      errors.roles = false;
-                      touched.roles = false;
-                      values.roles = val;
+                      setRolesError(false);
                     }
                   }}
                 />
