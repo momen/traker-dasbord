@@ -109,7 +109,10 @@ function ProductsForm({
     car_made_id: itemToEdit ? itemToEdit.car_made_id : "",
     car_model_id: itemToEdit ? itemToEdit.car_model_id : "",
     year_id: itemToEdit ? itemToEdit.year_id : "",
-    discount: itemToEdit?.discount ? itemToEdit.discount : "",
+    discount:
+      itemToEdit?.discount && itemToEdit?.discount > 0
+        ? itemToEdit.discount
+        : "",
     price: itemToEdit ? itemToEdit.price : "",
     part_category_id: itemToEdit ? itemToEdit.part_category_id : "",
     categories: itemToEdit
@@ -491,7 +494,9 @@ function ProductsForm({
                     onChange={(e) => {
                       updateFormData({
                         ...formData,
-                        discount: parseFloat(e.target.value),
+                        discount: e.target.value
+                          ? parseFloat(e.target.value)
+                          : "",
                       });
                       handleChange(e);
                     }}
