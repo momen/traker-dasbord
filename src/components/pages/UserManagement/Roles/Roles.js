@@ -108,7 +108,7 @@ function CustomLoadingOverlay() {
 function Roles() {
   const classes = useStyles();
   const history = useHistory();
-  const userPermissions  = useSelector((state) =>  state.userPermissions)
+  const userPermissions = useSelector((state) => state.userPermissions);
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState("New Permission");
@@ -169,7 +169,8 @@ function Roles() {
                 View
               </Button>
             ) : null}
-            {userPermissions.includes("role_edit") ? (
+            {userPermissions.includes("role_edit") &&
+            params.row.title !== "Admin" ? (
               <Button
                 style={{ marginRight: "5px" }}
                 color="primary"

@@ -1,13 +1,9 @@
 import React, { useRef, useState } from "react";
-import {
-  Button,
-  Grid,
-  makeStyles,
-  TextField,
-} from "@material-ui/core";
+import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import axios from "../../../../axios";
+import NumberFormat from "react-number-format";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -51,7 +47,6 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
   const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = () => {
-    
     setIsSubmitting(true);
 
     if (itemToEdit) {
@@ -81,12 +76,12 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
 
   const handleStateChange = (e) => {
     let value = e.target.value;
-    if((value < 0)){
+    if (value < 0) {
       value = 1960;
     }
 
-    if((value > new Date().getFullYear() + 1)){
-      value = new Date().getFullYear() + 1; 
+    if (value > new Date().getFullYear() + 1) {
+      value = new Date().getFullYear() + 1;
     }
 
     updateFormData({
@@ -103,7 +98,7 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
   };
   return (
     <div className={classes.paper}>
-      <Formik 
+      <Formik
         initialValues={formData}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -118,73 +113,70 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
           status,
           resetForm,
         }) => (
-      <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              name="year"
-              type="number"
-              required
-              fullWidth
-              id="year"
-              label="Car Year"
-              value={formData.year}
-              autoFocus
-              onChange={(e) => {
-                handleChange(e);
-                handleStateChange(e);
-              }}
-              onBlur={handleBlur}
-              error={
-                responseErrors?.year ||
-                Boolean(touched.year && errors.year)
-              }
-              helperText={touched.year && errors.year}
-            />
-          </Grid>
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.year?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
+          <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <NumberFormat
+                  customInput={TextField}
+                  name="year"
+                  required
+                  fullWidth
+                  label="Car Year"
+                  // prefix="%"
+                  value={formData.year}
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.year || Boolean(touched.year && errors.year)
+                  }
+                  helperText={touched.year && errors.year}
+                />
+              </Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.year?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
             </Grid>
-          ) : null}
 
-        </Grid>
-
-        {typeof responseErrors === "string" ? (
+            {typeof responseErrors === "string" ? (
               <Grid item xs={12}>
                 <span key={`faluire-msg`} className={classes.errorMsg}>
                   {responseErrors}
                 </span>
               </Grid>
             ) : null}
-        <Grid container justify="center">
-          <Button
-            className={classes.button}
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSubmitting}
-          >
-            Submit
-          </Button>
-          <Button
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              handleReset();
-              resetForm();
-            }} 
-            disabled={isSubmitting}
-          >
-            Reset
-          </Button>
-        </Grid>
-      </form>
-      )}
+            <Grid container justify="center">
+              <Button
+                className={classes.button}
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+              >
+                Submit
+              </Button>
+              <Button
+                className={classes.button}
+                variant="contained"
+                onClick={() => {
+                  handleReset();
+                  resetForm();
+                }}
+                disabled={isSubmitting}
+              >
+                Reset
+              </Button>
+            </Grid>
+          </form>
+        )}
       </Formik>
     </div>
   );
