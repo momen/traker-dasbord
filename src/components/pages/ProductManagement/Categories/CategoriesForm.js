@@ -52,7 +52,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("This field is Required"),
+  name: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    ),
   description: Yup.string()
     .notRequired()
     .min(5, "Description must be at least 5 characters")

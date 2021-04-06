@@ -33,7 +33,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  question: Yup.string().required("This field is Required"),
+  question: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    ),
   answer: Yup.string().required("This field is Required"),
 });
 
@@ -49,7 +55,6 @@ function FAQ_Form({ setOpenPopup, itemToEdit }) {
   const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = async () => {
-
     setIsSubmitting(true);
     if (itemToEdit) {
       await axios

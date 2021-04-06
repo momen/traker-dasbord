@@ -16,7 +16,6 @@ import { CloseIcon } from "@material-ui/data-grid";
 import { Alert, Autocomplete } from "@material-ui/lab";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import CurrencyTextField from "@unicef/material-ui-currency-textfield";
 import NumberFormat from "react-number-format";
 import * as Yup from "yup";
 import { Formik } from "formik";
@@ -64,11 +63,20 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("This field is Required"),
-  description: Yup.string()
-    .min(5, "Description must be at least 5 characters")
-    .max(255, "Description must not exceed 255 characters")
-    .required("This field is Required"),
+  name: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    ),
+  serial_number: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    ),
   car_made_id: Yup.string().required(),
   car_model_id: Yup.string().required(),
   year_id: Yup.string().required(),
@@ -83,7 +91,10 @@ const validationSchema = Yup.object().shape({
   quantity: Yup.number()
     .min(5, "Minimum value should be 5")
     .required("This field is Required"),
-  serial_number: Yup.string().required("This field is Required"),
+  description: Yup.string()
+    .min(5, "Description must be at least 5 characters")
+    .max(255, "Description must not exceed 255 characters")
+    .required("This field is Required"),
 });
 
 function ProductsForm({
@@ -155,7 +166,7 @@ function ProductsForm({
     setIsSubmitting(true); // Update on other components
     let data = new FormData();
 
-    if (!formData.photo && !itemToEdit) {
+    if (formData.photo.length === 0 && !itemToEdit) {
       setOpenAlert(true);
     } else {
       Object.entries(formData).forEach(([key, value]) => {
@@ -416,17 +427,25 @@ function ProductsForm({
 
               <Grid item xs={4}>
                 <div>
-                  <TextField
+                  <NumberFormat
+                    allowNegative={false}
+                    customInput={TextField}
+                    thousandSeparator={true}
                     name="quantity"
-                    type="number"
-                    InputProps={{ inputProps: { min: 5 } }}
                     required
                     fullWidth
                     label="Qunatity"
                     value={formData.quantity}
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
+                    onValueChange={({ floatValue }) => {
+                      updateFormData({ ...formData, quantity: floatValue });
+                      values.quantity = floatValue;
+                      if (floatValue >= 5) {
+                        errors.quantity = false;
+                      } else if (floatValue) {
+                        errors.quantity = "Minimum value should be 5";
+                      } else {
+                        errors.quantity = "This field is Required";
+                      }
                     }}
                     onBlur={handleBlur}
                     error={
@@ -459,13 +478,16 @@ function ProductsForm({
                     name="price"
                     label="Price"
                     value={formData.price}
-                    onValueChange={({ floatValue }) =>
-                      updateFormData({ ...formData, price: floatValue })
-                    }
-                    onChange={(event, value) => {
-                      // console.log(event.target.value);
-                      // updateFormData({ ...formData, price: value });
-                      handleChange(event);
+                    onValueChange={({ floatValue }) => {
+                      updateFormData({ ...formData, price: floatValue });
+                      values.price = floatValue;
+                      if (floatValue > 0) {
+                        errors.price = false;
+                      } else if (floatValue === 0) {
+                        errors.price = "Enter a value greater than 0";
+                      } else {
+                        errors.price = "This field is Required";
+                      }
                     }}
                     onBlur={handleBlur}
                     error={
@@ -490,6 +512,7 @@ function ProductsForm({
               <Grid item xs={4}>
                 <div>
                   <NumberFormat
+                    allowNegative={false}
                     customInput={TextField}
                     name="discount"
                     fullWidth

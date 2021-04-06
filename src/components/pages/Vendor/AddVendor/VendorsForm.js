@@ -57,8 +57,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  vendor_name: Yup.string().required("This field is Required"),
-  email: Yup.string().email("Please enter a valid Email").required("This field is Required"),
+  vendor_name: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    ),
+  email: Yup.string()
+    .required("This field is Required")
+    .email("Please enter a valid Email"),
   type: Yup.string().required("Please specify a type"),
   userid_id: Yup.string().required(),
 });
@@ -94,7 +102,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
       data.append("images", formData.images);
 
       setIsSubmitting(true);
-      
+
       if (itemToEdit) {
         await axios
           .post(`/add-vendors/${itemToEdit.id}`, data, {
@@ -182,7 +190,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   };
   return (
     <div className={classes.paper}>
-      <Formik 
+      <Formik
         initialValues={formData}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -197,272 +205,278 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
           status,
           resetForm,
         }) => (
-      <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              name="vendor_name"
-              // variant="outlined"
-              required
-              fullWidth
-              id="vendor_name"
-              label="Vendor Name"
-              value={formData.vendor_name}
-              autoFocus
-              onChange={(e) => {
-                handleChange(e);
-                handleStateChange(e);
-              }}
-              onBlur={handleBlur}
-              error={
-                responseErrors?.vendor_name ||
-                Boolean(touched.vendor_name && errors.vendor_name)
-              }
-              helperText={touched.vendor_name && errors.vendor_name}
-            />
-          </Grid>
-
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.vendor_name?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
-
-          <Grid item xs={12}>
-            <TextField
-              name="email"
-              label="Email"
-              // variant="outlined"
-              type="email"
-              required
-              value={formData.email}
-              fullWidth
-              onChange={(e) => {
-                handleChange(e);
-                handleStateChange(e);
-              }}
-              onBlur={handleBlur}
-              error={
-                responseErrors?.email ||
-                Boolean(touched.email && errors.email)
-              }
-              helperText={touched.email && errors.email}
-            />
-          </Grid>
-
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.email?.map((msg) => (
-                <div className={classes.errorsContainer}>
-                  <span key={msg} className={classes.errorMsg}>
-                    {msg}
-                  </span>
-                </div>
-              ))}
-            </Grid>
-          ) : null}
-
-          <Grid item xs={12}>
-            <FormControl component="fieldset" error={
-                    responseErrors?.type ||
-                    Boolean(touched.type && errors.type)
-                  }>
-              <FormLabel component="legend">Type</FormLabel>
-              <RadioGroup
-                aria-label="type"
-                name="type"
-                value={formData.type}
-                onChange={(e) => {
-                  handleChange(e);
-                  handleStateChange(e);
-                }}
-                onBlur={handleBlur}
-              >
-                <FormControlLabel
-                  value="1"
-                  control={<Radio />}
-                  label="Vendor"
-                />
-                <FormControlLabel
-                  value="2"
-                  control={<Radio />}
-                  label="hot sale"
-                />
-                <FormControlLabel value="3" control={<Radio />} label="Both" />
-              </RadioGroup>
-              <FormHelperText>{touched.type && errors.type}</FormHelperText>
-            </FormControl>
-          </Grid>
-
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.type?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
-
-          <Grid item xs={12}>
-            <FormControl>
-              {
+          <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
                 <TextField
-                  id="standard-select-currency-native"
-                  select
-                  label="User"
-                  value={formData.userid_id}
-                  name="userid_id"
-                  SelectProps={{
-                    native: true,
-                  }}
-                  fullWidth
+                  name="vendor_name"
+                  // variant="outlined"
                   required
+                  fullWidth
+                  id="vendor_name"
+                  label="Vendor Name"
+                  value={formData.vendor_name}
+                  autoFocus
                   onChange={(e) => {
                     handleChange(e);
                     handleStateChange(e);
                   }}
                   onBlur={handleBlur}
-                    error={
-                      responseErrors?.userid_id ||
-                      Boolean(touched.userid_id && errors.userid_id)
-                    }
-                  helperText="Please select a User"
-                >
-                  <option aria-label="None" value="" />
+                  error={
+                    responseErrors?.vendor_name ||
+                    Boolean(touched.vendor_name && errors.vendor_name)
+                  }
+                  helperText={touched.vendor_name && errors.vendor_name}
+                />
+              </Grid>
 
-                  {Object.entries(users)?.map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value}
-                    </option>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.vendor_name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
                   ))}
-                </TextField>
-              }
-            </FormControl>
-          </Grid>
+                </Grid>
+              ) : null}
 
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.userid_id?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
+              <Grid item xs={12}>
+                <TextField
+                  name="email"
+                  label="Email"
+                  // variant="outlined"
+                  type="email"
+                  required
+                  value={formData.email}
+                  fullWidth
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.email ||
+                    Boolean(touched.email && errors.email)
+                  }
+                  helperText={touched.email && errors.email}
+                />
+              </Grid>
 
-          <Grid item xs={12} md={3}>
-            <input
-              ref={uploadRef}
-              accept="image/*"
-              className={classes.uploadInput}
-              id="icon-button-file"
-              type="file"
-              onChange={handleUpload}
-            />
-            <label htmlFor="icon-button-file">
-              <Button
-                variant="contained"
-                color="default"
-                className={classes.uploadButton}
-                startIcon={<PhotoCamera />}
-                component="span"
-              >
-                Upload
-              </Button>
-            </label>
-          </Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.email?.map((msg) => (
+                    <div className={classes.errorsContainer}>
+                      <span key={msg} className={classes.errorMsg}>
+                        {msg}
+                      </span>
+                    </div>
+                  ))}
+                </Grid>
+              ) : null}
 
-          {imgName ? (
-            <Grid item xs md={9}>
-              <Chip
-                className={classes.chip}
-                // icon={<FaceIcon/>}
-                label={imgName}
-                onDelete={handleDeleteImage}
-                variant="outlined"
-              />
-            </Grid>
-          ) : null}
-
-          {bigImgSize ? (
-            <Grid item xs={12}>
-                <p className={classes.errorMsg}>
-                  The uploaded image size shouldn't exceed 2MB.
-                </p>
-            </Grid>
-          ) : null}
-
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.images?.map((msg) => (
-                <p key={msg} className={classes.errorMsg}>
-                  {msg}
-                </p>
-              ))}
-            </Grid>
-          ) : null}
-
-          <Grid item xs={12}>
-            <FormControl>
-              <Collapse in={openAlert}>
-                <Alert
-                  severity="error"
-                  action={
-                    <IconButton
-                      aria-label="close"
-                      color="inherit"
-                      size="small"
-                      onClick={() => {
-                        setOpenAlert(false);
-                      }}
-                    >
-                      <CloseIcon fontSize="inherit" />
-                    </IconButton>
+              <Grid item xs={12}>
+                <FormControl
+                  component="fieldset"
+                  error={
+                    responseErrors?.type || Boolean(touched.type && errors.type)
                   }
                 >
-                  Please upload an Image.
-                </Alert>
-              </Collapse>
-            </FormControl>
-          </Grid>
-        </Grid>
+                  <FormLabel component="legend">Type</FormLabel>
+                  <RadioGroup
+                    aria-label="type"
+                    name="type"
+                    value={formData.type}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                  >
+                    <FormControlLabel
+                      value="1"
+                      control={<Radio />}
+                      label="Vendor"
+                    />
+                    <FormControlLabel
+                      value="2"
+                      control={<Radio />}
+                      label="hot sale"
+                    />
+                    <FormControlLabel
+                      value="3"
+                      control={<Radio />}
+                      label="Both"
+                    />
+                  </RadioGroup>
+                  <FormHelperText>{touched.type && errors.type}</FormHelperText>
+                </FormControl>
+              </Grid>
 
-        {typeof responseErrors === "string" ? (
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.type?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12}>
+                <FormControl>
+                  {
+                    <TextField
+                      id="standard-select-currency-native"
+                      select
+                      label="User"
+                      value={formData.userid_id}
+                      name="userid_id"
+                      SelectProps={{
+                        native: true,
+                      }}
+                      fullWidth
+                      required
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleStateChange(e);
+                      }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.userid_id ||
+                        Boolean(touched.userid_id && errors.userid_id)
+                      }
+                      helperText="Please select a User"
+                    >
+                      <option aria-label="None" value="" />
+
+                      {Object.entries(users)?.map(([key, value]) => (
+                        <option key={key} value={key}>
+                          {value}
+                        </option>
+                      ))}
+                    </TextField>
+                  }
+                </FormControl>
+              </Grid>
+
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.userid_id?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12} md={3}>
+                <input
+                  ref={uploadRef}
+                  accept="image/*"
+                  className={classes.uploadInput}
+                  id="icon-button-file"
+                  type="file"
+                  onChange={handleUpload}
+                />
+                <label htmlFor="icon-button-file">
+                  <Button
+                    variant="contained"
+                    color="default"
+                    className={classes.uploadButton}
+                    startIcon={<PhotoCamera />}
+                    component="span"
+                  >
+                    Upload
+                  </Button>
+                </label>
+              </Grid>
+
+              {imgName ? (
+                <Grid item xs md={9}>
+                  <Chip
+                    className={classes.chip}
+                    // icon={<FaceIcon/>}
+                    label={imgName}
+                    onDelete={handleDeleteImage}
+                    variant="outlined"
+                  />
+                </Grid>
+              ) : null}
+
+              {bigImgSize ? (
+                <Grid item xs={12}>
+                  <p className={classes.errorMsg}>
+                    The uploaded image size shouldn't exceed 2MB.
+                  </p>
+                </Grid>
+              ) : null}
+
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.images?.map((msg) => (
+                    <p key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </p>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12}>
+                <FormControl>
+                  <Collapse in={openAlert}>
+                    <Alert
+                      severity="error"
+                      action={
+                        <IconButton
+                          aria-label="close"
+                          color="inherit"
+                          size="small"
+                          onClick={() => {
+                            setOpenAlert(false);
+                          }}
+                        >
+                          <CloseIcon fontSize="inherit" />
+                        </IconButton>
+                      }
+                    >
+                      Please upload an Image.
+                    </Alert>
+                  </Collapse>
+                </FormControl>
+              </Grid>
+            </Grid>
+
+            {typeof responseErrors === "string" ? (
               <Grid item xs={12}>
                 <span key={`faluire-msg`} className={classes.errorMsg}>
                   {responseErrors}
                 </span>
               </Grid>
             ) : null}
-        <Grid container justify="center">
-          <Button
-            className={classes.button}
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSubmitting}
-          >
-            Submit
-          </Button>
-          <Button
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              handleReset();
-              resetForm();
-            }} 
-            disabled={isSubmitting}
-          >
-            Reset
-          </Button>
-        </Grid>
-      </form>
-      )}
+            <Grid container justify="center">
+              <Button
+                className={classes.button}
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+              >
+                Submit
+              </Button>
+              <Button
+                className={classes.button}
+                variant="contained"
+                onClick={() => {
+                  handleReset();
+                  resetForm();
+                }}
+                disabled={isSubmitting}
+              >
+                Reset
+              </Button>
+            </Grid>
+          </form>
+        )}
       </Formik>
     </div>
   );

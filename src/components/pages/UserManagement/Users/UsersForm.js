@@ -51,8 +51,8 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("This field is Required."),
     email: Yup.string()
-      .email("Please enter a valid Email")
-      .required("This field is Required."),
+      .required("This field is Required.")
+      .email("Please enter a valid Email"),
     password: !itemToEdit
       ? Yup.string()
           .matches(

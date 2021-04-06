@@ -1,42 +1,61 @@
-import { Button } from "@material-ui/core";
+import { Button, Grid } from "@material-ui/core";
 import React from "react";
 import axios from "../../../axios";
 import { useSelector } from "react-redux";
+import { green, red } from "@material-ui/core/colors";
+import Stats from "./Stats";
+// import BarChart from "./BarChart";
 
 function Dashboard() {
   const userToken = useSelector((state) => state.userToken);
 
   return (
     <div>
-      <h1>Dashboard</h1>
-      <h1>Buttons added for the sake of easier debugging</h1>
-      <Button
-        style={{ marginRight: "5px" }}
-        variant="contained"
-        color="primary"
-        onClick={() => alert(userToken)}
-      >
-        Check Token
-      </Button>
-
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => {
-          axios
-            .post("/logout", null)
-            .then(async (res) => {
-              delete axios.defaults.headers.common["Authorization"];
-              // localStorage.removeItem("trkar-token");
-              alert("Logged Out Successfully");
-            })
-            .catch((err) => {
-              alert("Failed to Logout, please try again.");
-            });
-        }}
-      >
-        Simulate Logout
-      </Button>
+      <Grid container spacing={6}>
+        <Grid item xs={12} lg={5}>
+          <Grid container spacing={6}>
+            <Grid item xs={12} sm={12} md={6}>
+              <Stats
+                title="Total Orders"
+                amount="24.532"
+                chip="Today"
+                percentageText="+14%"
+                percentagecolor={green[500]}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6}>
+              <Stats
+                title="Total Invoices"
+                amount="63.200"
+                chip="Annual"
+                percentageText="-12%"
+                percentagecolor={red[500]}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6}>
+              <Stats
+                title="Total Products"
+                amount="1.320"
+                chip="Monthly"
+                percentageText="-18%"
+                percentagecolor={red[500]}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6}>
+              <Stats
+                title="Total Sales"
+                amount="12.364"
+                chip="Yearly"
+                percentageText="+27%"
+                percentagecolor={green[500]}
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={12} lg={7}>
+          {/* <BarChart /> */}
+        </Grid>
+      </Grid>
     </div>
   );
 }

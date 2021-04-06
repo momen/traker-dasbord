@@ -52,7 +52,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  category_name: Yup.string().required("This field is Required"),
+  category_name: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    ),
 });
 
 function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
@@ -165,7 +171,7 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
   };
   return (
     <div className={classes.paper}>
-      <Formik 
+      <Formik
         initialValues={formData}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -180,148 +186,148 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
           status,
           resetForm,
         }) => (
-      <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              name="category_name"
-              required
-              fullWidth
-              id="category_name"
-              label="Part Category Name"
-              value={formData.category_name}
-              autoFocus
-              onChange={(e) => {
-                handleChange(e);
-                handleStateChange(e);
-              }}
-              onBlur={handleBlur}
-              error={
-                responseErrors?.category_name ||
-                Boolean(touched.category_name && errors.category_name)
-              }
-              helperText={touched.category_name && errors.category_name}
-            />
-          </Grid>
-
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.category_name?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
-
-          <Grid item xs={12} md={3}>
-            <input
-              ref={uploadRef}
-              accept="image/*"
-              className={classes.uploadInput}
-              id="icon-button-file"
-              type="file"
-              onChange={handleUpload}
-            />
-            <label htmlFor="icon-button-file">
-              <Button
-                variant="contained"
-                color="default"
-                className={classes.uploadButton}
-                startIcon={<PhotoCamera />}
-                component="span"
-              >
-                Upload
-              </Button>
-            </label>
-          </Grid>
-
-          {imgName ? (
-            <Grid item xs md={9}>
-              <Chip
-                className={classes.chip}
-                // icon={<FaceIcon/>}
-                label={imgName}
-                onDelete={handleDeleteImage}
-                variant="outlined"
-              />
-            </Grid>
-          ) : null}
-
-          {bigImgSize ? (
-            <Grid item xs={12}>
-              <p className={classes.errorMsg}>
-                The uploaded image size shouldn't exceed 2MB.
-              </p>
-            </Grid>
-          ) : null}
-
-          {responseErrors ? (
-            <Grid item xs={12}>
-              {responseErrors.photo?.map((msg) => (
-                <span key={msg} className={classes.errorMsg}>
-                  {msg}
-                </span>
-              ))}
-            </Grid>
-          ) : null}
-
-          <Grid item xs={12}>
-            <FormControl>
-              <Collapse in={openAlert}>
-                <Alert
-                  severity="error"
-                  action={
-                    <IconButton
-                      aria-label="close"
-                      color="inherit"
-                      size="small"
-                      onClick={() => {
-                        setOpenAlert(false);
-                      }}
-                    >
-                      <CloseIcon fontSize="inherit" />
-                    </IconButton>
+          <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  name="category_name"
+                  required
+                  fullWidth
+                  id="category_name"
+                  label="Part Category Name"
+                  value={formData.category_name}
+                  autoFocus
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.category_name ||
+                    Boolean(touched.category_name && errors.category_name)
                   }
-                >
-                  Please upload an Image.
-                </Alert>
-              </Collapse>
-            </FormControl>
-          </Grid>
-        </Grid>
+                  helperText={touched.category_name && errors.category_name}
+                />
+              </Grid>
 
-        {typeof responseErrors === "string" ? (
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.category_name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12} md={3}>
+                <input
+                  ref={uploadRef}
+                  accept="image/*"
+                  className={classes.uploadInput}
+                  id="icon-button-file"
+                  type="file"
+                  onChange={handleUpload}
+                />
+                <label htmlFor="icon-button-file">
+                  <Button
+                    variant="contained"
+                    color="default"
+                    className={classes.uploadButton}
+                    startIcon={<PhotoCamera />}
+                    component="span"
+                  >
+                    Upload
+                  </Button>
+                </label>
+              </Grid>
+
+              {imgName ? (
+                <Grid item xs md={9}>
+                  <Chip
+                    className={classes.chip}
+                    // icon={<FaceIcon/>}
+                    label={imgName}
+                    onDelete={handleDeleteImage}
+                    variant="outlined"
+                  />
+                </Grid>
+              ) : null}
+
+              {bigImgSize ? (
+                <Grid item xs={12}>
+                  <p className={classes.errorMsg}>
+                    The uploaded image size shouldn't exceed 2MB.
+                  </p>
+                </Grid>
+              ) : null}
+
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.photo?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12}>
+                <FormControl>
+                  <Collapse in={openAlert}>
+                    <Alert
+                      severity="error"
+                      action={
+                        <IconButton
+                          aria-label="close"
+                          color="inherit"
+                          size="small"
+                          onClick={() => {
+                            setOpenAlert(false);
+                          }}
+                        >
+                          <CloseIcon fontSize="inherit" />
+                        </IconButton>
+                      }
+                    >
+                      Please upload an Image.
+                    </Alert>
+                  </Collapse>
+                </FormControl>
+              </Grid>
+            </Grid>
+
+            {typeof responseErrors === "string" ? (
               <Grid item xs={12}>
                 <span key={`faluire-msg`} className={classes.errorMsg}>
                   {responseErrors}
                 </span>
               </Grid>
             ) : null}
-        <Grid container justify="center">
-          <Button
-            className={classes.button}
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSubmitting}
-          >
-            Submit
-          </Button>
-          <Button
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              handleReset();
-              resetForm();
-            }} 
-            disabled={isSubmitting}
-          >
-            Reset
-          </Button>
-        </Grid>
-      </form>
-      )}
+            <Grid container justify="center">
+              <Button
+                className={classes.button}
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+              >
+                Submit
+              </Button>
+              <Button
+                className={classes.button}
+                variant="contained"
+                onClick={() => {
+                  handleReset();
+                  resetForm();
+                }}
+                disabled={isSubmitting}
+              >
+                Reset
+              </Button>
+            </Grid>
+          </form>
+        )}
       </Formik>
     </div>
   );

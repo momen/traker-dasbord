@@ -38,11 +38,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("This field is Required"),
+  name: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    ),
   address: Yup.string().required("This field is Required"),
-  moderator_name: Yup.string().required("This field is Required"),
+  moderator_name: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    ),
   moderator_phone: Yup.string()
-    .test("len", "Enter a valid phone number", (val) => val?.replace(/[^A-Z0-9]/gi, "").length === 12)
+    .test(
+      "len",
+      "Enter a valid phone number",
+      (val) => val?.replace(/[^A-Z0-9]/gi, "").length === 12
+    )
     .required("This field is Required"),
   moderator_alt_phone: Yup.string()
     .notRequired()
@@ -65,7 +81,9 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
     address: itemToEdit ? itemToEdit.address : "",
     moderator_name: itemToEdit ? itemToEdit.moderator_name : "",
     moderator_phone: itemToEdit ? itemToEdit.moderator_phone : "",
-    moderator_alt_phone: itemToEdit?.moderator_alt_phone ? itemToEdit.moderator_alt_phone : "",
+    moderator_alt_phone: itemToEdit?.moderator_alt_phone
+      ? itemToEdit.moderator_alt_phone
+      : "",
     lat: itemToEdit ? itemToEdit.lat : "",
     long: itemToEdit ? itemToEdit.long : "",
   });
@@ -231,7 +249,9 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
                     name="moderator_phone"
                     required
                     fullWidth
-                    format={itemToEdit? "+### ## ### ####":"+966 ## ### ####"}
+                    format={
+                      itemToEdit ? "+### ## ### ####" : "+966 ## ### ####"
+                    }
                     mask="_ "
                     allowEmptyFormatting
                     customInput={TextField}

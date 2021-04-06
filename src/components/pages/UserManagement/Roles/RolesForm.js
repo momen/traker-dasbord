@@ -42,7 +42,13 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const validationSchema = Yup.object().shape({
-  title: Yup.string().required("This field is Required"),
+  title: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    ),
 });
 
 function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
