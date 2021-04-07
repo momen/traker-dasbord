@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components/macro";
+import styled, { withTheme } from "styled-components/macro";
 
 import {
   Card as MuiCard,
@@ -10,10 +10,10 @@ import {
 
 import { spacing } from "@material-ui/system";
 
-import { Bar } from "react-chartjs-2";
+import "./roundedBarCharts";
+import { Bar, defaults } from "react-chartjs-2";
 
 import { MoreVertical } from "react-feather";
-import { useSelector } from "react-redux";
 
 const Card = styled(MuiCard)(spacing);
 
@@ -28,9 +28,7 @@ const ChartWrapper = styled.div`
   width: 100%;
 `;
 
-const BarChart = () => {
-  const theme = useSelector((state) => state.theme);
-
+const BarChart = ({ theme, barChartLabels, sales }) => {
   const firstDatasetColor = theme.palette?.secondary.main;
   const secondDatasetColor =
     theme.palette?.type === "dark"
@@ -38,39 +36,26 @@ const BarChart = () => {
       : "rgba(0, 0, 0, 0.1)";
 
   const data = {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
+    labels: barChartLabels,
     datasets: [
-      {
-        label: "Mobile",
-        backgroundColor: firstDatasetColor,
-        borderColor: firstDatasetColor,
-        hoverBackgroundColor: firstDatasetColor,
-        hoverBorderColor: firstDatasetColor,
-        data: [54, 67, 41, 55, 62, 45, 55, 73, 60, 76, 48, 79],
-        barPercentage: 1,
-        categoryPercentage: 0.5,
-      },
+      // {
+      //   label: "Mobile",
+      //   backgroundColor: firstDatasetColor,
+      //   borderColor: firstDatasetColor,
+      //   hoverBackgroundColor: firstDatasetColor,
+      //   hoverBorderColor: firstDatasetColor,
+      //   data: [54, 67, 41, 55, 62, 45, 55, 73, 60, 76, 48, 79],
+      //   barPercentage: 1,
+      //   categoryPercentage: 0.5,
+      // },
       {
         label: "Desktop",
         backgroundColor: secondDatasetColor,
         borderColor: secondDatasetColor,
         hoverBackgroundColor: secondDatasetColor,
         hoverBorderColor: secondDatasetColor,
-        data: [69, 66, 24, 48, 52, 51, 44, 53, 62, 79, 51, 68],
-        barPercentage: 0.4,
+        data: sales,
+        barPercentage: 0.5,
         categoryPercentage: 0.5,
       },
     ],
@@ -86,11 +71,11 @@ const BarChart = () => {
       yAxes: [
         {
           gridLines: {
-            display: false,
+            display: true,
           },
           stacked: true,
           ticks: {
-            stepSize: 20,
+            stepSize: 200,
             fontColor: theme.palette?.text.secondary,
           },
         },
@@ -112,12 +97,12 @@ const BarChart = () => {
   return (
     <Card mb={3}>
       <CardHeader
-        action={
-          <IconButton aria-label="settings">
-            <MoreVertical />
-          </IconButton>
-        }
-        title="Mobile / Desktop"
+        // action={
+        //   <IconButton aria-label="settings">
+        //     <MoreVertical />
+        //   </IconButton>
+        // }
+        title="Sales"
       />
       <CardContent>
         <ChartWrapper>
@@ -128,4 +113,4 @@ const BarChart = () => {
   );
 };
 
-export default BarChart;
+export default withTheme(BarChart);

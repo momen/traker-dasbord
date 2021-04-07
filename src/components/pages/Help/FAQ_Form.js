@@ -43,7 +43,7 @@ const validationSchema = Yup.object().shape({
   answer: Yup.string().required("This field is Required"),
 });
 
-function FAQ_Form({ setOpenPopup, itemToEdit }) {
+function FilterForm({ setOpenPopup, itemToEdit }) {
   const classes = useStyles();
 
   const formRef = useRef();
@@ -214,4 +214,4 @@ function FAQ_Form({ setOpenPopup, itemToEdit }) {
   );
 }
 
-export default FAQ_Form;
+export default FilterForm;

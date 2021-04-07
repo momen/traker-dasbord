@@ -145,7 +145,7 @@ function Support() {
           setFAQs(data.data);
         })
         .catch((res) => {
-          alert("Y");
+          alert("Failed to Fetch data");
         });
     } else {
       axios

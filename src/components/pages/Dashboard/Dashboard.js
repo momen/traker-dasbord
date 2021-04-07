@@ -1,61 +1,88 @@
 import { Button, Grid } from "@material-ui/core";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import axios from "../../../axios";
 import { useSelector } from "react-redux";
 import { green, red } from "@material-ui/core/colors";
 import Stats from "./Stats";
-// import BarChart from "./BarChart";
+import BarChart from "./BarChart";
+import Popup from "../../Popup";
+import FilterForm from "./FilterForm";
 
 function Dashboard() {
-  const userToken = useSelector((state) => state.userToken);
+  // const userToken = useSelector((state) => state.userToken);
+  const [barChartLabels, setBarChartLabels] = useState("");
+  const [dashboardInfo, setDashboardInfo] = useState({});
+  const [sales, setSales] = useState([]);
+
+  const [openPopup, setOpenPopup] = useState(false);
+
+  const [filterData, updateFilterData] = React.useState({
+    from: null,
+    to: null,
+  });
+
+  useEffect(() => {
+    axios
+      .post("/fetch/report/period", filterData)
+      .then(({ data }) => {
+        setBarChartLabels(data.period_details?.map((detail) => detail.day));
+        setDashboardInfo(data);
+        setSales(
+          data.period_details?.map((detail) => detail.reports.total_sale)
+        );
+      })
+      .catch((res) => {
+        alert("Failed to Fetch data");
+      });
+  }, [filterData]);
 
   return (
     <div>
       <Grid container spacing={6}>
-        <Grid item xs={12} lg={5}>
-          <Grid container spacing={6}>
-            <Grid item xs={12} sm={12} md={6}>
-              <Stats
-                title="Total Orders"
-                amount="24.532"
-                chip="Today"
-                percentageText="+14%"
-                percentagecolor={green[500]}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-              <Stats
-                title="Total Invoices"
-                amount="63.200"
-                chip="Annual"
-                percentageText="-12%"
-                percentagecolor={red[500]}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-              <Stats
-                title="Total Products"
-                amount="1.320"
-                chip="Monthly"
-                percentageText="-18%"
-                percentagecolor={red[500]}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-              <Stats
-                title="Total Sales"
-                amount="12.364"
-                chip="Yearly"
-                percentageText="+27%"
-                percentagecolor={green[500]}
-              />
-            </Grid>
+        <Grid item xs={12} lg={12}>
+          <Grid container spacing={2}>
+            {Object.entries(dashboardInfo).map(([key, value]) =>
+              key !== "period_details" ? (
+                <Grid item xs={12} sm={12} md={2}>
+                  <Stats
+                    title={key}
+                    amount={value}
+                    chip="Today"
+                    percentageText="+14%"
+                    percentagecolor={green[500]}
+                  />
+                </Grid>
+              ) : null
+            )}
           </Grid>
         </Grid>
-        <Grid item xs={12} lg={7}>
-          {/* <BarChart /> */}
+
+        <Grid item>
+          <Button
+            color="primary"
+            variant="outlined"
+            onClick={() => setOpenPopup(true)}
+          >
+            Filter
+          </Button>
+        </Grid>
+
+        <Grid item xs={12} lg={12}>
+          <BarChart barChartLabels={barChartLabels} sales={sales} />
         </Grid>
       </Grid>
+
+      <Popup
+        title="Dashboard Filter"
+        openPopup={openPopup}
+        setOpenPopup={setOpenPopup}
+      >
+        <FilterForm
+          setOpenPopup={setOpenPopup}
+          filterData={filterData}
+          updateFilterData={updateFilterData}
+        />
+      </Popup>
     </div>
   );
 }

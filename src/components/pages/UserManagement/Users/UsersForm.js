@@ -55,6 +55,11 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
       .email("Please enter a valid Email"),
     password: !itemToEdit
       ? Yup.string()
+          // .test(
+          //   "No Space",
+          //   "Please remove spaces",
+          //   (val) => !val?.indexOf(" ") >= 0
+          // )
           .matches(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!/@#\$%\^&\*])/,
             "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and one Special Character"
@@ -302,7 +307,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
               <Grid item xs={12}>
                 <TextField
                   name="email" //Customize
-                  type="email"
+                  // type="email"
                   // autoComplete="new-password"
                   required
                   fullWidth

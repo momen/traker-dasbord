@@ -41,8 +41,6 @@ function App({ userToken, theme }) {
   useEffect(() => {
     axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
 
-    console.log(window.localStorage.getItem("trkar-theme"));
-
     axios.interceptors.response.use(
       (res) => {
         return res;

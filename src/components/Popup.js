@@ -26,8 +26,8 @@ function Popup({ title, children, openPopup, setOpenPopup }) {
       classes={{ paper: classes.dialogWrapper }}
     >
       <DialogTitle>
-        <div style={{ display: "flex" }}>
-          <Typography variant="h6" component="div" style={{ flexGrow: 1 }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Typography variant="h6" component="div" style={{ flexGrow: 1}}>
             {title}
           </Typography>
           <Button
