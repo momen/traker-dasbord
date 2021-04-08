@@ -158,7 +158,7 @@ function SignIn() {
               </Alert>
             )}
             <TextField
-              type="email"
+              id="signIn__email"
               name="email"
               label="Email Address"
               value={values.email}
@@ -173,6 +173,7 @@ function SignIn() {
             />
             <TextField
               type={showPassword ? "text" : "password"}
+              id="signIn__password"
               name="password"
               label="Password"
               value={values.password}

@@ -122,7 +122,6 @@ export default function BasicForm() {
                   helperText={touched.email && errors.email}
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  type="email"
                   variant="outlined"
                   my={2}
                 />

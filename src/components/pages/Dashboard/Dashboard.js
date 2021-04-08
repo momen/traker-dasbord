@@ -14,6 +14,9 @@ function Dashboard() {
   const [dashboardInfo, setDashboardInfo] = useState({});
   const [sales, setSales] = useState([]);
 
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+
   const [openPopup, setOpenPopup] = useState(false);
 
   const [filterData, updateFilterData] = React.useState({
@@ -23,7 +26,7 @@ function Dashboard() {
 
   useEffect(() => {
     axios
-      .post("/fetch/report/period", filterData)
+      .post("/fetch/basic/report", filterData)
       .then(({ data }) => {
         setBarChartLabels(data.period_details?.map((detail) => detail.day));
         setDashboardInfo(data);
@@ -73,7 +76,7 @@ function Dashboard() {
       </Grid>
 
       <Popup
-        title="Dashboard Filter"
+        title="Filter Sales by"
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
@@ -81,6 +84,10 @@ function Dashboard() {
           setOpenPopup={setOpenPopup}
           filterData={filterData}
           updateFilterData={updateFilterData}
+          fromDate={fromDate}
+          toDate={toDate}
+          setFromDate={setFromDate}
+          setToDate={setToDate}
         />
       </Popup>
     </div>

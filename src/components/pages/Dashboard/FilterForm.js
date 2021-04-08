@@ -37,19 +37,31 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const validationSchema = Yup.object().shape({});
+const validationSchema = Yup.object().shape({
+  from: Yup.date().required("Please select a starting date").nullable(),
+  to: Yup.date()
+    .min(Yup.ref("from"), "This date can't be eariler than the starting one")
+    .required("Please select an ending date")
+    .nullable(),
+});
 
-function FAQ_Form({ setOpenPopup, filterData, updateFilterData }) {
+function FAQ_Form({
+  setOpenPopup,
+  filterData,
+  updateFilterData,
+  fromDate,
+  toDate,
+  setFromDate,
+  setToDate,
+}) {
   const classes = useStyles();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState(filterData);
-  const [fromDate, setFromDate] = useState(new Date());
-  const [toDate, setToDate] = useState(new Date());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
     updateFilterData(formData);
     setOpenPopup(false);
   };
@@ -63,9 +75,11 @@ function FAQ_Form({ setOpenPopup, filterData, updateFilterData }) {
 
   const handleReset = () => {
     updateFormData({
-      question: "",
-      answer: "",
+      from: null,
+      to: null,
     });
+    setFromDate(null);
+    setToDate(null);
     setResponseErrors("");
   };
 
@@ -79,8 +93,8 @@ function FAQ_Form({ setOpenPopup, filterData, updateFilterData }) {
         {({
           errors,
           handleSubmit,
-          handleChange,
           handleBlur,
+          setFieldValue,
           touched,
           values,
           status,
@@ -88,11 +102,14 @@ function FAQ_Form({ setOpenPopup, filterData, updateFilterData }) {
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
+              <Grid container spacing={3}>
+                <Grid item xs={6} md={3}>
                   <div>
                     <KeyboardDatePicker
+                      name="from"
+                      required
                       disableToolbar
+                      disableFuture
                       autoOk={true}
                       variant="inline"
                       format="MM/dd/yyyy"
@@ -101,16 +118,21 @@ function FAQ_Form({ setOpenPopup, filterData, updateFilterData }) {
                       label="From"
                       value={fromDate}
                       onChange={(date) => {
-                        console.log(date);
-                        console.log(date.toISOString().slice(0, 10));
+                        setFieldValue("from", date);
                         setFromDate(date);
                         updateFormData({
                           ...formData,
                           from: date.toISOString().slice(0, 10),
                         });
                       }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.from ||
+                        Boolean(touched.from && errors.from)
+                      }
+                      helperText={touched.from && errors.from}
                       KeyboardButtonProps={{
-                        "aria-label": "change date",
+                        "aria-label": "from date",
                       }}
                     />
                     {responseErrors ? (
@@ -125,11 +147,15 @@ function FAQ_Form({ setOpenPopup, filterData, updateFilterData }) {
                   </div>
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid item xs={6} md={3}>
                   <div>
                     <KeyboardDatePicker
+                      name="to"
+                      required
                       disableToolbar
+                      disableFuture
                       autoOk={true}
+                      minDate={fromDate}
                       variant="inline"
                       format="MM/dd/yyyy"
                       margin="normal"
@@ -137,14 +163,20 @@ function FAQ_Form({ setOpenPopup, filterData, updateFilterData }) {
                       label="To"
                       value={toDate}
                       onChange={(date) => {
+                        setFieldValue("to", date);
                         setToDate(date);
                         updateFormData({
                           ...formData,
                           to: date.toISOString().slice(0, 10),
                         });
                       }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.to || Boolean(touched.to && errors.to)
+                      }
+                      helperText={touched.to && errors.to}
                       KeyboardButtonProps={{
-                        "aria-label": "change date",
+                        "aria-label": "from date",
                       }}
                     />
                     {responseErrors ? (
