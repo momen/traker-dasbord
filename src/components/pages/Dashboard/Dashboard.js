@@ -76,12 +76,12 @@ function Dashboard() {
         </Grid>
 
         <Grid item xs={12} lg={12}>
-          <BarChart barChartLabels={barChartLabels} sales={sales} />
+          <BarChart barChartLabels={barChartLabels} sales={sales} fromDate={filterData.from} toDate={filterData.to}/>
         </Grid>
       </Grid>
 
       <Popup
-        title="Filter Sales by"
+        title="Filter Sales by period"
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >

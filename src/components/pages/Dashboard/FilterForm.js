@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "60vw",
+    width: "40vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -86,7 +86,10 @@ function FAQ_Form({
   return (
     <div className={classes.paper}>
       <Formik
-        initialValues={formData}
+        initialValues={{
+          from: fromDate,
+          to: toDate,
+        }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
@@ -103,11 +106,10 @@ function FAQ_Form({
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <Grid container spacing={3}>
-                <Grid item xs={6} md={3}>
+                <Grid item xs={6}>
                   <div>
                     <KeyboardDatePicker
                       name="from"
-                      required
                       disableToolbar
                       disableFuture
                       autoOk={true}
@@ -115,7 +117,7 @@ function FAQ_Form({
                       format="MM/dd/yyyy"
                       margin="normal"
                       id="date-picker-from"
-                      label="From"
+                      label="From *"
                       value={fromDate}
                       onChange={(date) => {
                         setFieldValue("from", date);
@@ -147,11 +149,10 @@ function FAQ_Form({
                   </div>
                 </Grid>
 
-                <Grid item xs={6} md={3}>
+                <Grid item xs={6}>
                   <div>
                     <KeyboardDatePicker
                       name="to"
-                      required
                       disableToolbar
                       disableFuture
                       autoOk={true}
@@ -160,7 +161,7 @@ function FAQ_Form({
                       format="MM/dd/yyyy"
                       margin="normal"
                       id="date-picker-to"
-                      label="To"
+                      label="To *"
                       value={toDate}
                       onChange={(date) => {
                         setFieldValue("to", date);

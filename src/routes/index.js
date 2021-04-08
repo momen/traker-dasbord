@@ -4,9 +4,11 @@ import async from "../components/Async";
 
 import {
   Calendar,
+  Clipboard,
   FileText,
   Folder,
   LogOut,
+  ShoppingBag,
   ShoppingCart,
   Tag,
   Unlock,
@@ -17,6 +19,7 @@ import {
   BusinessCenter,
   Category,
   Dashboard,
+  EventNote,
   Group,
   GroupAdd,
   GroupWork,
@@ -26,6 +29,7 @@ import {
   QuestionAnswer,
   Receipt,
   RecentActors,
+  Report,
   ShoppingBasket,
   Store,
   TimeToLeave,
@@ -106,6 +110,8 @@ const VendorInvoices = async(() =>
 const ViewVendorInvoice = async(() =>
   import("../components/pages/Vendor/AddVendor/ViewVendorInvoice")
 );
+
+const Reports = async(() => import("../components/pages/AdvancedReports/Reports"));
 
 const Stores = async(() => import("../components/pages/Vendor/Stores/Stores"));
 const PendingOrders = async(() => import("../components/pages/Vendor/Orders/PendingOrders"));
@@ -225,7 +231,7 @@ const userManagementRoutes = {
       path: "/user-mgt/logs",
       name: "Audit Logs",
       component: AuditLogs,
-      icon: <FileText />,
+      icon: <EventNote />,
       guard: PermissionGuard,
       permission: "audit_log_access",
     },
@@ -316,7 +322,7 @@ const productManagementRoutes = {
       path: "/product/products",
       name: "Products",
       component: Products,
-      icon: <Store />,
+      icon: <ShoppingBag />,
       guard: PermissionGuard,
       permission: "product_access",
     },
@@ -463,6 +469,16 @@ const viewInvoice = {
 };
 
 
+const advancedReportsRoute = {
+  id: "Reports",
+  path: "/reports",
+  icon: <Clipboard />,
+  component: Reports,
+  children: null,
+  // guard: StoresGuard,
+  noPermissionRequired: true,
+};
+
 const storesRoute = {
   id: "Stores",
   path: "/vendor/stores",
@@ -573,6 +589,7 @@ export const dashboardLayoutRoutes = [
   userManagementRoutes,
   productManagementRoutes,
   vendorRoutes,
+  advancedReportsRoute,
   storesRoute,
   pendingOrdersRoute,
   ordersHistoryRoute,
@@ -614,6 +631,7 @@ export const sidebarRoutes = [
   userManagementRoutes,
   productManagementRoutes,
   vendorRoutes,
+  advancedReportsRoute,
   storesRoute,
   pendingOrdersRoute,
   ordersHistoryRoute,
