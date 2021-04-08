@@ -55,20 +55,20 @@ const Stats = ({ title, amount, chip, percentageText, percentagecolor }) => {
   return (
     <Card>
       <CardContent>
-        <Typography variant="h6" mb={6}>
+        <Typography variant="h6" mb={6} style={{textAlign:"center"}}>
           {title}
         </Typography>
         <Typography variant="h3" mb={6}>
-          <Box fontWeight="fontWeightRegular">{amount}</Box>
+          <Box fontWeight="fontWeightRegular" style={{textAlign:"center"}}>{amount}</Box>
         </Typography>
-        <Percentage
+        {/* <Percentage
           variant="subtitle2"
           mb={6}
           color="textSecondary"
           percentagecolor={percentagecolor}
         >
           <span>{percentageText}</span> Since last week
-        </Percentage>
+        </Percentage> */}
         {/* <Chip label={chip} /> */}
       </CardContent>
     </Card>
