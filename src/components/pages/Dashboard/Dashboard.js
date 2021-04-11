@@ -40,7 +40,7 @@ function Dashboard() {
   }, [filterData]);
 
   return (
-    <div>
+    <>
       <Grid container spacing={6}>
         <Grid item xs={12} lg={12}>
           <Grid container spacing={2}>
@@ -51,7 +51,7 @@ function Dashboard() {
               title = title.replace(/^(.)|\s+(.)/g, (c) => c.toUpperCase());
 
               return key !== "period_details" ? (
-                <Grid item xs={12} sm={12} md={2}>
+                <Grid item xs={12} sm={12} lg={2}>
                   <Stats
                     title={title}
                     amount={value}
@@ -95,7 +95,7 @@ function Dashboard() {
           setToDate={setToDate}
         />
       </Popup>
-    </div>
+    </>
   );
 }
 

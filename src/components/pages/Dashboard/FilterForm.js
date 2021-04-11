@@ -62,7 +62,11 @@ function FAQ_Form({
   const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = async (e) => {
-    updateFilterData(formData);
+    setIsSubmitting(true);
+    updateFilterData({
+      from: fromDate.toISOString().slice(0, 10),
+      to: toDate.toISOString().slice(0, 10),
+    });
     setOpenPopup(false);
   };
 
@@ -122,10 +126,10 @@ function FAQ_Form({
                       onChange={(date) => {
                         setFieldValue("from", date);
                         setFromDate(date);
-                        updateFormData({
-                          ...formData,
-                          from: date.toISOString().slice(0, 10),
-                        });
+                        // updateFormData({
+                        //   ...formData,
+                        //   from: date.toISOString().slice(0, 10),
+                        // });
                       }}
                       onBlur={handleBlur}
                       error={
@@ -166,10 +170,6 @@ function FAQ_Form({
                       onChange={(date) => {
                         setFieldValue("to", date);
                         setToDate(date);
-                        updateFormData({
-                          ...formData,
-                          to: date.toISOString().slice(0, 10),
-                        });
                       }}
                       onBlur={handleBlur}
                       error={

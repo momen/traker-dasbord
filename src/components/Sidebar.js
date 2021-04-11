@@ -31,7 +31,7 @@ import { sidebarRoutes as routes } from "../routes/index";
 
 import { ReactComponent as Logo } from "../vendor/logo.svg";
 import { useDispatch, useSelector } from "react-redux";
-import {Logout} from "../actions"
+import { Logout } from "../actions";
 
 const Box = styled(MuiBox)(spacing);
 
@@ -304,7 +304,6 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
   });
   const dispatch = useDispatch();
 
-
   const initOpenRoutes = () => {
     /* Open collapse element that matches current url */
     const pathName = location.pathname;
@@ -381,6 +380,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                     <SidebarCategory
                       isOpen={!openRoutes[index]}
                       isCollapsable={true}
+                      id={category.id}
                       name={category.id}
                       icon={category.icon}
                       button={true}
@@ -396,6 +396,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                         userPermissions?.includes(route.permission) ? (
                           <SidebarLink
                             key={index}
+                            id={route.name}
                             name={route.name}
                             to={route.path}
                             icon={route.icon}
@@ -412,6 +413,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                   category.id !== "Logout" ? (
                   <SidebarCategory
                     isCollapsable={false}
+                    id={category.id}
                     name={category.id}
                     to={category.path}
                     activeClassName="active"
@@ -425,6 +427,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                 ) : category.id == "Logout" ? (
                   <SidebarCategory
                     isCollapsable={false}
+                    id={category.id}
                     name={category.id}
                     activeClassName="active"
                     icon={category.icon}

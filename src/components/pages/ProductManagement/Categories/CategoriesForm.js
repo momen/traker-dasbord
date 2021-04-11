@@ -230,7 +230,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
 
               <Grid item xs={12}>
                 <TextField
-                  id="standard-multiline-flexible"
+                  id="description"
                   name="description"
                   label="Description"
                   multiline

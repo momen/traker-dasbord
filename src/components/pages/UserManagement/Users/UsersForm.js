@@ -359,7 +359,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
                 <Autocomplete
                   multiple
                   // filterSelectedOptions
-                  id="checkboxes-tags-demo"
+                  id="autocomplete-roles"
                   options={rolesList ? rolesList : []}
                   value={formData.roles}
                   getOptionSelected={(option, value) => option.id === value.id}
@@ -381,6 +381,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
                   renderInput={(params) => (
                     <TextField
                       {...params}
+                      id="roles"
                       name="roles"
                       variant="outlined"
                       label="Roles *"

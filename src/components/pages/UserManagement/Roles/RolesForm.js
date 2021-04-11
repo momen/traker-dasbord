@@ -220,7 +220,7 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                   multiple
                   limitTags={10}
                   // filterSelectedOptions
-                  id="checkboxes-tags-demo"
+                  id="autocomplete-permissions"
                   options={permissionsList ? permissionsList : []}
                   value={formData.permissions}
                   getOptionSelected={(option, value) => option.id === value.id}
@@ -242,6 +242,7 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                   renderInput={(params) => (
                     <TextField
                       {...params}
+                      id="permissions"
                       name="permissions"
                       variant="outlined"
                       label="Permissions *"

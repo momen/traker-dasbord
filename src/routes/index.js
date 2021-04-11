@@ -111,15 +111,20 @@ const ViewVendorInvoice = async(() =>
   import("../components/pages/Vendor/AddVendor/ViewVendorInvoice")
 );
 
-const Reports = async(() => import("../components/pages/AdvancedReports/Reports"));
+const Reports = async(() =>
+  import("../components/pages/AdvancedReports/Reports")
+);
 
 const Stores = async(() => import("../components/pages/Vendor/Stores/Stores"));
-const PendingOrders = async(() => import("../components/pages/Vendor/Orders/PendingOrders"));
-const OrdersHistory = async(() => import("../components/pages/Vendor/Orders/OrdersHistory"));
+const PendingOrders = async(() =>
+  import("../components/pages/Vendor/Orders/PendingOrders")
+);
+const OrdersHistory = async(() =>
+  import("../components/pages/Vendor/Orders/OrdersHistory")
+);
 const Invoices = async(() =>
   import("../components/pages/Vendor/Invoices/Invoices")
 );
-
 
 const ViewPermission = async(() =>
   import("../components/pages/UserManagement/Permissions/ViewPermission")
@@ -169,22 +174,16 @@ const ViewInvoice = async(() =>
   import("../components/pages/Vendor/Invoices/ViewInvoice")
 );
 
-
-const Tickets = async(() =>
-  import("../components/pages/Support/Support")
-);
+const Tickets = async(() => import("../components/pages/Support/Support"));
 const ViewTicket = async(() =>
   import("../components/pages/Support/ViewTicket")
 );
 
-const Help = async(() =>
-  import("../components/pages/Help/Help")
-);
+const Help = async(() => import("../components/pages/Help/Help"));
 
 const ManageAccount = async(() =>
   import("../components/pages/ManageAccount/ManageAccount")
 );
-
 
 const dashboardRoutes = {
   id: "Dashborad",
@@ -468,7 +467,6 @@ const viewInvoice = {
   children: null,
 };
 
-
 const advancedReportsRoute = {
   id: "Reports",
   path: "/reports",
@@ -519,7 +517,6 @@ const invoicesRoute = {
   permission: "access_tabs_separately",
 };
 
-
 const ticketsRoute = {
   id: "Support",
   path: "/support",
@@ -534,7 +531,6 @@ const viewTicket = {
   component: ViewTicket,
   children: null,
 };
-
 
 const helpRoute = {
   id: "Help",
