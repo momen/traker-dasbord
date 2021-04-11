@@ -281,7 +281,7 @@ const SidebarCategory = ({
   );
 };
 
-const SidebarLink = ({ name, to, badge, icon }) => {
+const SidebarLink = ({ name, to, badge, icon, id }) => {
   return (
     <Link
       button
@@ -290,6 +290,7 @@ const SidebarLink = ({ name, to, badge, icon }) => {
       // exact
       to={to}
       activeClassName="active"
+      id={id}
     >
       {icon}
       <LinkText>{name}</LinkText>
