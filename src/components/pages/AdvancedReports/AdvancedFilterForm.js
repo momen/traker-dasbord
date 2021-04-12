@@ -59,6 +59,7 @@ function FAQ_Form({
   products,
   stores,
   partCategories,
+  isAdmin,
 }) {
   const classes = useStyles();
 
@@ -211,46 +212,47 @@ function FAQ_Form({
                   </div>
                 </Grid>
               </MuiPickersUtilsProvider>
-
-              <Grid item xs={12} sm={6} md={4}>
-                <div>
-                  <TextField
-                    select
-                    label="Vendor"
-                    value={formData.vendor}
-                    name="vendor"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.vendor ||
-                      Boolean(touched.vendor && errors.vendor)
-                    }
-                    helperText="Please select a Vendor"
-                    fullWidth
-                  >
-                    <option aria-label="None" value="" />
-                    {vendors?.map((vendor) => (
-                      <option value={vendor.id}>{vendor.vendor_name}</option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.vendor?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
+              {isAdmin ? (
+                <Grid item xs={12} sm={6} md={4}>
+                  <div>
+                    <TextField
+                      select
+                      label="Vendor"
+                      value={formData.vendor}
+                      name="vendor"
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleStateChange(e);
+                      }}
+                      SelectProps={{
+                        native: true,
+                      }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.vendor ||
+                        Boolean(touched.vendor && errors.vendor)
+                      }
+                      helperText="Please select a Vendor"
+                      fullWidth
+                    >
+                      <option aria-label="None" value="" />
+                      {vendors?.map((vendor) => (
+                        <option value={vendor.id}>{vendor.vendor_name}</option>
                       ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
+                    </TextField>
+
+                    {responseErrors ? (
+                      <div className={classes.inputMessage}>
+                        {responseErrors.vendor?.map((msg) => (
+                          <span key={msg} className={classes.errorMsg}>
+                            {msg}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </Grid>
+              ) : null}
 
               <Grid item xs={12} sm={6} md={4}>
                 <div>
@@ -332,7 +334,7 @@ function FAQ_Form({
                 </div>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6} md={4}>
                 <div>
                   <TextField
                     select
@@ -374,44 +376,50 @@ function FAQ_Form({
                 </div>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
-                <div>
-                  <TextField
-                    select
-                    label="Sale Type"
-                    value={formData.sale_type}
-                    name="sale_type"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.sale_type ||
-                      Boolean(touched.sale_type && errors.sale_type)
-                    }
-                    helperText="Please select a Type"
-                    fullWidth
-                  >
-                    <option aria-label="None" value="" />
-                    <option aria-label="Vendor" label="Vendor" value="1" />
-                    <option aria-label="Hot Sale" label="Hot Sale" value="2" />
-                  </TextField>
+              {isAdmin ? (
+                <Grid item xs={12} sm={6} md={4}>
+                  <div>
+                    <TextField
+                      select
+                      label="Sale Type"
+                      value={formData.sale_type}
+                      name="sale_type"
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleStateChange(e);
+                      }}
+                      SelectProps={{
+                        native: true,
+                      }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.sale_type ||
+                        Boolean(touched.sale_type && errors.sale_type)
+                      }
+                      helperText="Please select a Type"
+                      fullWidth
+                    >
+                      <option aria-label="None" value="" />
+                      <option aria-label="Vendor" label="Vendor" value="1" />
+                      <option
+                        aria-label="Hot Sale"
+                        label="Hot Sale"
+                        value="2"
+                      />
+                    </TextField>
 
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.part_category?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
+                    {responseErrors ? (
+                      <div className={classes.inputMessage}>
+                        {responseErrors.sale_type?.map((msg) => (
+                          <span key={msg} className={classes.errorMsg}>
+                            {msg}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </Grid>
+              ) : null}
             </Grid>
 
             {typeof responseErrors === "string" ? (

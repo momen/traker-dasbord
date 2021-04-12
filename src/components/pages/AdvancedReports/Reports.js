@@ -5,10 +5,14 @@ import {
   Card,
   Collapse,
   Divider as MuiDivider,
+  FormControl,
   Grid as MuiGrid,
   IconButton,
+  InputLabel,
   makeStyles,
+  MenuItem,
   Paper as MuiPaper,
+  Select,
   styled,
   Table,
   TableBody,
@@ -222,11 +226,17 @@ TablePaginationActions.propTypes = {
 function Reports() {
   const user = useSelector((state) => state.user);
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
+
+  const [searchData, updateSearchData] = useState({
+    order_number: "",
+    order_total: "",
+  });
 
   const [vendors, setVendors] = useState([]);
   const [products, setProducts] = useState([]);
@@ -243,7 +253,7 @@ function Reports() {
     sale_type: null,
   });
 
-  /*-Get car mades only on the initial render to pass it to the pop-up form 
+  /*-Get list to use in the filter only on the initial render to pass it to the pop-up form 
     when adding or editing, to prevent repeating the request each time the
     pop-up is opened-*/
   useEffect(() => {
@@ -342,8 +352,27 @@ function Reports() {
                     <TableCell>
                       <TextField variant="outlined" size="small" />
                     </TableCell>
-                    <TableCell>
-                      <TextField variant="outlined" size="small" />
+                    <TableCell style={{ width: "15%"}}>
+                      <FormControl variant="outlined" style={{ width: "100%"}} size="small">
+                        <InputLabel id="demo-simple-select-outlined-label">
+                          Status
+                        </InputLabel>
+                        <Select
+                          autoWidth
+                          labelId="demo-simple-select-outlined-label"
+                          id="demo-simple-select-outlined"
+                          // value={age}
+                          // onChange={handleChange}
+                          label="Status"
+                        >
+                          <MenuItem value="">
+                            <em>None</em>
+                          </MenuItem>
+                          <MenuItem value={10}>Pending</MenuItem>
+                          <MenuItem value={20}>Approved</MenuItem>
+                          <MenuItem value={30}>Cancelled</MenuItem>
+                        </Select>
+                      </FormControl>
                     </TableCell>
                     <TableCell>
                       <Button
@@ -423,6 +452,7 @@ function Reports() {
           products={products}
           stores={stores}
           partCategories={partCategories}
+          isAdmin={user?.roles[0].title === "Admin"}
         />
       </Popup>
     </React.Fragment>
