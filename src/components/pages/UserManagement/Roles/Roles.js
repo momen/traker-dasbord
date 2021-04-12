@@ -169,8 +169,7 @@ function Roles() {
                 View
               </Button>
             ) : null}
-            {userPermissions.includes("role_edit") &&
-            params.row.title !== "Admin" ? (
+            {userPermissions.includes("role_edit") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 color="primary"

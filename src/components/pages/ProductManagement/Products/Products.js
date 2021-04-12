@@ -485,7 +485,6 @@ function Products() {
           alert("Failed to Fetch data");
         });
     } else {
-      console.log(columnToFilter);
       axios
         .post(
           `/products/search/dynamic?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,

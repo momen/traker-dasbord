@@ -300,7 +300,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
                     <FormControlLabel
                       value="2"
                       control={<Radio />}
-                      label="hot sale"
+                      label="Hot Sale"
                     />
                     <FormControlLabel
                       value="3"

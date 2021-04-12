@@ -1,37 +1,24 @@
 import React, { useEffect, useState } from "react";
 import {
-  Accordion,
-  AccordionActions,
-  AccordionDetails,
-  AccordionSummary,
   Box,
   Button,
   Card,
-  Checkbox,
   Collapse,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Divider as MuiDivider,
-  FormControl,
-  FormControlLabel,
   Grid as MuiGrid,
   IconButton,
-  LinearProgress,
   makeStyles,
-  MenuItem,
   Paper as MuiPaper,
-  Select,
   styled,
   Table,
   TableBody,
   TableContainer,
+  TableFooter,
   TableHead,
+  TablePagination,
   TextField,
-  Toolbar,
   Typography,
+  useTheme,
 } from "@material-ui/core";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
@@ -43,8 +30,14 @@ import { useSelector } from "react-redux";
 import { Helmet } from "react-helmet";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import PropTypes from "prop-types";
 import { Search } from "@material-ui/icons";
+import { Pagination } from "@material-ui/lab";
+import PropTypes from "prop-types";
+import FirstPageIcon from "@material-ui/icons/FirstPage";
+import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
+import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
+import LastPageIcon from "@material-ui/icons/LastPage";
+import AdvancedFilterForm from "./AdvancedFilterForm";
 
 const Grid = styled(MuiGrid)(spacing);
 const Divider = styled(MuiDivider)(spacing);
@@ -82,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Row({ row, index }) {
+function Row({ row, index, page, pageSize }) {
   //   const { row } = props;
   const [open, setOpen] = React.useState(false);
   const classes = useRowStyles();
@@ -100,7 +93,7 @@ function Row({ row, index }) {
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row">
-          {index+1}
+          {index + 1 + (pageSize > 0 ? parseInt(page * pageSize) : 0)}
         </TableCell>
         <TableCell>{row.order_number}</TableCell>
         <TableCell>{row.order_total}</TableCell>
@@ -111,9 +104,43 @@ function Row({ row, index }) {
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box margin={1}>
-              <Typography variant="h6" gutterBottom component="div">
+              {/* <Typography variant="h6" gutterBottom component="div">
                 Order Details
-              </Typography>
+              </Typography> */}
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>#</TableCell>
+                    <TableCell>Product Name</TableCell>
+                    <TableCell>Product Serial</TableCell>
+                    <TableCell>Store</TableCell>
+                    <TableCell>Vendor</TableCell>
+                    <TableCell>Quantity</TableCell>
+                    <TableCell>Price</TableCell>
+                    <TableCell>Discount</TableCell>
+                    <TableCell>Total</TableCell>
+                  </TableRow>
+                </TableHead>
+
+                {row.orderDetails?.map((detail, index) => (
+                  <TableRow
+                    key={`Order-${row.id}-detail-${index}`}
+                    className={classes.root}
+                  >
+                    <TableCell component="th" scope="row">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell>{detail.product_name}</TableCell>
+                    <TableCell>{detail.product_serial}</TableCell>
+                    <TableCell>{detail.store_name}</TableCell>
+                    <TableCell>{detail.vendor_name}</TableCell>
+                    <TableCell>{detail.quantity}</TableCell>
+                    <TableCell>{detail.price}</TableCell>
+                    <TableCell>%{detail.discount}</TableCell>
+                    <TableCell>{detail.total}</TableCell>
+                  </TableRow>
+                ))}
+              </Table>
             </Box>
           </Collapse>
         </TableCell>
@@ -122,110 +149,178 @@ function Row({ row, index }) {
   );
 }
 
-function Reports() {
+function TablePaginationActions(props) {
   const classes = useStyles();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const theme = useTheme();
+  const { count, page, rowsPerPage, onChangePage } = props;
+
+  const handleFirstPageButtonClick = (event) => {
+    onChangePage(event, 0);
+  };
+
+  const handleBackButtonClick = (event) => {
+    onChangePage(event, page - 1);
+  };
+
+  const handleNextButtonClick = (event) => {
+    onChangePage(event, page + 1);
+  };
+
+  const handleLastPageButtonClick = (event) => {
+    onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+  };
+
+  return (
+    <div className={classes.root}>
+      <IconButton
+        onClick={handleFirstPageButtonClick}
+        disabled={page === 0}
+        aria-label="first page"
+      >
+        {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
+      </IconButton>
+      <IconButton
+        onClick={handleBackButtonClick}
+        disabled={page === 0}
+        aria-label="previous page"
+      >
+        {theme.direction === "rtl" ? (
+          <KeyboardArrowRight />
+        ) : (
+          <KeyboardArrowLeft />
+        )}
+      </IconButton>
+      <IconButton
+        onClick={handleNextButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="next page"
+      >
+        {theme.direction === "rtl" ? (
+          <KeyboardArrowLeft />
+        ) : (
+          <KeyboardArrowRight />
+        )}
+      </IconButton>
+      <IconButton
+        onClick={handleLastPageButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="last page"
+      >
+        {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
+      </IconButton>
+    </div>
+  );
+}
+
+TablePaginationActions.propTypes = {
+  count: PropTypes.number.isRequired,
+  onChangePage: PropTypes.func.isRequired,
+  page: PropTypes.number.isRequired,
+  rowsPerPage: PropTypes.number.isRequired,
+};
+
+function Reports() {
+  const user = useSelector((state) => state.user);
   const [orders, setOrders] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState(
-    "New Frquently asked question"
-  );
-  const [rows, setRows] = useState([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  const [rowsCount, setRowsCount] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState("");
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState("");
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
 
-  //   const columns = [
-  //     {
-  //       field: "order_number",
-  //       headerName: "Order Number",
-  //       headerAlign: "center",
-  //       align: "center",
-  //       width: 200,
-  //       flex: 1,
-  //     },
-  //     {
-  //       field: "order_total",
-  //       headerName: "Order Total",
-  //       headerAlign: "center",
-  //       align: "center",
-  //       width: 200,
-  //       flex: 1,
-  //     },
-  //     {
-  //       field: "orderStatus",
-  //       headerName: "Status",
-  //       headerAlign: "center",
-  //       align: "center",
-  //       width: 200,
-  //       flex: 1,
-  //     },
-  //     {
-  //       field: "search",
-  //       headerName: "Search",
-  //       width: 300,
-  //       headerAlign: "center",
-  //       sortable: false,
-  //       disableClickEventBubbling: true,
-  //       renderCell: (params) => {
-  //         return (
-  //           <TextField
-  //             id="input-with-icon-grid"
-  //             variant="outlined"
-  //             fullWidth
-  //             // onChange={handleSearchInput}
-  //           />
-  //         );
-  //       },
-  //     },
+  const [vendors, setVendors] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [partCategories, setPartCategories] = useState([]);
+  const [stores, setStores] = useState([]);
 
-  //     {
-  //       field: "actions",
-  //       headerName: "Actions",
-  //       width: 250,
-  //       sortable: false,
-  //       disableClickEventBubbling: true,
-  //       renderCell: (params) => {
-  //         return (
-  //           <Button variant="contained" color="primary">
-  //             Show details
-  //           </Button>
-  //         );
-  //       },
-  //     },
-  //   ];
+  const [filterData, updateFilterData] = useState({
+    from: null,
+    to: null,
+    vendor: null,
+    part_category: null,
+    stock: null,
+    product: null,
+    sale_type: null,
+  });
+
+  /*-Get car mades only on the initial render to pass it to the pop-up form 
+    when adding or editing, to prevent repeating the request each time the
+    pop-up is opened-*/
+  useEffect(() => {
+    if (user?.roles[0].title === "Admin") {
+      axios
+        .get("/vendors-list")
+        .then((res) => {
+          const _vendors = res.data.data.map(({ id, vendor_name }) => ({
+            id,
+            vendor_name,
+          }));
+          setVendors(_vendors);
+        })
+        .catch(() => {
+          alert("Failed to Fetch Vendors List");
+        });
+    }
+
+    axios
+      .get("/products-list")
+      .then((res) => {
+        const _products = res.data.data.map(({ id, name }) => ({ id, name }));
+        setProducts(_products);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Products List");
+      });
+
+    axios
+      .get("/storeslist")
+      .then((res) => {
+        const _stores = res.data.data.map(({ id, name }) => ({ id, name }));
+        setStores(_stores);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Stores List");
+      });
+
+    axios
+      .get("/part-categorieslist")
+      .then((res) => {
+        const _partCategories = res.data.data.map(({ id, category_name }) => ({
+          id,
+          category_name,
+        })); // Customize
+        setPartCategories(_partCategories);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Part Categories List");
+      });
+  }, []);
 
   useEffect(() => {
     axios
-      .post(`/fetch/advanced/report`, {
-        from: "2021-03-01",
-        to: "2021-03-15",
-      })
+      .post(`/fetch/advanced/report`, filterData)
       .then(({ data }) => {
         setOrders(data.total_orders);
       })
       .catch((res) => {
         alert("Failed to Fetch data");
       });
-  }, []);
+  }, [filterData]);
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
   };
 
-  const handlePageChange = ({ page }) => {
-    setPage(page);
+  const handleChangeRowsPerPage = (event) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Orders
+        Orders Summary
       </Typography>
 
       <Divider my={6} />
@@ -240,16 +335,24 @@ function Reports() {
                     <TableCell>
                       <Search />
                     </TableCell>
-                    <TableCell>
-                    </TableCell>
-                    <TableCell>
-                      <TextField variant="outlined" size="small" />
-                    </TableCell>
+                    <TableCell></TableCell>
                     <TableCell>
                       <TextField variant="outlined" size="small" />
                     </TableCell>
                     <TableCell>
                       <TextField variant="outlined" size="small" />
+                    </TableCell>
+                    <TableCell>
+                      <TextField variant="outlined" size="small" />
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => setOpenPopup(true)}
+                      >
+                        Advanced Filter
+                      </Button>
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -262,26 +365,66 @@ function Reports() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {orders?.map((row, index) => (
-                    <Row key={row.name} row={row} index={index} />
+                  {(pageSize > 0
+                    ? orders.slice(page * pageSize, page * pageSize + pageSize)
+                    : orders
+                  )?.map((row, index) => (
+                    <Row
+                      key={row.name}
+                      row={row}
+                      index={index}
+                      page={page}
+                      pageSize={pageSize}
+                    />
                   ))}
                 </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TablePagination
+                      rowsPerPageOptions={[
+                        5,
+                        10,
+                        25,
+                        { label: "All", value: -1 },
+                      ]}
+                      // colSpan={3}
+                      count={orders.length}
+                      rowsPerPage={pageSize}
+                      page={page}
+                      SelectProps={{
+                        inputProps: { "aria-label": "rows per page" },
+                        native: true,
+                      }}
+                      onChangePage={handleChangePage}
+                      onChangeRowsPerPage={handleChangeRowsPerPage}
+                      ActionsComponent={TablePaginationActions}
+                    />
+                  </TableRow>
+                </TableFooter>
               </Table>
             </TableContainer>
           </div>
         </Paper>
       </Card>
-      {/* <Popup
-        title={openPopupTitle}
+      <Popup
+        title="Filter Orders by period"
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
-        <AddPermission
-          setPage={setPage}
+        <AdvancedFilterForm
           setOpenPopup={setOpenPopup}
-          itemToEdit={selectedItem}
+          filterData={filterData}
+          updateFilterData={updateFilterData}
+          fromDate={fromDate}
+          toDate={toDate}
+          setFromDate={setFromDate}
+          setToDate={setToDate}
+          vendors={vendors}
+          products={products}
+          stores={stores}
+          partCategories={partCategories}
         />
-      </Popup> */}
+      </Popup>
     </React.Fragment>
   );
 }

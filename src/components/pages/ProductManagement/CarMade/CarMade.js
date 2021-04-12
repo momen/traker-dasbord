@@ -349,6 +349,7 @@ function CarMade() {
         {userPermissions.includes("car_made_create") ? (
           <Button
             mb={3}
+            id="carMade__addBtn"
             className={classes.button}
             variant="contained"
             onClick={() => {

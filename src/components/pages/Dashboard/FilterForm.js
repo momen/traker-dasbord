@@ -58,23 +58,20 @@ function FAQ_Form({
 
   const formRef = useRef();
   const [formData, updateFormData] = useState(filterData);
+  const [newFromDate, setNewFromDate] = useState(fromDate);
+  const [newToDate, setNewToDate] = useState(toDate);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
   const handleSubmit = async (e) => {
     setIsSubmitting(true);
+    setFromDate(newFromDate);
+    setToDate(newToDate);
     updateFilterData({
-      from: fromDate.toISOString().slice(0, 10),
-      to: toDate.toISOString().slice(0, 10),
+      from: newFromDate.toISOString().slice(0, 10),
+      to: newToDate.toISOString().slice(0, 10),
     });
     setOpenPopup(false);
-  };
-
-  const handleStateChange = (e) => {
-    updateFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
   };
 
   const handleReset = () => {
@@ -122,10 +119,10 @@ function FAQ_Form({
                       margin="normal"
                       id="date-picker-from"
                       label="From *"
-                      value={fromDate}
+                      value={newFromDate}
                       onChange={(date) => {
                         setFieldValue("from", date);
-                        setFromDate(date);
+                        setNewFromDate(date);
                         // updateFormData({
                         //   ...formData,
                         //   from: date.toISOString().slice(0, 10),
@@ -160,16 +157,16 @@ function FAQ_Form({
                       disableToolbar
                       disableFuture
                       autoOk={true}
-                      minDate={fromDate}
+                      minDate={newFromDate}
                       variant="inline"
                       format="MM/dd/yyyy"
                       margin="normal"
                       id="date-picker-to"
                       label="To *"
-                      value={toDate}
+                      value={newToDate}
                       onChange={(date) => {
                         setFieldValue("to", date);
-                        setToDate(date);
+                        setNewToDate(date);
                       }}
                       onBlur={handleBlur}
                       error={
