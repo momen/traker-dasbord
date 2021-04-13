@@ -17,7 +17,6 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
   makeStyles,
   LinearProgress,
   Grid,
@@ -349,7 +348,7 @@ function CarMade() {
         {userPermissions.includes("car_made_create") ? (
           <Button
             mb={3}
-            id="carMade__addBtn"
+            id="CarMade_Button"
             className={classes.button}
             variant="contained"
             onClick={() => {
