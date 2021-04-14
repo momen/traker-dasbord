@@ -60,6 +60,7 @@ function FAQ_Form({
   stores,
   partCategories,
   isAdmin,
+  setuserIsSearching,
 }) {
   const classes = useStyles();
 
@@ -74,6 +75,7 @@ function FAQ_Form({
     setIsSubmitting(true);
     setFromDate(newFromDate);
     setToDate(newToDate);
+    setuserIsSearching(false);
     updateFilterData({
       ...formData,
       from: newFromDate.toISOString().slice(0, 10),

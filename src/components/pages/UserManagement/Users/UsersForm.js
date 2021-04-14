@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "40vw",
+    width: "30vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -50,6 +50,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("This field is Required."),
+    roles: Yup.string().required(),
     email: Yup.string()
       .required("This field is Required.")
       .email("Please enter a valid Email"),
@@ -192,7 +193,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
         }) => (
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid item xs={8}>
                 <TextField
                   name="name" //Customize
                   required
@@ -221,6 +222,47 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
                   ))}
                 </Grid>
               ) : null}
+
+              <Grid item xs={4}>
+                <div>
+                  <TextField
+                    select
+                    label="Role"
+                    value={formData.roles}
+                    name="roles"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.roles ||
+                      Boolean(touched.roles && errors.roles)
+                    }
+                    helperText="Please select a Role"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {rolesList?.map((role) => (
+                      <option value={role.id}>{role.title}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.roles?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
 
               {!itemToEdit ? (
                 <Fragment>
@@ -324,91 +366,6 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.email?.map((msg) => (
-                    <span key={msg} className={classes.errorMsg}>
-                      {msg}
-                    </span>
-                  ))}
-                </Grid>
-              ) : null}
-
-              <Grid item xs={12} spacing={2}>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  style={{ marginRight: "5px" }}
-                  onClick={() => {
-                    updateFormData({ ...formData, roles: rolesList });
-                    setRolesError(false);
-                  }}
-                >
-                  Select All
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => {
-                    updateFormData({ ...formData, roles: [] });
-                    setRolesError(true);
-                  }}
-                >
-                  Unselect All
-                </Button>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Autocomplete
-                  multiple
-                  // filterSelectedOptions
-                  id="autocomplete-roles"
-                  options={rolesList ? rolesList : []}
-                  value={formData.roles}
-                  getOptionSelected={(option, value) => option.id === value.id}
-                  // setSelectedItem={formData.permissions}
-                  disableCloseOnSelect
-                  getOptionLabel={(option) => option.title}
-                  renderOption={(option, { selected }) => (
-                    <React.Fragment>
-                      <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={selected}
-                      />
-                      {option.title}
-                    </React.Fragment>
-                  )}
-                  fullWidth
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      id="roles"
-                      name="roles"
-                      variant="outlined"
-                      label="Roles *"
-                      placeholder="Select roles for this user."
-                      fullWidth
-                      helperText="At least one role must be selected."
-                      error={responseErrors?.roles || rolesError}
-                    />
-                  )}
-                  onBlur={() => {
-                    if (formData.roles.length === 0) {
-                      setRolesError(true);
-                    }
-                  }}
-                  onChange={(e, val) => {
-                    updateAutoComplete(e, val);
-                    if (val.length === 0) {
-                      setRolesError(true);
-                    } else {
-                      setRolesError(false);
-                    }
-                  }}
-                />
-              </Grid>
-              {responseErrors ? (
-                <Grid item xs={12}>
-                  {responseErrors.roles?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>

@@ -161,7 +161,7 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                   name="title" //Customize
                   required
                   fullWidth
-                  disabled={formData.title === "Admin"}
+                  disabled={formData.title === "Admin" ||formData.title === "Vendor"}
                   id="title" //Customize
                   label="Title" //Customize
                   value={formData.title} //Customize

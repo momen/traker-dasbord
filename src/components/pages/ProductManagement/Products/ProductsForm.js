@@ -104,7 +104,6 @@ function ProductsForm({
   stores,
   categories,
   carMades,
-  carModels,
   partCategories,
   carYears,
   productTags,
@@ -135,6 +134,8 @@ function ProductsForm({
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
     photo: [],
   });
+
+  const [carModels, setCarModels] = useState([]);
 
   const [imagesToDelete, setImagesToDelete] = useState("");
 
@@ -562,6 +563,22 @@ function ProductsForm({
                     onChange={(e) => {
                       handleChange(e);
                       handleStateChange(e);
+                      if (e.target.value) {
+                        axios
+                          .get(`/car-modelslist/${e.target.value}`)
+                          .then((res) => {
+                            const _carModels = res.data.data.map(
+                              ({ id, carmodel }) => ({
+                                id,
+                                carmodel,
+                              })
+                            ); // Customize
+                            setCarModels(_carModels);
+                          })
+                          .catch(() => {
+                            alert("Failed to Fetch Car Model List");
+                          });
+                      }
                     }}
                     SelectProps={{
                       native: true,
@@ -597,6 +614,7 @@ function ProductsForm({
                 <div>
                   <TextField
                     select
+                    disabled={carModels.length === 0}
                     label="Car Model"
                     value={formData.car_model_id}
                     name="car_model_id"

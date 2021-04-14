@@ -116,7 +116,7 @@ function CustomLoadingOverlay() {
 
 function Products() {
   const classes = useStyles();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const { userPermissions, user } = useSelector((state) => state);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -125,7 +125,7 @@ function Products() {
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [columnToFilter, setColumnToFilter] = useState("");
+  const [columnToFilter, setColumnToFilter] = useState("generic");
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
   const [selectedItem, setSelectedItem] = useState(""); // Customize
@@ -414,19 +414,6 @@ function Products() {
       });
 
     axios
-      .get("/car-modelslist")
-      .then((res) => {
-        const _carModels = res.data.data.map(({ id, carmodel }) => ({
-          id,
-          carmodel,
-        })); // Customize
-        setCarModels(_carModels);
-      })
-      .catch(() => {
-        alert("Failed to Fetch Car Model List");
-      });
-
-    axios
       .get("/car-yearslist")
       .then((res) => {
         const _carYears = res.data.data.map(({ id, year }) => ({
@@ -622,9 +609,9 @@ function Products() {
                           getContentAnchorEl: () => null,
                         }}
                       >
-                        <MenuItem value="" disabled>
+                        {/* <MenuItem value="" disabled>
                           Select a column to filter by
-                        </MenuItem>
+                        </MenuItem> */}
                         <MenuItem value={"generic"}>Generic Search</MenuItem>
                         <MenuItem value={"name"}>Product Name</MenuItem>
                         <MenuItem value={"quantity"}>Quantity</MenuItem>
@@ -636,6 +623,10 @@ function Products() {
                         <MenuItem value={"part_category"}>
                           Part Category
                         </MenuItem>
+                        {user?.roles[0].title === "Admin" ? (
+                          <MenuItem value={"vendor_id"}>Vendor Name</MenuItem>
+                        ) : null}
+                        <MenuItem value={"store_id"}>Store Name</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -686,7 +677,6 @@ function Products() {
           stores={stores}
           categories={categories}
           carMades={carMades}
-          carModels={carModels}
           partCategories={partCategories}
           carYears={carYears}
           productTags={productTags}

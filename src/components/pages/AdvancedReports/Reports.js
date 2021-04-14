@@ -236,7 +236,9 @@ function Reports() {
   const [searchData, updateSearchData] = useState({
     order_number: "",
     order_total: "",
+    status: "",
   });
+  const [userIsSearching, setuserIsSearching] = useState(false);
 
   const [vendors, setVendors] = useState([]);
   const [products, setProducts] = useState([]);
@@ -307,15 +309,40 @@ function Reports() {
   }, []);
 
   useEffect(() => {
-    axios
-      .post(`/fetch/advanced/report`, filterData)
-      .then(({ data }) => {
-        setOrders(data.total_orders);
-      })
-      .catch((res) => {
-        alert("Failed to Fetch data");
-      });
-  }, [filterData]);
+    if (!userIsSearching) {
+      axios
+        .post(`/fetch/advanced/report`, filterData)
+        .then(({ data }) => {
+          setOrders(data.total_orders);
+          setFilteredOrders(data.total_orders);
+        })
+        .catch((res) => {
+          alert("Failed to Fetch data");
+        });
+    } else {
+      const ordersAfterSearch =
+        searchData.order_number || searchData.order_number.trim() !== ""
+          ? orders.filter((order) =>
+              order.order_number.startsWith(searchData.order_number)
+            )
+          : orders;
+
+      ordersAfterSearch =
+        searchData.order_total || searchData.order_total.trim() !== ""
+          ? ordersAfterSearch.filter(
+              (order) => order.order_total <= searchData.order_total
+            )
+          : ordersAfterSearch;
+
+      ordersAfterSearch = searchData.status
+        ? filteredOrders.filter(
+            (order) => order.orderStatus === searchData.status
+          )
+        : ordersAfterSearch;
+
+      setFilteredOrders(ordersAfterSearch);
+    }
+  }, [filterData, searchData]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -324,6 +351,16 @@ function Reports() {
   const handleChangeRowsPerPage = (event) => {
     setPageSize(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const handleSearch = (e) => {
+    if (!userIsSearching) {
+      setuserIsSearching(true);
+    }
+    updateSearchData({
+      ...searchData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   return (
@@ -347,23 +384,47 @@ function Reports() {
                     </TableCell>
                     <TableCell></TableCell>
                     <TableCell>
-                      <TextField variant="outlined" size="small" />
+                      <TextField
+                        variant="outlined"
+                        size="small"
+                        name="order_number"
+                      />
                     </TableCell>
                     <TableCell>
-                      <TextField variant="outlined" size="small" />
+                      <TextField
+                        variant="outlined"
+                        size="small"
+                        name="order_total"
+                      />
                     </TableCell>
-                    <TableCell style={{ width: "15%"}}>
-                      <FormControl variant="outlined" style={{ width: "100%"}} size="small">
+                    <TableCell style={{ width: "15%" }}>
+                      <FormControl
+                        variant="outlined"
+                        style={{ width: "100%" }}
+                        size="small"
+                      >
                         <InputLabel id="demo-simple-select-outlined-label">
                           Status
                         </InputLabel>
                         <Select
                           autoWidth
                           labelId="demo-simple-select-outlined-label"
-                          id="demo-simple-select-outlined"
+                          id="status"
+                          name="status"
                           // value={age}
                           // onChange={handleChange}
                           label="Status"
+                          MenuProps={{
+                            anchorOrigin: {
+                              vertical: "bottom",
+                              horizontal: "center",
+                            },
+                            transformOrigin: {
+                              vertical: "top",
+                              horizontal: "center",
+                            },
+                            getContentAnchorEl: () => null,
+                          }}
                         >
                           <MenuItem value="">
                             <em>None</em>
@@ -453,6 +514,7 @@ function Reports() {
           stores={stores}
           partCategories={partCategories}
           isAdmin={user?.roles[0].title === "Admin"}
+          setuserIsSearching={setuserIsSearching}
         />
       </Popup>
     </React.Fragment>
