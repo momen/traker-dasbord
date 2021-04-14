@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Card,
+  CardHeader,
   Collapse,
   Divider as MuiDivider,
   FormControl,
@@ -373,6 +374,12 @@ function Reports() {
       <Typography variant="h3" gutterBottom display="inline">
         Orders Summary
       </Typography>
+
+      <h3>
+        {filterData.from && filterData.to
+          ? ` ${filterData.from} - ${filterData.to}`
+          : " Last week (Default)"}
+      </h3>
 
       <Divider my={6} />
 

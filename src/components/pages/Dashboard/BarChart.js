@@ -49,9 +49,9 @@ const BarChart = ({ theme, barChartLabels, sales, fromDate, toDate }) => {
       //   categoryPercentage: 0.5,
       // },
       {
-        label: "Desktop",
-        backgroundColor: secondDatasetColor,
-        borderColor: secondDatasetColor,
+        label: "Sales",
+        backgroundColor: firstDatasetColor,
+        borderColor: firstDatasetColor,
         hoverBackgroundColor: secondDatasetColor,
         hoverBorderColor: secondDatasetColor,
         data: sales,
@@ -75,7 +75,7 @@ const BarChart = ({ theme, barChartLabels, sales, fromDate, toDate }) => {
           },
           stacked: true,
           ticks: {
-            stepSize: 200,
+            // stepSize: 100,
             fontColor: theme.palette?.text.secondary,
           },
         },
@@ -112,7 +112,7 @@ const BarChart = ({ theme, barChartLabels, sales, fromDate, toDate }) => {
         // }
         title={
           fromDate && toDate
-            ? `Period: From ${fromDate} To ${toDate}`
+            ? `Period: ${fromDate} ~ ${toDate}`
             : "Period: Last week"
         }
       />
