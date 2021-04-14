@@ -320,22 +320,26 @@ function Reports() {
           alert("Failed to Fetch data");
         });
     } else {
-      const ordersAfterSearch =
-        searchData.order_number || searchData.order_number.trim() !== ""
+      let ordersAfterSearch =
+        searchData.order_number ||
+        searchData.order_number.toString().trim() !== ""
           ? orders.filter((order) =>
-              order.order_number.startsWith(searchData.order_number)
+              order.order_number
+                .toString()
+                .startsWith(searchData.order_number.toString())
             )
           : orders;
 
       ordersAfterSearch =
-        searchData.order_total || searchData.order_total.trim() !== ""
+        searchData.order_total ||
+        searchData.order_total.toString().trim() !== ""
           ? ordersAfterSearch.filter(
-              (order) => order.order_total <= searchData.order_total
+              (order) => order.order_total <= parseFloat(searchData.order_total)
             )
           : ordersAfterSearch;
 
       ordersAfterSearch = searchData.status
-        ? filteredOrders.filter(
+        ? ordersAfterSearch.filter(
             (order) => order.orderStatus === searchData.status
           )
         : ordersAfterSearch;
@@ -388,6 +392,7 @@ function Reports() {
                         variant="outlined"
                         size="small"
                         name="order_number"
+                        onChange={handleSearch}
                       />
                     </TableCell>
                     <TableCell>
@@ -395,6 +400,7 @@ function Reports() {
                         variant="outlined"
                         size="small"
                         name="order_total"
+                        onChange={handleSearch}
                       />
                     </TableCell>
                     <TableCell style={{ width: "15%" }}>
@@ -425,13 +431,14 @@ function Reports() {
                             },
                             getContentAnchorEl: () => null,
                           }}
+                          onChange={handleSearch}
                         >
                           <MenuItem value="">
                             <em>None</em>
                           </MenuItem>
-                          <MenuItem value={10}>Pending</MenuItem>
-                          <MenuItem value={20}>Approved</MenuItem>
-                          <MenuItem value={30}>Cancelled</MenuItem>
+                          <MenuItem value="pending">Pending</MenuItem>
+                          <MenuItem value="approved">Approved</MenuItem>
+                          <MenuItem value="cancelled">Cancelled</MenuItem>
                         </Select>
                       </FormControl>
                     </TableCell>
@@ -456,8 +463,11 @@ function Reports() {
                 </TableHead>
                 <TableBody>
                   {(pageSize > 0
-                    ? orders.slice(page * pageSize, page * pageSize + pageSize)
-                    : orders
+                    ? filteredOrders.slice(
+                        page * pageSize,
+                        page * pageSize + pageSize
+                      )
+                    : filteredOrders
                   )?.map((row, index) => (
                     <Row
                       key={row.name}
@@ -478,7 +488,7 @@ function Reports() {
                         { label: "All", value: -1 },
                       ]}
                       // colSpan={3}
-                      count={orders.length}
+                      count={filteredOrders.length}
                       rowsPerPage={pageSize}
                       page={page}
                       SelectProps={{
