@@ -104,6 +104,15 @@ function ViewRole({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">{role.title}</StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`addedBy-${role.added_by_name}`}>
+              <StyledTableCell
+                component="th"
+                scope="row"
+              >
+                Created by
+              </StyledTableCell>
+              <StyledTableCell align="left">{role.added_by_name}</StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={`${role.id} ${role.title}`}>
               <StyledTableCell
                 component="th"

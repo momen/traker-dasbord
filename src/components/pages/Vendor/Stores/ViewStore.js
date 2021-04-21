@@ -97,6 +97,12 @@ function ViewStore({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">{store.name}</StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={store.vendor_name}>
+              <StyledTableCell component="th" scope="row">
+                Owner (vendor)
+              </StyledTableCell>
+              <StyledTableCell align="left">{store.vendor_name}</StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={store.address}>
               <StyledTableCell component="th" scope="row">
                 Address
