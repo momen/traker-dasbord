@@ -182,7 +182,7 @@ function VendorOrders({ match }) {
     if (!userIsSearching) {
       axios
         .post(
-          `/admin/show/vendor/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/admin/show/vendor/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             vendor_id: match.params.id,
           }
@@ -198,7 +198,7 @@ function VendorOrders({ match }) {
     } else {
       axios
         .post(
-          `/admin/search/vendor/orders?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/admin/search/vendor/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
             vendor_id: match.params.id,
@@ -213,7 +213,7 @@ function VendorOrders({ match }) {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel]);
+  }, [page, searchValue, sortModel, pageSize]);
 
   return (
     <React.Fragment>

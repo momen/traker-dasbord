@@ -178,7 +178,7 @@ function VendorInvoices({ match }) {
     if (!userIsSearching) {
       axios
         .post(
-          `/admin/show/vendor/invoices?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/admin/show/vendor/invoices?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
               vendor_id: match.params.id
           }
@@ -194,7 +194,7 @@ function VendorInvoices({ match }) {
     } else {
       axios
         .post(
-          `/admin/search/vendor/invoices?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/admin/search/vendor/invoices?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
             vendor_id: match.params.id,
@@ -209,7 +209,7 @@ function VendorInvoices({ match }) {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel]);
+  }, [page, searchValue, sortModel, pageSize]);
 
   return (
     <React.Fragment>

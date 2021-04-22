@@ -149,11 +149,9 @@ function Users() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          {params.value?.map((role) => (
-            <span key={role.id} className={classes.roleBadge}>
-              {role.title}
-            </span>
-          ))}
+          <span key={params.value?.id} className={classes.roleBadge}>
+            {params.value?.title}
+          </span>
         </div>
       ),
     },
@@ -256,7 +254,7 @@ function Users() {
         setLoading(true);
         axios
           .get(
-            `/users?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/users?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -286,7 +284,7 @@ function Users() {
         setLoading(true);
         axios
           .get(
-            `/users?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/users?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -324,7 +322,7 @@ function Users() {
     if (!userIsSearching) {
       axios
         .get(
-          `/users?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/users?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -337,7 +335,7 @@ function Users() {
     } else {
       axios
         .post(
-          `/users/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/users/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -351,7 +349,7 @@ function Users() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel]);
+  }, [page, searchValue, openPopup, sortModel, pageSize]);
 
   return (
     <React.Fragment>

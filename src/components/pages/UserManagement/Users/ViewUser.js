@@ -128,11 +128,9 @@ function ViewUser({ match }) {
                 Roles
               </StyledTableCell>
               <StyledTableCell align="left">
-                {singleUser.roles?.map((role) => (
-                  <span key={role.id} className={classes.roleBadge}>
-                    {role.title}
+                  <span key={singleUser.roles?.id} className={classes.roleBadge}>
+                    {singleUser.roles?.title}
                   </span>
-                ))}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>

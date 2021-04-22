@@ -444,7 +444,8 @@ function Reports() {
                             <em>None</em>
                           </MenuItem>
                           <MenuItem value="pending">Pending</MenuItem>
-                          <MenuItem value="approved">Approved</MenuItem>
+                          <MenuItem value="in progress">In Progress</MenuItem>
+                          <MenuItem value="delivered">Delivered</MenuItem>
                           <MenuItem value="cancelled">Cancelled</MenuItem>
                         </Select>
                       </FormControl>

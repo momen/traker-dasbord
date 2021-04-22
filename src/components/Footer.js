@@ -8,6 +8,7 @@ import {
   ListItemText as MuiListItemText,
   ListItem as MuiListItem,
 } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 const Wrapper = styled.div`
   padding: ${(props) => props.theme.spacing(1) / 4}px
@@ -41,27 +42,33 @@ function Footer() {
         <Hidden smDown>
           <Grid container item xs={12} md={6}>
             <List>
-              <ListItem button={true} component="a" href="#">
-                <ListItemText primary="Support" />
-              </ListItem>
-              <ListItem button={true} component="a" href="#">
-                <ListItemText primary="Help Center" />
-              </ListItem>
-              <ListItem button={true} component="a" href="#">
-                <ListItemText primary="Privacy" />
-              </ListItem>
-              <ListItem button={true} component="a" href="#">
-                <ListItemText primary="Terms of Service" />
-              </ListItem>
+              <Link to="/support">
+                <ListItem button={true}>
+                  <ListItemText primary="Support" />
+                </ListItem>
+              </Link>
+              <Link to="/help">
+                <ListItem button={true}>
+                  <ListItemText primary="Help Center" />
+                </ListItem>
+              </Link>
+              <Link to="/">
+                <ListItem button={true}>
+                  <ListItemText primary="Privacy" />
+                </ListItem>
+              </Link>
+              <Link to="/">
+                <ListItem button={true}>
+                  <ListItemText primary="Terms of Service" />
+                </ListItem>
+              </Link>
             </List>
           </Grid>
         </Hidden>
         <Grid container item xs={12} md={6} justify="flex-end">
           <List>
             <ListItem button={true}>
-              <ListItemText
-                primary={`© ${new Date().getFullYear()} - Material App`}
-              />
+              <ListItemText primary={`© ${new Date().getFullYear()} - Trkar`} />
             </ListItem>
           </List>
         </Grid>

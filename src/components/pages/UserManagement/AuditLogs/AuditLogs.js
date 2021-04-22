@@ -95,7 +95,7 @@ function CustomLoadingOverlay() {
 
 function AuditLogs() {
   const classes = useStyles();
-  const userPermissions  = useSelector((state) =>  state.userPermissions)
+  const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(1);
@@ -110,11 +110,29 @@ function AuditLogs() {
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 60, headerAlign: 'center', align:'center' },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 60,
+      headerAlign: "center",
+      align: "center",
+    },
     { field: "description", headerName: "Description", width: 150 },
-    { field: "subject_id", headerName: "Subject ID", width: 80, headerAlign: 'center', align:'center' },
+    {
+      field: "subject_id",
+      headerName: "Subject ID",
+      width: 80,
+      headerAlign: "center",
+      align: "center",
+    },
     { field: "subject_type", headerName: "Subject Type", width: 150 },
-    { field: "user_id", headerName: "User ID", width: 80, headerAlign: 'center', align:'center' },
+    {
+      field: "user_id",
+      headerName: "User ID",
+      width: 80,
+      headerAlign: "center",
+      align: "center",
+    },
     { field: "host", headerName: "Host", width: 120 },
     { field: "created_at", headerName: "Created at", width: 120 },
     {
@@ -182,7 +200,7 @@ function AuditLogs() {
     if (!userIsSearching) {
       axios
         .get(
-          `/audit-logs?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/audit-logs?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -195,7 +213,7 @@ function AuditLogs() {
     } else {
       axios
         .post(
-          `/audit-logs/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/audit-logs/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -209,7 +227,7 @@ function AuditLogs() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel]);
+  }, [page, searchValue, sortModel, pageSize]);
 
   return (
     <React.Fragment>

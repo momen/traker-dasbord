@@ -253,7 +253,7 @@ function PartCategory() {
         setLoading(true);
         axios
           .get(
-            `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/part-categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -274,19 +274,16 @@ function PartCategory() {
 
   const MassDelete = () => {
     axios
-      .post(
-        `/part-categories/mass/delete`,
-        {
-          ids: JSON.stringify(rowsToDelete),
-        }
-      )
+      .post(`/part-categories/mass/delete`, {
+        ids: JSON.stringify(rowsToDelete),
+      })
       .then((res) => {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
         setLoading(true);
         axios
           .get(
-            `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/part-categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -312,7 +309,7 @@ function PartCategory() {
     if (!userIsSearching) {
       axios
         .get(
-          `/part-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/part-categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -325,7 +322,7 @@ function PartCategory() {
     } else {
       axios
         .post(
-          `/part/categories/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/part/categories/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -339,7 +336,7 @@ function PartCategory() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel]);
+  }, [page, searchValue, openPopup, sortModel, pageSize]);
 
   return (
     <React.Fragment>
@@ -509,7 +506,8 @@ function PartCategory() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete all the selected Part Categories? <br />
+            Are you sure you want to delete all the selected Part Categories?{" "}
+            <br />
             If you wish press Yes, otherwise press Back.
           </DialogContentText>
         </DialogContent>

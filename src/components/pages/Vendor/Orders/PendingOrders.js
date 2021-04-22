@@ -225,7 +225,7 @@ function PendingOrders() {
         setLoading(true);
         axios
           .get(
-            `/orders/need/approval?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/orders/need/approval?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -254,7 +254,7 @@ function PendingOrders() {
         setLoading(true);
         axios
           .get(
-            `/orders/need/approval?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/orders/need/approval?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -279,7 +279,7 @@ function PendingOrders() {
     if (!userIsSearching) {
       axios
         .get(
-          `/orders/need/approval?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/orders/need/approval?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -292,7 +292,7 @@ function PendingOrders() {
     } else {
       axios
         .post(
-          `/orders/need/approval/search?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/orders/need/approval/search?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -306,7 +306,7 @@ function PendingOrders() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel]);
+  }, [page, searchValue, sortModel, pageSize]);
 
   return (
     <React.Fragment>
@@ -392,9 +392,7 @@ function PendingOrders() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {"Order Approval"}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Order Approval"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Are you sure you want to Approve this order?
@@ -424,9 +422,7 @@ function PendingOrders() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {"Cancel Order"}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Cancel Order"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Are you sure you want to Cancel this order?

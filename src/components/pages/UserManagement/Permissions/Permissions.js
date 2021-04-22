@@ -165,7 +165,7 @@ function Permissions() {
 
     await axios
       .get(
-        `/permissions?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        `/permissions?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
       )
       .then((res) => {
         if (Math.ceil(res.data.total / pageSize) < page) {
@@ -186,7 +186,7 @@ function Permissions() {
       setLoading(true);
       axios
         .get(
-          `/permissions?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/permissions?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -197,7 +197,7 @@ function Permissions() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, openPopup, sortModel]);
+  }, [page, openPopup, sortModel, pageSize]);
 
   return (
     <React.Fragment>

@@ -275,7 +275,7 @@ function Vendors() {
         setLoading(true);
         axios
           .get(
-            `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/add-vendors?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -296,19 +296,16 @@ function Vendors() {
 
   const MassDelete = () => {
     axios
-      .post(
-        `/add-vendors/mass/delete`,
-        {
-          ids: JSON.stringify(rowsToDelete),
-        }
-      )
+      .post(`/add-vendors/mass/delete`, {
+        ids: JSON.stringify(rowsToDelete),
+      })
       .then((res) => {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
         setLoading(true);
         axios
           .get(
-            `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/add-vendors?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -340,7 +337,7 @@ function Vendors() {
         alert("Failed to Fetch Users List");
       });
 
-      console.log(rowsToDelete.length);
+    console.log(rowsToDelete.length);
   }, []);
 
   //Request the page records either on the initial render, or whenever the page changes
@@ -350,7 +347,7 @@ function Vendors() {
     if (!userIsSearching) {
       axios
         .get(
-          `/add-vendors?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/add-vendors?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -363,7 +360,7 @@ function Vendors() {
     } else {
       axios
         .post(
-          `/add-vendors/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/add-vendors/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -377,7 +374,7 @@ function Vendors() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel]);
+  }, [page, searchValue, openPopup, sortModel, pageSize]);
 
   return (
     <React.Fragment>

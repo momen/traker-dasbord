@@ -184,7 +184,7 @@ function Support() {
     if (!userIsSearching) {
       axios
         .get(
-          `/all/tickets?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/all/tickets?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -197,7 +197,7 @@ function Support() {
     } else {
       axios
         .post(
-          `/search/tickets?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/search/tickets?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -211,7 +211,7 @@ function Support() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel]);
+  }, [page, searchValue, sortModel, pageSize]);
 
   return (
     <React.Fragment>

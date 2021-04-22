@@ -245,7 +245,7 @@ function Stores() {
         setLoading(true);
         axios
           .get(
-            `/stores?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/stores?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -266,19 +266,16 @@ function Stores() {
 
   const MassDelete = () => {
     axios
-      .post(
-        `/stores/mass/delete`,
-        {
-          ids: JSON.stringify(rowsToDelete),
-        }
-      )
+      .post(`/stores/mass/delete`, {
+        ids: JSON.stringify(rowsToDelete),
+      })
       .then((res) => {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
         setLoading(true);
         axios
           .get(
-            `/stores?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/stores?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -304,7 +301,7 @@ function Stores() {
     if (!userIsSearching) {
       axios
         .get(
-          `/stores?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/stores?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -317,7 +314,7 @@ function Stores() {
     } else {
       axios
         .post(
-          `/stores/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/stores/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -331,7 +328,7 @@ function Stores() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel]);
+  }, [page, searchValue, openPopup, sortModel, pageSize]);
 
   return (
     <React.Fragment>

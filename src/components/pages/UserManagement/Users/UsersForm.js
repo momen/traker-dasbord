@@ -81,9 +81,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
     email: itemToEdit ? itemToEdit.email : "",
-    roles: itemToEdit
-      ? itemToEdit.roles.map(({ id, title }) => ({ id, title }))
-      : [],
+    roles: itemToEdit ? itemToEdit.roles.id : null,
   });
   const [rolesError, setRolesError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -107,15 +105,11 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
       roles: formData.roles,
     };
 
-    data.roles = data.roles.map((role) => role.id);
-    data.roles = JSON.stringify(data.roles); //VI
-
     if (itemToEdit) {
       //Customize
       axios
         .put(`/users/${itemToEdit.id}`, data)
         .then((res) => {
-          // setPage(1);
           setOpenPopup(false);
         })
         .catch(({ response }) => {

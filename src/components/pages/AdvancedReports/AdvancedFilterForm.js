@@ -78,8 +78,8 @@ function FAQ_Form({
     setuserIsSearching(false);
     updateFilterData({
       ...formData,
-      from: newFromDate.toISOString().slice(0, 10),
-      to: newToDate.toISOString().slice(0, 10),
+      from: newFromDate?.toISOString().slice(0, 10),
+      to: newToDate?.toISOString().slice(0, 10),
     });
     setOpenPopup(false);
   };
@@ -101,8 +101,8 @@ function FAQ_Form({
       product: null,
       sale_type: null,
     });
-    setFromDate(null);
-    setToDate(null);
+    setNewFromDate(null);
+    setNewToDate(null);
     setResponseErrors("");
   };
 

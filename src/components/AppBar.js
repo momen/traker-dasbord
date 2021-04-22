@@ -130,7 +130,7 @@ const AppBarComponent = ({ onDrawerToggle }) => {
               />
               <MessagesDropdown />
               <NotificationsDropdown />
-              <LanguagesDropdown />
+              {/* <LanguagesDropdown /> */}
               {/* <UserDropdown /> */}
             </Grid>
           </Grid>

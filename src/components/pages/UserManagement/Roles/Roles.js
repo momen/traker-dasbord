@@ -226,7 +226,7 @@ function Roles() {
         setLoading(true);
         axios
           .get(
-            `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/roles?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -256,7 +256,7 @@ function Roles() {
         setLoading(true);
         axios
           .get(
-            `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/roles?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -292,7 +292,7 @@ function Roles() {
       setLoading(true);
       axios
         .get(
-          `/roles?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/roles?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -303,7 +303,7 @@ function Roles() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, openPopup, sortModel]);
+  }, [page, openPopup, sortModel, pageSize]);
 
   return (
     <React.Fragment>

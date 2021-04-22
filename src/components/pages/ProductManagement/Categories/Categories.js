@@ -105,7 +105,7 @@ function CustomLoadingOverlay() {
 
 function Categories() {
   const classes = useStyles();
-  const userPermissions  = useSelector((state) =>  state.userPermissions)
+  const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -252,7 +252,7 @@ function Categories() {
 
     await axios
       .get(
-        `/product-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        `/product-categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
       )
       .then((res) => {
         if (Math.ceil(res.data.total / pageSize) < page) {
@@ -278,7 +278,7 @@ function Categories() {
         setLoading(true);
         axios
           .get(
-            `/product-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/product-categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -304,7 +304,7 @@ function Categories() {
     if (!userIsSearching) {
       axios
         .get(
-          `/product-categories?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/product-categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -317,7 +317,7 @@ function Categories() {
     } else {
       axios
         .post(
-          `/categories/search/name?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/categories/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -331,7 +331,7 @@ function Categories() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel]);
+  }, [page, searchValue, openPopup, sortModel, pageSize]);
 
   return (
     <React.Fragment>

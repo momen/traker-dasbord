@@ -202,7 +202,7 @@ function Tags() {
         setLoading(true);
         axios
           .get(
-            `/product-tags?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/product-tags?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -223,19 +223,16 @@ function Tags() {
 
   const MassDelete = () => {
     axios
-      .post(
-        `/product-tags/mass/delete`,
-        {
-          ids: JSON.stringify(rowsToDelete),
-        }
-      )
+      .post(`/product-tags/mass/delete`, {
+        ids: JSON.stringify(rowsToDelete),
+      })
       .then((res) => {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
         setLoading(true);
         axios
           .get(
-            `/product-tags?page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/product-tags?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -260,7 +257,7 @@ function Tags() {
     setLoading(true);
     axios
       .get(
-        `/product-tags??page=${page}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}` 
+        `/product-tags??page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
       )
       .then((res) => {
         setRowsCount(res.data.total);
@@ -270,7 +267,7 @@ function Tags() {
       .catch(() => {
         alert("Failed to Fetch data");
       });
-  }, [page, openPopup, sortModel]);
+  }, [page, openPopup, sortModel, pageSize]);
 
   return (
     <React.Fragment>
