@@ -125,7 +125,7 @@ function CarModel() {
       headerName: "Car Made",
       width: 200,
       flex: 1,
-      renderCell: (params) => params.row.carmade.car_made,
+      renderCell: (params) => params.row.carmade?.car_made,
     },
     {
       field: "actions",
