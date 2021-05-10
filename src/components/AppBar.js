@@ -107,14 +107,14 @@ const AppBarComponent = ({ onDrawerToggle }) => {
                 </IconButton>
               </Grid>
             </Hidden>
-            <Grid item>
+            {/* <Grid item>
               <Search>
                 <SearchIconWrapper>
                   <SearchIcon />
                 </SearchIconWrapper>
                 <Input placeholder="Search topics" />
               </Search>
-            </Grid>
+            </Grid> */}
             <Grid item xs />
             <Grid item>
               {currentTheme.darkTheme ? (

@@ -189,21 +189,6 @@ function ViewProduct({ match }) {
                 <span className={classes.rowContent}>{product.serial_number}</span>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`product-cat-${product.id}`}>
-              <StyledTableCell
-                component="th"
-                scope="row"
-              >
-                Categories
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {product.categories?.map((category) => (
-                  <span key={category.id} className={classes.categoriesBadge}>
-                    {category.name}
-                  </span>
-                ))}
-              </StyledTableCell>
-            </StyledTableRow>
             <StyledTableRow key={`product-tags-${product.id}`}>
               <StyledTableCell
                 component="th"
@@ -242,6 +227,14 @@ function ViewProduct({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>{product.car_made?.car_made}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`product-category-${product.category_id}`}>
+              <StyledTableCell component="th" scope="row">
+                Category
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.category?.name}</span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`part-${product.part_category_id}`}>

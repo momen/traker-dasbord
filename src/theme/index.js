@@ -6,7 +6,7 @@ import breakpoints from "./breakpoints";
 import props from "./props";
 import shadows from "./shadows";
 
-const createTheme = (name) => {
+const createTheme = (name, direction) => {
   let themeConfig = variants.find((variant) => variant.name === name);
 
   if (!themeConfig) {
@@ -23,6 +23,7 @@ const createTheme = (name) => {
       typography: typography,
       shadows: shadows,
       palette: themeConfig.palette,
+      direction
     },
     {
       name: themeConfig.name,

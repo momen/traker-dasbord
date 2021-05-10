@@ -134,10 +134,11 @@ function Products() {
   const [itemToDelete, setItemToDelete] = useState("");
   const [categories, setCategories] = useState([]);
   const [carMades, setCarMades] = useState([]);
-  const [carModels, setCarModels] = useState([]);
-  const [partCategories, setPartCategories] = useState([]);
   const [carYears, setCarYears] = useState([]);
   const [stores, setStores] = useState([]);
+  const [manufacturers, setManufacturers] = useState([]);
+  const [originCountries, setOriginCountries] = useState([]);
+  const [carTypes, setCarTypes] = useState([]);
   const [productTags, setProductTags] = useState([]);
   const [sortModel, setSortModel] = useState([
     { field: "quantity", sort: "desc" },
@@ -170,19 +171,11 @@ function Products() {
       align: "center",
     },
     {
-      field: "categories",
-      headerName: "Categories",
+      field: "category",
+      headerName: "Category",
       width: 100,
       sortable: false,
-      renderCell: (params) => (
-        <div>
-          {params.value?.map((category) => (
-            <span key={category.id} className={classes.categoriesBadge}>
-              {category.name}
-            </span>
-          ))}
-        </div>
-      ),
+      renderCell: (params) => params.row.category?.name,
     },
     {
       field: "photo",
@@ -427,16 +420,44 @@ function Products() {
       });
 
     axios
-      .get("/part-categorieslist")
+      .get("/manufacturer/list")
       .then((res) => {
-        const _partCategories = res.data.data.map(({ id, category_name }) => ({
-          id,
-          category_name,
-        })); // Customize
-        setPartCategories(_partCategories);
+        const _manufacturers = res.data.data.map(
+          ({ id, manufacturer_name }) => ({
+            id,
+            manufacturer_name,
+          })
+        ); // Customize
+        setManufacturers(_manufacturers);
       })
       .catch(() => {
-        alert("Failed to Fetch Part Categories List");
+        alert("Failed to Fetch Manufacturers List");
+      });
+
+    axios
+      .get("/prodcountries/list")
+      .then((res) => {
+        const _countries = res.data.data.map(({ id, country_name }) => ({
+          id,
+          country_name,
+        })); // Customize
+        setOriginCountries(_countries);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Origin Countries List");
+      });
+
+      axios
+      .get("/cartypes/list")
+      .then((res) => {
+        const _carTypes = res.data.data.map(({ id, type_name }) => ({
+          id,
+          type_name,
+        })); // Customize
+        setCarTypes(_carTypes);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Car Types List");
       });
 
     axios
@@ -677,8 +698,10 @@ function Products() {
           stores={stores}
           categories={categories}
           carMades={carMades}
-          partCategories={partCategories}
           carYears={carYears}
+          manufacturers={manufacturers}
+          originCountries={originCountries}
+          carTypes={carTypes}
           productTags={productTags}
         />
       </Popup>

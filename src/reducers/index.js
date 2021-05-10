@@ -8,6 +8,13 @@ const CSRFReducer = (csrf = null, action) => {
   return csrf;
 };
 
+const langReducer = (lang = "ar", action) => {
+  if (action.type === "SET_LANG") {
+    return action.payload;
+  }
+  return lang;
+};
+
 const userInfoReducer = (user = null, action) => {
   switch (action.type) {
     case "LOGIN":
@@ -81,6 +88,7 @@ const themeReducer = (
 
 export default combineReducers({
   csrf: CSRFReducer,
+  lang: langReducer,
   user: userInfoReducer,
   userToken: userTokenReducer,
   userPermissions: userPermissionsReducer,

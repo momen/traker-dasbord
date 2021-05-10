@@ -20,13 +20,15 @@ import { Redirect } from "react-router-dom";
 import { connect, useDispatch } from "react-redux";
 import { Logout } from "./actions";
 import { THEMES } from "./constants";
+import jssRTL from "jss-rtl";
 
 const jss = create({
+  // plugins: [...jssPreset().plugins, jssRTL()],
   ...jssPreset(),
   insertionPoint: document.getElementById("jss-insertion-point"),
 });
 
-function App({ userToken, theme }) {
+function App({ userToken, theme, lang }) {
   // const userToken = useSelector((state) => state.userToken);
   // const [{ userToken, theme }, dispatch] = useStateValue();
   const dispatch = useDispatch();
@@ -40,6 +42,7 @@ function App({ userToken, theme }) {
   // beginning as no token is provided in the headers
   useEffect(() => {
     axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+    axios.defaults.headers.common["Accept-Language"] = lang;
 
     axios.interceptors.response.use(
       (res) => {
@@ -69,11 +72,13 @@ function App({ userToken, theme }) {
           <MuiThemeProvider
             theme={createTheme(
               theme === "light" ? THEMES.DEFAULT : THEMES.DARK
+              // lang === "ar" ? "rtl" : "ltr"
             )}
           >
             <ThemeProvider
               theme={createTheme(
                 theme === "light" ? THEMES.DEFAULT : THEMES.DARK
+                // lang === "ar" ? "rtl" : "ltr"
               )}
             >
               <Routes />
@@ -89,6 +94,7 @@ const mapStateToProps = (state) => {
   return {
     userToken: state.userToken,
     theme: state.theme,
+    lang: state.lang,
   };
 };
 

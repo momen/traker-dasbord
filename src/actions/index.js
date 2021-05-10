@@ -30,3 +30,10 @@ export const toggleTheme = (theme) => {
     payload: theme,
   };
 };
+
+export const setLanguage = (lang) => {
+  return {
+    type: "SET_LANG",
+    payload: lang,
+  };
+};

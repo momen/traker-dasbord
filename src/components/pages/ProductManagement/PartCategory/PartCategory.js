@@ -119,6 +119,7 @@ function PartCategory() {
   const [selectedItem, setSelectedItem] = useState(
     ""
   ); /****** Customize ******/
+  const [categories, setCategories] = useState([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
@@ -302,6 +303,21 @@ function PartCategory() {
       });
   };
 
+  /*-Get categories only on the initial render to pass it to the pop-up form 
+    when adding or editing, to prevent repeating the request each time the
+    pop-up is opened-*/
+  useEffect(() => {
+    axios
+      .get("/categorieslist")
+      .then((res) => {
+        let _categories = res.data.data.map(({ id, name }) => ({ id, name }));
+        setCategories(_categories);
+      })
+      .catch(() => {
+        alert("Failed to Fetch data");
+      });
+  }, []);
+
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
     if (openPopup) return;
@@ -460,6 +476,7 @@ function PartCategory() {
           setPage={setPage}
           setOpenPopup={setOpenPopup}
           itemToEdit={selectedItem}
+          categories={categories}
         />
       </Popup>
 

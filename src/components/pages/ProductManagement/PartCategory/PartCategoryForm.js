@@ -59,9 +59,10 @@ const validationSchema = Yup.object().shape({
       "Please remove any dots",
       (val) => !val?.includes(".")
     ),
+  category_id: Yup.string().required(),
 });
 
-function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
+function PartCategoryForm({ setPage, setOpenPopup, itemToEdit, categories }) {
   const classes = useStyles();
 
   const formRef = useRef();
@@ -69,6 +70,7 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
 
   const [formData, updateFormData] = useState({
     category_name: itemToEdit ? itemToEdit.category_name : "",
+    category_id: itemToEdit ? itemToEdit.category_id : "",
   });
   const [imgName, setImgName] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
@@ -82,6 +84,7 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
       setOpenAlert(true);
     } else {
       data.append("category_name", formData.category_name);
+      data.append("category_id", formData.category_id);
       if (formData.photo) {
         data.append("photo", formData.photo, formData.photo.name);
       }
@@ -164,6 +167,7 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
   const handleReset = () => {
     updateFormData({
       category_name: "",
+      category_id: "",
     });
     setResponseErrors("");
     setImgName("");
@@ -188,37 +192,78 @@ function PartCategoryForm({ setPage, setOpenPopup, itemToEdit }) {
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  name="category_name"
-                  required
-                  fullWidth
-                  id="category_name"
-                  label="Part Category Name"
-                  value={formData.category_name}
-                  autoFocus
-                  onChange={(e) => {
-                    handleChange(e);
-                    handleStateChange(e);
-                  }}
-                  onBlur={handleBlur}
-                  error={
-                    responseErrors?.category_name ||
-                    Boolean(touched.category_name && errors.category_name)
-                  }
-                  helperText={touched.category_name && errors.category_name}
-                />
+              <Grid item xs={8}>
+                <div>
+                  <TextField
+                    name="category_name"
+                    required
+                    fullWidth
+                    id="category_name"
+                    label="Part Category Name"
+                    value={formData.category_name}
+                    autoFocus
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.category_name ||
+                      Boolean(touched.category_name && errors.category_name)
+                    }
+                    helperText={touched.category_name && errors.category_name}
+                  />
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.category_name?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
               </Grid>
 
-              {responseErrors ? (
-                <Grid item xs={12}>
-                  {responseErrors.category_name?.map((msg) => (
-                    <span key={msg} className={classes.errorMsg}>
-                      {msg}
-                    </span>
-                  ))}
-                </Grid>
-              ) : null}
+              <Grid item xs={4}>
+                <div>
+                  <TextField
+                    select
+                    label="Related Category"
+                    value={formData.category_id}
+                    name="category_id"
+                    SelectProps={{
+                      native: true,
+                    }}
+                    helperText="Please select a related Category"
+                    fullWidth
+                    required
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.category_id ||
+                      Boolean(touched.category_id && errors.category_id)
+                    }
+                  >
+                    <option aria-label="None" value="" />
+                    {categories?.map((category) => (
+                      <option value={category.id}>{category.name}</option>
+                    ))}
+                  </TextField>
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.category_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
 
               <Grid item xs={12} md={3}>
                 <input
