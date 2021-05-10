@@ -58,9 +58,24 @@ const validationSchema = Yup.object().shape({
       "No floating points",
       "Please remove any dots",
       (val) => !val?.includes(".")
+    )
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
     ),
   description: Yup.string()
     .notRequired()
+    .test(
+      "Minimum 5 chars without spaces",
+      "Please enter 5 characters excluding spaces",
+      (val) => val?.trim().length >= 5
+    )
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => val?.trim() !== ""
+    )
     .min(5, "Description must be at least 5 characters")
     .max(255, "Description must not exceed 255 characters"),
 });

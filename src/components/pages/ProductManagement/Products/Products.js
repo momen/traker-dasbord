@@ -125,7 +125,7 @@ function Products() {
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [columnToFilter, setColumnToFilter] = useState("generic");
+  const [columnToFilter, setColumnToFilter] = useState("");
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
   const [selectedItem, setSelectedItem] = useState(""); // Customize
@@ -298,7 +298,7 @@ function Products() {
     let search = e.target.value;
     if (!search || search.trim() === "") {
       setuserIsSearching(false);
-      setSearchValue(search);
+      setSearchValue("");
     } else {
       if (!userIsSearching) {
         setuserIsSearching(true);
@@ -633,14 +633,14 @@ function Products() {
                         {/* <MenuItem value="" disabled>
                           Select a column to filter by
                         </MenuItem> */}
-                        <MenuItem value={"generic"}>Generic Search</MenuItem>
+                        <MenuItem value={""}>Generic Search</MenuItem>
                         <MenuItem value={"name"}>Product Name</MenuItem>
                         <MenuItem value={"quantity"}>Quantity</MenuItem>
                         <MenuItem value={"price"}>Price</MenuItem>
                         <MenuItem value={"car_made"}>Car Made</MenuItem>
                         <MenuItem value={"car_model"}>Car Model</MenuItem>
                         <MenuItem value={"year"}>Car Year</MenuItem>
-                        <MenuItem value={"categories"}>Category</MenuItem>
+                        <MenuItem value={"category_id"}>Category</MenuItem>
                         <MenuItem value={"part_category"}>
                           Part Category
                         </MenuItem>

@@ -42,6 +42,12 @@ const validationSchema = Yup.object().shape({
       "No floating points",
       "Please remove any dots",
       (val) => !val?.includes(".")
+    )
+    .matches(/^([^0-9]*)$/, "Number are not allowed, only letters.")
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
     ),
   categoryid_id: Yup.string().required(),
 });

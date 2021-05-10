@@ -42,6 +42,11 @@ const validationSchema = Yup.object().shape({
       "No floating points",
       "Please remove any dots",
       (val) => !val?.includes(".")
+    )
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
     ),
 });
 

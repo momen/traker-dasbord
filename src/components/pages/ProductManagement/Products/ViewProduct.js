@@ -10,8 +10,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
-import CurrencyFormat from 'react-currency-format';
-
+import CurrencyFormat from "react-currency-format";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -130,7 +129,9 @@ function ViewProduct({ match }) {
                 Store
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.store?.name}</span>
+                <span className={classes.rowContent}>
+                  {product.store?.name}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={product.description}>
@@ -148,11 +149,11 @@ function ViewProduct({ match }) {
               <StyledTableCell align="left">
                 {product.photo?.map((img) => (
                   <Fragment>
-                  <img
-                    className={classes.media}
-                    src={img.image}
-                    alt={img.file_name}
-                  />
+                    <img
+                      className={classes.media}
+                      src={img.image}
+                      alt={img.file_name}
+                    />
                   </Fragment>
                 ))}
               </StyledTableCell>
@@ -170,7 +171,15 @@ function ViewProduct({ match }) {
                 Price
               </StyledTableCell>
               <StyledTableCell align="left">
-              <CurrencyFormat value={product.price} displayType={'text'} thousandSeparator={true} prefix={'$'} renderText={value => <span className={classes.rowContent}>{value}</span>}/>
+                <CurrencyFormat
+                  value={product.price}
+                  displayType={"text"}
+                  thousandSeparator={true}
+                  prefix={"$"}
+                  renderText={(value) => (
+                    <span className={classes.rowContent}>{value}</span>
+                  )}
+                />
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`discount-${product.discount}`}>
@@ -178,7 +187,7 @@ function ViewProduct({ match }) {
                 Discount
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.discount}</span>
+                <span className={classes.rowContent}>{product.discount?product.discount: "N/A"}</span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`serial-${product.serial_number}`}>
@@ -186,14 +195,13 @@ function ViewProduct({ match }) {
                 Serial Number
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.serial_number}</span>
+                <span className={classes.rowContent}>
+                  {product.serial_number}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`product-tags-${product.id}`}>
-              <StyledTableCell
-                component="th"
-                scope="row"
-              >
+              <StyledTableCell component="th" scope="row">
                 Tags
               </StyledTableCell>
               <StyledTableCell align="left">
@@ -205,12 +213,36 @@ function ViewProduct({ match }) {
               </StyledTableCell>
             </StyledTableRow>
 
+            <StyledTableRow key={`manufacturer-${product.manufacturer?.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Manufacturer
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>
+                  {product.manufacturer?.manufacturer_name}
+                </span>
+              </StyledTableCell>
+            </StyledTableRow>
+
+            <StyledTableRow key={`origin-${product.origin_country?.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Origin Country
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>
+                  {product.origin_country?.country_name}
+                </span>
+              </StyledTableCell>
+            </StyledTableRow>
+
             <StyledTableRow key={`model-${product.car_model_id}`}>
               <StyledTableCell component="th" scope="row">
                 Car Model
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.car_model?.carmodel}</span>
+                <span className={classes.rowContent}>
+                  {product.car_model?.carmodel}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`year-${product.year_id}`}>
@@ -226,7 +258,9 @@ function ViewProduct({ match }) {
                 Car Made
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.car_made?.car_made}</span>
+                <span className={classes.rowContent}>
+                  {product.car_made?.car_made}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`product-category-${product.category_id}`}>
@@ -234,7 +268,9 @@ function ViewProduct({ match }) {
                 Category
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.category?.name}</span>
+                <span className={classes.rowContent}>
+                  {product.category?.name}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`part-${product.part_category_id}`}>
@@ -242,7 +278,9 @@ function ViewProduct({ match }) {
                 Part Category
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.part_category?.category_name}</span>
+                <span className={classes.rowContent}>
+                  {product.part_category?.category_name}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>

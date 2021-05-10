@@ -48,6 +48,11 @@ const validationSchema = Yup.object().shape({
       "No floating points",
       "Please remove any dots",
       (val) => !val?.includes(".")
+    )
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
     ),
 });
 
@@ -161,7 +166,11 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                   name="title" //Customize
                   required
                   fullWidth
-                  disabled={formData.title === "Admin" || formData.title === "User"|| formData.title === "Vendor"}
+                  disabled={
+                    formData.title === "Admin" ||
+                    formData.title === "User" ||
+                    formData.title === "Vendor"
+                  }
                   id="title" //Customize
                   label="Title" //Customize
                   value={formData.title} //Customize

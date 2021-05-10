@@ -39,8 +39,19 @@ const validationSchema = Yup.object().shape({
       "No floating points",
       "Please remove any dots",
       (val) => !val?.includes(".")
+    )
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
     ),
-  answer: Yup.string().required("This field is Required"),
+  answer: Yup.string()
+    .required("This field is Required")
+    .test(
+      "Not empty",
+      "Cannot enter an empty value",
+      (val) => val?.trim() !== ""
+    ),
 });
 
 function FilterForm({ setOpenPopup, itemToEdit }) {
