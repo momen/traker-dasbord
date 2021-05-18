@@ -257,7 +257,7 @@ function Tags() {
     setLoading(true);
     axios
       .get(
-        `/product-tags??page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        `/product-tags?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
       )
       .then((res) => {
         setRowsCount(res.data.total);
