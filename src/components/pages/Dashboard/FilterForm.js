@@ -137,6 +137,7 @@ function FAQ_Form({
                       KeyboardButtonProps={{
                         "aria-label": "from date",
                       }}
+                      InputProps={{ readOnly: true }}
                     />
                     {responseErrors ? (
                       <div className={classes.inputMessage}>
@@ -176,6 +177,7 @@ function FAQ_Form({
                       KeyboardButtonProps={{
                         "aria-label": "from date",
                       }}
+                      InputProps={{ readOnly: true }}
                     />
                     {responseErrors ? (
                       <div className={classes.inputMessage}>
