@@ -471,7 +471,7 @@ function Reports() {
                 </TableHead>
                 <TableBody>
                   {(pageSize > 0
-                    ? filteredOrders.slice(
+                    ? filteredOrders?.slice(
                         page * pageSize,
                         page * pageSize + pageSize
                       )
