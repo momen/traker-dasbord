@@ -151,16 +151,6 @@ function ViewVendorOrder({ match }) {
                 size="small"
               >
                 <TableBody>
-                  <StyledTableRow key={`detail-{detail.id}`}>
-                    <StyledTableCell
-                      component="th"
-                      scope="row"
-                      style={{ width: "40%" }}
-                    >
-                      Details ID
-                    </StyledTableCell>
-                    <StyledTableCell align="left">{detail.id}</StyledTableCell>
-                  </StyledTableRow>
                   <StyledTableRow key={`product-name${detail.product_name}`}>
                     <StyledTableCell component="th" scope="row">
                       Product Name
