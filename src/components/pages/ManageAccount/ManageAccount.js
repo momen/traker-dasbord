@@ -47,23 +47,6 @@ const initialValues = {
   confirmPassword: "mypassword123",
 };
 
-const validationSchema = Yup.object().shape({
-  firstName: Yup.string().required("Required"),
-  lastName: Yup.string().required("Required"),
-  email: Yup.string().email().required("Required"),
-  password: Yup.string()
-    .min(12, "Must be at least 12 characters")
-    .max(255)
-    .required("Required"),
-  confirmPassword: Yup.string().when("password", {
-    is: (val) => (val && val.length > 0 ? true : false),
-    then: Yup.string().oneOf(
-      [Yup.ref("password")],
-      "Both password need to be the same"
-    ),
-  }),
-});
-
 function ChangePassword() {
   return (
     <React.Fragment>
