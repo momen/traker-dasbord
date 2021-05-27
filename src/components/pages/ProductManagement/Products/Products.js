@@ -139,6 +139,7 @@ function Products() {
   const [manufacturers, setManufacturers] = useState([]);
   const [originCountries, setOriginCountries] = useState([]);
   const [carTypes, setCarTypes] = useState([]);
+  const [productTypes, setProductTypes] = useState([]);
   const [productTags, setProductTags] = useState([]);
   const [sortModel, setSortModel] = useState([
     { field: "quantity", sort: "desc" },
@@ -447,7 +448,7 @@ function Products() {
         alert("Failed to Fetch Origin Countries List");
       });
 
-      axios
+    axios
       .get("/cartypes/list")
       .then((res) => {
         const _carTypes = res.data.data.map(({ id, type_name }) => ({
@@ -471,6 +472,19 @@ function Products() {
       })
       .catch(() => {
         alert("Failed to Fetch Product Tags List");
+      });
+
+      axios
+      .get("product/types/list")
+      .then((res) => {
+        const _productTypes = res.data.data.map(({ id, producttype }) => ({
+          id,
+          producttype,
+        })); // Customize
+        setProductTypes(_productTypes);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Product Types List");
       });
   }, []);
 
@@ -703,6 +717,7 @@ function Products() {
           originCountries={originCountries}
           carTypes={carTypes}
           productTags={productTags}
+          productTypes={productTypes}
         />
       </Popup>
 

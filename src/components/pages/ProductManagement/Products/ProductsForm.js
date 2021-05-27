@@ -87,6 +87,13 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
+  producttype_id: Yup.string().required(),
+  holesale_price: Yup.number()
+    .min(1, "Enter a value greater than 0")
+    .required("This field is Required"),
+  no_of_orders: Yup.number()
+    .min(1, "Minimum value should be 1")
+    .required("This field is Required"),
   car_made_id: Yup.string().required(),
   car_model_id: Yup.string().required(),
   year_id: Yup.string().required(),
@@ -134,6 +141,7 @@ function ProductsForm({
   manufacturers,
   originCountries,
   carTypes,
+  productTypes,
 }) {
   const classes = useStyles();
 
@@ -161,6 +169,9 @@ function ProductsForm({
     store_id: itemToEdit ? itemToEdit.store_id : "",
     quantity: itemToEdit ? itemToEdit.quantity : "",
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
+    producttype_id: itemToEdit ? itemToEdit.producttype_id : "",
+    holesale_price: itemToEdit ? itemToEdit.holesale_price : "",
+    no_of_orders: itemToEdit ? itemToEdit.no_of_orders : "",
     photo: [],
   });
 
@@ -351,6 +362,9 @@ function ProductsForm({
       store_id: "",
       quantity: "",
       serial_number: "",
+      producttype_id: "",
+      holesale_price: "",
+      no_of_orders: "",
       photo: [],
     });
     setResponseErrors("");
@@ -375,7 +389,7 @@ function ProductsForm({
         }) => (
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              <Grid item xs={6}>
+              <Grid item xs={6} sm={4}>
                 <div>
                   <TextField
                     name="name"
@@ -409,7 +423,7 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={6}>
+              <Grid item xs={6} sm={4}>
                 <div>
                   <TextField
                     name="serial_number"
@@ -442,6 +456,151 @@ function ProductsForm({
                 </div>
               </Grid>
 
+              <Grid item xs={6} sm={4}>
+                <div>
+                  <TextField
+                    select
+                    label="Product Type"
+                    value={formData.producttype_id}
+                    name="producttype_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.producttype_id ||
+                      Boolean(touched.producttype_id && errors.producttype_id)
+                    }
+                    helperText="Please select a Product Type"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {productTypes?.map((type) => (
+                      <option value={type.id}>{type.producttype}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.producttype_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={12}></Grid>
+
+
+              {formData.producttype_id !== "1" ? (
+                <>
+                  <Grid item xs={6} md={3}>
+                    <div>
+                      <NumberFormat
+                        allowNegative={false}
+                        customInput={TextField}
+                        thousandSeparator={true}
+                        required
+                        fullWidth
+                        name="holesale_price"
+                        label="Wholesale Price"
+                        value={formData.holesale_price}
+                        onValueChange={({ floatValue }) => {
+                          updateFormData({
+                            ...formData,
+                            holesale_price: Math.round(floatValue),
+                          });
+                          values.holesale_price = Math.round(floatValue);
+                          if (floatValue > 0) {
+                            errors.holesale_price = false;
+                          } else if (floatValue === 0) {
+                            errors.holesale_price =
+                              "Enter a value greater than 0";
+                          } else {
+                            errors.holesale_price = "This field is Required";
+                          }
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.holesale_price ||
+                          Boolean(
+                            touched.holesale_price && errors.holesale_price
+                          )
+                        }
+                        helperText={
+                          touched.holesale_price && errors.holesale_price
+                        }
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.holesale_price?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+
+                  <Grid item xs={6} md={3} lg={2}>
+                    <div>
+                      <NumberFormat
+                        allowNegative={false}
+                        customInput={TextField}
+                        thousandSeparator={true}
+                        name="no_of_orders"
+                        required
+                        fullWidth
+                        label="Number of orders"
+                        value={formData.no_of_orders}
+                        onValueChange={({ floatValue }) => {
+                          updateFormData({
+                            ...formData,
+                            no_of_orders: floatValue,
+                          });
+                          values.no_of_orders = floatValue;
+                          if (floatValue >= 5) {
+                            errors.no_of_orders = false;
+                          } else if (floatValue) {
+                            errors.no_of_orders = "Minimum value should be 1";
+                          } else {
+                            errors.no_of_orders = "This field is Required";
+                          }
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.no_of_orders ||
+                          Boolean(touched.no_of_orders && errors.no_of_orders)
+                        }
+                        helperText={touched.no_of_orders && errors.no_of_orders}
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.no_of_orders?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
+
+              <Grid item xs={12}></Grid>
+
               <Grid item xs={4} md={2}>
                 <div>
                   <NumberFormat
@@ -454,8 +613,11 @@ function ProductsForm({
                     label="Qunatity"
                     value={formData.quantity}
                     onValueChange={({ floatValue }) => {
-                      updateFormData({ ...formData, quantity: floatValue });
-                      values.quantity = floatValue;
+                      updateFormData({
+                        ...formData,
+                        quantity: Math.round(floatValue),
+                      });
+                      values.quantity = Math.round(floatValue);
                       if (floatValue >= 5) {
                         errors.quantity = false;
                       } else if (floatValue) {
@@ -628,7 +790,7 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid xs={6} md={3}>
+              <Grid item xs={6} md={3}>
                 <div>
                   <TextField
                     select
