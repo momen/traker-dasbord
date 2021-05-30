@@ -406,8 +406,8 @@ function FAQ_Form({
                       <option aria-label="None" value="" />
                       <option aria-label="Vendor" label="Vendor" value="1" />
                       <option
-                        aria-label="Hot Sale"
-                        label="Hot Sale"
+                        aria-label="ًWholesale"
+                        label="Wholesale"
                         value="2"
                       />
                     </TextField>
