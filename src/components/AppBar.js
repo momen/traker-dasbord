@@ -128,8 +128,8 @@ const AppBarComponent = ({ onDrawerToggle }) => {
                 name="darkTheme"
                 inputProps={{ "aria-label": "secondary checkbox" }}
               />
-              <MessagesDropdown />
-              <NotificationsDropdown />
+              {/* <MessagesDropdown />
+              <NotificationsDropdown /> */}
               {/* <LanguagesDropdown /> */}
               {/* <UserDropdown /> */}
             </Grid>
