@@ -401,7 +401,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                             name={route.name}
                             to={route.path}
                             icon={route.icon}
-                            badge={route.badge}
+                            // badge={route.badge}
                           />
                         ) : null
                       )}
@@ -423,7 +423,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                     exact={category.containsHome ? true : false}
                     //To make tabs other than the home page to track navigation of it's inner tabs
                     button
-                    badge={category.badge}
+                    // badge={category.badge}
                   />
                 ) : category.id == "Logout" ? (
                   <SidebarCategory
@@ -433,7 +433,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                     activeClassName="active"
                     icon={category.icon}
                     button
-                    badge={category.badge}
+                    // badge={category.badge}
                     onClick={handleLogout}
                   />
                 ) : null}

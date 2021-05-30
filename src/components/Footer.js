@@ -52,16 +52,6 @@ function Footer() {
                   <ListItemText primary="Help Center" />
                 </ListItem>
               </Link>
-              <Link to="/">
-                <ListItem button={true}>
-                  <ListItemText primary="Privacy" />
-                </ListItem>
-              </Link>
-              <Link to="/">
-                <ListItem button={true}>
-                  <ListItemText primary="Terms of Service" />
-                </ListItem>
-              </Link>
             </List>
           </Grid>
         </Hidden>
