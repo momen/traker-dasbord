@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -62,73 +62,6 @@ const useStyles = makeStyles((theme) => ({
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .required("This field is Required")
-    .test(
-      "No floating points",
-      "Please remove any dots",
-      (val) => !val?.includes(".")
-    )
-    .test(
-      "Not empty",
-      "Please remove any spaces at the beginning",
-      (val) => !(val?.substring(0, 1) === " ")
-    ),
-  serial_number: Yup.string()
-    .required("This field is Required")
-    .test(
-      "No floating points",
-      "Please remove any dots",
-      (val) => !val?.includes(".")
-    )
-    .test(
-      "Not empty",
-      "Please remove any spaces at the beginning",
-      (val) => !(val?.substring(0, 1) === " ")
-    ),
-  producttype_id: Yup.string().required(),
-  holesale_price: Yup.number()
-    .min(1, "Enter a value greater than 0")
-    .required("This field is Required"),
-  no_of_orders: Yup.number()
-    .min(1, "Minimum value should be 1")
-    .required("This field is Required"),
-  car_made_id: Yup.string().required(),
-  car_model_id: Yup.string().required(),
-  year_id: Yup.string().required(),
-  discount: Yup.number()
-    .min(5, "Minimum value for discount is 5%")
-    .max(80, "Maximum value for discount is 80%"),
-  price: Yup.number()
-    .min(1, "Enter a value greater than 0")
-    .required("This field is Required"),
-  category_id: Yup.string().required(),
-  part_category_id: Yup.string().required(),
-  manufacturer_id: Yup.string().required(),
-  prodcountry_id: Yup.string().required(),
-  transmission_id: Yup.string().required(),
-  cartype_id: Yup.string().required(),
-  store_id: Yup.string().required(),
-  quantity: Yup.number()
-    .min(5, "Minimum value should be 5")
-    .required("This field is Required"),
-  description: Yup.string()
-    .required("This field is Required")
-    .test(
-      "Minimum 5 chars without spaces",
-      "Please enter 5 characters excluding spaces",
-      (val) => val?.trim().length >= 5
-    )
-    .test(
-      "Not empty",
-      "Please remove any spaces at the beginning",
-      (val) => val?.trim() !== ""
-    )
-    .min(5, "Description must be at least 5 characters")
-    .max(255, "Description must not exceed 255 characters"),
-});
-
 function ProductsForm({
   setPage,
   setOpenPopup,
@@ -144,21 +77,20 @@ function ProductsForm({
   productTypes,
 }) {
   const classes = useStyles();
-
   const uploadRef = useRef();
+
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
     description: itemToEdit ? itemToEdit.description : "",
     car_made_id: itemToEdit ? itemToEdit.car_made_id : "",
-    car_model_id: itemToEdit ? itemToEdit.car_model_id : "",
+    car_model_id: itemToEdit ? itemToEdit.car_model_id.toString() : "",
     year_id: itemToEdit ? itemToEdit.year_id : "",
     discount:
       itemToEdit?.discount && itemToEdit?.discount > 0
         ? itemToEdit.discount
         : "",
-    price: itemToEdit ? itemToEdit.price : "",
     category_id: itemToEdit ? itemToEdit.category_id : "",
-    part_category_id: itemToEdit ? itemToEdit.part_category_id : "",
+    part_category_id: itemToEdit ? itemToEdit.part_category_id.toString() : "",
     manufacturer_id: itemToEdit ? itemToEdit.manufacturer_id : "",
     prodcountry_id: itemToEdit ? itemToEdit.prodcountry_id : "",
     transmission_id: itemToEdit ? itemToEdit.transmission_id : "",
@@ -170,13 +102,90 @@ function ProductsForm({
     quantity: itemToEdit ? itemToEdit.quantity : "",
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
     producttype_id: itemToEdit ? itemToEdit.producttype_id : "",
-    holesale_price: itemToEdit ? itemToEdit.holesale_price : "",
-    no_of_orders: itemToEdit ? itemToEdit.no_of_orders : "",
     photo: [],
   });
 
-  const [carModels, setCarModels] = useState([]);
-  const [partCategories, setPartCategories] = useState([]);
+  const validationSchema = Yup.object().shape({
+    name: Yup.string()
+      .required("This field is Required")
+      .test(
+        "No floating points",
+        "Please remove any dots",
+        (val) => !val?.includes(".")
+      )
+      .test(
+        "Not empty",
+        "Please remove any spaces at the beginning",
+        (val) => !(val?.substring(0, 1) === " ")
+      ),
+    serial_number: Yup.string()
+      .required("This field is Required")
+      .test(
+        "No floating points",
+        "Please remove any dots",
+        (val) => !val?.includes(".")
+      )
+      .test(
+        "Not empty",
+        "Please remove any spaces at the beginning",
+        (val) => !(val?.substring(0, 1) === " ")
+      ),
+    producttype_id: Yup.string().required(),
+    holesale_price:
+      formData.producttype_id.toString() === "2" ||
+      formData.producttype_id.toString() === "3"
+        ? Yup.number()
+            .min(1, "Enter a value greater than 0")
+            .required("This field is Required")
+        : Yup.string().notRequired(),
+    no_of_orders:
+      formData.producttype_id.toString() === "2" ||
+      formData.producttype_id.toString() === "3"
+        ? Yup.number()
+            .min(1, "Minimum value should be 1")
+            .required("This field is Required")
+        : Yup.string().notRequired(),
+    car_made_id: Yup.string().required(),
+    car_model_id: Yup.string().required(),
+    year_id: Yup.string().required(),
+    discount: Yup.number()
+      .min(5, "Minimum value for discount is 5%")
+      .max(80, "Maximum value for discount is 80%"),
+    price:
+      formData.producttype_id.toString() === "1" ||
+      formData.producttype_id.toString() === "3"
+        ? Yup.number()
+            .required("This field is Required")
+            .min(1, "Enter a value greater than 0")
+        : Yup.string().notRequired(),
+    category_id: Yup.string().required(),
+    part_category_id: Yup.string().required(),
+    manufacturer_id: Yup.string().required(),
+    prodcountry_id: Yup.string().required(),
+    transmission_id: Yup.string().required(),
+    cartype_id: Yup.string().required(),
+    store_id: Yup.string().required(),
+    quantity: Yup.number()
+      .min(5, "Minimum value should be 5")
+      .required("This field is Required"),
+    description: Yup.string()
+      .required("This field is Required")
+      .test(
+        "Minimum 5 chars without spaces",
+        "Please enter 5 characters excluding spaces",
+        (val) => val?.trim().length >= 5
+      )
+      .test(
+        "Not empty",
+        "Please remove any spaces at the beginning",
+        (val) => val?.trim() !== ""
+      )
+      .min(5, "Description must be at least 5 characters")
+      .max(255, "Description must not exceed 255 characters"),
+  });
+
+  const [carModels, setCarModels] = useState(null);
+  const [partCategories, setPartCategories] = useState(null);
 
   const [imagesToDelete, setImagesToDelete] = useState("");
 
@@ -191,6 +200,58 @@ function ProductsForm({
   const [isSubmitting, setIsSubmitting] = useState(false); // Update on other components
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
+
+  useEffect(() => {
+    if (itemToEdit) {
+      axios
+        .get(`/car-modelslist/${itemToEdit.car_made_id}`)
+        .then((res) => {
+          const _carModels = res.data.data.map(({ id, carmodel }) => ({
+            id,
+            carmodel,
+          })); // Customize
+          setCarModels(_carModels);
+        })
+        .catch(() => {
+          alert("Failed to Fetch Car Model List");
+        });
+
+      axios
+        .get(`/part-categorieslist/${itemToEdit.category_id}`)
+        .then((res) => {
+          const _partCategories = res.data.data.map(
+            ({ id, category_name }) => ({
+              id,
+              category_name,
+            })
+          ); // Customize
+          setPartCategories(_partCategories);
+        })
+        .catch(() => {
+          alert("Failed to Fetch Part Categories List");
+        });
+
+      if (itemToEdit.producttype_id == "1") {
+        updateFormData({
+          ...formData,
+          price: itemToEdit.holesale_price,
+        });
+      } else if (itemToEdit.producttype_id == "2") {
+        updateFormData({
+          ...formData,
+          holesale_price: itemToEdit.holesale_price,
+          no_of_orders: itemToEdit.no_of_orders,
+        });
+      } else {
+        updateFormData({
+          ...formData,
+          price: itemToEdit.holesale_price,
+          holesale_price: itemToEdit.holesale_price,
+          no_of_orders: itemToEdit.no_of_orders,
+        });
+      }
+    }
+  }, []);
 
   const handleSubmit = async () => {
     if (formData.tags.length === 0) {
@@ -275,8 +336,15 @@ function ProductsForm({
 
   // Update Function Name on other components
   const handleStateChange = (e) => {
+    const updatedData = formData;
+    if (e.target.name === "producttype_id" && e.target.value == "1") {
+      delete updatedData.holesale_price;
+      delete updatedData.no_of_orders;
+    } else if (e.target.name === "producttype_id" && e.target.value == "2") {
+      delete updatedData.price;
+    }
     updateFormData({
-      ...formData,
+      ...updatedData,
       [e.target.name]: e.target.value,
     });
   };
@@ -363,8 +431,6 @@ function ProductsForm({
       quantity: "",
       serial_number: "",
       producttype_id: "",
-      holesale_price: "",
-      no_of_orders: "",
       photo: [],
     });
     setResponseErrors("");
@@ -499,8 +565,8 @@ function ProductsForm({
 
               <Grid item xs={12}></Grid>
 
-
-              {formData.producttype_id !== "1" ? (
+              {formData.producttype_id.toString() === "2" ||
+              formData.producttype_id.toString() === "3" ? (
                 <>
                   <Grid item xs={6} md={3}>
                     <div>
@@ -512,7 +578,9 @@ function ProductsForm({
                         fullWidth
                         name="holesale_price"
                         label="Wholesale Price"
-                        value={formData.holesale_price}
+                        value={
+                          formData.holesale_price || itemToEdit?.holesale_price
+                        }
                         onValueChange={({ floatValue }) => {
                           updateFormData({
                             ...formData,
@@ -562,7 +630,7 @@ function ProductsForm({
                         required
                         fullWidth
                         label="Number of orders"
-                        value={formData.no_of_orders}
+                        value={formData.no_of_orders || itemToEdit.no_of_orders}
                         onValueChange={({ floatValue }) => {
                           updateFormData({
                             ...formData,
@@ -597,6 +665,96 @@ function ProductsForm({
                     </div>
                   </Grid>
                 </>
+              ) : null}
+
+              {formData.producttype_id.toString() === "1" ||
+              formData.producttype_id.toString() === "3" ? (
+                <Grid item xs={6} md={3}>
+                  <div>
+                    <NumberFormat
+                      allowNegative={false}
+                      customInput={TextField}
+                      thousandSeparator={true}
+                      required
+                      fullWidth
+                      name="price"
+                      label="Price"
+                      value={formData.price || itemToEdit.price}
+                      onValueChange={({ floatValue }) => {
+                        updateFormData({ ...formData, price: floatValue });
+                        values.price = floatValue;
+                        if (floatValue > 0) {
+                          errors.price = false;
+                        } else if (floatValue === 0) {
+                          errors.price = "Enter a value greater than 0";
+                        } else {
+                          errors.price = "This field is Required";
+                        }
+                      }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.price ||
+                        Boolean(touched.price && errors.price)
+                      }
+                      helperText={touched.price && errors.price}
+                    />
+
+                    {responseErrors ? (
+                      <div className={classes.inputMessage}>
+                        {responseErrors.price?.map((msg) => (
+                          <span key={msg} className={classes.errorMsg}>
+                            {msg}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </Grid>
+              ) : null}
+
+              {formData.producttype_id ? (
+                <Grid item xs={4} md={2}>
+                  <div>
+                    <NumberFormat
+                      allowNegative={false}
+                      customInput={TextField}
+                      name="discount"
+                      fullWidth
+                      label="Discount"
+                      // prefix="%"
+                      value={formData.discount}
+                      onChange={(e) => {
+                        updateFormData({
+                          ...formData,
+                          discount: e.target.value
+                            ? parseFloat(e.target.value)
+                            : "",
+                        });
+                        handleChange(e);
+                      }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.discount ||
+                        Boolean(touched.discount && errors.discount)
+                      }
+                      helperText={
+                        (touched.discount && errors.discount) ||
+                        "Min 5% & Max 80%"
+                      }
+                      InputProps={{ inputProps: { min: 5 } }}
+                    />
+
+                    {responseErrors ? (
+                      <div className={classes.inputMessage}>
+                        {responseErrors.discount?.map((msg) => (
+                          <span key={msg} className={classes.errorMsg}>
+                            {msg}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </Grid>
               ) : null}
 
               <Grid item xs={12}></Grid>
@@ -646,91 +804,6 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={4} md={2}>
-                <div>
-                  <NumberFormat
-                    allowNegative={false}
-                    customInput={TextField}
-                    thousandSeparator={true}
-                    required
-                    fullWidth
-                    name="price"
-                    label="Price"
-                    value={formData.price}
-                    onValueChange={({ floatValue }) => {
-                      updateFormData({ ...formData, price: floatValue });
-                      values.price = floatValue;
-                      if (floatValue > 0) {
-                        errors.price = false;
-                      } else if (floatValue === 0) {
-                        errors.price = "Enter a value greater than 0";
-                      } else {
-                        errors.price = "This field is Required";
-                      }
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.price ||
-                      Boolean(touched.price && errors.price)
-                    }
-                    helperText={touched.price && errors.price}
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.price?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={4} md={2}>
-                <div>
-                  <NumberFormat
-                    allowNegative={false}
-                    customInput={TextField}
-                    name="discount"
-                    fullWidth
-                    label="Discount"
-                    // prefix="%"
-                    value={formData.discount}
-                    onChange={(e) => {
-                      updateFormData({
-                        ...formData,
-                        discount: e.target.value
-                          ? parseFloat(e.target.value)
-                          : "",
-                      });
-                      handleChange(e);
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.discount ||
-                      Boolean(touched.discount && errors.discount)
-                    }
-                    helperText={
-                      (touched.discount && errors.discount) ||
-                      "Min 5% & Max 80%"
-                    }
-                    InputProps={{ inputProps: { min: 5 } }}
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.discount?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
               <Grid item xs={6} md={3}>
                 <div>
                   <TextField
@@ -757,7 +830,7 @@ function ProductsForm({
                             alert("Failed to Fetch Car Model List");
                           });
                       } else {
-                        setCarModels([]);
+                        setCarModels(null);
                       }
                     }}
                     SelectProps={{
@@ -794,7 +867,7 @@ function ProductsForm({
                 <div>
                   <TextField
                     select
-                    disabled={carModels.length === 0}
+                    disabled={!carModels}
                     label="Car Model"
                     value={formData.car_model_id}
                     name="car_model_id"
@@ -858,7 +931,7 @@ function ProductsForm({
                             alert("Failed to Fetch Part Categories List");
                           });
                       } else {
-                        setPartCategories([]);
+                        setPartCategories(null);
                       }
                     }}
                     SelectProps={{
@@ -894,7 +967,7 @@ function ProductsForm({
               <Grid item xs={6} md={3}>
                 <div>
                   <TextField
-                    disabled={partCategories.length === 0}
+                    disabled={!partCategories}
                     select
                     label="Part Category"
                     value={formData.part_category_id}

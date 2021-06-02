@@ -149,7 +149,6 @@ function Products() {
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
     { field: "name", headerName: "Name", width: 80 },
-    { field: "description", headerName: "Description", width: 80 },
     {
       field: "car_model_id",
       headerName: "Car Model",
@@ -163,38 +162,30 @@ function Products() {
       renderCell: (params) => params.row.year?.year,
     },
     { field: "quantity", headerName: "Quantity", width: 70 },
+    {
+      field: "product_type",
+      headerName: "Product Type",
+      width: 80,
+      sortable: false,
+      renderCell: (params) => params.row.product_type?.producttype,
+    },
     { field: "price", headerName: "Price", width: 70 },
+    { field: "holesale_price", headerName: "Wholesale Price", width: 70 },
+    { field: "no_of_orders", headerName: "No of orders", width: 70 },
     {
       field: "discount",
       headerName: "Discount",
-      width: 70,
-      renderCell: (params) => `%${params.value}`,
+      width: 60,
+      renderCell: (params) =>
+        params.value ? `%${parseFloat(params.value).toFixed(2)}` : "N/A",
       align: "center",
     },
     {
       field: "category",
       headerName: "Category",
-      width: 100,
-      sortable: false,
-      renderCell: (params) => params.row.category?.name,
-    },
-    {
-      field: "photo",
-      headerName: "Photos",
       width: 80,
       sortable: false,
-      renderCell: (params) => (
-        <Fragment>
-          {params.value?.map((img, index) => (
-            <img
-              key={img.uuid}
-              src={img.image}
-              alt="ph"
-              style={{ objectFit: "contain", width: 50 }}
-            />
-          ))}
-        </Fragment>
-      ),
+      renderCell: (params) => params.row.category?.name,
     },
     {
       field: "actions",
@@ -262,6 +253,24 @@ function Products() {
           </div>
         );
       },
+    },
+    {
+      field: "photo",
+      headerName: "Photos",
+      width: 80,
+      sortable: false,
+      renderCell: (params) => (
+        <Fragment>
+          {params.value?.map((img, index) => (
+            <img
+              key={img.uuid}
+              src={img.image}
+              alt="ph"
+              style={{ objectFit: "contain", width: 50 }}
+            />
+          ))}
+        </Fragment>
+      ),
     },
     {
       field: "car_made_id",
@@ -474,7 +483,7 @@ function Products() {
         alert("Failed to Fetch Product Tags List");
       });
 
-      axios
+    axios
       .get("product/types/list")
       .then((res) => {
         const _productTypes = res.data.data.map(({ id, producttype }) => ({

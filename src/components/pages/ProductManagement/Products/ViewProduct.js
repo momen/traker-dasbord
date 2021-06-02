@@ -50,7 +50,7 @@ const useStyles = makeStyles({
   },
 
   media: {
-    width: "24%",
+    maxWidth: "24%",
     objectFit: "contain",
     marginRight: "5px",
   },
@@ -142,6 +142,64 @@ function ViewProduct({ match }) {
                 <p className={classes.rowContent}>{product.description}</p>
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={product.description}>
+              <StyledTableCell component="th" scope="row">
+                Product Type
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <p className={classes.rowContent}>
+                  {product.producttype_id?.producttype}
+                </p>
+              </StyledTableCell>
+            </StyledTableRow>
+            {product?.price ? (
+              <StyledTableRow key={`price-${product.price}`}>
+                <StyledTableCell component="th" scope="row">
+                  Price
+                </StyledTableCell>
+                <StyledTableCell align="left">
+                  <CurrencyFormat
+                    value={product.price}
+                    displayType={"text"}
+                    thousandSeparator={true}
+                    prefix={"$"}
+                    renderText={(value) => (
+                      <span className={classes.rowContent}>{value}</span>
+                    )}
+                  />
+                </StyledTableCell>
+              </StyledTableRow>
+            ) : null}
+
+            {product?.holesale_price ? (
+              <StyledTableRow key={`wholesale-price-${product.holesale_price}`}>
+                <StyledTableCell component="th" scope="row">
+                  Wholesale Price
+                </StyledTableCell>
+                <StyledTableCell align="left">
+                  <CurrencyFormat
+                    value={product.holesale_price}
+                    displayType={"text"}
+                    thousandSeparator={true}
+                    prefix={"$"}
+                    renderText={(value) => (
+                      <span className={classes.rowContent}>{value}</span>
+                    )}
+                  />
+                </StyledTableCell>
+              </StyledTableRow>
+            ) : null}
+
+            {product?.no_of_orders ? (
+              <StyledTableRow key={`wholesale-orders-${product.no_of_orders}`}>
+                <StyledTableCell component="th" scope="row">
+                  Number of Orders (Wholesale)
+                </StyledTableCell>
+                <StyledTableCell align="left">
+                  <p className={classes.rowContent}>{product.no_of_orders}</p>
+                </StyledTableCell>
+              </StyledTableRow>
+            ) : null}
             <StyledTableRow key={`product-${product.id}-Images`}>
               <StyledTableCell component="th" scope="row">
                 Images
@@ -166,28 +224,14 @@ function ViewProduct({ match }) {
                 <span className={classes.rowContent}>{product.quantity}</span>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`price-${product.price}`}>
-              <StyledTableCell component="th" scope="row">
-                Price
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <CurrencyFormat
-                  value={product.price}
-                  displayType={"text"}
-                  thousandSeparator={true}
-                  prefix={"$"}
-                  renderText={(value) => (
-                    <span className={classes.rowContent}>{value}</span>
-                  )}
-                />
-              </StyledTableCell>
-            </StyledTableRow>
             <StyledTableRow key={`discount-${product.discount}`}>
               <StyledTableCell component="th" scope="row">
                 Discount
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.discount?product.discount: "N/A"}</span>
+                <span className={classes.rowContent}>
+                  {product.discount ? product.discount : "N/A"}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`serial-${product.serial_number}`}>
