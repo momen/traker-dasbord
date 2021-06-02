@@ -313,9 +313,9 @@ function Reports() {
     if (!userIsSearching) {
       axios
         .post(`/fetch/advanced/report`, filterData)
-        .then(({ data }) => {
-          setOrders(data.total_orders);
-          setFilteredOrders(data.total_orders);
+        .then((res) => {
+          setOrders(res.data.total_orders);
+          setFilteredOrders(res.data.total_orders);
         })
         .catch((res) => {
           alert("Failed to Fetch data");
