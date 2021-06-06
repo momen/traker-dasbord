@@ -100,10 +100,10 @@ function Row({ row, index, page, pageSize }) {
         <TableCell component="th" scope="row">
           {index + 1 + (pageSize > 0 ? parseInt(page * pageSize) : 0)}
         </TableCell>
-        <TableCell>{row.order_number}</TableCell>
-        <TableCell>{row.order_total}</TableCell>
-        <TableCell>{row.orderStatus}</TableCell>
-        <TableCell>{row.created_at}</TableCell>
+        <TableCell>{row?.order_number}</TableCell>
+        <TableCell>{row?.order_total}</TableCell>
+        <TableCell>{row?.orderStatus}</TableCell>
+        <TableCell>{row?.created_at}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -135,14 +135,14 @@ function Row({ row, index, page, pageSize }) {
                     <TableCell component="th" scope="row">
                       {index + 1}
                     </TableCell>
-                    <TableCell>{detail.product_name}</TableCell>
-                    <TableCell>{detail.product_serial}</TableCell>
-                    <TableCell>{detail.store_name}</TableCell>
-                    <TableCell>{detail.vendor_name}</TableCell>
-                    <TableCell>{detail.quantity}</TableCell>
-                    <TableCell>{detail.price}</TableCell>
-                    <TableCell>%{detail.discount}</TableCell>
-                    <TableCell>{detail.total}</TableCell>
+                    <TableCell>{detail?.product_name}</TableCell>
+                    <TableCell>{detail?.product_serial}</TableCell>
+                    <TableCell>{detail?.store_name}</TableCell>
+                    <TableCell>{detail?.vendor_name}</TableCell>
+                    <TableCell>{detail?.quantity}</TableCell>
+                    <TableCell>{detail?.price}</TableCell>
+                    <TableCell>%{detail?.discount}</TableCell>
+                    <TableCell>{detail?.total}</TableCell>
                   </TableRow>
                 ))}
               </Table>
@@ -316,6 +316,7 @@ function Reports() {
         .then((res) => {
           setOrders(res.data.total_orders);
           setFilteredOrders(res.data.total_orders);
+          console.log(res.data.total_orders);
         })
         .catch((res) => {
           alert("Failed to Fetch data");
@@ -483,6 +484,7 @@ function Reports() {
                       index={index}
                       page={page}
                       pageSize={pageSize}
+                      user={user?.roles[0].title}
                     />
                   ))}
                 </TableBody>

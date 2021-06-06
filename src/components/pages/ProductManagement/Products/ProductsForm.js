@@ -90,6 +90,9 @@ function ProductsForm({
         ? itemToEdit.discount
         : "",
     category_id: itemToEdit ? itemToEdit.category_id : "",
+    price: itemToEdit ? itemToEdit.price : "",
+    holesale_price: itemToEdit ? itemToEdit.holesale_price : "",
+    no_of_orders: itemToEdit ? itemToEdit.no_of_orders : "",
     part_category_id: itemToEdit ? itemToEdit.part_category_id.toString() : "",
     manufacturer_id: itemToEdit ? itemToEdit.manufacturer_id : "",
     prodcountry_id: itemToEdit ? itemToEdit.prodcountry_id : "",
@@ -137,14 +140,14 @@ function ProductsForm({
         ? Yup.number()
             .min(1, "Enter a value greater than 0")
             .required("This field is Required")
-        : Yup.string().notRequired(),
+        : Yup.string().nullable().notRequired(),
     no_of_orders:
       formData.producttype_id.toString() === "2" ||
       formData.producttype_id.toString() === "3"
         ? Yup.number()
             .min(1, "Minimum value should be 1")
             .required("This field is Required")
-        : Yup.string().notRequired(),
+        : Yup.string().nullable().notRequired(),
     car_made_id: Yup.string().required(),
     car_model_id: Yup.string().required(),
     year_id: Yup.string().required(),
@@ -157,7 +160,7 @@ function ProductsForm({
         ? Yup.number()
             .required("This field is Required")
             .min(1, "Enter a value greater than 0")
-        : Yup.string().notRequired(),
+        : Yup.string().nullable().notRequired(),
     category_id: Yup.string().required(),
     part_category_id: Yup.string().required(),
     manufacturer_id: Yup.string().required(),
@@ -231,25 +234,25 @@ function ProductsForm({
           alert("Failed to Fetch Part Categories List");
         });
 
-      if (itemToEdit.producttype_id == "1") {
-        updateFormData({
-          ...formData,
-          price: itemToEdit.holesale_price,
-        });
-      } else if (itemToEdit.producttype_id == "2") {
-        updateFormData({
-          ...formData,
-          holesale_price: itemToEdit.holesale_price,
-          no_of_orders: itemToEdit.no_of_orders,
-        });
-      } else {
-        updateFormData({
-          ...formData,
-          price: itemToEdit.holesale_price,
-          holesale_price: itemToEdit.holesale_price,
-          no_of_orders: itemToEdit.no_of_orders,
-        });
-      }
+      // if (itemToEdit.producttype_id == "1") {
+      //   updateFormData({
+      //     ...formData,
+      //     price: itemToEdit.holesale_price,
+      //   });
+      // } else if (itemToEdit.producttype_id == "2") {
+      //   updateFormData({
+      //     ...formData,
+      //     holesale_price: itemToEdit.holesale_price,
+      //     no_of_orders: itemToEdit.no_of_orders,
+      //   });
+      // } else {
+      //   updateFormData({
+      //     ...formData,
+      //     price: itemToEdit.holesale_price,
+      //     holesale_price: itemToEdit.holesale_price,
+      //     no_of_orders: itemToEdit.no_of_orders,
+      //   });
+      // }
     }
   }, []);
 
