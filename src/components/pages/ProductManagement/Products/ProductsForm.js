@@ -233,26 +233,6 @@ function ProductsForm({
         .catch(() => {
           alert("Failed to Fetch Part Categories List");
         });
-
-      // if (itemToEdit.producttype_id == "1") {
-      //   updateFormData({
-      //     ...formData,
-      //     price: itemToEdit.holesale_price,
-      //   });
-      // } else if (itemToEdit.producttype_id == "2") {
-      //   updateFormData({
-      //     ...formData,
-      //     holesale_price: itemToEdit.holesale_price,
-      //     no_of_orders: itemToEdit.no_of_orders,
-      //   });
-      // } else {
-      //   updateFormData({
-      //     ...formData,
-      //     price: itemToEdit.holesale_price,
-      //     holesale_price: itemToEdit.holesale_price,
-      //     no_of_orders: itemToEdit.no_of_orders,
-      //   });
-      // }
     }
   }, []);
 
@@ -881,6 +861,7 @@ function ProductsForm({
                     SelectProps={{
                       native: true,
                     }}
+                    InputLabelProps={{ shrink: !!formData.car_model_id }}
                     onBlur={handleBlur}
                     error={
                       responseErrors?.car_model_id ||
@@ -982,6 +963,8 @@ function ProductsForm({
                     SelectProps={{
                       native: true,
                     }}
+                    InputLabelProps={{ shrink: !!formData.part_category_id }}
+
                     onBlur={handleBlur}
                     error={
                       responseErrors?.part_category_id ||
