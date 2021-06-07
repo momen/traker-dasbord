@@ -49,12 +49,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
   const classes = useStyles();
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .required("This field is Required.")
-      .matches(
-        /^(?!.* )/,
-        "Spaces aren't allowed for the username"
-      ),
+    name: Yup.string().required("This field is Required."),
     roles: Yup.string().required(),
     email: Yup.string()
       .required("This field is Required.")
@@ -198,7 +193,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList }) {
                   required
                   fullWidth
                   id="name" //Customize
-                  label="Username" //Customize
+                  label="First Name" //Customize
                   value={formData.name} //Customize
                   autoFocus
                   onChange={(e) => {

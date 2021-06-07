@@ -63,36 +63,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const validationSchema = Yup.object().shape({
-  vendor_name: Yup.string()
-    .required("This field is Required")
-    .test(
-      "No floating points",
-      "Please remove any dots",
-      (val) => !val?.includes(".")
-    )
-    .test(
-      "Not empty",
-      "Please remove any spaces at the beginning",
-      (val) => !(val?.substring(0, 1) === " ")
-    ),
-  // email: Yup.string()
-  //   .required("This field is Required")
-  //   .email("Please enter a valid Email"),
-  type: Yup.string().required("Please specify a type"),
-  userid_id: Yup.string().required(),
-  commercial_no: Yup.string()
-    .required("This field is Required")
-    .matches(/^(?!.* )/, "Please remove any spaces"),
-  tax_card_no: Yup.string()
-    .required("This field is Required")
-    .matches(/^(?!.* )/, "Please remove any spaces"),
-
-  bank_account: Yup.string()
-    .required("This field is Required")
-    .matches(/^(?!.* )/, "Please remove any spaces"),
-});
-
 function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const classes = useStyles();
 
@@ -102,7 +72,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const taxDocRef = useRef();
   const [formData, updateFormData] = useState({
     vendor_name: itemToEdit ? itemToEdit.vendor_name : "",
-    // email: itemToEdit ? itemToEdit.email : "",
+    email: itemToEdit ? itemToEdit.email : "",
     type: itemToEdit ? itemToEdit.type : "",
     userid_id: itemToEdit ? itemToEdit.userid_id : "",
     bank_account: itemToEdit ? itemToEdit.bank_account : "",
@@ -125,6 +95,38 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const [bigTaxDoc, setBigTaxDoc] = useState(false);
   const [taxDocName, setTaxDocName] = useState("");
   const [taxDocNotFound, setTaxDocNotFound] = useState(false);
+
+  const validationSchema = Yup.object().shape({
+    vendor_name: Yup.string()
+      .required("This field is Required")
+      .test(
+        "No floating points",
+        "Please remove any dots",
+        (val) => !val?.includes(".")
+      )
+      .test(
+        "Not empty",
+        "Please remove any spaces at the beginning",
+        (val) => !(val?.substring(0, 1) === " ")
+      ),
+    email: itemToEdit
+      ? Yup.string()
+          .required("This field is Required")
+          .email("Please enter a valid Email")
+      : Yup.string(),
+    type: Yup.string().required("Please specify a type"),
+    userid_id: Yup.string().required(),
+    commercial_no: Yup.string()
+      .required("This field is Required")
+      .matches(/^(?!.* )/, "Please remove any spaces"),
+    tax_card_no: Yup.string()
+      .required("This field is Required")
+      .matches(/^(?!.* )/, "Please remove any spaces"),
+
+    bank_account: Yup.string()
+      .required("This field is Required")
+      .matches(/^(?!.* )/, "Please remove any spaces"),
+  });
 
   useEffect(() => {
     if (itemToEdit) {
@@ -221,7 +223,6 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
     } else {
       let data = new FormData();
       data.append("vendor_name", formData.vendor_name);
-      // data.append("email", formData.email);
       data.append("type", formData.type);
       data.append("userid_id", formData.userid_id);
       data.append("commercial_no", formData.commercial_no);
@@ -235,6 +236,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
       setIsSubmitting(true);
 
       if (itemToEdit) {
+      data.append("email", formData.email);
         await axios
           .post(`/add-vendors/${itemToEdit.id}`, data, {
             headers: {
@@ -423,6 +425,41 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
                 </Grid>
               ) : null}
 
+              {itemToEdit ? (
+                <Grid item xs={12}>
+                  <TextField
+                    name="email"
+                    label="Email"
+                    // variant="outlined"
+                    type="email"
+                    required
+                    value={formData.email}
+                    fullWidth
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.email ||
+                      Boolean(touched.email && errors.email)
+                    }
+                    helperText={touched.email && errors.email}
+                  />
+                </Grid>
+              ) : null}
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.email?.map((msg) => (
+                    <div className={classes.errorsContainer}>
+                      <span key={msg} className={classes.errorMsg}>
+                        {msg}
+                      </span>
+                    </div>
+                  ))}
+                </Grid>
+              ) : null}
+
               <Grid item xs={12}>
                 <FormControl
                   component="fieldset"
@@ -506,7 +543,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
 
               <Grid item xs={6}></Grid>
 
-              <Grid item xs={4}>
+              <Grid item xs={12} lg={4}>
                 <input
                   ref={commercialDocRef}
                   accept="application/pdf,image/*"
@@ -591,7 +628,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
 
               <Grid item xs={6}></Grid>
 
-              <Grid item xs={4}>
+              <Grid item xs={12} lg={4}>
                 <input
                   ref={taxDocRef}
                   accept="application/pdf,image/*"
