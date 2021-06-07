@@ -289,7 +289,6 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
                     variant="contained"
                     color="default"
                     className={classes.uploadButton}
-                    startIcon={<PhotoCamera />}
                     component="span"
                   >
                     Upload

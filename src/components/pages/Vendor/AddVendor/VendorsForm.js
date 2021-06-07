@@ -8,7 +8,6 @@ import {
   FormHelperText,
   FormLabel,
   Grid,
-  IconButton,
   makeStyles,
   Radio,
   RadioGroup,
@@ -16,8 +15,6 @@ import {
 } from "@material-ui/core";
 import axios from "../../../../axios";
 import { CloudUpload, PhotoCamera } from "@material-ui/icons";
-import { Alert } from "@material-ui/lab";
-import { CloseIcon } from "@material-ui/data-grid";
 import * as Yup from "yup";
 import { Formik } from "formik";
 
@@ -79,9 +76,9 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
-  email: Yup.string()
-    .required("This field is Required")
-    .email("Please enter a valid Email"),
+  // email: Yup.string()
+  //   .required("This field is Required")
+  //   .email("Please enter a valid Email"),
   type: Yup.string().required("Please specify a type"),
   userid_id: Yup.string().required(),
   commercial_no: Yup.string()
@@ -105,7 +102,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const taxDocRef = useRef();
   const [formData, updateFormData] = useState({
     vendor_name: itemToEdit ? itemToEdit.vendor_name : "",
-    email: itemToEdit ? itemToEdit.email : "",
+    // email: itemToEdit ? itemToEdit.email : "",
     type: itemToEdit ? itemToEdit.type : "",
     userid_id: itemToEdit ? itemToEdit.userid_id : "",
     bank_account: itemToEdit ? itemToEdit.bank_account : "",
@@ -224,7 +221,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
     } else {
       let data = new FormData();
       data.append("vendor_name", formData.vendor_name);
-      data.append("email", formData.email);
+      // data.append("email", formData.email);
       data.append("type", formData.type);
       data.append("userid_id", formData.userid_id);
       data.append("commercial_no", formData.commercial_no);
@@ -313,7 +310,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const handleReset = () => {
     updateFormData({
       vendor_name: "",
-      email: "",
+      // email: "",
       type: "",
       userid_id: "",
       bank_account: "",
@@ -422,40 +419,6 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>
-                  ))}
-                </Grid>
-              ) : null}
-
-              <Grid item xs={12}>
-                <TextField
-                  name="email"
-                  label="Email"
-                  // variant="outlined"
-                  type="email"
-                  required
-                  value={formData.email}
-                  fullWidth
-                  onChange={(e) => {
-                    handleChange(e);
-                    handleStateChange(e);
-                  }}
-                  onBlur={handleBlur}
-                  error={
-                    responseErrors?.email ||
-                    Boolean(touched.email && errors.email)
-                  }
-                  helperText={touched.email && errors.email}
-                />
-              </Grid>
-
-              {responseErrors ? (
-                <Grid item xs={12}>
-                  {responseErrors.email?.map((msg) => (
-                    <div className={classes.errorsContainer}>
-                      <span key={msg} className={classes.errorMsg}>
-                        {msg}
-                      </span>
-                    </div>
                   ))}
                 </Grid>
               ) : null}
