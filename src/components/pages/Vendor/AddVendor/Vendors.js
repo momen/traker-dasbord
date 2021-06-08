@@ -229,7 +229,7 @@ function Vendors() {
             ) : null}
             {userPermissions.includes("admin_access_vendor_orders") ? (
               <Button
-                style={{ marginRight: "5px", marginLeft: "auto" }}
+                style={{ marginRight: "5px", marginLeft: "15px" }}
                 // color="secondary"
                 variant="contained"
                 size="small"
