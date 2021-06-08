@@ -117,17 +117,28 @@ function Vendors() {
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
 
+  const [openApproveDialog, setOpenApproveDialog] = useState(false);
+  const [vendorToApprove, setVendorToApprove] = useState();
+
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
     { field: "serial", headerName: "Serial", width: 70 },
-    { field: "vendor_name", headerName: "Vendor Name", width: 100 },
-    { field: "email", headerName: "Email", width: 150 },
+    { field: "vendor_name", headerName: "Vendor Name", width: 80 },
+    { field: "email", headerName: "Email", width: 120 },
     {
       field: "userid_id",
       headerName: "Username",
       width: 100,
       renderCell: (params) => {
         return params.row.userid.name;
+      },
+    },
+    {
+      field: "approved",
+      headerName: "Approval",
+      width: 100,
+      renderCell: (params) => {
+        return params.row.approved ? "Approved" : "Pending";
       },
     },
     {
@@ -150,7 +161,7 @@ function Vendors() {
     {
       field: "actions",
       headerName: "Actions",
-      width: 450,
+      width: 550,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -164,6 +175,20 @@ function Vendors() {
               // padding: "5px"
             }}
           >
+            {!params.row.approved ? (
+              <Button
+                style={{ marginRight: "5px" }}
+                className={classes.button}
+                variant="contained"
+                size="small"
+                onClick={() => {
+                  setOpenApproveDialog(true);
+                  setVendorToApprove(params.row.id);
+                }}
+              >
+                Approve Vendor
+              </Button>
+            ) : null}
             {userPermissions.includes("add_vendor_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
@@ -302,6 +327,35 @@ function Vendors() {
       .then((res) => {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
+        setLoading(true);
+        axios
+          .get(
+            `/add-vendors?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
+  };
+
+  const approveVendor = () => {
+    axios
+      .post(`/admin/approve/vendor`, {
+        vendor_id: vendorToApprove,
+      })
+      .then(() => {
+        setOpenApproveDialog(false);
         setLoading(true);
         axios
           .get(
@@ -538,6 +592,36 @@ function Vendors() {
             autoFocus
           >
             Back
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openApproveDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Vendor Approval"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            By approving this vendor they will be able to take actions, proceed?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              approveVendor();
+            }}
+            color="secondary"
+          >
+            Yes
+          </Button>
+          <Button
+            onClick={() => setOpenApproveDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            No
           </Button>
         </DialogActions>
       </Dialog>
