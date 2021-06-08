@@ -248,6 +248,7 @@ function ProductsForm({
 
     if (formData.photo.length === 0 && !itemToEdit) {
       setOpenAlert(true);
+      setIsSubmitting(false);
     } else {
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "photo") return;
