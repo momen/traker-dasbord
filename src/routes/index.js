@@ -76,8 +76,8 @@ const AuditLogs = async(() =>
 const Categories = async(() =>
   import("../components/pages/ProductManagement/Categories/Categories")
 );
-const CarMade = async(() =>
-  import("../components/pages/ProductManagement/CarMade/CarMade.js")
+const Brand = async(() =>
+  import("../components/pages/ProductManagement/CarMade/Brand.js")
 );
 const CarModel = async(() =>
   import("../components/pages/ProductManagement/CarModel/CarModel.js")
@@ -278,9 +278,9 @@ const productManagementRoutes = {
       permission: "product_category_access",
     },
     {
-      path: "/product/car-made",
-      name: "Car Made",
-      component: CarMade,
+      path: "/product/brands",
+      name: "Brand",
+      component: Brand,
       icon: <TimeToLeave />,
       guard: PermissionGuard,
       permission: "car_made_access",

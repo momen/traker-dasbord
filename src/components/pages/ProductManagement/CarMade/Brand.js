@@ -339,7 +339,7 @@ function CarMade() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Car Made List
+        Brands List
       </Typography>
 
       <Divider my={6} />
@@ -356,7 +356,7 @@ function CarMade() {
               setCarMade("");
             }}
           >
-            Add Car Made
+            Add new Brand
           </Button>
         ) : null}
 
@@ -478,7 +478,7 @@ function CarMade() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Car Made? <br />
+            Are you sure you want to delete this Brand? <br />
             If this was by accident please press Back
           </DialogContentText>
         </DialogContent>
@@ -511,7 +511,7 @@ function CarMade() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete all the selected Car Mades? <br />
+            Are you sure you want to delete all the selected Brands? <br />
             If you wish press Yes, otherwise press Back.
           </DialogContentText>
         </DialogContent>
