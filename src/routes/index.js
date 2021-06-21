@@ -8,6 +8,7 @@ import {
   FileText,
   Folder,
   LogOut,
+  Map,
   ShoppingBag,
   ShoppingCart,
   Tag,
@@ -20,16 +21,19 @@ import {
   Category,
   Dashboard,
   EventNote,
+  Explore,
   Group,
   GroupAdd,
   GroupWork,
   HourglassEmpty,
   LiveHelp,
   NewReleases,
+  Public,
   QuestionAnswer,
   Receipt,
   RecentActors,
   Report,
+  Room,
   ShoppingBasket,
   Store,
   TimeToLeave,
@@ -47,6 +51,10 @@ const ProductManagementGuard = async(() =>
   import("../Permissions Guard/ProductManagementGuard")
 );
 const VendorsGuard = async(() => import("../Permissions Guard/VendorsGuard"));
+const GeographyGuard = async(() =>
+  import("../Permissions Guard/GeographyGuard")
+);
+
 const StoresGuard = async(() => import("../Permissions Guard/StoresGuard"));
 const OrdersGuard = async(() => import("../Permissions Guard/OrdersGuard"));
 const InvoicesGuard = async(() => import("../Permissions Guard/InvoicesGuard"));
@@ -110,6 +118,26 @@ const VendorInvoices = async(() =>
 const ViewVendorInvoice = async(() =>
   import("../components/pages/Vendor/AddVendor/ViewVendorInvoice")
 );
+
+/* Geography */
+const Countries = async(() =>
+  import("../components/pages/Geography/Countries/Countries")
+);
+const Areas = async(() => import("../components/pages/Geography/Areas/Areas"));
+const Cities = async(() =>
+  import("../components/pages/Geography/Cities/Cities.js")
+);
+
+const ViewCountry = async(() =>
+  import("../components/pages/Geography/Countries/ViewCountry")
+);
+const ViewArea = async(() =>
+  import("../components/pages/Geography/Areas/ViewArea")
+);
+const ViewCity = async(() =>
+  import("../components/pages/Geography/Cities/ViewCity")
+);
+/* Geography */
 
 const Reports = async(() =>
   import("../components/pages/AdvancedReports/Reports")
@@ -467,6 +495,59 @@ const viewInvoice = {
   children: null,
 };
 
+const geographyRoutes = {
+  id: "Geography",
+  path: "/geography",
+  icon: <Map />,
+  component: null,
+  children: [
+    {
+      path: "/geography/countries",
+      name: "Countries",
+      component: Countries,
+      icon: <Public />,
+      guard: PermissionGuard,
+      permission: "countries_access",
+    },
+    {
+      path: "/geography/areas",
+      name: "Areas",
+      component: Areas,
+      icon: <Explore />,
+      guard: PermissionGuard,
+      permission: "areas_access",
+    },
+    {
+      path: "/geography/cities",
+      name: "Cities",
+      component: Cities,
+      icon: <Room />,
+      guard: PermissionGuard,
+      permission: "cities_access",
+    },
+  ],
+  guard: GeographyGuard,
+  permission: "countries_access",
+};
+
+const viewCountry = {
+  path: "/geography/countries/:id",
+  component: ViewCountry,
+  children: null,
+};
+
+const viewArea = {
+  path: "/geography/areas/:id",
+  component: ViewArea,
+  children: null,
+};
+
+const viewCity = {
+  path: "/geography/cities/:id",
+  component: ViewCity,
+  children: null,
+};
+
 const advancedReportsRoute = {
   id: "Reports",
   path: "/reports",
@@ -585,6 +666,10 @@ export const dashboardLayoutRoutes = [
   userManagementRoutes,
   productManagementRoutes,
   vendorRoutes,
+  geographyRoutes,
+  viewCountry,
+  viewArea,
+  viewCity,
   advancedReportsRoute,
   storesRoute,
   pendingOrdersRoute,
@@ -627,6 +712,10 @@ export const sidebarRoutes = [
   userManagementRoutes,
   productManagementRoutes,
   vendorRoutes,
+  geographyRoutes,
+  viewCountry,
+  viewArea,
+  viewCity,
   advancedReportsRoute,
   storesRoute,
   pendingOrdersRoute,
