@@ -83,12 +83,16 @@ function ProductsForm({
     name: itemToEdit ? itemToEdit.name : "",
     description: itemToEdit ? itemToEdit.description : "",
     car_made_id: itemToEdit ? itemToEdit.car_made_id : "",
-    car_model_id: itemToEdit ? itemToEdit.car_model_id.toString() : "",
-    year_id: itemToEdit ? itemToEdit.year_id : "",
+    models: itemToEdit
+      ? itemToEdit.models.map(({ id, carmodel }) => ({ id, carmodel }))
+      : [],
+    year_from: itemToEdit ? itemToEdit.year_from : "",
+    year_to: itemToEdit ? itemToEdit.year_to : "",
     discount:
       itemToEdit?.discount && itemToEdit?.discount > 0
         ? itemToEdit.discount
         : "",
+    maincategory_id: itemToEdit ? itemToEdit.maincategory_id : "",
     category_id: itemToEdit ? itemToEdit.category_id : "",
     price: itemToEdit ? itemToEdit.price : "",
     holesale_price: itemToEdit ? itemToEdit.holesale_price : "",
@@ -149,8 +153,8 @@ function ProductsForm({
             .required("This field is Required")
         : Yup.string().nullable().notRequired(),
     car_made_id: Yup.string().required(),
-    car_model_id: Yup.string().required(),
-    year_id: Yup.string().required(),
+    year_from: Yup.string().required(),
+    year_to: Yup.string().required(),
     discount: Yup.number()
       .min(5, "Minimum value for discount is 5%")
       .max(80, "Maximum value for discount is 80%"),
@@ -161,6 +165,7 @@ function ProductsForm({
             .required("This field is Required")
             .min(1, "Enter a value greater than 0")
         : Yup.string().nullable().notRequired(),
+    maincategory_id: Yup.string().required(),
     category_id: Yup.string().required(),
     part_category_id: Yup.string().required(),
     manufacturer_id: Yup.string().required(),
@@ -189,6 +194,7 @@ function ProductsForm({
 
   const [carModels, setCarModels] = useState(null);
   const [partCategories, setPartCategories] = useState(null);
+  const [toYears, setToYears] = useState([]);
 
   const [imagesToDelete, setImagesToDelete] = useState("");
 
@@ -199,6 +205,7 @@ function ProductsForm({
   );
 
   const [openAlert, setOpenAlert] = useState(false);
+  const [autoSelectModelError, setAutoSelectModelError] = useState(false);
   const [autoSelectTagError, setAutoSelectTagError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false); // Update on other components
   const [responseErrors, setResponseErrors] = useState("");
@@ -216,7 +223,7 @@ function ProductsForm({
           setCarModels(_carModels);
         })
         .catch(() => {
-          alert("Failed to Fetch Car Model List");
+          alert("Failed to Fetch Brands List");
         });
 
       axios
@@ -333,6 +340,17 @@ function ProductsForm({
     });
   };
 
+  const updateAutoCompleteModels = (e, val) => {
+    if (autoSelectModelError) {
+      setAutoSelectModelError(false);
+    }
+    const models = val.length > 0 ? val : [];
+    updateFormData({
+      ...formData,
+      models: models,
+    });
+  };
+
   const updateAutoCompleteTags = (e, val) => {
     if (autoSelectTagError) {
       setAutoSelectTagError(false);
@@ -400,10 +418,12 @@ function ProductsForm({
       name: "",
       description: "",
       car_made_id: "",
-      car_model_id: "",
-      year_id: "",
+      models: [],
+      year_from: "",
+      year_to: "",
       discount: "",
       price: "",
+      maincategory_id: "",
       category_id: [],
       part_category_id: "",
       manufacturer_id: "",
@@ -413,6 +433,7 @@ function ProductsForm({
       tags: [],
       store_id: "",
       quantity: "",
+      qty_reminder: "",
       serial_number: "",
       producttype_id: "",
       photo: [],
@@ -743,7 +764,7 @@ function ProductsForm({
 
               <Grid item xs={12}></Grid>
 
-              <Grid item xs={4} md={2}>
+              <Grid item xs={4} md={3}>
                 <div>
                   <NumberFormat
                     allowNegative={false}
@@ -788,99 +809,42 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={6} md={3}>
+              <Grid item xs={4} md={3}>
                 <div>
-                  <TextField
-                    select
-                    label="Car Made"
-                    value={formData.car_made_id}
-                    name="car_made_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                      if (e.target.value) {
-                        axios
-                          .get(`/car-modelslist/${e.target.value}`)
-                          .then((res) => {
-                            const _carModels = res.data.data.map(
-                              ({ id, carmodel }) => ({
-                                id,
-                                carmodel,
-                              })
-                            ); // Customize
-                            setCarModels(_carModels);
-                          })
-                          .catch(() => {
-                            alert("Failed to Fetch Car Model List");
-                          });
+                  <NumberFormat
+                    allowNegative={false}
+                    customInput={TextField}
+                    thousandSeparator={true}
+                    name="qty_reminder"
+                    required
+                    fullWidth
+                    label="Reminder Quantity"
+                    value={formData.qty_reminder}
+                    onValueChange={({ floatValue }) => {
+                      updateFormData({
+                        ...formData,
+                        qty_reminder: Math.round(floatValue),
+                      });
+                      values.qty_reminder = Math.round(floatValue);
+                      if (floatValue >= 5) {
+                        errors.qty_reminder = false;
+                      } else if (floatValue) {
+                        errors.qty_reminder = "Minimum value should be 5";
                       } else {
-                        setCarModels(null);
+                        errors.qty_reminder = "This field is Required";
                       }
                     }}
-                    SelectProps={{
-                      native: true,
-                    }}
                     onBlur={handleBlur}
                     error={
-                      responseErrors?.car_made_id ||
-                      Boolean(touched.car_made_id && errors.car_made_id)
+                      responseErrors?.qty_reminder ||
+                      Boolean(touched.qty_reminder && errors.qty_reminder)
                     }
-                    helperText="Please select a Car Made"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {carMades?.map((carMade) => (
-                      <option value={carMade.id}>{carMade.car_made}</option>
-                    ))}
-                  </TextField>
+                    helperText={touched.qty_reminder && errors.qty_reminder}
+                  />
 
                   {responseErrors ? (
                     <div className={classes.inputMessage}>
-                      {responseErrors.car_made_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    disabled={!carModels}
-                    label="Car Model"
-                    value={formData.car_model_id}
-                    name="car_model_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    InputLabelProps={{ shrink: !!formData.car_model_id }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.car_model_id ||
-                      Boolean(touched.car_model_id && errors.car_model_id)
-                    }
-                    helperText="Please select a Car Model"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {carModels?.map((carModel) => (
-                      <option value={carModel.id}>{carModel.carmodel}</option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.car_model_id?.map((msg) => (
+                      {responseErrors.qty_reminder?.map((msg) => (
                         <span key={msg} className={classes.errorMsg}>
                           {msg}
                         </span>
@@ -965,7 +929,6 @@ function ProductsForm({
                       native: true,
                     }}
                     InputLabelProps={{ shrink: !!formData.part_category_id }}
-
                     onBlur={handleBlur}
                     error={
                       responseErrors?.part_category_id ||
@@ -1001,20 +964,149 @@ function ProductsForm({
                 <div>
                   <TextField
                     select
-                    label="Year"
-                    value={formData.year_id}
-                    name="year_id"
+                    label="Brand"
+                    value={formData.car_made_id}
+                    name="car_made_id"
                     onChange={(e) => {
                       handleChange(e);
                       handleStateChange(e);
+                      if (e.target.value) {
+                        axios
+                          .get(`/car-modelslist/${e.target.value}`)
+                          .then((res) => {
+                            const _carModels = res.data.data.map(
+                              ({ id, carmodel }) => ({
+                                id,
+                                carmodel,
+                              })
+                            ); // Customize
+                            setCarModels(_carModels);
+                            console.log(_carModels);
+                          })
+                          .catch(() => {
+                            alert("Failed to Fetch Brands List");
+                          });
+                      } else {
+                        setCarModels(null);
+                      }
                     }}
                     SelectProps={{
                       native: true,
                     }}
                     onBlur={handleBlur}
                     error={
-                      responseErrors?.year_id ||
-                      Boolean(touched.year_id && errors.year_id)
+                      responseErrors?.car_made_id ||
+                      Boolean(touched.car_made_id && errors.car_made_id)
+                    }
+                    helperText="Please select a Brand"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {carMades?.map((carMade) => (
+                      <option value={carMade.id}>{carMade.car_made}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.car_made_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={9}>
+                <div>
+                  <Autocomplete
+                    disabled={!formData.car_made_id}
+                    multiple
+                    // filterSelectedOptions
+                    options={carModels ? carModels : []}
+                    value={formData.models}
+                    getOptionSelected={(option, value) =>
+                      option.id === value.id
+                    }
+                    disableCloseOnSelect
+                    getOptionLabel={(option) => option.carmodel}
+                    renderOption={(option, { selected }) => (
+                      <React.Fragment>
+                        <Checkbox
+                          icon={icon}
+                          checkedIcon={checkedIcon}
+                          style={{ marginRight: 8 }}
+                          checked={selected}
+                        />
+                        {option.carmodel}
+                      </React.Fragment>
+                    )}
+                    fullWidth
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="models"
+                        variant="outlined"
+                        label="Models *"
+                        placeholder="Select related Models for the selected Brand"
+                        fullWidth
+                        error={responseErrors?.models || autoSelectModelError}
+                        helperText="At least one model must be selected."
+                      />
+                    )}
+                    onBlur={() => {
+                      if (formData.models.length === 0) {
+                        setAutoSelectModelError(true);
+                      }
+                    }}
+                    onChange={(e, val) => {
+                      updateAutoCompleteModels(e, val);
+                      if (val.length === 0) {
+                        setAutoSelectModelError(true);
+                      } else {
+                        setAutoSelectModelError(false);
+                      }
+                    }}
+                  />
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.models?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} md={3}>
+                <div>
+                  <TextField
+                    select
+                    label="From Year"
+                    value={formData.year_from}
+                    name="year_from"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                      setToYears(
+                        carYears.filter(
+                          (year) => parseInt(year) >= parseInt(e.target.value)
+                        )
+                      );
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.year_from ||
+                      Boolean(touched.year_from && errors.year_from)
                     }
                     helperText="Please select a Year"
                     fullWidth
@@ -1028,7 +1120,49 @@ function ProductsForm({
 
                   {responseErrors ? (
                     <div className={classes.inputMessage}>
-                      {responseErrors.year_id?.map((msg) => (
+                      {responseErrors.year_from?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} md={3}>
+                <div>
+                  <TextField
+                    disabled={!formData.year_from}
+                    select
+                    label="To Year"
+                    value={formData.year_to}
+                    name="year_to"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.year_to ||
+                      Boolean(touched.year_to && errors.year_to)
+                    }
+                    helperText="Please select a Year"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {toYears.map((carYear) => (
+                      <option value={carYear.id}>{carYear.year}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.year_to?.map((msg) => (
                         <span key={msg} className={classes.errorMsg}>
                           {msg}
                         </span>
