@@ -67,6 +67,7 @@ function ProductsForm({
   setOpenPopup,
   itemToEdit,
   stores,
+  mainCategories,
   categories,
   carMades,
   carYears,
@@ -84,7 +85,10 @@ function ProductsForm({
     description: itemToEdit ? itemToEdit.description : "",
     car_made_id: itemToEdit ? itemToEdit.car_made_id : "",
     models: itemToEdit
-      ? itemToEdit.models.map(({ id, carmodel }) => ({ id, carmodel }))
+      ? itemToEdit.models?.map(({ id, main_category_name }) => ({
+          id,
+          main_category_name,
+        }))
       : [],
     year_from: itemToEdit ? itemToEdit.year_from : "",
     year_to: itemToEdit ? itemToEdit.year_to : "",
@@ -259,7 +263,7 @@ function ProductsForm({
     } else {
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "photo") return;
-        if (key === "tags") {
+        if (key === "tags" || key === "models") {
           data.append(key, JSON.stringify(value.map((val) => val.id)));
         } else if (key === "discount" && !value) {
           data.append(key, 0);
@@ -858,6 +862,49 @@ function ProductsForm({
                 <div>
                   <TextField
                     select
+                    label="Main Category"
+                    value={formData.maincategory_id}
+                    name="maincategory_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.maincategory_id ||
+                      Boolean(touched.maincategory_id && errors.maincategory_id)
+                    }
+                    helperText="Please select a Main Category"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {mainCategories?.map((category) => (
+                      <option value={category.id}>
+                        {category.main_category_name}
+                      </option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.maincategory_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} md={3}>
+                <div>
+                  <TextField
+                    select
                     label="Category"
                     value={formData.category_id}
                     name="category_id"
@@ -1020,7 +1067,7 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={9}>
+              <Grid item xs={9} md={6}>
                 <div>
                   <Autocomplete
                     disabled={!formData.car_made_id}
@@ -1094,9 +1141,13 @@ function ProductsForm({
                     onChange={(e) => {
                       handleChange(e);
                       handleStateChange(e);
+                      const fromYear = carYears.find(
+                        (carYear) => carYear.id == e.target.value
+                      );
                       setToYears(
                         carYears.filter(
-                          (year) => parseInt(year) >= parseInt(e.target.value)
+                          (year) =>
+                            parseInt(year.year) >= parseInt(fromYear.year)
                         )
                       );
                     }}
