@@ -77,6 +77,9 @@ const Roles = async(() =>
 const UsersComponent = async(() =>
   import("../components/pages/UserManagement/Users/Users")
 );
+const VendorStaff = async(() =>
+  import("../components/pages/UserManagement/VendorStaff/Users")
+);
 const AuditLogs = async(() =>
   import("../components/pages/UserManagement/AuditLogs/AuditLogs.js")
 );
@@ -162,6 +165,9 @@ const ViewRole = async(() =>
 );
 const ViewUser = async(() =>
   import("../components/pages/UserManagement/Users/ViewUser")
+);
+const ViewStaff = async(() =>
+  import("../components/pages/UserManagement/VendorStaff/ViewUser")
 );
 const ViewLog = async(() =>
   import("../components/pages/UserManagement/AuditLogs/ViewLog")
@@ -255,6 +261,14 @@ const userManagementRoutes = {
       permission: "user_access",
     },
     {
+      path: "/user-mgt/vendor-users",
+      name: "Staff",
+      component: VendorStaff,
+      icon: <User />,
+      guard: PermissionGuard,
+      permission: "vendor_add_staff",
+    },
+    {
       path: "/user-mgt/logs",
       name: "Audit Logs",
       component: AuditLogs,
@@ -282,6 +296,12 @@ const viewRole = {
 const viewUser = {
   path: "/user-mgt/users/:id",
   component: ViewUser,
+  children: null,
+};
+
+const viewStaff = {
+  path: "/user-mgt/vendor-users/:id",
+  component: ViewStaff,
   children: null,
 };
 
@@ -678,6 +698,7 @@ export const dashboardLayoutRoutes = [
   viewPermission,
   viewRole,
   viewUser,
+  viewStaff,
   viewLog,
   viewCategory,
   viewCarMade,

@@ -68,7 +68,7 @@ function ProductsForm({
   itemToEdit,
   stores,
   mainCategories,
-  categories,
+  // categories,
   carMades,
   carYears,
   productTags,
@@ -156,9 +156,33 @@ function ProductsForm({
             .min(1, "Minimum value should be 1")
             .required("This field is Required")
         : Yup.string().nullable().notRequired(),
-    car_made_id: Yup.string().required(),
-    year_from: Yup.string().required(),
-    year_to: Yup.string().required(),
+    car_made_id:
+      formData.category_id &&
+      formData.category_id !== "81" &&
+      formData.category_id !== "82" &&
+      formData.category_id !== "83" &&
+      formData.category_id !== "84" &&
+      formData.category_id !== "85"
+        ? Yup.string().required()
+        : Yup.string().nullable().notRequired(),
+    year_from:
+      formData.category_id &&
+      formData.category_id !== "81" &&
+      formData.category_id !== "82" &&
+      formData.category_id !== "83" &&
+      formData.category_id !== "84" &&
+      formData.category_id !== "85"
+        ? Yup.string().required()
+        : Yup.string().nullable().notRequired(),
+    year_to:
+      formData.category_id &&
+      formData.category_id !== "81" &&
+      formData.category_id !== "82" &&
+      formData.category_id !== "83" &&
+      formData.category_id !== "84" &&
+      formData.category_id !== "85"
+        ? Yup.string().required()
+        : Yup.string().nullable().notRequired(),
     discount: Yup.number()
       .min(5, "Minimum value for discount is 5%")
       .max(80, "Maximum value for discount is 80%"),
@@ -174,8 +198,24 @@ function ProductsForm({
     part_category_id: Yup.string().required(),
     manufacturer_id: Yup.string().required(),
     prodcountry_id: Yup.string().required(),
-    transmission_id: Yup.string().required(),
-    cartype_id: Yup.string().required(),
+    transmission_id:
+      formData.category_id &&
+      formData.category_id !== "81" &&
+      formData.category_id !== "82" &&
+      formData.category_id !== "83" &&
+      formData.category_id !== "84" &&
+      formData.category_id !== "85"
+        ? Yup.string().required()
+        : Yup.string().nullable().notRequired(),
+    cartype_id:
+      formData.category_id &&
+      formData.category_id !== "81" &&
+      formData.category_id !== "82" &&
+      formData.category_id !== "83" &&
+      formData.category_id !== "84" &&
+      formData.category_id !== "85"
+        ? Yup.string().required()
+        : Yup.string().nullable().notRequired(),
     store_id: Yup.string().required(),
     quantity: Yup.number()
       .min(5, "Minimum value should be 5")
@@ -197,6 +237,7 @@ function ProductsForm({
   });
 
   const [carModels, setCarModels] = useState(null);
+  const [categories, setCategories] = useState(null);
   const [partCategories, setPartCategories] = useState(null);
   const [toYears, setToYears] = useState([]);
 
@@ -231,6 +272,19 @@ function ProductsForm({
         });
 
       axios
+        .get(`/categorieslist/${itemToEdit.maincategory_id}`)
+        .then((res) => {
+          const _categories = res.data.data.map(({ id, name }) => ({
+            id,
+            name,
+          })); // Customize
+          setCarModels(_categories);
+        })
+        .catch(() => {
+          alert("Failed to Fetch Categories List");
+        });
+
+      axios
         .get(`/part-categorieslist/${itemToEdit.category_id}`)
         .then((res) => {
           const _partCategories = res.data.data.map(
@@ -248,10 +302,26 @@ function ProductsForm({
   }, []);
 
   const handleSubmit = async () => {
+    if (
+      formData.models.length === 0 &&
+      formData.category_id &&
+      formData.category_id !== "81" &&
+      formData.category_id !== "82" &&
+      formData.category_id !== "83" &&
+      formData.category_id !== "84" &&
+      formData.category_id !== "85"
+    ) {
+      setAutoSelectModelError(true);
+      return;
+    }
     if (formData.tags.length === 0) {
       setAutoSelectTagError(true);
       return;
     }
+
+    //   ? Yup.string().required()
+    //   : Yup.string().nullable().notRequired(),
+    setAutoSelectModelError(false);
     setAutoSelectTagError(false);
 
     setIsSubmitting(true); // Update on other components
@@ -868,6 +938,24 @@ function ProductsForm({
                     onChange={(e) => {
                       handleChange(e);
                       handleStateChange(e);
+                      if (e.target.value) {
+                        axios
+                          .get(`/categorieslist/${e.target.value}`)
+                          .then((res) => {
+                            const _categories = res.data.data.map(
+                              ({ id, name }) => ({
+                                id,
+                                name,
+                              })
+                            ); // Customize
+                            setCategories(_categories);
+                          })
+                          .catch(() => {
+                            alert("Failed to Fetch Categories List");
+                          });
+                      } else {
+                        setCategories(null);
+                      }
                     }}
                     SelectProps={{
                       native: true,
@@ -904,6 +992,7 @@ function ProductsForm({
               <Grid item xs={6} md={3}>
                 <div>
                   <TextField
+                    disabled={!formData.maincategory_id}
                     select
                     label="Category"
                     value={formData.category_id}
@@ -1007,221 +1096,234 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    label="Brand"
-                    value={formData.car_made_id}
-                    name="car_made_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                      if (e.target.value) {
-                        axios
-                          .get(`/car-modelslist/${e.target.value}`)
-                          .then((res) => {
-                            const _carModels = res.data.data.map(
-                              ({ id, carmodel }) => ({
-                                id,
-                                carmodel,
-                              })
-                            ); // Customize
-                            setCarModels(_carModels);
-                            console.log(_carModels);
-                          })
-                          .catch(() => {
-                            alert("Failed to Fetch Brands List");
-                          });
-                      } else {
-                        setCarModels(null);
-                      }
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.car_made_id ||
-                      Boolean(touched.car_made_id && errors.car_made_id)
-                    }
-                    helperText="Please select a Brand"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {carMades?.map((carMade) => (
-                      <option value={carMade.id}>{carMade.car_made}</option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.car_made_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={9} md={6}>
-                <div>
-                  <Autocomplete
-                    disabled={!formData.car_made_id}
-                    multiple
-                    // filterSelectedOptions
-                    options={carModels ? carModels : []}
-                    value={formData.models}
-                    getOptionSelected={(option, value) =>
-                      option.id === value.id
-                    }
-                    disableCloseOnSelect
-                    getOptionLabel={(option) => option.carmodel}
-                    renderOption={(option, { selected }) => (
-                      <React.Fragment>
-                        <Checkbox
-                          icon={icon}
-                          checkedIcon={checkedIcon}
-                          style={{ marginRight: 8 }}
-                          checked={selected}
-                        />
-                        {option.carmodel}
-                      </React.Fragment>
-                    )}
-                    fullWidth
-                    renderInput={(params) => (
+              {formData.category_id &&
+              formData.category_id !== "81" &&
+              formData.category_id !== "82" &&
+              formData.category_id !== "83" &&
+              formData.category_id !== "84" &&
+              formData.category_id !== "85" ? (
+                <>
+                  <Grid item xs={6} md={3}>
+                    <div>
                       <TextField
-                        {...params}
-                        name="models"
-                        variant="outlined"
-                        label="Models *"
-                        placeholder="Select related Models for the selected Brand"
+                        select
+                        label="Brand"
+                        value={formData.car_made_id}
+                        name="car_made_id"
+                        onChange={(e) => {
+                          handleChange(e);
+                          handleStateChange(e);
+                          if (e.target.value) {
+                            axios
+                              .get(`/car-modelslist/${e.target.value}`)
+                              .then((res) => {
+                                const _carModels = res.data.data.map(
+                                  ({ id, carmodel }) => ({
+                                    id,
+                                    carmodel,
+                                  })
+                                ); // Customize
+                                setCarModels(_carModels);
+                                console.log(_carModels);
+                              })
+                              .catch(() => {
+                                alert("Failed to Fetch Brands List");
+                              });
+                          } else {
+                            setCarModels(null);
+                          }
+                        }}
+                        SelectProps={{
+                          native: true,
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.car_made_id ||
+                          Boolean(touched.car_made_id && errors.car_made_id)
+                        }
+                        helperText="Please select a Brand"
                         fullWidth
-                        error={responseErrors?.models || autoSelectModelError}
-                        helperText="At least one model must be selected."
+                        required
+                      >
+                        <option aria-label="None" value="" />
+                        {carMades?.map((carMade) => (
+                          <option value={carMade.id}>{carMade.car_made}</option>
+                        ))}
+                      </TextField>
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.car_made_id?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span>{formData.category_id}</span>
+                      )}
+                    </div>
+                  </Grid>
+
+                  <Grid item xs={9} md={6}>
+                    <div>
+                      <Autocomplete
+                        disabled={!formData.car_made_id}
+                        multiple
+                        // filterSelectedOptions
+                        options={carModels ? carModels : []}
+                        value={formData.models}
+                        getOptionSelected={(option, value) =>
+                          option.id === value.id
+                        }
+                        disableCloseOnSelect
+                        getOptionLabel={(option) => option.carmodel}
+                        renderOption={(option, { selected }) => (
+                          <React.Fragment>
+                            <Checkbox
+                              icon={icon}
+                              checkedIcon={checkedIcon}
+                              style={{ marginRight: 8 }}
+                              checked={selected}
+                            />
+                            {option.carmodel}
+                          </React.Fragment>
+                        )}
+                        fullWidth
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            name="models"
+                            variant="outlined"
+                            label="Models *"
+                            placeholder="Select related Models for the selected Brand"
+                            fullWidth
+                            error={
+                              responseErrors?.models || autoSelectModelError
+                            }
+                            helperText="At least one model must be selected."
+                          />
+                        )}
+                        onBlur={() => {
+                          if (formData.models.length === 0) {
+                            setAutoSelectModelError(true);
+                          }
+                        }}
+                        onChange={(e, val) => {
+                          updateAutoCompleteModels(e, val);
+                          if (val.length === 0) {
+                            setAutoSelectModelError(true);
+                          } else {
+                            setAutoSelectModelError(false);
+                          }
+                        }}
                       />
-                    )}
-                    onBlur={() => {
-                      if (formData.models.length === 0) {
-                        setAutoSelectModelError(true);
-                      }
-                    }}
-                    onChange={(e, val) => {
-                      updateAutoCompleteModels(e, val);
-                      if (val.length === 0) {
-                        setAutoSelectModelError(true);
-                      } else {
-                        setAutoSelectModelError(false);
-                      }
-                    }}
-                  />
 
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.models?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.models?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
-                  ) : null}
-                </div>
-              </Grid>
+                  </Grid>
 
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    label="From Year"
-                    value={formData.year_from}
-                    name="year_from"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                      const fromYear = carYears.find(
-                        (carYear) => carYear.id == e.target.value
-                      );
-                      setToYears(
-                        carYears.filter(
-                          (year) =>
-                            parseInt(year.year) >= parseInt(fromYear.year)
-                        )
-                      );
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.year_from ||
-                      Boolean(touched.year_from && errors.year_from)
-                    }
-                    helperText="Please select a Year"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {carYears?.map((carYear) => (
-                      <option value={carYear.id}>{carYear.year}</option>
-                    ))}
-                  </TextField>
+                  <Grid item xs={6} md={3}>
+                    <div>
+                      <TextField
+                        select
+                        label="From Year"
+                        value={formData.year_from}
+                        name="year_from"
+                        onChange={(e) => {
+                          handleChange(e);
+                          handleStateChange(e);
+                          const fromYear = carYears.find(
+                            (carYear) => carYear.id == e.target.value
+                          );
+                          setToYears(
+                            carYears.filter(
+                              (year) =>
+                                parseInt(year.year) >= parseInt(fromYear.year)
+                            )
+                          );
+                        }}
+                        SelectProps={{
+                          native: true,
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.year_from ||
+                          Boolean(touched.year_from && errors.year_from)
+                        }
+                        helperText="Please select a Year"
+                        fullWidth
+                        required
+                      >
+                        <option aria-label="None" value="" />
+                        {carYears?.map((carYear) => (
+                          <option value={carYear.id}>{carYear.year}</option>
+                        ))}
+                      </TextField>
 
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.year_from?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.year_from?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
-                  ) : null}
-                </div>
-              </Grid>
+                  </Grid>
 
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    disabled={!formData.year_from}
-                    select
-                    label="To Year"
-                    value={formData.year_to}
-                    name="year_to"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.year_to ||
-                      Boolean(touched.year_to && errors.year_to)
-                    }
-                    helperText="Please select a Year"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {toYears.map((carYear) => (
-                      <option value={carYear.id}>{carYear.year}</option>
-                    ))}
-                  </TextField>
+                  <Grid item xs={6} md={3}>
+                    <div>
+                      <TextField
+                        disabled={!formData.year_from}
+                        select
+                        label="To Year"
+                        value={formData.year_to}
+                        name="year_to"
+                        onChange={(e) => {
+                          handleChange(e);
+                          handleStateChange(e);
+                        }}
+                        SelectProps={{
+                          native: true,
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.year_to ||
+                          Boolean(touched.year_to && errors.year_to)
+                        }
+                        helperText="Please select a Year"
+                        fullWidth
+                        required
+                      >
+                        <option aria-label="None" value="" />
+                        {toYears.map((carYear) => (
+                          <option value={carYear.id}>{carYear.year}</option>
+                        ))}
+                      </TextField>
 
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.year_to?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.year_to?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
-                  ) : null}
-                </div>
-              </Grid>
+                  </Grid>
+                </>
+              ) : null}
 
               {/****************************** ******************************/}
 
@@ -1350,86 +1452,99 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    label="Transmission"
-                    value={formData.transmission_id}
-                    name="transmission_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.transmission_id ||
-                      Boolean(touched.transmission_id && errors.transmission_id)
-                    }
-                    helperText="Please select a Transmission"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    <option value={1}>Manual</option>
-                    <option value={2}>Automatic</option>
-                  </TextField>
+              {formData.category_id &&
+              formData.category_id !== "81" &&
+              formData.category_id !== "82" &&
+              formData.category_id !== "83" &&
+              formData.category_id !== "84" &&
+              formData.category_id !== "85" ? (
+                <>
+                  <Grid item xs={6} md={3}>
+                    <div>
+                      <TextField
+                        select
+                        label="Transmission"
+                        value={formData.transmission_id}
+                        name="transmission_id"
+                        onChange={(e) => {
+                          handleChange(e);
+                          handleStateChange(e);
+                        }}
+                        SelectProps={{
+                          native: true,
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.transmission_id ||
+                          Boolean(
+                            touched.transmission_id && errors.transmission_id
+                          )
+                        }
+                        helperText="Please select a Transmission"
+                        fullWidth
+                        required
+                      >
+                        <option aria-label="None" value="" />
+                        <option value={1}>Manual</option>
+                        <option value={2}>Automatic</option>
+                      </TextField>
 
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.transmission_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.transmission_id?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
-                  ) : null}
-                </div>
-              </Grid>
+                  </Grid>
 
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    label="Car Types"
-                    value={formData.cartype_id}
-                    name="cartype_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.cartype_id ||
-                      Boolean(touched.cartype_id && errors.cartype_id)
-                    }
-                    helperText="Please select a Car Type"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {carTypes?.map((carType) => (
-                      <option value={carType.id}>{carType.type_name}</option>
-                    ))}
-                  </TextField>
+                  <Grid item xs={6} md={3}>
+                    <div>
+                      <TextField
+                        select
+                        label="Car Types"
+                        value={formData.cartype_id}
+                        name="cartype_id"
+                        onChange={(e) => {
+                          handleChange(e);
+                          handleStateChange(e);
+                        }}
+                        SelectProps={{
+                          native: true,
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.cartype_id ||
+                          Boolean(touched.cartype_id && errors.cartype_id)
+                        }
+                        helperText="Please select a Car Type"
+                        fullWidth
+                        required
+                      >
+                        <option aria-label="None" value="" />
+                        {carTypes?.map((carType) => (
+                          <option value={carType.id}>
+                            {carType.type_name}
+                          </option>
+                        ))}
+                      </TextField>
 
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.cartype_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.cartype_id?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
-                  ) : null}
-                </div>
-              </Grid>
+                  </Grid>
+                </>
+              ) : null}
 
               <Grid item xs={12}>
                 <div>

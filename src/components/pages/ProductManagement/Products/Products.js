@@ -150,18 +150,8 @@ function Products() {
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
     { field: "name", headerName: "Name", width: 80 },
-    {
-      field: "car_model_id",
-      headerName: "Car Model",
-      width: 80,
-      renderCell: (params) => params.row.car_model?.carmodel,
-    },
-    {
-      field: "year_d",
-      headerName: "Year",
-      width: 50,
-      renderCell: (params) => params.row.year?.year,
-    },
+    { field: "serial_number", headerName: "Serial Number", width: 100 },
+    { field: "serial_coding", headerName: "Serial Encoding", width: 100 },
     { field: "quantity", headerName: "Quantity", width: 70 },
     {
       field: "product_type",
@@ -187,6 +177,24 @@ function Products() {
       width: 80,
       sortable: false,
       renderCell: (params) => params.row.category?.name,
+    },
+    {
+      field: "photo",
+      headerName: "Photos",
+      width: 80,
+      sortable: false,
+      renderCell: (params) => (
+        <Fragment>
+          {params.value?.map((img, index) => (
+            <img
+              key={img.uuid}
+              src={img.image}
+              alt="ph"
+              style={{ objectFit: "contain", width: 50 }}
+            />
+          ))}
+        </Fragment>
+      ),
     },
     {
       field: "actions",
@@ -254,36 +262,6 @@ function Products() {
           </div>
         );
       },
-    },
-    {
-      field: "photo",
-      headerName: "Photos",
-      width: 80,
-      sortable: false,
-      renderCell: (params) => (
-        <Fragment>
-          {params.value?.map((img, index) => (
-            <img
-              key={img.uuid}
-              src={img.image}
-              alt="ph"
-              style={{ objectFit: "contain", width: 50 }}
-            />
-          ))}
-        </Fragment>
-      ),
-    },
-    {
-      field: "car_made_id",
-      headerName: "Car Made",
-      width: 80,
-      renderCell: (params) => params.row.car_made?.car_made,
-    },
-    {
-      field: "part_category_id",
-      headerName: "Part Category",
-      width: 80,
-      renderCell: (params) => params.row.part_category?.category_name,
     },
   ];
 

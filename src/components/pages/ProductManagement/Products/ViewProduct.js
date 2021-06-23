@@ -116,6 +116,22 @@ function ViewProduct({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">{product.id}</StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={product.serial_number}>
+              <StyledTableCell component="th" scope="row">
+                Serial Number
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.serial_number}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={product.serial_coding}>
+              <StyledTableCell component="th" scope="row">
+                Serial Encoding
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.serial_coding}</span>
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={product.name}>
               <StyledTableCell component="th" scope="row">
                 Product Name

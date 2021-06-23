@@ -1,9 +1,12 @@
 import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components/macro";
+import { NavLink, useHistory } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import PropTypes from "prop-types";
 
 import {
+  Link,
+  Breadcrumbs as MuiBreadcrumbs,
   Card as MuiCard,
   CardContent as MuiCardContent,
   Divider as MuiDivider,
@@ -14,29 +17,29 @@ import {
   Select,
   MenuItem,
   FormControl,
+  InputLabel,
   makeStyles,
   LinearProgress,
-  Grid,
-  TextField,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
   DialogActions,
+  Grid,
+  TextField,
 } from "@material-ui/core";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import { Search, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
-import StoresForm from "./StoresForm";
+import UsersForm from "./UsersForm";
 import { Pagination } from "@material-ui/lab";
-import { Search } from "react-feather";
-import { useHistory, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const Card = styled(MuiCard)(spacing);
+const CardContent = styled(MuiCardContent)(spacing);
 const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
@@ -52,6 +55,20 @@ const useStyles = makeStyles({
       background: "#388e3c",
     },
     marginRight: "5px",
+  },
+  roleBadge: {
+    background: "#FFBF00",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
+  },
+  toolBar: {
+    display: "flex",
+    justifyContent: "space-between",
+    width: "100%",
+    borderRadius: "6px",
   },
 });
 
@@ -95,50 +112,42 @@ function CustomLoadingOverlay() {
   );
 }
 
-function Stores() {
+function Users() {
   const classes = useStyles();
-  const history = useHistory();
   const userPermissions = useSelector((state) => state.userPermissions);
+  const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Store");
+  const [openPopupTitle, setOpenPopupTitle] = useState("New User");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [selectedItem, setSelectedItem] =
-    useState(""); /****** Customize ******/
+  const [selectedItem, setSelectedItem] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
+  const [rolesList, setRolesList] = useState("");
+  const [stores, setStores] = useState([]);
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
-  const [countries, setCountries] = useState([]);
-
-  const location = useLocation();
 
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
-    { field: "address", headerName: "Address", width: 200, flex: 1 },
+    { field: "name", headerName: "Name", width: 100 },
+    { field: "email", headerName: "Email", width: 150, flex: 1 },
     {
-      field: "moderator_name",
-      headerName: "Moderator Name",
-      width: 200,
-      flex: 1,
+      field: "email_verified_at",
+      headerName: "Email Verification Date",
+      width: 100,
     },
     {
-      field: "moderator_phone",
-      headerName: "Moderator Phone",
-      width: 200,
-      flex: 1,
-    },
-    {
-      field: "moderator_alt_phone",
-      headerName: "Moderator Alt Phone",
-      width: 200,
-      flex: 1,
+      field: "role",
+      headerName: "Role",
+      width: 150,
+      sortable: false,
     },
     {
       field: "actions",
@@ -147,7 +156,6 @@ function Stores() {
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
-        // let carMade = params.getValue("id");
         return (
           <div
             style={{
@@ -157,38 +165,18 @@ function Stores() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("stores_show") ? (
+            {userPermissions.includes("user_show_by_vendor") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() => {
-                  history.push(`${location.pathname}/${params.row.id}`);
-                  console.log(location);
-                }}
+                onClick={() => history.push(`/user-mgt/vendor-users/${params.row.id}`)}
               >
                 View
               </Button>
             ) : null}
-            {userPermissions.includes("stores_edit") ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                color="primary"
-                variant="contained"
-                size="small"
-                onClick={() => {
-                  setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle(
-                    "Update Store Details"
-                  ); /****** Customize ******/
-                }}
-              >
-                Edit
-              </Button>
-            ) : null}
 
-            {userPermissions.includes("stores_delete") ? (
+            {userPermissions.includes("user_delete_by_vendor") ? (
               <Button
                 color="secondary"
                 variant="contained"
@@ -213,6 +201,7 @@ function Stores() {
   };
 
   const handleSortModelChange = (params) => {
+    console.log(params);
     if (params.sortModel !== sortModel) {
       setSortModel(params.sortModel);
     }
@@ -236,15 +225,15 @@ function Stores() {
     setItemToDelete(id);
   };
 
-  const DeleteStore = () => {
+  const DeleteItem = () => {
     axios
-      .delete(`/stores/${itemToDelete}`)
+      .delete(`/users/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
         setLoading(true);
         axios
           .get(
-            `/stores?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/users?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -265,7 +254,7 @@ function Stores() {
 
   const MassDelete = () => {
     axios
-      .post(`/stores/mass/delete`, {
+      .post(`/users/mass/delete`, {
         ids: JSON.stringify(rowsToDelete),
       })
       .then((res) => {
@@ -274,7 +263,7 @@ function Stores() {
         setLoading(true);
         axios
           .get(
-            `/stores?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/users?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -293,20 +282,26 @@ function Stores() {
       });
   };
 
+  //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
     axios
-      .get("/countries/list/all")
+      .get(`/roleslist`)
       .then((res) => {
-        const _countries = res.data.data.map(({ id, country_name }) => ({
-          id,
-          country_name,
-        }));
-        setCountries(_countries);
+        setRolesList(res.data.data);
+      })
+      .catch(({ response }) => {
+        // alert(response.data?.errors);
+      });
+    axios
+      .get("/storeslist")
+      .then((res) => {
+        const _stores = res.data.data.map(({ id, name }) => ({ id, name }));
+        setStores(_stores);
       })
       .catch(() => {
-        alert("Failed to Fetch Countries List");
+        alert("Failed to Fetch Stores List");
       });
-  });
+  }, []);
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
@@ -315,7 +310,7 @@ function Stores() {
     if (!userIsSearching) {
       axios
         .get(
-          `/stores?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/users?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -328,7 +323,7 @@ function Stores() {
     } else {
       axios
         .post(
-          `/stores/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/users/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -348,28 +343,28 @@ function Stores() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Stores
+        Staff
       </Typography>
-
       <Divider my={6} />
 
-      <Grid container flex>
-        {userPermissions.includes("stores_create") ? (
+      <Grid container>
+        {userPermissions.includes("vendor_add_staff") ? (
           <Button
+            data-test="users-create-btn"
             mb={3}
             className={classes.button}
             variant="contained"
             onClick={() => {
-              setOpenPopupTitle("New Store");
-              setOpenPopup(true);
               setSelectedItem("");
+              setOpenPopup(true);
+              setOpenPopupTitle("New User");
             }}
           >
-            Add Store
+            Add User
           </Button>
         ) : null}
 
-        {userPermissions.includes("stores_delete") ? (
+        {userPermissions.includes("user_delete_by_vendor") ? (
           <Button
             mb={3}
             color="secondary"
@@ -386,14 +381,7 @@ function Stores() {
 
       <Card mb={6}>
         <Paper mb={2}>
-          <Toolbar
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              borderRadius: "3px",
-            }}
-          >
+          <Toolbar className={classes.toolBar}>
             <FormControl variant="outlined">
               <Select
                 value={pageSize}
@@ -469,14 +457,13 @@ function Stores() {
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
-        <StoresForm
+        <UsersForm
           setPage={setPage}
           setOpenPopup={setOpenPopup}
-          itemToEdit={selectedItem}
-          countries={countries}
+          rolesList={rolesList}
+          stores={stores}
         />
       </Popup>
-
       <Dialog
         open={openDeleteDialog}
         aria-labelledby="alert-dialog-title"
@@ -487,14 +474,14 @@ function Stores() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Store? <br />
+            Are you sure you want to delete this User? <br />
             If this was by accident please press Back
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => {
-              DeleteStore();
+              DeleteItem();
             }}
             color="secondary"
           >
@@ -520,7 +507,7 @@ function Stores() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete all the selected Stores? <br />
+            Are you sure you want to delete all the selected Users? <br />
             If you wish press Yes, otherwise press Back.
           </DialogContentText>
         </DialogContent>
@@ -546,4 +533,4 @@ function Stores() {
   );
 }
 
-export default Stores;
+export default Users;

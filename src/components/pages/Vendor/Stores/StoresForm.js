@@ -57,18 +57,6 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
-  moderator_name: Yup.string()
-    .required("This field is Required")
-    .test(
-      "No floating points",
-      "Please remove any dots",
-      (val) => !val?.includes(".")
-    )
-    .test(
-      "Not empty",
-      "Please remove any spaces at the beginning",
-      (val) => !(val?.substring(0, 1) === " ")
-    ),
   moderator_phone: Yup.string()
     .test(
       "len",
@@ -84,25 +72,30 @@ const validationSchema = Yup.object().shape({
       }
       return val?.replace(/[^A-Z0-9]/gi, "").length === 12;
     }),
-  // lat: Yup.string().required("This field is Required"),
-  // long: Yup.string().required("This field is Required"),
+  country_id: Yup.string().required("Please select a Country"),
+  area_id: Yup.string().required("Please select an Area"),
+  city_id: Yup.string().required("Please select a City"),
 });
 
-function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
+function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
   const classes = useStyles();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
     address: itemToEdit ? itemToEdit.address : "",
-    moderator_name: itemToEdit ? itemToEdit.moderator_name : "",
     moderator_phone: itemToEdit ? itemToEdit.moderator_phone : "",
     moderator_alt_phone: itemToEdit?.moderator_alt_phone
       ? itemToEdit.moderator_alt_phone
       : "",
     lat: itemToEdit ? itemToEdit.lat : "",
     long: itemToEdit ? itemToEdit.long : "",
+    country_id: itemToEdit ? itemToEdit.country_id : "",
+    area_id: itemToEdit ? itemToEdit.area_id : "",
+    city_id: itemToEdit ? itemToEdit.city_id : "",
   });
+  const [areas, setAreas] = useState([]);
+  const [cities, setCities] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [locationNotSelected, setLocationNotSelected] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
@@ -119,11 +112,13 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
     let data = {
       name: formData.name,
       address: formData.address,
-      moderator_name: formData.moderator_name,
       moderator_phone: mod_phone,
       moderator_alt_phone: mod_alt_phone,
       lat: formData.lat,
       long: formData.long,
+      country_id: formData.country_id,
+      area_id: formData.area_id,
+      city_id: formData.city_id,
     };
 
     setLocationNotSelected(false);
@@ -165,11 +160,13 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
     updateFormData({
       name: "",
       address: "",
-      moderator_name: "",
       moderator_phone: "",
       moderator_alt_phone: "",
       lat: "",
       long: "",
+      country_id: "",
+      area_id: "",
+      city_id: "",
     });
     setResponseErrors("");
   };
@@ -192,7 +189,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <div>
                   <TextField
                     name="name"
@@ -226,40 +223,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
                 </div>
               </Grid>
 
-              <Grid item xs={6}>
-                <div>
-                  <TextField
-                    name="moderator_name"
-                    required
-                    fullWidth
-                    id="moderator_name"
-                    label="Moderator Name"
-                    value={formData.moderator_name}
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.moderator_name ||
-                      Boolean(touched.moderator_name && errors.moderator_name)
-                    }
-                    helperText={touched.moderator_name && errors.moderator_name}
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.moderator_name?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <div>
                   <NumberFormat
                     name="moderator_phone"
@@ -300,7 +264,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
                 </div>
               </Grid>
 
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <div>
                   <NumberFormat
                     name="moderator_alt_phone"
@@ -338,6 +302,193 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit }) {
                     </div>
                   ) : null}
                 </div>
+              </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  select
+                  label="country"
+                  name="country_id"
+                  value={formData.country_id}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      handleChange(e);
+                      handleStateChange(e);
+                      axios
+                        .get(`areas/list/all/${e.target.value}`)
+                        .then(({ data }) => {
+                          const _areas = data.data.map(({ id, area_name }) => ({
+                            id,
+                            area_name,
+                          })); // Customize
+                          setAreas(_areas);
+                        })
+                        .catch(() => {
+                          alert("Failed to Fetch Areas List");
+                        });
+                    } else {
+                      setAreas([]);
+                      updateFormData({
+                        ...formData,
+                        country_id: "",
+                        area_id: "",
+                        city_id: "",
+                      });
+                    }
+                  }}
+                  fullWidth
+                  error={
+                    Boolean(touched.country_id && errors.country_id) ||
+                    responseErrors.country_id
+                  }
+                  helperText={
+                    (touched.country_id && errors.country_id) ||
+                    responseErrors.country_id
+                  }
+                  onBlur={handleBlur}
+                  InputProps={{
+                    classes: {
+                      input: classes.input,
+                    },
+                  }}
+                  FormHelperTextProps={{
+                    classes: {
+                      error: classes.error,
+                    },
+                  }}
+                  SelectProps={{
+                    native: true,
+                  }}
+                >
+                  {countries?.map((country) => (
+                    <option
+                      key={`country-${country.id}`}
+                      value={country.id}
+                      className={classes.dropdownOption}
+                    >
+                      {country.country_name}
+                    </option>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  disabled={!formData.country_id}
+                  select
+                  label="Area"
+                  name="area_id"
+                  value={formData.area_id}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      handleChange(e);
+                      handleStateChange(e);
+                      axios
+                        .get(`cities/list/all/${e.target.value}`)
+                        .then(({ data }) => {
+                          const _cities = data.data.map(
+                            ({ id, city_name }) => ({
+                              id,
+                              city_name,
+                            })
+                          ); // Customize
+                          setCities(_cities);
+                        })
+                        .catch(() => {
+                          alert("Failed to Fetch Cities List");
+                        });
+                    } else {
+                      setCities([]);
+                      updateFormData({
+                        ...formData,
+                        area_id: "",
+                        city_id: "",
+                      });
+                    }
+                  }}
+                  fullWidth
+                  error={
+                    Boolean(touched.area_id && errors.area_id) ||
+                    responseErrors.area_id
+                  }
+                  helperText={
+                    (touched.area_id && errors.area_id) ||
+                    responseErrors.area_id
+                  }
+                  onBlur={handleBlur}
+                  InputProps={{
+                    classes: {
+                      input: classes.input,
+                    },
+                  }}
+                  FormHelperTextProps={{
+                    classes: {
+                      error: classes.error,
+                    },
+                  }}
+                  SelectProps={{
+                    native: true,
+                  }}
+                >
+                  <option value=""></option>
+                  {areas?.map((area) => (
+                    <option
+                      key={`area-${area.id}`}
+                      value={area.id}
+                      className={classes.dropdownOption}
+                    >
+                      {area.area_name}
+                    </option>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  disabled={!formData.area_id}
+                  select
+                  label="City"
+                  name="city_id"
+                  fullWidth
+                  value={formData.city_id}
+                  error={
+                    Boolean(touched.city_id && errors.city_id) ||
+                    responseErrors.city_id
+                  }
+                  helperText={
+                    (touched.city_id && errors.city_id) ||
+                    responseErrors.city_id
+                  }
+                  onBlur={handleBlur}
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  InputProps={{
+                    classes: {
+                      input: classes.input,
+                    },
+                  }}
+                  FormHelperTextProps={{
+                    classes: {
+                      error: classes.error,
+                    },
+                  }}
+                  SelectProps={{
+                    native: true,
+                  }}
+                >
+                  <option value=""></option>
+                  {cities?.map((city) => (
+                    <option
+                      key={`city-${city.id}`}
+                      value={city.id}
+                      className={classes.dropdownOption}
+                    >
+                      {city.city_name}
+                    </option>
+                  ))}
+                </TextField>
               </Grid>
 
               <Grid item xs={12}>
