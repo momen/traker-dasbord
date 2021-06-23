@@ -64,6 +64,7 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
+  maincategory_id: Yup.string().required(),
   description: Yup.string()
     .notRequired()
     .test(
@@ -80,7 +81,7 @@ const validationSchema = Yup.object().shape({
     .max(255, "Description must not exceed 255 characters"),
 });
 
-function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
+function CategoriesForm({ setPage, setOpenPopup, itemToEdit, mainCategories }) {
   const classes = useStyles();
 
   const formRef = useRef();
@@ -88,6 +89,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
 
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
+    maincategory_id: itemToEdit ? itemToEdit.maincategory_id : "",
     description: itemToEdit ? itemToEdit.description : "",
     photo: "",
   });
@@ -103,6 +105,8 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
     } else {
       let data = new FormData();
       data.append("name", formData.name);
+      data.append("maincategory_id", formData.maincategory_id);
+
       if (formData.description) {
         data.append("description", formData.description);
       }
@@ -187,6 +191,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   const handleReset = () => {
     updateFormData({
       name: "",
+      maincategory_id: "",
       description: "",
     });
     setResponseErrors("");
@@ -212,7 +217,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid item xs={8}>
                 <TextField
                   name="name"
                   required
@@ -231,6 +236,49 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
                   }
                   helperText={touched.name && errors.name}
                 />
+              </Grid>
+
+              <Grid item xs={4}>
+                <div>
+                  <TextField
+                    select
+                    label="Main Category"
+                    value={formData.maincategory_id}
+                    name="maincategory_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.maincategory_id ||
+                      Boolean(touched.maincategory_id && errors.maincategory_id)
+                    }
+                    helperText="Please select a Main Category"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {mainCategories?.map((category) => (
+                      <option value={category.id}>
+                        {category.main_category_name}
+                      </option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.maincategory_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
               </Grid>
 
               {responseErrors ? (

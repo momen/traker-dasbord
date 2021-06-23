@@ -116,15 +116,15 @@ function Categories() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(
-    ""
-  ); /****** Customize ******/
-  const [itemAddedOrEdited, setItemAddedOrEdited] = useState(false);
+  const [selectedItem, setSelectedItem] =
+    useState(""); /****** Customize ******/
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
+
+  const [mainCategories, setMainCategories] = useState([]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
@@ -297,6 +297,23 @@ function Categories() {
       });
   };
 
+  useEffect(() => {
+    axios
+      .get("/main/categories/list/all")
+      .then((res) => {
+        const _mainCategories = res.data.data.map(
+          ({ id, main_category_name }) => ({
+            id,
+            main_category_name,
+          })
+        );
+        setMainCategories(_mainCategories);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Categories List");
+      });
+  }, []);
+
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
     if (openPopup) return;
@@ -455,7 +472,7 @@ function Categories() {
           setPage={setPage}
           setOpenPopup={setOpenPopup}
           itemToEdit={selectedItem}
-          setItemAddedOrEdited={setItemAddedOrEdited}
+          mainCategories={mainCategories}
         />
       </Popup>
 
