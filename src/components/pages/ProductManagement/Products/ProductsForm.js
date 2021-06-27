@@ -113,6 +113,7 @@ function ProductsForm({
     quantity: itemToEdit ? itemToEdit.quantity : "",
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
     producttype_id: itemToEdit ? itemToEdit.producttype_id : "",
+    qty_reminder: itemToEdit ? itemToEdit.qty_reminder : "",
     photo: [],
   });
 
@@ -236,7 +237,7 @@ function ProductsForm({
       .max(255, "Description must not exceed 255 characters"),
   });
 
-  const [carModels, setCarModels] = useState(null);
+  const [carModels, setCarModels] = useState([]);
   const [categories, setCategories] = useState(null);
   const [partCategories, setPartCategories] = useState(null);
   const [toYears, setToYears] = useState([]);
@@ -1159,9 +1160,7 @@ function ProductsForm({
                             </span>
                           ))}
                         </div>
-                      ) : (
-                        <span>{formData.category_id}</span>
-                      )}
+                      ) : null}
                     </div>
                   </Grid>
 
@@ -1205,7 +1204,7 @@ function ProductsForm({
                           />
                         )}
                         onBlur={() => {
-                          if (formData.models.length === 0) {
+                          if (formData.models?.length === 0) {
                             setAutoSelectModelError(true);
                           }
                         }}
