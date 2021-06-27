@@ -112,7 +112,7 @@ function ProductsForm({
     store_id: itemToEdit ? itemToEdit.store_id : "",
     quantity: itemToEdit ? itemToEdit.quantity : "",
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
-    producttype_id: itemToEdit ? itemToEdit.producttype_id : "",
+    producttype_id: itemToEdit ? itemToEdit.producttype_id.id : "",
     photo: [],
   });
 

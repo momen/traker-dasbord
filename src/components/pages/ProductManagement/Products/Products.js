@@ -158,7 +158,7 @@ function Products() {
       headerName: "Product Type",
       width: 80,
       sortable: false,
-      renderCell: (params) => params.row.product_type?.producttype,
+      renderCell: (params) => params.row.producttype_id?.producttype,
     },
     { field: "price", headerName: "Price", width: 70 },
     { field: "holesale_price", headerName: "Wholesale Price", width: 70 },
