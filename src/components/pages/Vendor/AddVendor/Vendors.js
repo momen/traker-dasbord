@@ -175,20 +175,6 @@ function Vendors() {
               // padding: "5px"
             }}
           >
-            {!params.row.approved ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                className={classes.button}
-                variant="contained"
-                size="small"
-                onClick={() => {
-                  setOpenApproveDialog(true);
-                  setVendorToApprove(params.row.id);
-                }}
-              >
-                Approve Vendor
-              </Button>
-            ) : null}
             {userPermissions.includes("add_vendor_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
