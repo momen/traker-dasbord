@@ -104,7 +104,7 @@ function CarMade() {
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Car Made");
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Brand");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
@@ -121,7 +121,7 @@ function CarMade() {
 
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
-    { field: "car_made", headerName: "Car Made", width: 200, flex: 1 },
+    { field: "car_made", headerName: "Brand Name", width: 200, flex: 1 },
     {
       field: "categoryid_id",
       headerName: "Category",
@@ -173,7 +173,7 @@ function CarMade() {
                 onClick={() => {
                   setCarMade(params.row);
                   setOpenPopup(true);
-                  setOpenPopupTitle("Edit Car Made");
+                  setOpenPopupTitle("Edit Brand");
                 }}
               >
                 Edit
@@ -354,6 +354,7 @@ function CarMade() {
             onClick={() => {
               setOpenPopup(true);
               setCarMade("");
+              setOpenPopupTitle("New Brand");
             }}
           >
             Add new Brand

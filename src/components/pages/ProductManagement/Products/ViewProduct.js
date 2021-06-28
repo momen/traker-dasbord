@@ -140,6 +140,16 @@ function ViewProduct({ match }) {
                 <span className={classes.rowContent}>{product.name}</span>
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`vendor-${product.vendor?.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Vendor
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>
+                  {product.vendor?.vendor_name}
+                </span>
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={`store-${product.store_id}`}>
               <StyledTableCell component="th" scope="row">
                 Store
@@ -178,7 +188,7 @@ function ViewProduct({ match }) {
                     value={product.price}
                     displayType={"text"}
                     thousandSeparator={true}
-                    prefix={"$"}
+                    prefix={"ريال"}
                     renderText={(value) => (
                       <span className={classes.rowContent}>{value}</span>
                     )}
@@ -295,7 +305,7 @@ function ViewProduct({ match }) {
               </StyledTableCell>
             </StyledTableRow>
 
-            <StyledTableRow key={`model-${product.car_model_id}`}>
+            {/* <StyledTableRow key={`model-${product.car_model_id}`}>
               <StyledTableCell component="th" scope="row">
                 Car Model
               </StyledTableCell>
@@ -304,15 +314,15 @@ function ViewProduct({ match }) {
                   {product.car_model?.carmodel}
                 </span>
               </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`year-${product.year_id}`}>
+            </StyledTableRow> */}
+            {/* <StyledTableRow key={`year-${product.year_id}`}>
               <StyledTableCell component="th" scope="row">
                 Car Year
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>{product.year?.year}</span>
               </StyledTableCell>
-            </StyledTableRow>
+            </StyledTableRow> */}
             <StyledTableRow key={`made-${product.car_made_id}`}>
               <StyledTableCell component="th" scope="row">
                 Car Made

@@ -438,21 +438,14 @@ const vendorRoutes = {
       permission: "stores_access",
     },
     {
-      path: "/vendor/pending-orders",
-      name: "Pending Orders",
+      path: "/vendor/total-orders",
+      name: "Total Orders",
       component: PendingOrders,
-      icon: <HourglassEmpty />,
-      guard: PermissionGuard,
-      permission: "show_orders_access",
-    },
-    {
-      path: "/vendor/orders-history",
-      name: "Orders History",
-      component: OrdersHistory,
       icon: <ShoppingBasket />,
       guard: PermissionGuard,
       permission: "show_orders_access",
     },
+
     {
       path: "/vendor/invoices",
       name: "Invoices",
@@ -589,24 +582,24 @@ const storesRoute = {
 };
 
 const pendingOrdersRoute = {
-  id: "Pending Orders",
-  path: "/vendor/pending-orders",
-  icon: <HourglassEmpty />,
+  id: "Total Orders",
+  path: "/vendor/total-orders",
+  icon: <ShoppingBasket />,
   component: PendingOrders,
   children: null,
   guard: OrdersGuard,
   permission: "access_tabs_separately",
 };
 
-const ordersHistoryRoute = {
-  id: "Orders History",
-  path: "/vendor/orders-history",
-  icon: <ShoppingBasket />,
-  component: OrdersHistory,
-  children: null,
-  guard: OrdersGuard,
-  permission: "access_tabs_separately",
-};
+// const ordersHistoryRoute = {
+//   id: "Orders History",
+//   path: "/vendor/orders-history",
+//   icon: <ShoppingBasket />,
+//   component: OrdersHistory,
+//   children: null,
+//   guard: OrdersGuard,
+//   permission: "access_tabs_separately",
+// };
 
 const invoicesRoute = {
   id: "Invoices",
@@ -693,7 +686,7 @@ export const dashboardLayoutRoutes = [
   advancedReportsRoute,
   storesRoute,
   pendingOrdersRoute,
-  ordersHistoryRoute,
+  // ordersHistoryRoute,
   invoicesRoute,
   viewPermission,
   viewRole,
@@ -740,7 +733,7 @@ export const sidebarRoutes = [
   advancedReportsRoute,
   storesRoute,
   pendingOrdersRoute,
-  ordersHistoryRoute,
+  // ordersHistoryRoute,
   invoicesRoute,
   ticketsRoute,
   helpRoute,

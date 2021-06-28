@@ -85,25 +85,26 @@ function ProductsForm({
     description: itemToEdit ? itemToEdit.description : "",
     car_made_id: itemToEdit ? itemToEdit.car_made_id : "",
     models: itemToEdit
-      ? itemToEdit.models?.map(({ id, main_category_name }) => ({
+      ? itemToEdit.car_model?.map(({ id, carmodel }) => ({
           id,
-          main_category_name,
+          carmodel,
         }))
       : [],
-    year_from: itemToEdit ? itemToEdit.year_from : "",
-    year_to: itemToEdit ? itemToEdit.year_to : "",
+    year_from: itemToEdit ? itemToEdit.year_from?.id : "",
+    year_to: itemToEdit ? itemToEdit.year_to?.id : "",
     discount:
       itemToEdit?.discount && itemToEdit?.discount > 0
         ? itemToEdit.discount
         : "",
-    maincategory_id: itemToEdit ? itemToEdit.maincategory_id : "",
-    category_id: itemToEdit ? itemToEdit.category_id : "",
+    maincategory_id: itemToEdit ? itemToEdit.category?.maincategory_id : "",
+    category_id: itemToEdit ? itemToEdit.category?.id : "",
     price: itemToEdit ? itemToEdit.price : "",
     holesale_price: itemToEdit ? itemToEdit.holesale_price : "",
     no_of_orders: itemToEdit ? itemToEdit.no_of_orders : "",
+
     part_category_id: itemToEdit ? itemToEdit.part_category_id.toString() : "",
-    manufacturer_id: itemToEdit ? itemToEdit.manufacturer_id : "",
-    prodcountry_id: itemToEdit ? itemToEdit.prodcountry_id : "",
+    manufacturer_id: itemToEdit ? itemToEdit.manufacturer?.id : "",
+    prodcountry_id: itemToEdit ? itemToEdit.origin_country?.id : "",
     transmission_id: itemToEdit ? itemToEdit.transmission_id : "",
     cartype_id: itemToEdit ? itemToEdit.cartype_id : "",
     tags: itemToEdit
@@ -111,6 +112,7 @@ function ProductsForm({
       : [],
     store_id: itemToEdit ? itemToEdit.store_id : "",
     quantity: itemToEdit ? itemToEdit.quantity : "",
+    qty_reminder: itemToEdit ? itemToEdit.qty_reminder : "",
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
     producttype_id: itemToEdit ? itemToEdit.producttype_id.id : "",
     photo: [],
@@ -220,6 +222,7 @@ function ProductsForm({
     quantity: Yup.number()
       .min(5, "Minimum value should be 5")
       .required("This field is Required"),
+    qty_reminder: Yup.number().required("This field is Required"),
     description: Yup.string()
       .required("This field is Required")
       .test(
@@ -272,13 +275,13 @@ function ProductsForm({
         });
 
       axios
-        .get(`/categorieslist/${itemToEdit.maincategory_id}`)
+        .get(`/categorieslist/${itemToEdit.category?.maincategory_id}`)
         .then((res) => {
           const _categories = res.data.data.map(({ id, name }) => ({
             id,
             name,
           })); // Customize
-          setCarModels(_categories);
+          setCategories(_categories);
         })
         .catch(() => {
           alert("Failed to Fetch Categories List");
@@ -298,6 +301,16 @@ function ProductsForm({
         .catch(() => {
           alert("Failed to Fetch Part Categories List");
         });
+
+        const fromYear = carYears.find(
+          (carYear) => carYear.id == itemToEdit.year_from?.id
+        );
+        setToYears(
+          carYears.filter(
+            (year) =>
+              parseInt(year.year) >= parseInt(fromYear.year)
+          )
+        );
     }
   }, []);
 
@@ -1022,6 +1035,7 @@ function ProductsForm({
                     SelectProps={{
                       native: true,
                     }}
+                    InputLabelProps={{ shrink: !!formData.category_id }}
                     onBlur={handleBlur}
                     error={
                       responseErrors?.category_id ||
@@ -1159,9 +1173,7 @@ function ProductsForm({
                             </span>
                           ))}
                         </div>
-                      ) : (
-                        <span>{formData.category_id}</span>
-                      )}
+                      ) : null}
                     </div>
                   </Grid>
 
