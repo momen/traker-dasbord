@@ -126,6 +126,8 @@ function Users() {
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
+  const [openApprovalDialog, setOpenApprovalDialog] = useState(false);
+  const [memberToApprove, setMemberToApprove] = useState();
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [rolesList, setRolesList] = useState("");
@@ -137,17 +139,20 @@ function Users() {
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
     { field: "name", headerName: "Name", width: 100 },
-    { field: "email", headerName: "Email", width: 150, flex: 1 },
+    { field: "email", headerName: "Email", width: 180 },
+
     {
-      field: "email_verified_at",
-      headerName: "Email Verification Date",
-      width: 100,
+      field: "name",
+      headerName: "Name",
+      width: 120,
+      sortable: false,
     },
     {
-      field: "role",
-      headerName: "Role",
-      width: 150,
-      sortable: false,
+      field: "approved",
+      headerName: "Status",
+      width: 120,
+      renderCell: (params) =>
+        params.row.approved === 0 ? "Pending Approval" : "Approved",
     },
     {
       field: "actions",
@@ -165,12 +170,28 @@ function Users() {
               // padding: "5px"
             }}
           >
+            {params.row.approved === 0 ? (
+              <Button
+                style={{ marginRight: "5px" }}
+                className={classes.button}
+                variant="contained"
+                size="small"
+                onClick={() => {
+                  setMemberToApprove(params.row.id);
+                  setOpenApprovalDialog(true);
+                }}
+              >
+                Approve
+              </Button>
+            ) : null}
             {userPermissions.includes("user_show_by_vendor") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/user-mgt/vendor-users/${params.row.id}`)}
+                onClick={() =>
+                  history.push(`/user-mgt/vendor-users/${params.row.id}`)
+                }
               >
                 View
               </Button>
@@ -223,6 +244,35 @@ function Users() {
   const openDeleteConfirmation = (id) => {
     setOpenDeleteDialog(true);
     setItemToDelete(id);
+  };
+
+  const approveUser = () => {
+    axios
+      .post(`vendor/approve/staff`, {
+        staff_id: memberToApprove,
+      })
+      .then(() => {
+        setOpenApprovalDialog(false);
+        setLoading(true);
+        axios
+          .get(
+            `/users?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
   };
 
   const DeleteItem = () => {
@@ -464,6 +514,36 @@ function Users() {
           stores={stores}
         />
       </Popup>
+      <Dialog
+        open={openApprovalDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Staff Approval"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to approve this Staff member?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              approveUser();
+            }}
+            color="secondary"
+          >
+            Approve User
+          </Button>
+          <Button
+            onClick={() => setOpenApprovalDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            Back
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Dialog
         open={openDeleteDialog}
         aria-labelledby="alert-dialog-title"
