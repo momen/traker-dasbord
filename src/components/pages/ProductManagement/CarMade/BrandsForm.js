@@ -49,16 +49,16 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
-  categoryid_id: Yup.string().required(),
+  cartype_id: Yup.string().required(),
 });
 
-function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
+function CreateCarMade({ setPage, setOpenPopup, itemToEdit, carTypes }) {
   const classes = useStyles();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
     car_made: itemToEdit ? itemToEdit.car_made : "",
-    categoryid_id: itemToEdit ? itemToEdit.categoryid_id : "",
+    cartype_id: itemToEdit ? itemToEdit.cartype_id : "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
@@ -101,7 +101,7 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
   const handleReset = () => {
     updateFormData({
       car_made: "",
-      categoryid_id: "",
+      cartype_id: "",
     });
     setResponseErrors("");
   };
@@ -130,7 +130,7 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
                   required
                   fullWidth
                   id="car_made"
-                  label="Car Made"
+                  label="Brand"
                   value={formData.car_made}
                   autoFocus
                   onChange={(e) => {
@@ -161,13 +161,13 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
                     <TextField
                       id="standard-select-currency-native"
                       select
-                      label="Category"
-                      value={formData.categoryid_id}
-                      name="categoryid_id"
+                      label="Product Type"
+                      value={formData.cartype_id}
+                      name="cartype_id"
                       SelectProps={{
                         native: true,
                       }}
-                      helperText="Please select a Category"
+                      helperText="Please select a Product Type"
                       fullWidth
                       required
                       onChange={(e) => {
@@ -176,13 +176,13 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
                       }}
                       onBlur={handleBlur}
                       error={
-                        responseErrors?.categoryid_id ||
-                        Boolean(touched.categoryid_id && errors.categoryid_id)
+                        responseErrors?.cartype_id ||
+                        Boolean(touched.cartype_id && errors.cartype_id)
                       }
                     >
                       <option aria-label="None" value="" />
-                      {categories?.map((category) => (
-                        <option value={category.id}>{category.name}</option>
+                      {carTypes?.map((type) => (
+                        <option value={type.id}>{type.type_name}</option>
                       ))}
                     </TextField>
                   }
@@ -190,7 +190,7 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
               </Grid>
               {responseErrors ? (
                 <Grid item xs={12}>
-                  {responseErrors.categoryid_id?.map((msg) => (
+                  {responseErrors.cartype_id?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>

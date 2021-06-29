@@ -112,7 +112,7 @@ function CarMade() {
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
   const [carMade, setCarMade] = useState("");
-  const [categories, setCategories] = useState([]);
+  const [carTypes, setCarTypes] = useState([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
@@ -289,13 +289,16 @@ function CarMade() {
     pop-up is opened-*/
   useEffect(() => {
     axios
-      .get("/categorieslist")
+      .get("/cartypes/list")
       .then((res) => {
-        let _categories = res.data.data.map(({ id, name }) => ({ id, name }));
-        setCategories(_categories);
+        const _carTypes = res.data.data.map(({ id, type_name }) => ({
+          id,
+          type_name,
+        })); // Customize
+        setCarTypes(_carTypes);
       })
       .catch(() => {
-        alert("Failed to Fetch data");
+        alert("Failed to Fetch Car Types List");
       });
   }, []);
 
@@ -465,7 +468,7 @@ function CarMade() {
           setPage={setPage}
           setOpenPopup={setOpenPopup}
           itemToEdit={carMade}
-          categories={categories}
+          carTypes={carTypes}
         />
       </Popup>
 
