@@ -15,6 +15,7 @@ import {
   Select,
   MenuItem,
   FormControl,
+  InputLabel,
   makeStyles,
   LinearProgress,
   Grid,
@@ -113,6 +114,7 @@ function PendingOrders() {
   const [openApproveDialog, setOpenApproveDialog] = useState(false);
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const [orderToApproveOrCancel, setOrderToApproveOrCancel] = useState();
+  const [statusToFilterBy, setStatusToFilterBy] = useState("");
 
   const columns = [
     {
@@ -278,8 +280,11 @@ function PendingOrders() {
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .get(
-          `/orders/need/approval?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        .post(
+          `/show/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          {
+            fetch: statusToFilterBy,
+          }
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -292,7 +297,7 @@ function PendingOrders() {
     } else {
       axios
         .post(
-          `/orders/need/approval/search?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/orders/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -306,7 +311,7 @@ function PendingOrders() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel, pageSize]);
+  }, [page, searchValue, sortModel, pageSize, statusToFilterBy]);
 
   return (
     <React.Fragment>
@@ -344,8 +349,51 @@ function PendingOrders() {
               </Select>
             </FormControl>
 
-            <div>
-              <Grid container spacing={1} alignItems="flex-end">
+            <div style={{ display: "flex", alignItems: "flex-end" }}>
+              <FormControl
+                variant="outlined"
+                size="small"
+                style={{ width: "150px", marginRight: "15px" }}
+              >
+                <InputLabel id="demo-simple-select-outlined-label">
+                  Status
+                </InputLabel>
+                <Select
+                  // autoWidth
+                  labelId="demo-simple-select-outlined-label"
+                  id="status"
+                  name="status"
+                  // value={age}
+                  // onChange={handleChange}
+                  label="Status"
+                  MenuProps={{
+                    anchorOrigin: {
+                      vertical: "bottom",
+                      horizontal: "center",
+                    },
+                    transformOrigin: {
+                      vertical: "top",
+                      horizontal: "center",
+                    },
+                    getContentAnchorEl: () => null,
+                  }}
+                  onChange={(e) => setStatusToFilterBy(e.target.value)}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  <MenuItem value="pending">Pending</MenuItem>
+                  <MenuItem value="in progress">In Progress</MenuItem>
+                  <MenuItem value="delivered">Delivered</MenuItem>
+                  <MenuItem value="cancelled">Cancelled</MenuItem>
+                </Select>
+              </FormControl>
+              <Grid
+                container
+                spacing={1}
+                alignItems="flex-end"
+                style={{ display: "flex" }}
+              >
                 <Grid item>
                   <Search />
                 </Grid>
