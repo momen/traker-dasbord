@@ -33,7 +33,7 @@ import { spacing } from "@material-ui/system";
 import { UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
-import CreateCarMade from "./CreateCarMade";
+import BrandsForm from "./BrandsForm";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
 import { useSelector } from "react-redux";
@@ -461,7 +461,7 @@ function CarMade() {
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
-        <CreateCarMade
+        <BrandsForm
           setPage={setPage}
           setOpenPopup={setOpenPopup}
           itemToEdit={carMade}

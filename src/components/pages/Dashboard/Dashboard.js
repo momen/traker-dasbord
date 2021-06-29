@@ -45,14 +45,14 @@ function Dashboard() {
         <Grid item xs={12} lg={12}>
           <Grid container spacing={2}>
             {Object.entries(dashboardInfo).map(([key, value]) => {
-              if (key === "Status Code" || key === "Message") return;
+              if (key === "status_code" || key === "message") return;
               // This is done to reformat the key variable name in a better looking way to display as a title.
               // This should be done as we are using dynamic rendering.
               let title = key.replace("_", (c) => " ");
               title = title.replace(/^(.)|\s+(.)/g, (c) => c.toUpperCase());
 
               return key !== "period_details" ? (
-                <Grid item xs={12} sm={12} lg={2}>
+                <Grid item xs={12} md={6} lg={3}>
                   <Stats
                     title={title}
                     amount={value}
