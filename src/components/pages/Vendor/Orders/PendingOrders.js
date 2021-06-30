@@ -153,8 +153,9 @@ function PendingOrders() {
                 View
               </Button>
             ) : null}
-
-            {userPermissions.includes("approve_orders") ? (
+            {userPermissions.includes("approve_orders") &&
+            params.row.status !== "approved" &&
+            params.row.status !== "cancelled" ? (
               <Button
                 style={{ marginRight: "5px" }}
                 className={classes.button}
@@ -169,7 +170,9 @@ function PendingOrders() {
               </Button>
             ) : null}
 
-            {userPermissions.includes("cancel_orders") ? (
+            {userPermissions.includes("cancel_orders") &&
+            params.row.status !== "approved" &&
+            params.row.status !== "cancelled" ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
