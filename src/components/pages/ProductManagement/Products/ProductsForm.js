@@ -160,29 +160,29 @@ function ProductsForm({
         : Yup.string().nullable().notRequired(),
     car_made_id:
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     year_from:
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     year_to:
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     discount: Yup.number()
@@ -202,20 +202,20 @@ function ProductsForm({
     prodcountry_id: Yup.string().required(),
     transmission_id:
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     cartype_id:
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     store_id: Yup.string().required(),
@@ -261,18 +261,20 @@ function ProductsForm({
 
   useEffect(() => {
     if (itemToEdit) {
-      axios
-        .get(`/car-modelslist/${itemToEdit.car_made_id}`)
-        .then((res) => {
-          const _carModels = res.data.data.map(({ id, carmodel }) => ({
-            id,
-            carmodel,
-          })); // Customize
-          setCarModels(_carModels);
-        })
-        .catch(() => {
-          alert("Failed to Fetch Brands List");
-        });
+      if (itemToEdit.car_made_id) {
+        axios
+          .get(`/car-modelslist/${itemToEdit.car_made_id}`)
+          .then((res) => {
+            const _carModels = res.data.data.map(({ id, carmodel }) => ({
+              id,
+              carmodel,
+            })); // Customize
+            setCarModels(_carModels);
+          })
+          .catch(() => {
+            alert("Failed to Fetch Models List");
+          });
+      }
 
       axios
         .get(`/categorieslist/${itemToEdit.category?.maincategory_id}`)
@@ -302,15 +304,16 @@ function ProductsForm({
           alert("Failed to Fetch Part Categories List");
         });
 
+      if (itemToEdit.year_from) {
         const fromYear = carYears.find(
           (carYear) => carYear.id == itemToEdit.year_from?.id
         );
         setToYears(
           carYears.filter(
-            (year) =>
-              parseInt(year.year) >= parseInt(fromYear.year)
+            (year) => parseInt(year.year) >= parseInt(fromYear.year)
           )
         );
+      }
     }
   }, []);
 
@@ -318,11 +321,11 @@ function ProductsForm({
     if (
       formData.models.length === 0 &&
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85"
     ) {
       setAutoSelectModelError(true);
       return;
@@ -1111,11 +1114,11 @@ function ProductsForm({
               </Grid>
 
               {formData.category_id &&
-              formData.category_id !== "81" &&
-              formData.category_id !== "82" &&
-              formData.category_id !== "83" &&
-              formData.category_id !== "84" &&
-              formData.category_id !== "85" ? (
+              formData.category_id != "81" &&
+              formData.category_id != "82" &&
+              formData.category_id != "83" &&
+              formData.category_id != "84" &&
+              formData.category_id != "85" ? (
                 <>
                   <Grid item xs={6} md={3}>
                     <div>
@@ -1157,7 +1160,6 @@ function ProductsForm({
                         }
                         helperText="Please select a Brand"
                         fullWidth
-                        required
                       >
                         <option aria-label="None" value="" />
                         {carMades?.map((carMade) => (
@@ -1273,7 +1275,6 @@ function ProductsForm({
                         }
                         helperText="Please select a Year"
                         fullWidth
-                        required
                       >
                         <option aria-label="None" value="" />
                         {carYears?.map((carYear) => (
@@ -1315,7 +1316,6 @@ function ProductsForm({
                         }
                         helperText="Please select a Year"
                         fullWidth
-                        required
                       >
                         <option aria-label="None" value="" />
                         {toYears.map((carYear) => (
@@ -1360,7 +1360,6 @@ function ProductsForm({
                     }
                     helperText="Please select a Store"
                     fullWidth
-                    required
                   >
                     <option aria-label="None" value="" />
                     {stores?.map((store) => (
@@ -1465,11 +1464,11 @@ function ProductsForm({
               </Grid>
 
               {formData.category_id &&
-              formData.category_id !== "81" &&
-              formData.category_id !== "82" &&
-              formData.category_id !== "83" &&
-              formData.category_id !== "84" &&
-              formData.category_id !== "85" ? (
+              formData.category_id != "81" &&
+              formData.category_id != "82" &&
+              formData.category_id != "83" &&
+              formData.category_id != "84" &&
+              formData.category_id != "85" ? (
                 <>
                   <Grid item xs={6} md={3}>
                     <div>
@@ -1512,51 +1511,48 @@ function ProductsForm({
                       ) : null}
                     </div>
                   </Grid>
-
-                  <Grid item xs={6} md={3}>
-                    <div>
-                      <TextField
-                        select
-                        label="Car Types"
-                        value={formData.cartype_id}
-                        name="cartype_id"
-                        onChange={(e) => {
-                          handleChange(e);
-                          handleStateChange(e);
-                        }}
-                        SelectProps={{
-                          native: true,
-                        }}
-                        onBlur={handleBlur}
-                        error={
-                          responseErrors?.cartype_id ||
-                          Boolean(touched.cartype_id && errors.cartype_id)
-                        }
-                        helperText="Please select a Car Type"
-                        fullWidth
-                        required
-                      >
-                        <option aria-label="None" value="" />
-                        {carTypes?.map((carType) => (
-                          <option value={carType.id}>
-                            {carType.type_name}
-                          </option>
-                        ))}
-                      </TextField>
-
-                      {responseErrors ? (
-                        <div className={classes.inputMessage}>
-                          {responseErrors.cartype_id?.map((msg) => (
-                            <span key={msg} className={classes.errorMsg}>
-                              {msg}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
-                    </div>
-                  </Grid>
                 </>
               ) : null}
+
+              <Grid item xs={6} md={3}>
+                <div>
+                  <TextField
+                    select
+                    label="Car Types"
+                    value={formData.cartype_id}
+                    name="cartype_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.cartype_id ||
+                      Boolean(touched.cartype_id && errors.cartype_id)
+                    }
+                    helperText="Please select a Car Type"
+                    fullWidth
+                  >
+                    <option aria-label="None" value="" />
+                    {carTypes?.map((carType) => (
+                      <option value={carType.id}>{carType.type_name}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.cartype_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
 
               <Grid item xs={12}>
                 <div>
