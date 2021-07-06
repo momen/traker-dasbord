@@ -82,16 +82,16 @@ function ProductsForm({
 
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
-    description: itemToEdit ? itemToEdit.description : "",
-    car_made_id: itemToEdit ? itemToEdit.car_made_id : "",
+    description: itemToEdit ? itemToEdit.description || "" : "",
+    car_made_id: itemToEdit ? itemToEdit.car_made_id || "" : "",
     models: itemToEdit
       ? itemToEdit.car_model?.map(({ id, carmodel }) => ({
           id,
           carmodel,
         }))
       : [],
-    year_from: itemToEdit ? itemToEdit.year_from?.id : "",
-    year_to: itemToEdit ? itemToEdit.year_to?.id : "",
+    year_from: itemToEdit ? itemToEdit.year_from?.id || "" : "",
+    year_to: itemToEdit ? itemToEdit.year_to?.id || "" : "",
     discount:
       itemToEdit?.discount && itemToEdit?.discount > 0
         ? itemToEdit.discount
@@ -105,7 +105,7 @@ function ProductsForm({
     part_category_id: itemToEdit ? itemToEdit.part_category_id.toString() : "",
     manufacturer_id: itemToEdit ? itemToEdit.manufacturer?.id : "",
     prodcountry_id: itemToEdit ? itemToEdit.origin_country?.id : "",
-    transmission_id: itemToEdit ? itemToEdit.transmission_id : "",
+    transmission_id: itemToEdit ? itemToEdit.transmission_id || "" : "",
     cartype_id: itemToEdit ? itemToEdit.cartype_id : "",
     tags: itemToEdit
       ? itemToEdit.tags.map(({ id, name }) => ({ id, name }))
@@ -1129,7 +1129,11 @@ function ProductsForm({
                         name="car_made_id"
                         onChange={(e) => {
                           handleChange(e);
-                          handleStateChange(e);
+                          updateFormData({
+                            ...formData,
+                            car_made_id: e.target.value,
+                            models: [],
+                          });
                           if (e.target.value) {
                             axios
                               .get(`/car-modelslist/${e.target.value}`)
@@ -1141,13 +1145,17 @@ function ProductsForm({
                                   })
                                 ); // Customize
                                 setCarModels(_carModels);
-                                console.log(_carModels);
                               })
                               .catch(() => {
                                 alert("Failed to Fetch Brands List");
                               });
                           } else {
                             setCarModels(null);
+                            updateFormData({
+                              ...formData,
+                              car_made_id: "",
+                              models: [],
+                            });
                           }
                         }}
                         SelectProps={{

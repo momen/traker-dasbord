@@ -116,9 +116,9 @@ function ViewVendor({ match }) {
         reason,
         commented_field: itemToReject,
       })
-      .then(() => {
+      .then(({ data }) => {
         setOpenDialog(false);
-        alert("Field Rejected Successfully");
+        alert(data.message);
       })
       .catch(({ response }) => alert(response.data.errors));
   };
@@ -231,9 +231,9 @@ function ViewVendor({ match }) {
                   : vendor.approved
                   ? "Approved"
                   : vendor.declined
-                  ? "Request Declined"
-                  : vendor.rejected
                   ? "Request Terminated"
+                  : vendor.rejected
+                  ? "Request Rejected"
                   : null}
               </StyledTableCell>
             </StyledTableRow>
@@ -499,7 +499,7 @@ function ViewVendor({ match }) {
               </StyledTableCell>
             </StyledTableRow>
 
-            <StyledTableRow key={`vendor-logo`}>
+            <StyledTableRow key={`vendor-actions`}>
               <StyledTableCell component="th" scope="row">
                 Actions
               </StyledTableCell>
