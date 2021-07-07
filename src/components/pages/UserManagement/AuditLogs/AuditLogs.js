@@ -38,6 +38,13 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
   button: {
     background: "#4caf50",
     color: "#ffffff",
@@ -58,15 +65,20 @@ function CustomPagination(props) {
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <p style={{ width: "fit-content" }}>hello</p>
+    </div>
   );
 }
 
@@ -166,8 +178,8 @@ function AuditLogs() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {

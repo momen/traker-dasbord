@@ -38,6 +38,13 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
   button: {
     background: "#4caf50",
     color: "#ffffff",
@@ -58,15 +65,20 @@ function CustomPagination(props) {
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <p style={{ width: "fit-content" }}>hello</p>
+    </div>
   );
 }
 
@@ -107,7 +119,13 @@ function Orders() {
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 60, headerAlign: 'center', align:'center' },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 60,
+      headerAlign: "center",
+      align: "center",
+    },
     { field: "invoice_number", headerName: "Invoice Number", width: 120 },
     { field: "invoice_total", headerName: "Invoice Total", width: 100 },
     { field: "vendor_name", headerName: "Vendor Name", width: 120 },
@@ -151,8 +169,8 @@ function Orders() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {

@@ -39,9 +39,16 @@ const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+  },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
   },
   button: {
     background: "#4caf50",
@@ -50,22 +57,27 @@ const useStyles = makeStyles({
       background: "#388e3c",
     },
   },
-});
+}));
 
 function CustomPagination(props) {
   const { state, api } = props;
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <p style={{ width: "fit-content" }}>hello</p>
+    </div>
   );
 }
 
@@ -94,7 +106,7 @@ function CustomLoadingOverlay() {
 
 function Permissions() {
   const classes = useStyles();
-  const userPermissions  = useSelector((state) =>  state.userPermissions) 
+  const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -109,7 +121,13 @@ function Permissions() {
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 55, headerAlign: 'center', align:'center' },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 55,
+      headerAlign: "center",
+      align: "center",
+    },
     { field: "title", headerName: "Title", width: 200, flex: 1 },
     {
       field: "actions",
@@ -144,8 +162,8 @@ function Permissions() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {

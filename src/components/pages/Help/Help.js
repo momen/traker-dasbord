@@ -21,7 +21,7 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import { ExpandMore, Search } from "@material-ui/icons";
+import { Add, ExpandMore, Search } from "@material-ui/icons";
 import { spacing } from "@material-ui/system";
 import axios from "../../../axios";
 import Popup from "../../Popup";
@@ -46,10 +46,14 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   button: {
-    background: "#4caf50",
-    color: "#ffffff",
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
     "&:hover": {
-      background: "#388e3c",
+      background: "#EF9300",
+      color: "#ffffff",
     },
     marginRight: "5px",
   },
@@ -181,6 +185,7 @@ function Support() {
                 setOpenPopup(true);
                 setSelectedItem("");
               }}
+              startIcon={<Add />}
             >
               New Question
             </Button>
@@ -195,6 +200,7 @@ function Support() {
               onClick={() => {
                 setOpenMassDeleteDialog(true);
               }}
+              style={{ borderRadius: 0 }}
             >
               Delete Selected
             </Button>

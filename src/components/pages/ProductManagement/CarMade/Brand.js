@@ -30,7 +30,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import { Add, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import BrandsForm from "./BrandsForm";
@@ -44,34 +44,50 @@ const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
   button: {
-    background: "#4caf50",
-    color: "#ffffff",
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
     "&:hover": {
-      background: "#388e3c",
+      background: "#EF9300",
+      color: "#ffffff",
     },
     marginRight: "5px",
   },
-});
+}));
 
 function CustomPagination(props) {
   const { state, api } = props;
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <p style={{ width: "fit-content" }}>hello</p>
+    </div>
   );
 }
 
@@ -195,8 +211,8 @@ function CarMade() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {
@@ -359,8 +375,9 @@ function CarMade() {
               setCarMade("");
               setOpenPopupTitle("New Brand");
             }}
+            startIcon={<Add />}
           >
-            Add new Brand
+            Add New Brand
           </Button>
         ) : null}
 
@@ -373,6 +390,7 @@ function CarMade() {
             onClick={() => {
               setOpenMassDeleteDialog(true);
             }}
+            style={{ borderRadius: 0 }}
           >
             Delete Selected
           </Button>

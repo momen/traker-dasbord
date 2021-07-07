@@ -38,6 +38,13 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
   button: {
     background: "#4caf50",
     color: "#ffffff",
@@ -58,15 +65,20 @@ function CustomPagination(props) {
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <p style={{ width: "fit-content" }}>hello</p>
+    </div>
   );
 }
 
@@ -107,7 +119,13 @@ function Support() {
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 60, headerAlign: 'center', align:'center' },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 60,
+      headerAlign: "center",
+      align: "center",
+    },
     { field: "ticket_no", headerName: "Ticket Number", width: 100 },
     { field: "title", headerName: "Title", width: 100 },
     { field: "priority", headerName: "Priority", width: 80 },
@@ -151,8 +169,8 @@ function Support() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {

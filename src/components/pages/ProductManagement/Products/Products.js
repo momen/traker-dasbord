@@ -30,7 +30,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import { Add, ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import ProductsForm from "./ProductsForm";
@@ -47,11 +47,23 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
   button: {
-    background: "#4caf50",
-    color: "#ffffff",
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
     "&:hover": {
-      background: "#388e3c",
+      background: "#EF9300",
+      color: "#ffffff",
     },
     marginRight: "5px",
   },
@@ -79,15 +91,48 @@ function CustomPagination(props) {
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10} className={classes.dropdownOption}>
+          10 records / page
+        </MenuItem>
+        <MenuItem value={25} className={classes.dropdownOption}>
+          25 records / page
+        </MenuItem>
+        <MenuItem value={100} className={classes.dropdownOption}>
+          100 records / page
+        </MenuItem>
+      </Select>
+    </div>
   );
 }
 
@@ -265,8 +310,8 @@ function Products() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handleColumnToFilter = (event) => {
@@ -535,40 +580,7 @@ function Products() {
       <Typography variant="h3" gutterBottom display="inline">
         Products
       </Typography>
-
       <Divider my={6} />
-
-      <Grid container flex>
-        {userPermissions.includes("product_create") ? (
-          <Button
-            mb={3}
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              setOpenPopupTitle("New Product");
-              setOpenPopup(true);
-              setSelectedItem("");
-            }}
-          >
-            Add Product
-          </Button>
-        ) : null}
-
-        {userPermissions.includes("product_delete") ? (
-          <Button
-            mb={3}
-            color="secondary"
-            variant="contained"
-            disabled={rowsToDelete.length < 2}
-            onClick={() => {
-              setOpenMassDeleteDialog(true);
-            }}
-          >
-            Delete Selected
-          </Button>
-        ) : null}
-      </Grid>
-
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
@@ -580,31 +592,36 @@ function Products() {
                 justifyContent: "space-between",
               }}
             >
-              <Grid item>
-                <FormControl variant="outlined">
-                  <Select
-                    value={pageSize}
-                    onChange={handlePageSize}
-                    autoWidth
-                    IconComponent={UnfoldLess}
-                    MenuProps={{
-                      anchorOrigin: {
-                        vertical: "bottom",
-                        horizontal: "center",
-                      },
-                      transformOrigin: {
-                        vertical: "top",
-                        horizontal: "center",
-                      },
-                      getContentAnchorEl: () => null,
+              <div style={{ display: "flex", alignItems: "flex-end" }}>
+                {userPermissions.includes("product_create") ? (
+                  <Button
+                    className={classes.button}
+                    variant="contained"
+                    onClick={() => {
+                      setOpenPopupTitle("New Product");
+                      setOpenPopup(true);
+                      setSelectedItem("");
                     }}
+                    startIcon={<Add />}
                   >
-                    <MenuItem value={10}>10</MenuItem>
-                    <MenuItem value={25}>25</MenuItem>
-                    <MenuItem value={100}>100</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
+                    Add Product
+                  </Button>
+                ) : null}
+
+                {userPermissions.includes("product_delete") ? (
+                  <Button
+                    color="secondary"
+                    variant="contained"
+                    disabled={rowsToDelete.length < 2}
+                    onClick={() => {
+                      setOpenMassDeleteDialog(true);
+                    }}
+                    style={{ height: 40, borderRadius: 0 }}
+                  >
+                    Delete Selected
+                  </Button>
+                ) : null}
+              </div>
 
               <Grid item>
                 <div style={{ display: "flex" }}>
@@ -695,6 +712,7 @@ function Products() {
               disableColumnMenu
               autoHeight={true}
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
               onSelectionChange={(newSelection) => {
                 setRowsToDelete(newSelection.rowIds);
@@ -724,7 +742,6 @@ function Products() {
           productTypes={productTypes}
         />
       </Popup>
-
       <Dialog
         open={openDeleteDialog}
         aria-labelledby="alert-dialog-title"
@@ -757,7 +774,6 @@ function Products() {
           </Button>
         </DialogActions>
       </Dialog>
-
       <Dialog
         open={openMassDeleteDialog}
         aria-labelledby="alert-dialog-title"

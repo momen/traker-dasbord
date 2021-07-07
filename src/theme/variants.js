@@ -20,13 +20,13 @@ const defaultVariant = {
   palette: {
     type: "light",
     primary: {
-      main: customBlue[700],
+      main: "#EF9300",
       contrastText: "#FFF",
     },
-    // secondary: {
-    //   main: customBlue[500],
-    //   contrastText: "#FFF",
-    // },
+    secondary: {
+      main: "#ff0000",
+      contrastText: "#FFF",
+    },
     background: {
       default: "#F7F9FC",
       paper: "#FFF",
@@ -47,18 +47,18 @@ const defaultVariant = {
     background: "#FFF",
   },
   sidebar: {
-    color: grey[200],
-    background: "#233044",
+    color: "#FFFFFF",
+    background: "#7B7B7B",
     header: {
       color: grey[200],
-      background: "#233044",
+      background: "#424242",
       brand: {
         color: customBlue[500],
       },
     },
     footer: {
-      color: grey[200],
-      background: "#1E2A38",
+      color: "#424242",
+      background: "#CCCCCC",
       online: {
         background: green[500],
       },

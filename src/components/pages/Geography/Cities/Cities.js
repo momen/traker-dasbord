@@ -30,7 +30,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import { Add, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import CityForm from "./CityForm";
@@ -48,10 +48,14 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
   },
   button: {
-    background: "#4caf50",
-    color: "#ffffff",
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
     "&:hover": {
-      background: "#388e3c",
+      background: "#EF9300",
+      color: "#ffffff",
     },
     marginRight: "5px",
   },
@@ -87,6 +91,7 @@ function CustomPagination(props) {
       showFirstButton={true}
       showLastButton={true}
       onChange={(event, value) => api.current.setPage(value)}
+      variant="outlined" shape="rounded"
     />
   );
 }
@@ -378,6 +383,7 @@ function Countries() {
               setOpenPopup(true);
               setSelectedItem("");
             }}
+            startIcon={<Add />}
           >
             Add City
           </Button>
@@ -392,6 +398,7 @@ function Countries() {
             onClick={() => {
               setOpenMassDeleteDialog(true);
             }}
+            style={{ borderRadius: 0 }}
           >
             Delete Selected
           </Button>

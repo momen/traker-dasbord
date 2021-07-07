@@ -33,6 +33,8 @@ import { ReactComponent as Logo } from "../vendor/logo.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { Logout } from "../actions";
 
+import logo from "../assets/images/trkar_logo_white.svg";
+
 const Box = styled(MuiBox)(spacing);
 
 const Drawer = styled(MuiDrawer)`
@@ -66,7 +68,7 @@ const Brand = styled(ListItem)`
   min-height: 56px;
   padding-left: ${(props) => props.theme.spacing(6)}px;
   padding-right: ${(props) => props.theme.spacing(6)}px;
-  justify-content: center;
+  justify-content: flex-start;
   cursor: pointer;
 
   ${(props) => props.theme.breakpoints.up("sm")} {
@@ -114,7 +116,6 @@ const Category = styled(ListItem)`
     font-size: 20px;
     width: 20px;
     height: 20px;
-    opacity: 0.5;
   }
 
   &:hover {
@@ -122,8 +123,8 @@ const Category = styled(ListItem)`
   }
 
   &.${(props) => props.activeClassName} {
-    background-color: ${(props) =>
-      darken(0.03, props.theme.sidebar.background)};
+    background-color: ${(props) => "#424242"};
+    // darken(0.03, props.theme.sidebar.background)};
 
     span {
       color: ${(props) => props.theme.sidebar.color};
@@ -162,7 +163,6 @@ const Link = styled(ListItem)`
     font-size: 20px;
     width: 20px;
     height: 20px;
-    opacity: 0.5;
     margin-right: 15px;
   }
 
@@ -176,8 +176,10 @@ const Link = styled(ListItem)`
   }
 
   &.${(props) => props.activeClassName} {
-    background-color: ${(props) =>
-      darken(0.03, props.theme.sidebar.background)};
+    background-color: ${'#424242'
+      // (props) =>
+      // darken(0.03, props.theme.sidebar.background)
+    };
 
     span {
       color: ${(props) => props.theme.sidebar.color};
@@ -360,11 +362,39 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
   return (
     <Drawer variant="permanent" {...rest}>
       <Brand component={NavLink} to="/" button>
-        <BrandIcon />{" "}
-        <Box ml={1}>
+        {/* <BrandIcon />{" "} */}
+        <img src={logo} alt="" srcset="" style={{ width: "100px" }} />
+        {/* <Box ml={1}>
           TRKAR <BrandChip label="PRO" />
-        </Box>
+        </Box> */}
       </Brand>
+      <SidebarFooter>
+        <Grid container spacing={2}>
+          <Grid item>
+            <SidebarFooterBadge
+              overlap="circle"
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              variant="dot"
+            >
+              <Avatar alt={user?.name} src="" />
+            </SidebarFooterBadge>
+          </Grid>
+          <Grid item>
+            <b>
+              <SidebarFooterText variant="username">
+                {user?.name}
+              </SidebarFooterText>
+            </b>
+            <SidebarFooterSubText variant="caption">
+              {user?.email}
+            </SidebarFooterSubText>
+          </Grid>
+        </Grid>
+      </SidebarFooter>
+
       <Scrollbar>
         <List disablePadding>
           <Items>
@@ -442,28 +472,6 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
           </Items>
         </List>
       </Scrollbar>
-      <SidebarFooter>
-        <Grid container spacing={2}>
-          <Grid item>
-            <SidebarFooterBadge
-              overlap="circle"
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              variant="dot"
-            >
-              <Avatar alt={user?.name} src="/static/img/avatars/avatar-1.jpg" />
-            </SidebarFooterBadge>
-          </Grid>
-          <Grid item>
-            <SidebarFooterText variant="body2">{user?.name}</SidebarFooterText>
-            <SidebarFooterSubText variant="caption">
-              {user?.email}
-            </SidebarFooterSubText>
-          </Grid>
-        </Grid>
-      </SidebarFooter>
     </Drawer>
   );
 };

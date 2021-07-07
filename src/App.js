@@ -71,13 +71,15 @@ function App({ userToken, theme, lang }) {
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <MuiThemeProvider
             theme={createTheme(
-              theme === "light" ? THEMES.DEFAULT : THEMES.DARK
+              THEMES.DEFAULT
+              // theme === "light" ? THEMES.DEFAULT : THEMES.DARK
               // lang === "ar" ? "rtl" : "ltr"
             )}
           >
             <ThemeProvider
               theme={createTheme(
-                theme === "light" ? THEMES.DEFAULT : THEMES.DARK
+                THEMES.DEFAULT
+                // theme === "light" ? THEMES.DEFAULT : THEMES.DARK
                 // lang === "ar" ? "rtl" : "ltr"
               )}
             >
