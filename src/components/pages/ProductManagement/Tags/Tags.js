@@ -28,7 +28,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, UnfoldLess } from "@material-ui/icons";
+import { Add, ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import TagForm from "./TagForm";
@@ -52,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.direction === "rtl" ? 40 : 25,
   },
   button: {
+    height: 40,
     fontFamily: `"Almarai", sans-serif`,
     color: "#EF9300",
     background: "#ffffff",
@@ -82,7 +83,29 @@ function CustomPagination(props) {
         variant="outlined"
         shape="rounded"
       />
-      <p style={{ width: "fit-content" }}>hello</p>
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
+      </Select>
     </div>
   );
 }
@@ -294,64 +317,38 @@ function Tags() {
 
       <Divider my={6} />
 
-      <Grid container>
-        {userPermissions.includes("product_tag_create") ? (
-          <Button
-            mb={3}
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              setOpenPopup(true);
-              setSelectedItem("");
-            }}
-            startIcon={<Add />}
-          >
-            Create Tag
-          </Button>
-        ) : null}
-
-        {userPermissions.includes("product_tag_delete") ? (
-          <Button
-            mb={3}
-            color="secondary"
-            variant="contained"
-            disabled={rowsToDelete.length < 2}
-            onClick={() => {
-              setOpenMassDeleteDialog(true);
-            }}
-            style={{ borderRadius: 0 }}
-          >
-            Delete Selected
-          </Button>
-        ) : null}
-      </Grid>
-
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar>
-            <FormControl variant="outlined">
-              <Select
-                value={pageSize}
-                onChange={handlePageSize}
-                autoWidth
-                IconComponent={UnfoldLess}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "center",
-                  },
-                  transformOrigin: {
-                    vertical: "top",
-                    horizontal: "center",
-                  },
-                  getContentAnchorEl: () => null,
-                }}
-              >
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
+            <div style={{ display: "flex", alignItems: "flex-end" }}>
+              {userPermissions.includes("product_tag_create") ? (
+                <Button
+                  className={classes.button}
+                  variant="contained"
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                  }}
+                  startIcon={<Add />}
+                >
+                  Create Tag
+                </Button>
+              ) : null}
+
+              {userPermissions.includes("product_tag_delete") ? (
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  disabled={rowsToDelete.length < 2}
+                  onClick={() => {
+                    setOpenMassDeleteDialog(true);
+                  }}
+                  style={{ height: 40, borderRadius: 0 }}
+                >
+                  Delete Selected
+                </Button>
+              ) : null}
+            </div>
           </Toolbar>
         </Paper>
         <Paper>

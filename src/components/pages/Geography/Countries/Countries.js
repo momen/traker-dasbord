@@ -30,7 +30,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, UnfoldLess } from "@material-ui/icons";
+import { Add, ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import CountryForm from "./CountryForm";
@@ -46,6 +46,13 @@ const Button = styled(MuiButton)(spacing);
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+  },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
   },
   button: {
     fontFamily: `"Almarai", sans-serif`,
@@ -83,17 +90,42 @@ function CustomPagination(props) {
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-      variant="outlined"
-      shape="rounded"
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
+      </Select>
+    </div>
   );
 }
 
@@ -350,41 +382,6 @@ function Countries() {
         Countries
       </Typography>
 
-      <Divider my={6} />
-
-      <Grid container flex>
-        {userPermissions.includes("country_create") ? (
-          <Button
-            mb={3}
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              setOpenPopupTitle("New Country");
-              setOpenPopup(true);
-              setSelectedItem("");
-            }}
-            startIcon={<Add />}
-          >
-            Add Country
-          </Button>
-        ) : null}
-
-        {userPermissions.includes("country_delete") ? (
-          <Button
-            mb={3}
-            color="secondary"
-            variant="contained"
-            disabled={rowsToDelete.length < 2}
-            onClick={() => {
-              setOpenMassDeleteDialog(true);
-            }}
-            style={{ borderRadius: 0 }}
-          >
-            Delete Selected
-          </Button>
-        ) : null}
-      </Grid>
-
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
@@ -396,31 +393,38 @@ function Countries() {
                 justifyContent: "space-between",
               }}
             >
-              <Grid item>
-                <FormControl variant="outlined">
-                  <Select
-                    value={pageSize}
-                    onChange={handlePageSize}
-                    autoWidth
-                    IconComponent={UnfoldLess}
-                    MenuProps={{
-                      anchorOrigin: {
-                        vertical: "bottom",
-                        horizontal: "center",
-                      },
-                      transformOrigin: {
-                        vertical: "top",
-                        horizontal: "center",
-                      },
-                      getContentAnchorEl: () => null,
+              <div style={{ display: "flex", alignItems: "flex-end" }}>
+                {userPermissions.includes("country_create") ? (
+                  <Button
+                    mb={3}
+                    className={classes.button}
+                    variant="contained"
+                    onClick={() => {
+                      setOpenPopupTitle("New Country");
+                      setOpenPopup(true);
+                      setSelectedItem("");
                     }}
+                    startIcon={<Add />}
                   >
-                    <MenuItem value={10}>10</MenuItem>
-                    <MenuItem value={25}>25</MenuItem>
-                    <MenuItem value={100}>100</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
+                    Add Country
+                  </Button>
+                ) : null}
+
+                {userPermissions.includes("country_delete") ? (
+                  <Button
+                    mb={3}
+                    color="secondary"
+                    variant="contained"
+                    disabled={rowsToDelete.length < 2}
+                    onClick={() => {
+                      setOpenMassDeleteDialog(true);
+                    }}
+                    style={{ borderRadius: 0 }}
+                  >
+                    Delete Selected
+                  </Button>
+                ) : null}
+              </div>
 
               <Grid item>
                 <div style={{ display: "flex" }}>

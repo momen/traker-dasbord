@@ -29,7 +29,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import { ExpandMore, UnfoldLess } from "@material-ui/icons";
 import axios from "../../../../axios";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
@@ -83,7 +83,29 @@ function CustomPagination(props) {
         variant="outlined"
         shape="rounded"
       />
-      <p style={{ width: "fit-content" }}>hello</p>
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
+      </Select>
     </div>
   );
 }
@@ -166,8 +188,7 @@ function PendingOrders() {
               </Button>
             ) : null}
             {userPermissions.includes("approve_orders") &&
-            params.row.status !== "approved" &&
-            params.row.status !== "cancelled" ? (
+            params.row.status === "pending" ? (
               <Button
                 style={{ marginRight: "5px" }}
                 className={classes.button}
@@ -183,8 +204,7 @@ function PendingOrders() {
             ) : null}
 
             {userPermissions.includes("cancel_orders") &&
-            params.row.status !== "approved" &&
-            params.row.status !== "cancelled" ? (
+            params.row.status === "pending" ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
@@ -241,8 +261,8 @@ function PendingOrders() {
         setOpenApproveDialog(false);
         setLoading(true);
         axios
-          .get(
-            `/orders/need/approval?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          .post(
+            `/show/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -270,8 +290,8 @@ function PendingOrders() {
         setOpenCancelDialog(false);
         setLoading(true);
         axios
-          .get(
-            `/orders/need/approval?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          .post(
+            `/show/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -340,31 +360,14 @@ function PendingOrders() {
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
-            <FormControl variant="outlined">
-              <Select
-                value={pageSize}
-                onChange={handlePageSize}
-                autoWidth
-                IconComponent={UnfoldLess}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "center",
-                  },
-                  transformOrigin: {
-                    vertical: "top",
-                    horizontal: "center",
-                  },
-                  getContentAnchorEl: () => null,
-                }}
-              >
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
-
-            <div style={{ display: "flex", alignItems: "flex-end" }}>
+            <div
+              style={{
+                display: "flex",
+                flex: 1,
+                justifyContent: "space-between",
+                alignItems: "flex-end",
+              }}
+            >
               <FormControl
                 variant="outlined"
                 size="small"
@@ -403,23 +406,26 @@ function PendingOrders() {
                   <MenuItem value="cancelled">Cancelled</MenuItem>
                 </Select>
               </FormControl>
-              <Grid
-                container
-                spacing={1}
-                alignItems="flex-end"
-                style={{ display: "flex" }}
-              >
-                <Grid item>
-                  <Search />
+
+              <div>
+                <Grid
+                  container
+                  spacing={1}
+                  alignItems="flex-end"
+                  style={{ display: "flex" }}
+                >
+                  <Grid item>
+                    <Search />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="input-with-icon-grid"
+                      label="Search"
+                      onChange={handleSearchInput}
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <TextField
-                    id="input-with-icon-grid"
-                    label="Search"
-                    onChange={handleSearchInput}
-                  />
-                </Grid>
-              </Grid>
+              </div>
             </div>
           </Toolbar>
         </Paper>
