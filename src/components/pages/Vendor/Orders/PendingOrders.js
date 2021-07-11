@@ -449,6 +449,11 @@ function PendingOrders() {
               loading={loading}
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("show_specific_order")
+                  ? ({ row }) => history.push(`/vendor/orders/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
               onSortModelChange={handleSortModelChange}
             />

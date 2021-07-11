@@ -30,7 +30,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import { Pagination } from "@material-ui/lab";
@@ -72,6 +72,17 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-between",
     width: "100%",
     borderRadius: "6px",
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
   },
 }));
 
@@ -206,7 +217,7 @@ function PartCategory() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("part_category_show") ? (
+            {/* {userPermissions.includes("part_category_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
@@ -217,13 +228,15 @@ function PartCategory() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
             {userPermissions.includes("part_category_edit") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Edit />}
                 style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
                   setOpenPopup(true);
@@ -238,9 +251,11 @@ function PartCategory() {
 
             {userPermissions.includes("part_category_delete") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Delete />}
                 color="secondary"
                 variant="contained"
-                size="small"
+              // size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
@@ -422,6 +437,7 @@ function PartCategory() {
 
               {userPermissions.includes("part_category_delete") ? (
                 <Button
+                  startIcon={<Delete />}
                   color="secondary"
                   variant="contained"
                   disabled={rowsToDelete.length < 2}
@@ -472,7 +488,13 @@ function PartCategory() {
               checkboxSelection
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("part_category_show")
+                  ? ({ row }) => history.push(`/product/part-category/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
               onSelectionChange={(newSelection) => {
                 setRowsToDelete(newSelection.rowIds);

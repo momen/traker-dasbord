@@ -30,7 +30,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import ProductsForm from "./ProductsForm";
@@ -83,6 +83,17 @@ const useStyles = makeStyles((theme) => ({
     padding: "5px",
     marginRight: "5px",
     userSelect: "none",
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
   },
 }));
 
@@ -200,14 +211,14 @@ function Products() {
     { field: "quantity", headerName: "Quantity", width: 70 },
     {
       field: "product_type",
-      headerName: "Product Type",
-      width: 80,
+      headerName: "Type",
+      width: 65,
       sortable: false,
       renderCell: (params) => params.row.producttype_id?.producttype,
     },
-    { field: "price", headerName: "Price", width: 70 },
-    { field: "holesale_price", headerName: "Wholesale Price", width: 70 },
-    { field: "no_of_orders", headerName: "No of orders", width: 70 },
+    { field: "price", headerName: "Price", width: 60 },
+    { field: "holesale_price", headerName: "Wholesale Price", width: 60 },
+    { field: "no_of_orders", headerName: "No of orders", width: 60 },
     {
       field: "discount",
       headerName: "Discount",
@@ -217,11 +228,74 @@ function Products() {
       align: "center",
     },
     {
-      field: "category",
-      headerName: "Category",
-      width: 80,
+      field: "actions",
+      headerName: "Actions",
+      width: 170,
       sortable: false,
-      renderCell: (params) => params.row.category?.name,
+      disableClickEventBubbling: true,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-start",
+              width: "100%",
+              // padding: "5px"
+            }}
+          >
+            {/* {userPermissions.includes("product_show") ? (
+              <Button
+                style={{
+                  marginRight: "5px",
+                  minWidth: "50px",
+                  maxWidth: "50px",
+                }}
+                variant="contained"
+                size="small"
+                onClick={() =>
+                  history.push(`/product/products/${params.row.id}`)
+                }
+              >
+                View
+              </Button>
+            ) : null} */}
+            {userPermissions.includes("product_edit") ? (
+              <Button
+                style={{
+                  marginRight: "5px",
+                  // minWidth: "50px",
+                  // maxWidth: "50px",
+                }}
+                className={classes.actionBtn}
+                startIcon={<Edit />}
+                color="primary"
+                variant="contained"
+                // size="small"
+                onClick={() => {
+                  setSelectedItem(params.row);
+                  setOpenPopup(true);
+                  setOpenPopupTitle("Edit Product"); /****** Customize ******/
+                }}
+              >
+                Edit
+              </Button>
+            ) : null}
+
+            {userPermissions.includes("product_delete") ? (
+              <Button
+                className={classes.actionBtn}
+                startIcon={<Delete />}
+                color="secondary"
+                variant="contained"
+                size="small"
+                onClick={() => openDeleteConfirmation(params.row.id)}
+              >
+                Delete
+              </Button>
+            ) : null}
+          </div>
+        );
+      },
     },
     {
       field: "photo",
@@ -241,73 +315,7 @@ function Products() {
         </Fragment>
       ),
     },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 170,
-      sortable: false,
-      disableClickEventBubbling: true,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              width: "100%",
-              // padding: "5px"
-            }}
-          >
-            {userPermissions.includes("product_show") ? (
-              <Button
-                style={{
-                  marginRight: "5px",
-                  minWidth: "50px",
-                  maxWidth: "50px",
-                }}
-                variant="contained"
-                size="small"
-                onClick={() =>
-                  history.push(`/product/products/${params.row.id}`)
-                }
-              >
-                View
-              </Button>
-            ) : null}
-            {userPermissions.includes("product_edit") ? (
-              <Button
-                style={{
-                  marginRight: "5px",
-                  minWidth: "50px",
-                  maxWidth: "50px",
-                }}
-                color="primary"
-                variant="contained"
-                size="small"
-                onClick={() => {
-                  setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit Product"); /****** Customize ******/
-                }}
-              >
-                Edit
-              </Button>
-            ) : null}
-
-            {userPermissions.includes("product_delete") ? (
-              <Button
-                style={{ minWidth: "50px", maxWidth: "50px" }}
-                color="secondary"
-                variant="contained"
-                size="small"
-                onClick={() => openDeleteConfirmation(params.row.id)}
-              >
-                Delete
-              </Button>
-            ) : null}
-          </div>
-        );
-      },
-    },
+    
   ];
 
   const handlePageSize = ({ pageSize }) => {
@@ -610,6 +618,7 @@ function Products() {
 
                 {userPermissions.includes("product_delete") ? (
                   <Button
+                    startIcon={<Delete />}
                     color="secondary"
                     variant="contained"
                     disabled={rowsToDelete.length < 2}
@@ -711,6 +720,11 @@ function Products() {
               checkboxSelection
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("product_show")
+                  ? ({ row }) => history.push(`/product/products/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}

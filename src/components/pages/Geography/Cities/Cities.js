@@ -30,7 +30,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import CityForm from "./CityForm";
@@ -82,6 +82,17 @@ const useStyles = makeStyles((theme) => ({
     padding: "5px",
     marginRight: "5px",
     userSelect: "none",
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
   },
 }));
 
@@ -197,7 +208,7 @@ function Countries() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("city_show") ? (
+            {/* {userPermissions.includes("city_show") ? (
               <Button
                 style={{
                   marginRight: "5px",
@@ -211,16 +222,18 @@ function Countries() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
             {userPermissions.includes("city_update") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Edit />}
                 style={{
                   marginRight: "5px",
                   minWidth: "70px",
                 }}
                 color="primary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
                   setOpenPopup(true);
@@ -233,10 +246,12 @@ function Countries() {
 
             {userPermissions.includes("city_delete") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Delete />}
                 style={{ minWidth: "70px" }}
                 color="secondary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
@@ -248,8 +263,8 @@ function Countries() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handleColumnToFilter = (event) => {
@@ -434,6 +449,7 @@ function Countries() {
 
                 {userPermissions.includes("city_delete") ? (
                   <Button
+                    startIcon={<Delete />}
                     color="secondary"
                     variant="contained"
                     disabled={rowsToDelete.length < 2}
@@ -492,7 +508,13 @@ function Countries() {
               checkboxSelection
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("city_show")
+                  ? ({ row }) => history.push(`/geography/cities/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
               onSelectionChange={(newSelection) => {
                 setRowsToDelete(newSelection.rowIds);

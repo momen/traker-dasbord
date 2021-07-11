@@ -30,7 +30,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import BrandsForm from "./BrandsForm";
@@ -67,6 +67,17 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
   },
 }));
 
@@ -192,20 +203,22 @@ function CarMade() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("car_made_show") ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                variant="contained"
-                onClick={() =>
-                  history.push(`/product/car-made/${params.row.id}`)
-                }
-              >
-                View
-              </Button>
-            ) : null}
+            {/* {userPermissions.includes("car_made_show") ? (
+            <Button
+              style={{ marginRight: "5px" }}
+              variant="contained"
+              onClick={() =>
+                history.push(`/product/car-made/${params.row.id}`)
+              }
+            >
+              View
+            </Button>
+          ) : null} */}
 
             {userPermissions.includes("car_made_edit") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Edit />}
                 style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
@@ -221,6 +234,8 @@ function CarMade() {
 
             {userPermissions.includes("car_made_delete") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Delete />}
                 color="secondary"
                 variant="contained"
                 onClick={() => openDeleteConfirmation(params.row.id)}
@@ -415,6 +430,7 @@ function CarMade() {
 
               {userPermissions.includes("car_made_delete") ? (
                 <Button
+                  startIcon={<Delete />}
                   color="secondary"
                   variant="contained"
                   disabled={rowsToDelete.length < 2}
@@ -465,7 +481,13 @@ function CarMade() {
               checkboxSelection
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("car_made_show")
+                  ? ({ row }) => history.push(`/product/car-made/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
               onSelectionChange={(newSelection) => {
                 setRowsToDelete(newSelection.rowIds);

@@ -31,7 +31,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Search, UnfoldLess } from "@material-ui/icons";
+import { Delete, Search, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import UsersForm from "./UsersForm";
@@ -49,10 +49,15 @@ const useStyles = makeStyles({
     display: "flex",
   },
   button: {
-    background: "#4caf50",
-    color: "#ffffff",
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
     "&:hover": {
-      background: "#388e3c",
+      background: "#EF9300",
+      color: "#ffffff",
     },
     marginRight: "5px",
   },
@@ -69,6 +74,17 @@ const useStyles = makeStyles({
     justifyContent: "space-between",
     width: "100%",
     borderRadius: "6px",
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
   },
 });
 
@@ -184,7 +200,7 @@ function Users() {
                 Approve
               </Button>
             ) : null}
-            {userPermissions.includes("user_show_by_vendor") ? (
+            {/* {userPermissions.includes("user_show_by_vendor") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
@@ -195,11 +211,13 @@ function Users() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
 
             {userPermissions.includes("user_delete_by_vendor") ? (
               <Button
-                color="secondary"
+                className={classes.actionBtn}
+                startIcon={<Delete />}
+                // color="secondary"
                 variant="contained"
                 size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
@@ -396,65 +414,40 @@ function Users() {
         Staff
       </Typography>
       <Divider my={6} />
-
-      <Grid container>
-        {userPermissions.includes("vendor_add_staff") ? (
-          <Button
-            data-test="users-create-btn"
-            mb={3}
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              setSelectedItem("");
-              setOpenPopup(true);
-              setOpenPopupTitle("New User");
-            }}
-          >
-            Add User
-          </Button>
-        ) : null}
-
-        {userPermissions.includes("user_delete_by_vendor") ? (
-          <Button
-            mb={3}
-            color="secondary"
-            variant="contained"
-            disabled={rowsToDelete.length < 2}
-            onClick={() => {
-              setOpenMassDeleteDialog(true);
-            }}
-          >
-            Delete Selected
-          </Button>
-        ) : null}
-      </Grid>
-
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
-            <FormControl variant="outlined">
-              <Select
-                value={pageSize}
-                onChange={handlePageSize}
-                autoWidth
-                IconComponent={UnfoldLess}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "center",
-                  },
-                  transformOrigin: {
-                    vertical: "top",
-                    horizontal: "center",
-                  },
-                  getContentAnchorEl: () => null,
-                }}
-              >
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
+            <div style={{ display: "flex", alignItems: "flex-end" }}>
+              {userPermissions.includes("vendor_add_staff") ? (
+                <Button
+                  data-test="users-create-btn"
+                  className={classes.button}
+                  variant="contained"
+                  onClick={() => {
+                    setSelectedItem("");
+                    setOpenPopup(true);
+                    setOpenPopupTitle("New User");
+                  }}
+                >
+                  Add User
+                </Button>
+              ) : null}
+
+              {userPermissions.includes("user_delete_by_vendor") ? (
+                <Button
+                  startIcon={<Delete />}
+                  color="secondary"
+                  variant="contained"
+                  disabled={rowsToDelete.length < 2}
+                  onClick={() => {
+                    setOpenMassDeleteDialog(true);
+                  }}
+                  style={{ height: 40, borderRadius: 0 }}
+                >
+                  Delete Selected
+                </Button>
+              ) : null}
+            </div>
 
             <div>
               <Grid container spacing={1} alignItems="flex-end">
@@ -493,6 +486,11 @@ function Users() {
               checkboxSelection
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("user_show_by_vendor")
+                  ? ({ row }) => history.push(`/user-mgt/vendor-users/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
               onSortModelChange={handleSortModelChange}
               onSelectionChange={(newSelection) => {

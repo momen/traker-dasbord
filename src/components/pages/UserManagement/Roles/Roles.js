@@ -30,7 +30,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import RolesForm from "./RolesForm";
@@ -55,6 +55,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.direction === "rtl" ? 40 : 25,
   },
   button: {
+    height: 40,
     fontFamily: `"Almarai", sans-serif`,
     color: "#EF9300",
     background: "#ffffff",
@@ -73,6 +74,17 @@ const useStyles = makeStyles((theme) => ({
     padding: "5px",
     marginRight: "5px",
     userSelect: "none",
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
   },
 }));
 
@@ -198,7 +210,7 @@ function Roles() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("role_show") ? (
+            {/* {userPermissions.includes("role_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
@@ -206,9 +218,11 @@ function Roles() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
             {userPermissions.includes("role_edit") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Edit />}
                 style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
@@ -224,6 +238,8 @@ function Roles() {
 
             {userPermissions.includes("role_delete") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Delete />}
                 color="secondary"
                 variant="contained"
                 onClick={() => openDeleteConfirmation(params.row.id)}
@@ -352,65 +368,41 @@ function Roles() {
 
       <Divider my={6} />
 
-      <Grid container>
-        {userPermissions.includes("role_create") ? (
-          <Button
-            mb={3}
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              setSelectedItem("");
-              setOpenPopup(true);
-              setOpenPopupTitle("New Role");
-            }}
-            startIcon={<Add />}
-          >
-            Add Role
-          </Button>
-        ) : null}
-
-        {userPermissions.includes("role_delete") ? (
-          <Button
-            mb={3}
-            color="secondary"
-            variant="contained"
-            disabled={rowsToDelete.length < 2}
-            onClick={() => {
-              setOpenMassDeleteDialog(true);
-            }}
-            style={{ borderRadius: 0 }}
-          >
-            Delete Selected
-          </Button>
-        ) : null}
-      </Grid>
-
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar>
-            <FormControl variant="outlined">
-              <Select
-                value={pageSize}
-                onChange={handlePageSize}
-                autoWidth
-                IconComponent={UnfoldLess}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "center",
-                  },
-                  transformOrigin: {
-                    vertical: "top",
-                    horizontal: "center",
-                  },
-                  getContentAnchorEl: () => null,
-                }}
-              >
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
+            <div style={{ display: "flex", alignItems: "flex-end" }}>
+              {userPermissions.includes("role_create") ? (
+                <Button
+                  mb={3}
+                  className={classes.button}
+                  variant="contained"
+                  onClick={() => {
+                    setSelectedItem("");
+                    setOpenPopup(true);
+                    setOpenPopupTitle("New Role");
+                  }}
+                  startIcon={<Add />}
+                >
+                  Add Role
+                </Button>
+              ) : null}
+
+              {userPermissions.includes("role_delete") ? (
+                <Button
+                  startIcon={<Delete />}
+                  color="secondary"
+                  variant="contained"
+                  disabled={rowsToDelete.length < 2}
+                  onClick={() => {
+                    setOpenMassDeleteDialog(true);
+                  }}
+                  style={{ height: 40, borderRadius: 0 }}
+                >
+                  Delete Selected
+                </Button>
+              ) : null}
+            </div>
           </Toolbar>
         </Paper>
         <Paper>
@@ -434,7 +426,13 @@ function Roles() {
               checkboxSelection
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("role_show")
+                  ? ({ row }) => history.push(`/user-mgt/roles/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
               onSelectionChange={(newSelection) => {
                 setRowsToDelete(newSelection.rowIds);

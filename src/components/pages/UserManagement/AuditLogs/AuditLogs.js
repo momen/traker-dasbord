@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
   },
   toolBar: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     width: "100%",
     borderRadius: "6px",
   },
@@ -96,15 +96,9 @@ function CustomPagination(props) {
           getContentAnchorEl: null,
         }}
       >
-        <MenuItem value={10}>
-          10 records / page
-        </MenuItem>
-        <MenuItem value={25}>
-          25 records / page
-        </MenuItem>
-        <MenuItem value={100}>
-          100 records / page
-        </MenuItem>
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
       </Select>
     </div>
   );
@@ -190,7 +184,7 @@ function AuditLogs() {
               width: "100%",
             }}
           >
-            {userPermissions.includes("audit_log_show") ? (
+            {/* {userPermissions.includes("audit_log_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
@@ -199,7 +193,7 @@ function AuditLogs() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
           </div>
         );
       },
@@ -281,30 +275,6 @@ function AuditLogs() {
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
-            <FormControl variant="outlined">
-              <Select
-                value={pageSize}
-                onChange={handlePageSize}
-                autoWidth
-                IconComponent={UnfoldLess}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "center",
-                  },
-                  transformOrigin: {
-                    vertical: "top",
-                    horizontal: "center",
-                  },
-                  getContentAnchorEl: () => null,
-                }}
-              >
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
-
             <div>
               <Grid container spacing={1} alignItems="flex-end">
                 <Grid item>
@@ -341,7 +311,13 @@ function AuditLogs() {
               loading={loading}
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("audit_log_show")
+                  ? ({ row }) => history.push(`/user-mgt/logs/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
             />
           </div>

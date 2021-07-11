@@ -166,7 +166,7 @@ function Permissions() {
               width: "100%",
             }}
           >
-            {userPermissions.includes("permission_show") ? (
+            {/* {userPermissions.includes("permission_show") ? (
               <Button
                 id="view-permissions-btn"
                 style={{ marginRight: "5px" }}
@@ -177,7 +177,7 @@ function Permissions() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
           </div>
         );
       },
@@ -249,7 +249,7 @@ function Permissions() {
       <Divider my={6} />
 
       <Card mb={6}>
-        <Paper mb={2}>
+        {/* <Paper mb={2}>
           <Toolbar>
             <FormControl variant="outlined">
               <Select
@@ -275,7 +275,7 @@ function Permissions() {
               </Select>
             </FormControl>
           </Toolbar>
-        </Paper>
+        </Paper> */}
         <Paper>
           <div style={{ width: "100%" }}>
             <DataGrid
@@ -296,7 +296,13 @@ function Permissions() {
               loading={loading}
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("permission_show")
+                  ? ({ row }) => history.push(`/user-mgt/permissions/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
             />
           </div>

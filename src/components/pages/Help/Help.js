@@ -21,7 +21,7 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import { Add, ExpandMore, Search } from "@material-ui/icons";
+import { Add, Delete, Edit, ExpandMore, Search } from "@material-ui/icons";
 import { spacing } from "@material-ui/system";
 import axios from "../../../axios";
 import Popup from "../../Popup";
@@ -46,6 +46,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   button: {
+    height: 40,
     fontFamily: `"Almarai", sans-serif`,
     color: "#EF9300",
     background: "#ffffff",
@@ -56,6 +57,17 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
   },
 }));
 
@@ -177,7 +189,6 @@ function Support() {
         <Grid item xs>
           {userPermissions.includes("help_center_create") ? (
             <Button
-              mb={3}
               className={classes.button}
               variant="contained"
               onClick={() => {
@@ -193,21 +204,20 @@ function Support() {
 
           {userPermissions.includes("help_center_delete") ? (
             <Button
-              mb={3}
               color="secondary"
               variant="contained"
               disabled={rowsToDelete.length < 2}
               onClick={() => {
                 setOpenMassDeleteDialog(true);
               }}
-              style={{ borderRadius: 0 }}
+              style={{ height: 40, borderRadius: 0 }}
             >
               Delete Selected
             </Button>
           ) : null}
         </Grid>
 
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <Grid container spacing={1}>
             <div
               style={{ width: "100%", display: "flex", alignItems: "flex-end" }}
@@ -275,9 +285,11 @@ function Support() {
             <AccordionActions>
               {userPermissions.includes("help_center_update") ? (
                 <Button
+                  className={classes.actionBtn}
+                  startIcon={<Edit />}
                   color="primary"
                   variant="contained"
-                  size="small"
+                  // size="small"
                   onClick={() => {
                     setSelectedItem(faq);
                     setOpenPopup(true);
@@ -290,9 +302,11 @@ function Support() {
 
               {userPermissions.includes("help_center_delete") ? (
                 <Button
+                  className={classes.actionBtn}
+                  startIcon={<Delete />}
                   color="secondary"
                   variant="contained"
-                  size="small"
+                  // size="small"
                   onClick={() => openDeleteConfirmation(faq.id)}
                 >
                   Delete

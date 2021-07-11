@@ -27,7 +27,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import VendorsForm from "./VendorsForm";
@@ -65,6 +65,17 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
   },
 }));
 
@@ -220,7 +231,7 @@ function Vendors() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("add_vendor_show") ? (
+            {/* {userPermissions.includes("add_vendor_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
@@ -229,13 +240,17 @@ function Vendors() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
             {userPermissions.includes("add_vendor_edit") ? (
               <Button
-                style={{ marginRight: "5px" }}
+                style={{
+                  marginRight: "5px",
+                }}
+                className={classes.actionBtn}
+                startIcon={<Edit />}
                 color="primary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => {
                   setVendor(params.row);
                   setOpenPopup(true);
@@ -249,10 +264,14 @@ function Vendors() {
             ) : null}
             {userPermissions.includes("add_vendor_delete") ? (
               <Button
-                style={{ marginRight: "5px" }}
+                style={{
+                  marginRight: "5px",
+                }}
+                className={classes.actionBtn}
+                startIcon={<Delete />}
                 color="secondary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
@@ -510,6 +529,7 @@ function Vendors() {
                     alignSelf: "center",
                     borderRadius: 0,
                   }}
+                  startIcon={<Delete />}
                 >
                   Delete Selected
                 </Button>
@@ -553,6 +573,11 @@ function Vendors() {
               checkboxSelection
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("add_vendor_show")
+                  ? ({ row }) => history.push(`/vendor/vendors/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}

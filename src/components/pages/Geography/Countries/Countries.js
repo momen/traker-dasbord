@@ -30,7 +30,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import CountryForm from "./CountryForm";
@@ -55,6 +55,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.direction === "rtl" ? 40 : 25,
   },
   button: {
+    height: 40,
     fontFamily: `"Almarai", sans-serif`,
     color: "#EF9300",
     background: "#ffffff",
@@ -82,6 +83,17 @@ const useStyles = makeStyles((theme) => ({
     padding: "5px",
     marginRight: "5px",
     userSelect: "none",
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
   },
 }));
 
@@ -195,7 +207,7 @@ function Countries() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("country_show") ? (
+            {/* {userPermissions.includes("country_show") ? (
               <Button
                 style={{
                   marginRight: "5px",
@@ -209,16 +221,18 @@ function Countries() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
             {userPermissions.includes("country_update") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Edit />}
                 style={{
                   marginRight: "5px",
                   minWidth: "70px",
                 }}
                 color="primary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
                   setOpenPopup(true);
@@ -231,6 +245,8 @@ function Countries() {
 
             {userPermissions.includes("country_delete") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Delete />}
                 style={{ minWidth: "70px" }}
                 color="secondary"
                 variant="contained"
@@ -246,8 +262,8 @@ function Countries() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handleColumnToFilter = (event) => {
@@ -382,6 +398,8 @@ function Countries() {
         Countries
       </Typography>
 
+      <Divider my={6} />
+
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
@@ -396,7 +414,6 @@ function Countries() {
               <div style={{ display: "flex", alignItems: "flex-end" }}>
                 {userPermissions.includes("country_create") ? (
                   <Button
-                    mb={3}
                     className={classes.button}
                     variant="contained"
                     onClick={() => {
@@ -412,14 +429,14 @@ function Countries() {
 
                 {userPermissions.includes("country_delete") ? (
                   <Button
-                    mb={3}
+                    startIcon={<Delete />}
                     color="secondary"
                     variant="contained"
                     disabled={rowsToDelete.length < 2}
                     onClick={() => {
                       setOpenMassDeleteDialog(true);
                     }}
-                    style={{ borderRadius: 0 }}
+                    style={{ height: 40, borderRadius: 0 }}
                   >
                     Delete Selected
                   </Button>
@@ -471,7 +488,13 @@ function Countries() {
               checkboxSelection
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("country_show")
+                  ? ({ row }) => history.push(`/geography/countries/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
               onSelectionChange={(newSelection) => {
                 setRowsToDelete(newSelection.rowIds);
