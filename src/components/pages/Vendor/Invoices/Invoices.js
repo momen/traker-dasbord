@@ -149,46 +149,47 @@ function Orders() {
       align: "center",
     },
     { field: "invoice_number", headerName: "Invoice Number", width: 120 },
-    { field: "invoice_total", headerName: "Invoice Total", width: 100 },
-    { field: "vendor_name", headerName: "Vendor Name", width: 120 },
+    { field: "invoice_total", headerName: "Invoice Total", width: 120 },
+    { field: "vendor_name", headerName: "Vendor Name", width: 200 },
     {
       field: "vendor_email",
       headerName: "Vendor Email",
+      flex:1,
       width: 150,
       sortable: false,
     },
     { field: "order_number", headerName: "Order Number", width: 150 },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 220,
-      sortable: false,
-      disableClickEventBubbling: true,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              width: "100%",
-            }}
-          >
-            {userPermissions.includes("show_specific_invoice") ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                variant="contained"
-                size="small"
-                onClick={() =>
-                  history.push(`/vendor/invoices/${params.row.id}`)
-                }
-              >
-                View
-              </Button>
-            ) : null}
-          </div>
-        );
-      },
-    },
+    // {
+    //   field: "actions",
+    //   headerName: "Actions",
+    //   width: 220,
+    //   sortable: false,
+    //   disableClickEventBubbling: true,
+    //   renderCell: (params) => {
+    //     return (
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           justifyContent: "flex-start",
+    //           width: "100%",
+    //         }}
+    //       >
+    //         {/* {userPermissions.includes("show_specific_invoice") ? (
+    //           <Button
+    //             style={{ marginRight: "5px" }}
+    //             variant="contained"
+    //             size="small"
+    //             onClick={() =>
+    //               history.push(`/vendor/invoices/${params.row.id}`)
+    //             }
+    //           >
+    //             View
+    //           </Button>
+    //         ) : null} */}
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
   const handlePageSize = ({ pageSize }) => {

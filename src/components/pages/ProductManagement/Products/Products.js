@@ -30,7 +30,14 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import {
+  Add,
+  ArrowBack,
+  Delete,
+  Edit,
+  ExpandMore,
+  UnfoldLess,
+} from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import ProductsForm from "./ProductsForm";
@@ -66,6 +73,20 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  backBtn: {
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight:'bold',
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
+  backIcon: {
+    marginRight: theme.direction === "rtl" ? 0 : 5,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
   },
   toolBar: {
     display: "flex",
@@ -203,6 +224,9 @@ function Products() {
   ]);
   const [rowsToDelete, setRowsToDelete] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Products");
+  const [viewMode, setViewMode] = useState("data-grid");
+
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
     { field: "name", headerName: "Name", width: 80 },
@@ -273,8 +297,10 @@ function Products() {
                 // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit Product"); /****** Customize ******/
+                  // setOpenPopup(true);
+                  // setOpenPopupTitle("Edit Product");
+                  setViewMode("edit");
+                  setPageHeader("Edit Product");
                 }}
               >
                 Edit
@@ -315,7 +341,6 @@ function Products() {
         </Fragment>
       ),
     },
-    
   ];
 
   const handlePageSize = ({ pageSize }) => {
@@ -586,155 +611,193 @@ function Products() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Products
+        {pageHeader}
       </Typography>
-      <Divider my={6} />
-      <Card mb={6}>
-        <Paper mb={2}>
-          <Toolbar className={classes.toolBar}>
-            <Grid
-              container
-              style={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "flex-end" }}>
-                {userPermissions.includes("product_create") ? (
-                  <Button
-                    className={classes.button}
-                    variant="contained"
-                    onClick={() => {
-                      setOpenPopupTitle("New Product");
-                      setOpenPopup(true);
-                      setSelectedItem("");
-                    }}
-                    startIcon={<Add />}
-                  >
-                    Add Product
-                  </Button>
-                ) : null}
+      <Divider my={3} />
 
-                {userPermissions.includes("product_delete") ? (
-                  <Button
-                    startIcon={<Delete />}
-                    color="secondary"
-                    variant="contained"
-                    disabled={rowsToDelete.length < 2}
-                    onClick={() => {
-                      setOpenMassDeleteDialog(true);
-                    }}
-                    style={{ height: 40, borderRadius: 0 }}
-                  >
-                    Delete Selected
-                  </Button>
-                ) : null}
-              </div>
+      {viewMode === "data-grid" ? (
+        <Card mb={6}>
+          <Paper mb={2}>
+            <Toolbar className={classes.toolBar}>
+              <Grid
+                container
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-end" }}>
+                  {userPermissions.includes("product_create") ? (
+                    <Button
+                      className={classes.button}
+                      variant="contained"
+                      onClick={() => {
+                        // setOpenPopupTitle("New Product");
+                        // setOpenPopup(true);
+                        setViewMode("add");
+                        setPageHeader("Add Product");
+                        setSelectedItem("");
+                      }}
+                      startIcon={<Add />}
+                    >
+                      Add Product
+                    </Button>
+                  ) : null}
 
-              <Grid item>
-                <div style={{ display: "flex" }}>
-                  <Grid
-                    container
-                    spacing={1}
-                    alignItems="flex-end"
-                    style={{ marginRight: "5px" }}
-                  >
-                    <Grid item>
-                      <Search />
+                  {userPermissions.includes("product_delete") ? (
+                    <Button
+                      startIcon={<Delete />}
+                      color="secondary"
+                      variant="contained"
+                      disabled={rowsToDelete.length < 2}
+                      onClick={() => {
+                        setOpenMassDeleteDialog(true);
+                      }}
+                      style={{ height: 40, borderRadius: 0 }}
+                    >
+                      Delete Selected
+                    </Button>
+                  ) : null}
+                </div>
+
+                <Grid item>
+                  <div style={{ display: "flex" }}>
+                    <Grid
+                      container
+                      spacing={1}
+                      alignItems="flex-end"
+                      style={{ marginRight: "5px" }}
+                    >
+                      <Grid item>
+                        <Search />
+                      </Grid>
+                      <Grid item>
+                        <TextField
+                          id="input-with-icon-grid"
+                          label="Search by column"
+                          onChange={handleSearchInput}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item>
-                      <TextField
-                        id="input-with-icon-grid"
-                        label="Search by column"
-                        onChange={handleSearchInput}
-                      />
-                    </Grid>
-                  </Grid>
 
-                  <Grid style={{ alignSelf: "flex-end" }}>
-                    <FormControl variant="outlined" size="small">
-                      <Select
-                        autoWidth
-                        value={columnToFilter}
-                        onChange={handleColumnToFilter}
-                        displayEmpty
-                        size="small"
-                        IconComponent={UnfoldLess}
-                        MenuProps={{
-                          anchorOrigin: {
-                            vertical: "bottom",
-                            horizontal: "center",
-                          },
-                          transformOrigin: {
-                            vertical: "top",
-                            horizontal: "center",
-                          },
-                          getContentAnchorEl: () => null,
-                        }}
-                      >
-                        {/* <MenuItem value="" disabled>
+                    <Grid style={{ alignSelf: "flex-end" }}>
+                      <FormControl variant="outlined" size="small">
+                        <Select
+                          autoWidth
+                          value={columnToFilter}
+                          onChange={handleColumnToFilter}
+                          displayEmpty
+                          size="small"
+                          IconComponent={UnfoldLess}
+                          MenuProps={{
+                            anchorOrigin: {
+                              vertical: "bottom",
+                              horizontal: "center",
+                            },
+                            transformOrigin: {
+                              vertical: "top",
+                              horizontal: "center",
+                            },
+                            getContentAnchorEl: () => null,
+                          }}
+                        >
+                          {/* <MenuItem value="" disabled>
                           Select a column to filter by
                         </MenuItem> */}
-                        <MenuItem value={""}>Generic Search</MenuItem>
-                        <MenuItem value={"name"}>Product Name</MenuItem>
-                        <MenuItem value={"quantity"}>Quantity</MenuItem>
-                        <MenuItem value={"price"}>Price</MenuItem>
-                        <MenuItem value={"car_made"}>Car Made</MenuItem>
-                        <MenuItem value={"car_model"}>Car Model</MenuItem>
-                        <MenuItem value={"year"}>Car Year</MenuItem>
-                        <MenuItem value={"category_id"}>Category</MenuItem>
-                        <MenuItem value={"part_category"}>
-                          Part Category
-                        </MenuItem>
-                        {user?.roles[0].title === "Admin" ? (
-                          <MenuItem value={"vendor_id"}>Vendor Name</MenuItem>
-                        ) : null}
-                        <MenuItem value={"store_id"}>Store Name</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </div>
+                          <MenuItem value={""}>Generic Search</MenuItem>
+                          <MenuItem value={"name"}>Product Name</MenuItem>
+                          <MenuItem value={"quantity"}>Quantity</MenuItem>
+                          <MenuItem value={"price"}>Price</MenuItem>
+                          <MenuItem value={"car_made"}>Car Made</MenuItem>
+                          <MenuItem value={"car_model"}>Car Model</MenuItem>
+                          <MenuItem value={"year"}>Car Year</MenuItem>
+                          <MenuItem value={"category_id"}>Category</MenuItem>
+                          <MenuItem value={"part_category"}>
+                            Part Category
+                          </MenuItem>
+                          {user?.roles[0].title === "Admin" ? (
+                            <MenuItem value={"vendor_id"}>Vendor Name</MenuItem>
+                          ) : null}
+                          <MenuItem value={"store_id"}>Store Name</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </div>
+                </Grid>
               </Grid>
-            </Grid>
-          </Toolbar>
-        </Paper>
-        <Paper>
-          <div style={{ width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              page={page}
-              pageSize={pageSize}
-              rowCount={rowsCount}
-              sortingOrder={["desc", "asc"]}
-              sortModel={sortModel}
-              columnBuffer={pageSize}
-              paginationMode="server"
-              sortingMode="server"
-              components={{
-                Pagination: CustomPagination,
-                LoadingOverlay: CustomLoadingOverlay,
-              }}
-              loading={loading}
-              checkboxSelection
-              disableColumnMenu
-              autoHeight={true}
-              onRowClick={
-                userPermissions.includes("product_show")
-                  ? ({ row }) => history.push(`/product/products/${row.id}`)
-                  : null
-              }
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSize}
-              onSortModelChange={handleSortModelChange}
-              onSelectionChange={(newSelection) => {
-                setRowsToDelete(newSelection.rowIds);
-              }}
-            />
+            </Toolbar>
+          </Paper>
+          <Paper>
+            <div style={{ width: "100%" }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                page={page}
+                pageSize={pageSize}
+                rowCount={rowsCount}
+                sortingOrder={["desc", "asc"]}
+                sortModel={sortModel}
+                columnBuffer={pageSize}
+                paginationMode="server"
+                sortingMode="server"
+                components={{
+                  Pagination: CustomPagination,
+                  LoadingOverlay: CustomLoadingOverlay,
+                }}
+                loading={loading}
+                checkboxSelection
+                disableColumnMenu
+                autoHeight={true}
+                onRowClick={
+                  userPermissions.includes("product_show")
+                    ? ({ row }) => history.push(`/product/products/${row.id}`)
+                    : null
+                }
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSize}
+                onSortModelChange={handleSortModelChange}
+                onSelectionChange={(newSelection) => {
+                  setRowsToDelete(newSelection.rowIds);
+                }}
+              />
+            </div>
+          </Paper>
+        </Card>
+      ) : (
+        <Card mb={6} style={{ padding: "50px 60px" }}>
+          <div
+            className={classes.backBtn}
+            onClick={() => {
+              setViewMode("data-grid");
+              setPageHeader("Products");
+            }}
+          >
+            <ArrowBack className={classes.backIcon} />
+            <span>Back</span>
           </div>
-        </Paper>
-      </Card>
+
+          <Divider my={3} />
+          <ProductsForm
+            setPage={setPage}
+            setOpenPopup={setOpenPopup}
+            itemToEdit={selectedItem}
+            stores={stores}
+            mainCategories={mainCategories}
+            categories={categories}
+            carMades={carMades}
+            carYears={carYears}
+            manufacturers={manufacturers}
+            originCountries={originCountries}
+            carTypes={carTypes}
+            productTags={productTags}
+            productTypes={productTypes}
+            setViewMode={setViewMode}
+            setPageHeader={setPageHeader}
+          />
+        </Card>
+      )}
+
       <Popup
         title={openPopupTitle}
         openPopup={openPopup}

@@ -424,7 +424,7 @@ function Users() {
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
             <div style={{ display: "flex", alignItems: "flex-end" }}>
-              {userPermissions.includes("user_create") ? (
+              {/* {userPermissions.includes("user_create") ? (
                 <Button
                   data-test="users-create-btn"
                   className={classes.button}
@@ -438,7 +438,7 @@ function Users() {
                 >
                   Add User
                 </Button>
-              ) : null}
+              ) : null} */}
 
               {userPermissions.includes("user_delete") ? (
                 <Button

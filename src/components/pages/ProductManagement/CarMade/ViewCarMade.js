@@ -66,7 +66,7 @@ function ViewCarMade({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/product/car-made")}
+        onClick={() => history.push("/product/brands")}
         mb={3}
       >
         Back to list

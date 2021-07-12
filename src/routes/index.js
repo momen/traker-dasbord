@@ -147,8 +147,8 @@ const Reports = async(() =>
 );
 
 const Stores = async(() => import("../components/pages/Vendor/Stores/Stores"));
-const PendingOrders = async(() =>
-  import("../components/pages/Vendor/Orders/PendingOrders")
+const TotalOrders = async(() =>
+  import("../components/pages/Vendor/Orders/TotalOrders")
 );
 const OrdersHistory = async(() =>
   import("../components/pages/Vendor/Orders/OrdersHistory")
@@ -440,7 +440,7 @@ const vendorRoutes = {
     {
       path: "/vendor/total-orders",
       name: "Total Orders",
-      component: PendingOrders,
+      component: TotalOrders,
       icon: <ShoppingBasket />,
       guard: PermissionGuard,
       permission: "show_orders_access",
@@ -585,7 +585,7 @@ const pendingOrdersRoute = {
   id: "Total Orders",
   path: "/vendor/total-orders",
   icon: <ShoppingBasket />,
-  component: PendingOrders,
+  component: TotalOrders,
   children: null,
   guard: OrdersGuard,
   permission: "access_tabs_separately",

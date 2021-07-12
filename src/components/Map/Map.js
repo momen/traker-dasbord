@@ -41,6 +41,7 @@ function Map({
   formData,
   updateFormData,
   setLocationNotSelected,
+  showSearch,
 }) {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
@@ -89,8 +90,12 @@ function Map({
 
   return (
     <>
-      <Locate panTo={panTo} />
-      <Search panTo={panTo} />
+      {showSearch ? (
+        <>
+          <Locate panTo={panTo} />
+          <Search panTo={panTo} />
+        </>
+      ) : null}
 
       <GoogleMap
         id="map"

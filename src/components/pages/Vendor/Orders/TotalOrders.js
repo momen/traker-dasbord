@@ -160,68 +160,68 @@ function PendingOrders() {
     },
     { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
     { field: "order_total", headerName: "Order Total", width: 200 },
-    { field: "orderStatus", headerName: "Status", width: 100, sortable: false },
+    { field: "orderStatus", headerName: "Status", width: 150, sortable: false },
     { field: "paid", headerName: "Paid", width: 80, sortable: false },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 280,
-      sortable: false,
-      disableClickEventBubbling: true,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              width: "100%",
-            }}
-          >
-            {userPermissions.includes("show_specific_order") ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                variant="contained"
-                size="small"
-                onClick={() => history.push(`/vendor/orders/${params.row.id}`)}
-              >
-                View
-              </Button>
-            ) : null}
-            {userPermissions.includes("approve_orders") &&
-            params.row.status === "pending" ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                className={classes.button}
-                variant="contained"
-                size="small"
-                onClick={() => {
-                  setOpenApproveDialog(true);
-                  setOrderToApproveOrCancel(params.row.id);
-                }}
-              >
-                Approve Order
-              </Button>
-            ) : null}
+    // {
+    //   field: "actions",
+    //   headerName: "Actions",
+    //   width: 280,
+    //   sortable: false,
+    //   disableClickEventBubbling: true,
+    //   renderCell: (params) => {
+    //     return (
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           justifyContent: "flex-start",
+    //           width: "100%",
+    //         }}
+    //       >
+    //         {/* {userPermissions.includes("show_specific_order") ? (
+    //           <Button
+    //             style={{ marginRight: "5px" }}
+    //             variant="contained"
+    //             size="small"
+    //             onClick={() => history.push(`/vendor/orders/${params.row.id}`)}
+    //           >
+    //             View
+    //           </Button>
+    //         ) : null} */}
+    //         {userPermissions.includes("approve_orders") &&
+    //         params.row.status === "pending" ? (
+    //           <Button
+    //             style={{ marginRight: "5px" }}
+    //             className={classes.button}
+    //             variant="contained"
+    //             size="small"
+    //             onClick={() => {
+    //               setOpenApproveDialog(true);
+    //               setOrderToApproveOrCancel(params.row.id);
+    //             }}
+    //           >
+    //             Approve Order
+    //           </Button>
+    //         ) : null}
 
-            {userPermissions.includes("cancel_orders") &&
-            params.row.status === "pending" ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                variant="contained"
-                color="secondary"
-                size="small"
-                onClick={() => {
-                  setOpenCancelDialog(true);
-                  setOrderToApproveOrCancel(params.row.id);
-                }}
-              >
-                Cancel Order
-              </Button>
-            ) : null}
-          </div>
-        );
-      },
-    },
+    //         {userPermissions.includes("cancel_orders") &&
+    //         params.row.status === "pending" ? (
+    //           <Button
+    //             style={{ marginRight: "5px" }}
+    //             variant="contained"
+    //             color="secondary"
+    //             size="small"
+    //             onClick={() => {
+    //               setOpenCancelDialog(true);
+    //               setOrderToApproveOrCancel(params.row.id);
+    //             }}
+    //           >
+    //             Cancel Order
+    //           </Button>
+    //         ) : null}
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
   const handlePageSize = ({ pageSize }) => {
@@ -455,6 +455,7 @@ function PendingOrders() {
                   : null
               }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
             />
           </div>

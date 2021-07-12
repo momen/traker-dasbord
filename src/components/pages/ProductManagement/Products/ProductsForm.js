@@ -4,14 +4,16 @@ import {
   Checkbox,
   Chip,
   Collapse,
+  Divider as MuiDivider,
   FormControl,
   Grid,
   IconButton,
   makeStyles,
+  styled,
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
-import { PhotoCamera } from "@material-ui/icons";
+import { PhotoCamera, RotateLeft } from "@material-ui/icons";
 import { CloseIcon } from "@material-ui/data-grid";
 import { Alert, Autocomplete } from "@material-ui/lab";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
@@ -19,6 +21,10 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import NumberFormat from "react-number-format";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import SuccessPopup from "../../../SuccessPopup";
+import { spacing } from "@material-ui/system";
+
+const Divider = styled(MuiDivider)(spacing);
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -26,13 +32,39 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "60vw",
+    // width: "60vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "2px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    margin: theme.spacing(3, 2, 2),
+    width: "15%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
@@ -76,6 +108,8 @@ function ProductsForm({
   originCountries,
   carTypes,
   productTypes,
+  setViewMode,
+  setPageHeader,
 }) {
   const classes = useStyles();
   const uploadRef = useRef();
@@ -219,9 +253,12 @@ function ProductsForm({
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     store_id: Yup.string().required(),
-    quantity: Yup.number()
-      .min(5, "Minimum value should be 5")
-      .required("This field is Required"),
+    quantity:
+      formData.producttype_id.toString() !== "2"
+        ? Yup.number()
+            .min(5, "Minimum value should be 5")
+            .required("This field is Required")
+        : Yup.number().nullable().notRequired(),
     qty_reminder: Yup.number().required("This field is Required"),
     description: Yup.string()
       .required("This field is Required")
@@ -258,6 +295,21 @@ function ProductsForm({
   const [isSubmitting, setIsSubmitting] = useState(false); // Update on other components
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit
+      ? "Product details updated successfully."
+      : "New product added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    if (itemToEdit) {
+      setViewMode("data-grid");
+      setPageHeader("Products");
+    }
+  };
 
   useEffect(() => {
     if (itemToEdit) {
@@ -348,7 +400,11 @@ function ProductsForm({
       setIsSubmitting(false);
     } else {
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === "photo") return;
+        if (
+          key === "photo" ||
+          (key === "quantity" && formData.producttype_id == 2)
+        )
+          return;
         if (key === "tags" || key === "models") {
           data.append(key, JSON.stringify(value.map((val) => val.id)));
         } else if (key === "discount" && !value) {
@@ -384,12 +440,17 @@ function ProductsForm({
                 })
                 .then((res) => {
                   setOpenPopup(false);
+                  setDialogOpen(true);
+                  setIsSubmitting(false);
                 })
                 .catch((res) => {
                   setResponseErrors(res.response.data.errors);
+                  setIsSubmitting(false);
                 });
             } else {
               setOpenPopup(false);
+              setIsSubmitting(false);
+              setDialogOpen(true);
             }
           })
           .catch((res) => {
@@ -406,6 +467,8 @@ function ProductsForm({
           .then((res) => {
             setPage(1);
             setOpenPopup(false);
+            setDialogOpen(true);
+            setIsSubmitting(false);
           })
           .catch((res) => {
             setIsSubmitting(false); // Update on other components
@@ -549,8 +612,177 @@ function ProductsForm({
           resetForm,
         }) => (
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={6} sm={4}>
+            <Grid container spacing={8}>
+              <Grid item xs={6} md={4}>
+                <div>
+                  <TextField
+                    select
+                    label="Main Category"
+                    value={formData.maincategory_id}
+                    name="maincategory_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                      if (e.target.value) {
+                        axios
+                          .get(`/categorieslist/${e.target.value}`)
+                          .then((res) => {
+                            const _categories = res.data.data.map(
+                              ({ id, name }) => ({
+                                id,
+                                name,
+                              })
+                            ); // Customize
+                            setCategories(_categories);
+                          })
+                          .catch(() => {
+                            alert("Failed to Fetch Categories List");
+                          });
+                      } else {
+                        setCategories(null);
+                      }
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.maincategory_id ||
+                      Boolean(touched.maincategory_id && errors.maincategory_id)
+                    }
+                    helperText="Please select a Main Category"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {mainCategories?.map((category) => (
+                      <option value={category.id}>
+                        {category.main_category_name}
+                      </option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.maincategory_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} md={4}>
+                <div>
+                  <TextField
+                    disabled={!formData.maincategory_id}
+                    select
+                    label="Category"
+                    value={formData.category_id}
+                    name="category_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                      if (e.target.value) {
+                        axios
+                          .get(`/part-categorieslist/${e.target.value}`)
+                          .then((res) => {
+                            const _partCategories = res.data.data.map(
+                              ({ id, category_name }) => ({
+                                id,
+                                category_name,
+                              })
+                            ); // Customize
+                            setPartCategories(_partCategories);
+                          })
+                          .catch(() => {
+                            alert("Failed to Fetch Part Categories List");
+                          });
+                      } else {
+                        setPartCategories(null);
+                      }
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    InputLabelProps={{ shrink: !!formData.category_id }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.category_id ||
+                      Boolean(touched.category_id && errors.category_id)
+                    }
+                    helperText="Please select a Category"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {categories?.map((category) => (
+                      <option value={category.id}>{category.name}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.category_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} md={4}>
+                <div>
+                  <TextField
+                    disabled={!partCategories}
+                    select
+                    label="Part Category"
+                    value={formData.part_category_id}
+                    name="part_category_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    InputLabelProps={{ shrink: !!formData.part_category_id }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.part_category_id ||
+                      Boolean(
+                        touched.part_category_id && errors.part_category_id
+                      )
+                    }
+                    helperText="Please select a Part Category"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {partCategories?.map((partCategory) => (
+                      <option value={partCategory.id}>
+                        {partCategory.category_name}
+                      </option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.part_category_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} sm={6}>
                 <div>
                   <TextField
                     name="name"
@@ -559,7 +791,7 @@ function ProductsForm({
                     id="name"
                     label="Product Name"
                     value={values.name}
-                    autoFocus
+                    // autoFocus
                     onChange={(e) => {
                       handleChange(e);
                       handleStateChange(e);
@@ -584,7 +816,7 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={6} sm={4}>
+              <Grid item xs={6} sm={6}>
                 <div>
                   <TextField
                     name="serial_number"
@@ -615,6 +847,130 @@ function ProductsForm({
                     </div>
                   ) : null}
                 </div>
+              </Grid>
+
+              <Grid item xs={6} md={6}>
+                <div>
+                  <TextField
+                    select
+                    label="Manufacturer"
+                    value={formData.manufacturer_id}
+                    name="manufacturer_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.manufacturer_id ||
+                      Boolean(touched.manufacturer_id && errors.manufacturer_id)
+                    }
+                    helperText="Please select a Manufacturer"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {manufacturers?.map((manufacturer) => (
+                      <option value={manufacturer.id}>
+                        {manufacturer.manufacturer_name}
+                      </option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.manufacturer_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} md={6}>
+                <div>
+                  <TextField
+                    select
+                    label="Country of Origin"
+                    value={formData.prodcountry_id}
+                    name="prodcountry_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.prodcountry_id ||
+                      Boolean(touched.prodcountry_id && errors.prodcountry_id)
+                    }
+                    helperText="Please select a Country"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {originCountries?.map((country) => (
+                      <option value={country.id}>{country.country_name}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.prodcountry_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={12}>
+                <div style={{ minWidth: "100%", maxWidth: "100%" }}>
+                  <TextField
+                    variant="outlined"
+                    name="description"
+                    required
+                    label="Description"
+                    multiline
+                    rows={5}
+                    rowsMax={8}
+                    value={formData.description}
+                    fullWidth
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.description ||
+                      Boolean(touched.description && errors.description)
+                    }
+                    helperText={touched.description && errors.description}
+                  />
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.description?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Divider my={1} />
               </Grid>
 
               <Grid item xs={6} sm={4}>
@@ -658,11 +1014,10 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={12}></Grid>
-
               {formData.producttype_id.toString() === "2" ||
               formData.producttype_id.toString() === "3" ? (
                 <>
+                  <Grid item xs={6} md={0}></Grid>
                   <Grid item xs={6} md={3}>
                     <div>
                       <NumberFormat
@@ -808,40 +1163,90 @@ function ProductsForm({
               ) : null}
 
               {formData.producttype_id ? (
-                <Grid item xs={4} md={2}>
+                <>
+                  <Grid item xs={4} md={2}>
+                    <div>
+                      <NumberFormat
+                        allowNegative={false}
+                        customInput={TextField}
+                        name="discount"
+                        fullWidth
+                        label="Discount"
+                        // prefix="%"
+                        value={formData.discount}
+                        onChange={(e) => {
+                          updateFormData({
+                            ...formData,
+                            discount: e.target.value
+                              ? parseFloat(e.target.value)
+                              : "",
+                          });
+                          handleChange(e);
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.discount ||
+                          Boolean(touched.discount && errors.discount)
+                        }
+                        helperText={
+                          (touched.discount && errors.discount) ||
+                          "Min 5% & Max 80%"
+                        }
+                        InputProps={{ inputProps: { min: 5 } }}
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.discount?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+                  <Grid item xs={2} md={7}></Grid>
+                </>
+              ) : null}
+
+              {formData.producttype_id.toString() !== "2" ? (
+                <Grid item xs={4} md={3}>
                   <div>
                     <NumberFormat
                       allowNegative={false}
                       customInput={TextField}
-                      name="discount"
+                      thousandSeparator={true}
+                      name="quantity"
+                      required
                       fullWidth
-                      label="Discount"
-                      // prefix="%"
-                      value={formData.discount}
-                      onChange={(e) => {
+                      label="Qunatity"
+                      value={formData.quantity}
+                      onValueChange={({ floatValue }) => {
                         updateFormData({
                           ...formData,
-                          discount: e.target.value
-                            ? parseFloat(e.target.value)
-                            : "",
+                          quantity: Math.round(floatValue),
                         });
-                        handleChange(e);
+                        values.quantity = Math.round(floatValue);
+                        if (floatValue >= 5) {
+                          errors.quantity = false;
+                        } else if (floatValue) {
+                          errors.quantity = "Minimum value should be 5";
+                        } else {
+                          errors.quantity = "This field is Required";
+                        }
                       }}
                       onBlur={handleBlur}
                       error={
-                        responseErrors?.discount ||
-                        Boolean(touched.discount && errors.discount)
+                        responseErrors?.quantity ||
+                        Boolean(touched.quantity && errors.quantity)
                       }
-                      helperText={
-                        (touched.discount && errors.discount) ||
-                        "Min 5% & Max 80%"
-                      }
-                      InputProps={{ inputProps: { min: 5 } }}
+                      helperText={touched.quantity && errors.quantity}
                     />
 
                     {responseErrors ? (
                       <div className={classes.inputMessage}>
-                        {responseErrors.discount?.map((msg) => (
+                        {responseErrors.quantity?.map((msg) => (
                           <span key={msg} className={classes.errorMsg}>
                             {msg}
                           </span>
@@ -851,54 +1256,6 @@ function ProductsForm({
                   </div>
                 </Grid>
               ) : null}
-
-              <Grid item xs={12}></Grid>
-
-              <Grid item xs={4} md={3}>
-                <div>
-                  <NumberFormat
-                    allowNegative={false}
-                    customInput={TextField}
-                    thousandSeparator={true}
-                    name="quantity"
-                    required
-                    fullWidth
-                    label="Qunatity"
-                    value={formData.quantity}
-                    onValueChange={({ floatValue }) => {
-                      updateFormData({
-                        ...formData,
-                        quantity: Math.round(floatValue),
-                      });
-                      values.quantity = Math.round(floatValue);
-                      if (floatValue >= 5) {
-                        errors.quantity = false;
-                      } else if (floatValue) {
-                        errors.quantity = "Minimum value should be 5";
-                      } else {
-                        errors.quantity = "This field is Required";
-                      }
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.quantity ||
-                      Boolean(touched.quantity && errors.quantity)
-                    }
-                    helperText={touched.quantity && errors.quantity}
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.quantity?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
               <Grid item xs={4} md={3}>
                 <div>
                   <NumberFormat
@@ -944,176 +1301,8 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    label="Main Category"
-                    value={formData.maincategory_id}
-                    name="maincategory_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                      if (e.target.value) {
-                        axios
-                          .get(`/categorieslist/${e.target.value}`)
-                          .then((res) => {
-                            const _categories = res.data.data.map(
-                              ({ id, name }) => ({
-                                id,
-                                name,
-                              })
-                            ); // Customize
-                            setCategories(_categories);
-                          })
-                          .catch(() => {
-                            alert("Failed to Fetch Categories List");
-                          });
-                      } else {
-                        setCategories(null);
-                      }
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.maincategory_id ||
-                      Boolean(touched.maincategory_id && errors.maincategory_id)
-                    }
-                    helperText="Please select a Main Category"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {mainCategories?.map((category) => (
-                      <option value={category.id}>
-                        {category.main_category_name}
-                      </option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.maincategory_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    disabled={!formData.maincategory_id}
-                    select
-                    label="Category"
-                    value={formData.category_id}
-                    name="category_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                      if (e.target.value) {
-                        axios
-                          .get(`/part-categorieslist/${e.target.value}`)
-                          .then((res) => {
-                            const _partCategories = res.data.data.map(
-                              ({ id, category_name }) => ({
-                                id,
-                                category_name,
-                              })
-                            ); // Customize
-                            setPartCategories(_partCategories);
-                          })
-                          .catch(() => {
-                            alert("Failed to Fetch Part Categories List");
-                          });
-                      } else {
-                        setPartCategories(null);
-                      }
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    InputLabelProps={{ shrink: !!formData.category_id }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.category_id ||
-                      Boolean(touched.category_id && errors.category_id)
-                    }
-                    helperText="Please select a Category"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {categories?.map((category) => (
-                      <option value={category.id}>{category.name}</option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.category_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    disabled={!partCategories}
-                    select
-                    label="Part Category"
-                    value={formData.part_category_id}
-                    name="part_category_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    InputLabelProps={{ shrink: !!formData.part_category_id }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.part_category_id ||
-                      Boolean(
-                        touched.part_category_id && errors.part_category_id
-                      )
-                    }
-                    helperText="Please select a Part Category"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {partCategories?.map((partCategory) => (
-                      <option value={partCategory.id}>
-                        {partCategory.category_name}
-                      </option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.part_category_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
               {formData.category_id &&
+              formData.category_id != "43" &&
               formData.category_id != "81" &&
               formData.category_id != "82" &&
               formData.category_id != "83" &&
@@ -1387,90 +1576,6 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    label="Manufacturer"
-                    value={formData.manufacturer_id}
-                    name="manufacturer_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.manufacturer_id ||
-                      Boolean(touched.manufacturer_id && errors.manufacturer_id)
-                    }
-                    helperText="Please select a Manufacturer"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {manufacturers?.map((manufacturer) => (
-                      <option value={manufacturer.id}>
-                        {manufacturer.manufacturer_name}
-                      </option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.manufacturer_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    label="Country of Origin"
-                    value={formData.prodcountry_id}
-                    name="prodcountry_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.prodcountry_id ||
-                      Boolean(touched.prodcountry_id && errors.prodcountry_id)
-                    }
-                    helperText="Please select a Country"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {originCountries?.map((country) => (
-                      <option value={country.id}>{country.country_name}</option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.prodcountry_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
               {formData.category_id &&
               formData.category_id != "81" &&
               formData.category_id != "82" &&
@@ -1625,40 +1730,6 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={12}>
-                <div style={{ minWidth: "100%", maxWidth: "100%" }}>
-                  <TextField
-                    name="description"
-                    required
-                    label="Description"
-                    multiline
-                    rowsMax={8}
-                    value={formData.description}
-                    fullWidth
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.description ||
-                      Boolean(touched.description && errors.description)
-                    }
-                    helperText={touched.description && errors.description}
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.description?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
               <Grid item xs={12} lg={2}>
                 <input
                   ref={uploadRef}
@@ -1760,7 +1831,7 @@ function ProductsForm({
             ) : null}
             <Grid container justify="center">
               <Button
-                className={classes.button}
+                className={classes.submitButton}
                 type="submit"
                 variant="contained"
                 color="primary"
@@ -1769,8 +1840,9 @@ function ProductsForm({
                 Submit
               </Button>
               <Button
-                className={classes.button}
+                className={classes.resetButton}
                 variant="contained"
+                startIcon={<RotateLeft />}
                 disabled={isSubmitting} // Update on other components
                 onClick={() => {
                   handleReset();
@@ -1787,6 +1859,12 @@ function ProductsForm({
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

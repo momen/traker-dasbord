@@ -547,6 +547,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                     formData={formData}
                     updateFormData={updateFormData}
                     setLocationNotSelected={setLocationNotSelected}
+                    showSearch={true}
                   />
                 </div>
               </Grid>
