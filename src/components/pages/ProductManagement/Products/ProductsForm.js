@@ -6,9 +6,13 @@ import {
   Collapse,
   Divider as MuiDivider,
   FormControl,
+  FormControlLabel,
+  FormHelperText,
   Grid,
   IconButton,
   makeStyles,
+  Radio,
+  RadioGroup,
   styled,
   TextField,
 } from "@material-ui/core";
@@ -194,6 +198,7 @@ function ProductsForm({
         : Yup.string().nullable().notRequired(),
     car_made_id:
       formData.category_id &&
+      formData.category_id != "43" &&
       formData.category_id != "81" &&
       formData.category_id != "82" &&
       formData.category_id != "83" &&
@@ -203,6 +208,7 @@ function ProductsForm({
         : Yup.string().nullable().notRequired(),
     year_from:
       formData.category_id &&
+      formData.category_id != "43" &&
       formData.category_id != "81" &&
       formData.category_id != "82" &&
       formData.category_id != "83" &&
@@ -212,6 +218,7 @@ function ProductsForm({
         : Yup.string().nullable().notRequired(),
     year_to:
       formData.category_id &&
+      formData.category_id != "43" &&
       formData.category_id != "81" &&
       formData.category_id != "82" &&
       formData.category_id != "83" &&
@@ -220,8 +227,11 @@ function ProductsForm({
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     discount: Yup.number()
-      .min(5, "Minimum value for discount is 5%")
+      .min(1, "Minimum value for discount is 0%")
       .max(80, "Maximum value for discount is 80%"),
+    discount_value: Yup.number()
+      .min(1, "Minimum value for discount is 0%")
+      .max(formData.price * 0.8, "Maximum value for discount is 80%"),
     price:
       formData.producttype_id.toString() === "1" ||
       formData.producttype_id.toString() === "3"
@@ -236,6 +246,7 @@ function ProductsForm({
     prodcountry_id: Yup.string().required(),
     transmission_id:
       formData.category_id &&
+      formData.category_id != "43" &&
       formData.category_id != "81" &&
       formData.category_id != "82" &&
       formData.category_id != "83" &&
@@ -245,6 +256,7 @@ function ProductsForm({
         : Yup.string().nullable().notRequired(),
     cartype_id:
       formData.category_id &&
+      formData.category_id != "43" &&
       formData.category_id != "81" &&
       formData.category_id != "82" &&
       formData.category_id != "83" &&
@@ -285,7 +297,11 @@ function ProductsForm({
 
   const [productImages, setProductImages] = useState(() =>
     itemToEdit
-      ? itemToEdit.photo.map(({ id, file_name }) => ({ id, file_name }))
+      ? itemToEdit.photo.map(({ id, file_name, image }) => ({
+          id,
+          file_name,
+          image,
+        }))
       : null
   );
 
@@ -373,6 +389,7 @@ function ProductsForm({
     if (
       formData.models.length === 0 &&
       formData.category_id &&
+      formData.category_id != "43" &&
       formData.category_id != "81" &&
       formData.category_id != "82" &&
       formData.category_id != "83" &&
@@ -595,6 +612,12 @@ function ProductsForm({
     setOpenAlert(false);
     setBigImgSize(false);
   };
+
+  const vendorTypes = [
+    { id: "2", title: "Wholesale" },
+    { id: "1", title: "Retail" },
+    { id: "3", title: "Both" },
+  ];
   return (
     <div className={classes.paper}>
       <Formik
@@ -608,6 +631,7 @@ function ProductsForm({
           handleChange,
           handleBlur,
           touched,
+          setFieldValue,
           values,
           resetForm,
         }) => (
@@ -973,8 +997,8 @@ function ProductsForm({
                 <Divider my={1} />
               </Grid>
 
-              <Grid item xs={6} sm={4}>
-                <div>
+              <Grid item xs={12}>
+                {/* <div>
                   <TextField
                     select
                     label="Product Type"
@@ -1011,13 +1035,65 @@ function ProductsForm({
                       ))}
                     </div>
                   ) : null}
-                </div>
+                </div> */}
+
+                <b>
+                  {" "}
+                  <p className={classes.inputLabel}>Product Type</p>
+                </b>
+                <FormControl component="fieldset">
+                  {/* <FormLabel component="legend">Gender</FormLabel> */}
+                  <RadioGroup
+                    aria-label="vendor-type"
+                    name="producttype_id"
+                    value={formData.producttype_id}
+                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      handleChange(e);
+                      updateFormData({
+                        ...formData,
+                        producttype_id: e.target.value,
+                      });
+                    }}
+                  >
+                    <div style={{ display: "flex" }}>
+                      {vendorTypes?.map((type) => (
+                        <FormControlLabel
+                          key={`vendor-type-${type.id}`}
+                          // style={{ marginLeft: "30px" }}
+                          value={type.id}
+                          control={
+                            <Radio
+                              style={{
+                                alignSelf: "flex-start",
+                                color: "#424242",
+                              }}
+                              checked={formData.producttype_id === type.id}
+                            />
+                          }
+                          //   style={{ padding: 0 }}
+                          label={
+                            <span className={classes.radioLabel}>
+                              {type.title}
+                            </span>
+                          }
+                        />
+                      ))}
+                    </div>
+                  </RadioGroup>
+                  {Boolean(touched.producttype_id && errors.producttype_id) ||
+                  responseErrors.producttype_id ? (
+                    <FormHelperText className={classes.error}>
+                      {(touched.producttype_id && errors.producttype_id) ||
+                        responseErrors.producttype_id}
+                    </FormHelperText>
+                  ) : null}
+                </FormControl>
               </Grid>
 
               {formData.producttype_id.toString() === "2" ||
               formData.producttype_id.toString() === "3" ? (
                 <>
-                  <Grid item xs={6} md={0}></Grid>
                   <Grid item xs={6} md={3}>
                     <div>
                       <NumberFormat
@@ -1167,6 +1243,7 @@ function ProductsForm({
                   <Grid item xs={4} md={2}>
                     <div>
                       <NumberFormat
+                        disabled={!formData.price}
                         allowNegative={false}
                         customInput={TextField}
                         name="discount"
@@ -1190,7 +1267,7 @@ function ProductsForm({
                         }
                         helperText={
                           (touched.discount && errors.discount) ||
-                          "Min 5% & Max 80%"
+                          "Min 1% & Max 80%"
                         }
                         InputProps={{ inputProps: { min: 5 } }}
                       />
@@ -1206,8 +1283,64 @@ function ProductsForm({
                       ) : null}
                     </div>
                   </Grid>
-                  <Grid item xs={2} md={7}></Grid>
+
+                  <Grid item xs={4} md={2}>
+                    <div>
+                      <NumberFormat
+                        disabled={!formData.price}
+                        allowNegative={false}
+                        customInput={TextField}
+                        name="discount_value"
+                        fullWidth
+                        label="Discount"
+                        // prefix="%"
+                        // value={formData.discount}
+                        onChange={(e) => {
+                          updateFormData({
+                            ...formData,
+                            discount: e.target.value
+                              ? parseFloat(
+                                  (e.target.value / formData.price) * 100
+                                )
+                              : "",
+                          });
+                          setFieldValue("discount", e.target.value);
+                          if (!touched.discount) {
+                            touched.discount = true;
+                          }
+                          handleChange(e);
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.discount ||
+                          Boolean(
+                            touched.discount_value && errors.discount_value
+                          )
+                        }
+                        helperText={
+                          (touched.discount_value && errors.discount_value) ||
+                          "Min 1% & Max 80%"
+                        }
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.discount?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
                 </>
+              ) : null}
+
+              {formData.producttype_id.toString() === "1" ? (
+                <Grid item xs={5}></Grid>
+              ) : formData.producttype_id.toString() === "2" ? (
+                <Grid item xs={3}></Grid>
               ) : null}
 
               {formData.producttype_id.toString() !== "2" ? (
@@ -1301,6 +1434,53 @@ function ProductsForm({
                 </div>
               </Grid>
 
+              <Grid item xs={6} md={3}>
+                <div>
+                  <TextField
+                    select
+                    label="Store"
+                    value={formData.store_id}
+                    name="store_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.store_id ||
+                      Boolean(touched.store_id && errors.store_id)
+                    }
+                    helperText="Please select a Store"
+                    fullWidth
+                  >
+                    <option aria-label="None" value="" />
+                    {stores?.map((store) => (
+                      <option value={store.id}>{store.name}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.store_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              {formData.producttype_id.toString() === "2" ? (
+                <Grid item xs={6}></Grid>
+              ) : formData.producttype_id.toString() === "1" ||
+                formData.producttype_id.toString() === "3" ? (
+                <Grid item xs={3}></Grid>
+              ) : null}
+
               {formData.category_id &&
               formData.category_id != "43" &&
               formData.category_id != "81" &&
@@ -1376,7 +1556,7 @@ function ProductsForm({
                     </div>
                   </Grid>
 
-                  <Grid item xs={9} md={6}>
+                  <Grid item xs={9} md={9}>
                     <div>
                       <Autocomplete
                         disabled={!formData.car_made_id}
@@ -1536,47 +1716,8 @@ function ProductsForm({
 
               {/****************************** ******************************/}
 
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    label="Store"
-                    value={formData.store_id}
-                    name="store_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.store_id ||
-                      Boolean(touched.store_id && errors.store_id)
-                    }
-                    helperText="Please select a Store"
-                    fullWidth
-                  >
-                    <option aria-label="None" value="" />
-                    {stores?.map((store) => (
-                      <option value={store.id}>{store.name}</option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.store_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
               {formData.category_id &&
+              formData.category_id != "43" &&
               formData.category_id != "81" &&
               formData.category_id != "82" &&
               formData.category_id != "83" &&
@@ -1754,7 +1895,7 @@ function ProductsForm({
               </Grid>
 
               <Grid item xs>
-                {productImages?.map((img) => {
+                {productImages?.map((img, index) => {
                   // console.log(imagesToDelete);
                   return (
                     <Chip
@@ -1765,9 +1906,10 @@ function ProductsForm({
                       variant="outlined"
                       color={img.deleted ? "secondary" : "primary"}
                     />
+                    // <img src={img.image} alt={`img-${index}`} />
                   );
                 })}
-                {formData.photo?.map((img) => (
+                {formData.photo?.map((img, index) => (
                   <Chip
                     className={classes.chip}
                     // icon={<FaceIcon/>}
@@ -1775,6 +1917,7 @@ function ProductsForm({
                     onDelete={() => handleDeleteImage(img.name)}
                     variant="outlined"
                   />
+                  // <img src={img.image} alt={`img-${index}`} />
                 ))}
               </Grid>
 

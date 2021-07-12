@@ -613,7 +613,7 @@ function Products() {
       <Typography variant="h3" gutterBottom display="inline">
         {pageHeader}
       </Typography>
-      <Divider my={3} />
+      <Divider my={6} />
 
       {viewMode === "data-grid" ? (
         <Card mb={6}>

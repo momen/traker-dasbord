@@ -100,12 +100,28 @@ function ViewInvoice({ match }) {
                 {invoices.order_number}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`vendor-id${invoices.vendor_id}`}>
+            <StyledTableRow key={`username-${invoices.user_name}`}>
               <StyledTableCell component="th" scope="row">
-                Vendor ID
+                Username
               </StyledTableCell>
               <StyledTableCell align="left">
-                {invoices.vendor_id}
+                {invoices.user_name}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`username-phone`}>
+              <StyledTableCell component="th" scope="row">
+                Phone Number
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {invoices.user_address?.recipient_phone}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`user-address`}>
+              <StyledTableCell component="th" scope="row">
+                Address
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {`${invoices.user_address?.home_no}, ${invoices.user_address?.street}, ${invoices.user_address?.district} - ${invoices.user_address?.city} - ${invoices.user_address?.state}`}
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`vendor-name${invoices.vendor_name}`}>
@@ -116,14 +132,7 @@ function ViewInvoice({ match }) {
                 {invoices.vendor_name}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`vendor-email${invoices.vendor_email}`}>
-              <StyledTableCell component="th" scope="row">
-                Vendor Email
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {invoices.vendor_email}
-              </StyledTableCell>
-            </StyledTableRow>
+
             <StyledTableRow key={`invoice-number${invoices.invoice_number}`}>
               <StyledTableCell component="th" scope="row">
                 Invoice Number
@@ -144,9 +153,7 @@ function ViewInvoice({ match }) {
               <StyledTableCell component="th" scope="row">
                 Status
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {invoices.status}
-              </StyledTableCell>
+              <StyledTableCell align="left">{invoices.status}</StyledTableCell>
             </StyledTableRow>
           </TableBody>
         </Table>
