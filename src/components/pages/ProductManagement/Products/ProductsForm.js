@@ -156,6 +156,11 @@ function ProductsForm({
     photo: [],
   });
 
+  const [carModels, setCarModels] = useState(null);
+  const [categories, setCategories] = useState(null);
+  const [partCategories, setPartCategories] = useState(null);
+  const [toYears, setToYears] = useState([]);
+
   const validationSchema = Yup.object().shape({
     name: Yup.string()
       .required("This field is Required")
@@ -247,7 +252,9 @@ function ProductsForm({
         : Yup.string().nullable().notRequired(),
     maincategory_id: Yup.string().required(),
     category_id: Yup.string().required(),
-    part_category_id: Yup.string().required(),
+    part_category_id: partCategories?.length
+      ? Yup.string().required()
+      : Yup.string().nullable().notRequired(),
     manufacturer_id: Yup.string().required(),
     prodcountry_id: Yup.string().required(),
     transmission_id:
@@ -297,11 +304,6 @@ function ProductsForm({
       .min(5, "Description must be at least 5 characters")
       .max(255, "Description must not exceed 255 characters"),
   });
-
-  const [carModels, setCarModels] = useState(null);
-  const [categories, setCategories] = useState(null);
-  const [partCategories, setPartCategories] = useState(null);
-  const [toYears, setToYears] = useState([]);
 
   const [enableDiscount, setEnableDiscount] = useState(false);
 

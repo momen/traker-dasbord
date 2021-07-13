@@ -162,6 +162,9 @@ function Tags() {
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Tags List");
+  const [viewMode, setViewMode] = useState("data-grid");
+
   // Customize
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
@@ -203,8 +206,8 @@ function Tags() {
                 // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit Tag");
+                  setViewMode("edit");
+                    setPageHeader("Edit Tag");
                 }}
               >
                 Edit
@@ -327,7 +330,7 @@ function Tags() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Tags List
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />

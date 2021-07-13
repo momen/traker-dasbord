@@ -31,7 +31,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Delete, Search, UnfoldLess } from "@material-ui/icons";
+import { Delete, Search, UnfoldLess, ExpandMore, ArrowBack } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import UsersForm from "./UsersForm";
@@ -44,9 +44,16 @@ const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+  },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
   },
   button: {
     height: 40,
@@ -60,6 +67,21 @@ const useStyles = makeStyles({
       color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  backBtn: {
+    width: "fit-content",
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
+  backIcon: {
+    marginRight: theme.direction === "rtl" ? 0 : 5,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
   },
   roleBadge: {
     background: "#FFBF00",
@@ -86,22 +108,49 @@ const useStyles = makeStyles({
       borderBottom: "1px solid #7B7B7B",
     },
   },
-});
+}));
 
 function CustomPagination(props) {
   const { state, api } = props;
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
+      </Select>
+    </div>
   );
 }
 
@@ -151,6 +200,9 @@ function Users() {
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
+
+  const [pageHeader, setPageHeader] = useState("Staff");
+  const [viewMode, setViewMode] = useState("data-grid");
 
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
@@ -231,8 +283,8 @@ function Users() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {
@@ -411,95 +463,122 @@ function Users() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Staff
+        {pageHeader}
       </Typography>
       <Divider my={6} />
-      <Card mb={6}>
-        <Paper mb={2}>
-          <Toolbar className={classes.toolBar}>
-            <div style={{ display: "flex", alignItems: "flex-end" }}>
-              {userPermissions.includes("vendor_add_staff") ? (
-                <Button
-                  data-test="users-create-btn"
-                  className={classes.button}
-                  variant="contained"
-                  onClick={() => {
-                    setSelectedItem("");
-                    setOpenPopup(true);
-                    setOpenPopupTitle("New User");
-                  }}
-                >
-                  Add User
-                </Button>
-              ) : null}
+      {viewMode === "data-grid" ? (
+        <Card mb={6}>
+          <Paper mb={2}>
+            <Toolbar className={classes.toolBar}>
+              <div style={{ display: "flex", alignItems: "flex-end" }}>
+                {userPermissions.includes("vendor_add_staff") ? (
+                  <Button
+                    data-test="users-create-btn"
+                    className={classes.button}
+                    variant="contained"
+                    onClick={() => {
+                      setSelectedItem("");
+                      setViewMode("add");
+                      setPageHeader("New User");
+                    }}
+                  >
+                    Add User
+                  </Button>
+                ) : null}
 
-              {userPermissions.includes("user_delete_by_vendor") ? (
-                <Button
-                  startIcon={<Delete />}
-                  color="secondary"
-                  variant="contained"
-                  disabled={rowsToDelete.length < 2}
-                  onClick={() => {
-                    setOpenMassDeleteDialog(true);
-                  }}
-                  style={{ height: 40, borderRadius: 0 }}
-                >
-                  Delete Selected
-                </Button>
-              ) : null}
-            </div>
+                {userPermissions.includes("user_delete_by_vendor") ? (
+                  <Button
+                    startIcon={<Delete />}
+                    color="secondary"
+                    variant="contained"
+                    disabled={rowsToDelete.length < 2}
+                    onClick={() => {
+                      setOpenMassDeleteDialog(true);
+                    }}
+                    style={{ height: 40, borderRadius: 0 }}
+                  >
+                    Delete Selected
+                  </Button>
+                ) : null}
+              </div>
 
-            <div>
-              <Grid container spacing={1} alignItems="flex-end">
-                <Grid item>
-                  <Search />
+              <div>
+                <Grid container spacing={1} alignItems="flex-end">
+                  <Grid item>
+                    <Search />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="input-with-icon-grid"
+                      label="Search"
+                      onChange={handleSearchInput}
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <TextField
-                    id="input-with-icon-grid"
-                    label="Search"
-                    onChange={handleSearchInput}
-                  />
-                </Grid>
-              </Grid>
+              </div>
+            </Toolbar>
+          </Paper>
+          <Paper>
+            <div style={{ width: "100%" }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                page={page}
+                pageSize={pageSize}
+                rowCount={rowsCount}
+                sortingOrder={["desc", "asc"]}
+                sortModel={sortModel}
+                columnBuffer={pageSize}
+                paginationMode="server"
+                sortingMode="server"
+                components={{
+                  Pagination: CustomPagination,
+                  LoadingOverlay: CustomLoadingOverlay,
+                }}
+                loading={loading}
+                checkboxSelection
+                disableColumnMenu
+                autoHeight={true}
+                onRowClick={
+                  userPermissions.includes("user_show_by_vendor")
+                    ? ({ row }) =>
+                        history.push(`/user-mgt/vendor-users/${row.id}`)
+                    : null
+                }
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSize}
+                onSortModelChange={handleSortModelChange}
+                onSelectionChange={(newSelection) => {
+                  setRowsToDelete(newSelection.rowIds);
+                }}
+              />
             </div>
-          </Toolbar>
-        </Paper>
-        <Paper>
-          <div style={{ width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              page={page}
-              pageSize={pageSize}
-              rowCount={rowsCount}
-              sortingOrder={["desc", "asc"]}
-              sortModel={sortModel}
-              columnBuffer={pageSize}
-              paginationMode="server"
-              sortingMode="server"
-              components={{
-                Pagination: CustomPagination,
-                LoadingOverlay: CustomLoadingOverlay,
-              }}
-              loading={loading}
-              checkboxSelection
-              disableColumnMenu
-              autoHeight={true}
-              onRowClick={
-                userPermissions.includes("user_show_by_vendor")
-                  ? ({ row }) => history.push(`/user-mgt/vendor-users/${row.id}`)
-                  : null
-              }
-              onPageChange={handlePageChange}
-              onSortModelChange={handleSortModelChange}
-              onSelectionChange={(newSelection) => {
-                setRowsToDelete(newSelection.rowIds);
-              }}
-            />
+          </Paper>
+        </Card>
+      ) : (
+        <Card mb={6} style={{ padding: "50px 60px" }}>
+          <div
+            className={classes.backBtn}
+            onClick={() => {
+              setViewMode("data-grid");
+              setPageHeader("Staff");
+            }}
+          >
+            <ArrowBack className={classes.backIcon} />
+            <span>Back</span>
           </div>
-        </Paper>
-      </Card>
+
+          <Divider my={3} />
+          <UsersForm
+            setPage={setPage}
+            setOpenPopup={setOpenPopup}
+            rolesList={rolesList}
+            stores={stores}
+            setViewMode={setViewMode}
+            setPageHeader={setPageHeader}
+          />
+        </Card>
+      )}
       <Popup
         title={openPopupTitle}
         openPopup={openPopup}

@@ -165,6 +165,9 @@ function CarYear() {
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Years List");
+  const [viewMode, setViewMode] = useState("data-grid");
+
   // Customize
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
@@ -208,8 +211,8 @@ function CarYear() {
                 // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Change Car Year");
+                  setViewMode("edit");
+                  setPageHeader("Change Car Year");
                 }}
               >
                 Edit
@@ -363,7 +366,7 @@ function CarYear() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Years List
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />

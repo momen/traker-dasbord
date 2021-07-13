@@ -175,6 +175,9 @@ function PartCategory() {
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Part Categories");
+  const [viewMode, setViewMode] = useState("data-grid");
+
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
     {
@@ -239,10 +242,8 @@ function PartCategory() {
                 // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle(
-                    "Edit Part Category"
-                  ); /****** Customize ******/
+                  setViewMode("edit");
+                  setPageHeader("Edit Part Category");
                 }}
               >
                 Edit
@@ -255,7 +256,7 @@ function PartCategory() {
                 startIcon={<Delete />}
                 color="secondary"
                 variant="contained"
-              // size="small"
+                // size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
@@ -411,7 +412,7 @@ function PartCategory() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Part Categories
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />
@@ -425,9 +426,9 @@ function PartCategory() {
                   className={classes.button}
                   variant="contained"
                   onClick={() => {
-                    setOpenPopupTitle("New Category");
-                    setOpenPopup(true);
                     setSelectedItem("");
+                    setViewMode("add");
+                    setPageHeader("New Part Category");
                   }}
                   startIcon={<Add />}
                 >
@@ -490,7 +491,8 @@ function PartCategory() {
               autoHeight={true}
               onRowClick={
                 userPermissions.includes("part_category_show")
-                  ? ({ row }) => history.push(`/product/part-category/${row.id}`)
+                  ? ({ row }) =>
+                      history.push(`/product/part-category/${row.id}`)
                   : null
               }
               onPageChange={handlePageChange}

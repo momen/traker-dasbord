@@ -188,7 +188,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
           resetForm,
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
+            <Grid container spacing={8}>
               <Grid item xs={4}>
                 <div>
                   <TextField
@@ -222,6 +222,8 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                   ) : null}
                 </div>
               </Grid>
+
+              <Grid item xs={8}></Grid>
 
               <Grid item xs={4}>
                 <div>
@@ -303,6 +305,8 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                   ) : null}
                 </div>
               </Grid>
+
+              <Grid item xs={4}></Grid>
 
               <Grid item xs={4}>
                 <TextField
@@ -491,7 +495,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                 </TextField>
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid item xs={12} style={{ marginTop: -32 }}>
                 <div>
                   <TextField
                     name="address"
@@ -524,11 +528,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                 </div>
               </Grid>
 
-              <Grid item>
-                <label htmlFor="stores-map" style={{ marginTop: "10px" }}>
-                  Select your store location
-                </label>
-              </Grid>
+              {/* <Grid item></Grid> */}
 
               <Grid
                 item
@@ -539,7 +539,19 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                   marginBottom: "10px",
                 }}
               >
-                <div style={{ height: "60vh" }}>
+                <label
+                  htmlFor="stores-map"
+                  style={{ marginTop: "10px", fontWeight: "bold" }}
+                >
+                  Select your store location
+                </label>
+                <div
+                  style={{
+                    height: "50vh",
+                    marginTop: "10px",
+                    position: "relative",
+                  }}
+                >
                   <Map
                     id="stores-map"
                     lattitude={formData.lat ? parseFloat(formData.lat) : null}

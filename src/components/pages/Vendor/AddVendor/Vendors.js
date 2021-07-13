@@ -66,6 +66,21 @@ const useStyles = makeStyles((theme) => ({
     },
     marginRight: "5px",
   },
+  backBtn: {
+    width: "fit-content",
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
+  backIcon: {
+    marginRight: theme.direction === "rtl" ? 0 : 5,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
+  },
   actionBtn: {
     padding: 5,
     color: "#CCCCCC",
@@ -175,6 +190,9 @@ function Vendors() {
 
   const [openApproveDialog, setOpenApproveDialog] = useState(false);
   const [vendorToApprove, setVendorToApprove] = useState();
+
+  const [pageHeader, setPageHeader] = useState("Vendors");
+  const [viewMode, setViewMode] = useState("data-grid");
 
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
@@ -484,7 +502,7 @@ function Vendors() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Vendors
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />

@@ -232,7 +232,12 @@ function Products() {
     { field: "id", headerName: "ID", width: 45 },
     { field: "name", headerName: "Name", width: 80 },
     { field: "serial_number", headerName: "Serial Number", width: 100 },
-    { field: "serial_coding", headerName: "Serial Encoding", width: 100 },
+    {
+      field: "store_name",
+      headerName: "Store",
+      width: 100,
+      renderCell: (params) => params.row.store?.name,
+    },
     { field: "quantity", headerName: "Quantity", width: 70 },
     {
       field: "product_type",
@@ -574,6 +579,7 @@ function Products() {
   // or whenever the page changes (Pagination)
   useEffect(() => {
     if (openPopup) return;
+    if (viewMode !== "data-grid") return;
     setLoading(true);
     if (!userIsSearching) {
       axios
@@ -606,7 +612,7 @@ function Products() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode]);
 
   return (
     <React.Fragment>

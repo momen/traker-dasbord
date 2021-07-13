@@ -1,12 +1,19 @@
 import React from "react";
-import { Button, Dialog, DialogContent, DialogTitle, makeStyles, Typography } from "@material-ui/core";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  makeStyles,
+  Typography,
+} from "@material-ui/core";
 import { Close } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   dialogWrapper: {
     padding: theme.spacing(1),
     position: "absolute",
-    top: theme.spacing(5),
+    top: theme.spacing(30),
   },
   dialogTitle: {
     padding: "6px",
@@ -14,11 +21,19 @@ const useStyles = makeStyles((theme) => ({
   dialogContent: {
     marginTop: theme.spacing(1),
   },
+  closeIcon: {
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
 }));
 
 function Popup({ title, children, openPopup, setOpenPopup }) {
-    const classes = useStyles();
-    
+  const classes = useStyles();
+
   return (
     <Dialog
       open={openPopup}
@@ -27,17 +42,14 @@ function Popup({ title, children, openPopup, setOpenPopup }) {
     >
       <DialogTitle>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <Typography variant="h6" component="div" style={{ flexGrow: 1}}>
+          <Typography variant="h6" component="div" style={{ flexGrow: 1 }}>
             {title}
           </Typography>
-          <Button
-            className={classes.dialogTitle}
-            // variant="contained"
-            color="secondary"
+
+          <Close
+            className={classes.closeIcon}
             onClick={() => setOpenPopup(false)}
-          >
-            <Close />
-          </Button>
+          />
         </div>
       </DialogTitle>
       <DialogContent dividers>{children}</DialogContent>

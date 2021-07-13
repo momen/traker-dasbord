@@ -326,6 +326,14 @@ const productManagementRoutes = {
       permission: "product_category_access",
     },
     {
+      path: "/product/part-category",
+      name: "Part Category",
+      component: PartCategory,
+      icon: <Category />,
+      guard: PermissionGuard,
+      permission: "part_category_access",
+    },
+    {
       path: "/product/brands",
       name: "Brand",
       component: Brand,
@@ -341,14 +349,7 @@ const productManagementRoutes = {
       guard: PermissionGuard,
       permission: "car_model_access",
     },
-    {
-      path: "/product/part-category",
-      name: "Part Category",
-      component: PartCategory,
-      icon: <Category />,
-      guard: PermissionGuard,
-      permission: "part_category_access",
-    },
+
     {
       path: "/product/car-year",
       name: "Car Year",

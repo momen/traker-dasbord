@@ -176,6 +176,9 @@ function Categories() {
 
   const [mainCategories, setMainCategories] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Categories");
+  const [viewMode, setViewMode] = useState("data-grid");
+
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
     { field: "name", headerName: "Name", width: 150 },
@@ -236,8 +239,8 @@ function Categories() {
                 // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit Category"); /****** Customize ******/
+                  setViewMode("edit");
+                  setPageHeader("Edit Category");
                 }}
               >
                 Edit
@@ -408,7 +411,7 @@ function Categories() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Categories
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />
@@ -422,8 +425,8 @@ function Categories() {
                   className={classes.button}
                   variant="contained"
                   onClick={() => {
-                    setOpenPopupTitle("New Category");
-                    setOpenPopup(true);
+                    setViewMode("add");
+                    setPageHeader("New Category");
                     setSelectedItem("");
                   }}
                   startIcon={<Add />}

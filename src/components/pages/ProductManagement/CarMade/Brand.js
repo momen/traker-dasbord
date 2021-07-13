@@ -169,6 +169,9 @@ function CarMade() {
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Brands List");
+  const [viewMode, setViewMode] = useState("data-grid");
+
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "car_made", headerName: "Brand Name", width: 200, flex: 1 },
@@ -224,8 +227,8 @@ function CarMade() {
                 variant="contained"
                 onClick={() => {
                   setCarMade(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit Brand");
+                  setViewMode("edit");
+                  setPageHeader("Edit Brand");
                 }}
               >
                 Edit
@@ -396,7 +399,7 @@ function CarMade() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Brands List
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />
@@ -419,8 +422,8 @@ function CarMade() {
                   variant="contained"
                   onClick={() => {
                     setOpenPopup(true);
-                    setCarMade("");
-                    setOpenPopupTitle("New Brand");
+                    setViewMode("add");
+                    setPageHeader("New Brand");
                   }}
                   startIcon={<Add />}
                 >
