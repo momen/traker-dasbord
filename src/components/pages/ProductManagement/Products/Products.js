@@ -75,11 +75,12 @@ const useStyles = makeStyles((theme) => ({
     marginRight: "5px",
   },
   backBtn: {
+    width: "fit-content",
     display: "flex",
     alignItems: "center",
     cursor: "pointer",
     color: "#424242",
-    fontWeight:'bold',
+    fontWeight: "bold",
     "&:hover": {
       color: "#7B7B7B",
     },

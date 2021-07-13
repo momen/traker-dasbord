@@ -203,7 +203,9 @@ function ProductsForm({
       formData.category_id != "82" &&
       formData.category_id != "83" &&
       formData.category_id != "84" &&
-      formData.category_id != "85"
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     year_from:
@@ -213,7 +215,9 @@ function ProductsForm({
       formData.category_id != "82" &&
       formData.category_id != "83" &&
       formData.category_id != "84" &&
-      formData.category_id != "85"
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     year_to:
@@ -223,7 +227,9 @@ function ProductsForm({
       formData.category_id != "82" &&
       formData.category_id != "83" &&
       formData.category_id != "84" &&
-      formData.category_id != "85"
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     discount: Yup.number()
@@ -251,7 +257,9 @@ function ProductsForm({
       formData.category_id != "82" &&
       formData.category_id != "83" &&
       formData.category_id != "84" &&
-      formData.category_id != "85"
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     cartype_id:
@@ -261,7 +269,9 @@ function ProductsForm({
       formData.category_id != "82" &&
       formData.category_id != "83" &&
       formData.category_id != "84" &&
-      formData.category_id != "85"
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     store_id: Yup.string().required(),
@@ -292,6 +302,8 @@ function ProductsForm({
   const [categories, setCategories] = useState(null);
   const [partCategories, setPartCategories] = useState(null);
   const [toYears, setToYears] = useState([]);
+
+  const [enableDiscount, setEnableDiscount] = useState(false);
 
   const [imagesToDelete, setImagesToDelete] = useState("");
 
@@ -385,6 +397,10 @@ function ProductsForm({
     }
   }, []);
 
+  const toggleDiscount = () => {
+    setEnableDiscount(!enableDiscount);
+  };
+
   const handleSubmit = async () => {
     if (
       formData.models.length === 0 &&
@@ -394,7 +410,9 @@ function ProductsForm({
       formData.category_id != "82" &&
       formData.category_id != "83" &&
       formData.category_id != "84" &&
-      formData.category_id != "85"
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
     ) {
       setAutoSelectModelError(true);
       return;
@@ -424,7 +442,10 @@ function ProductsForm({
           return;
         if (key === "tags" || key === "models") {
           data.append(key, JSON.stringify(value.map((val) => val.id)));
-        } else if (key === "discount" && !value) {
+        } else if (
+          (key === "discount" && !value) ||
+          (key === "discount" && !enableDiscount)
+        ) {
           data.append(key, 0);
         } else {
           data.append(key, value);
@@ -614,9 +635,9 @@ function ProductsForm({
   };
 
   const vendorTypes = [
-    { id: "2", title: "Wholesale" },
-    { id: "1", title: "Retail" },
-    { id: "3", title: "Both" },
+    { id: 2, title: "Wholesale" },
+    { id: 1, title: "Retail" },
+    { id: 3, title: "Both" },
   ];
   return (
     <div className={classes.paper}>
@@ -1068,7 +1089,7 @@ function ProductsForm({
                                 alignSelf: "flex-start",
                                 color: "#424242",
                               }}
-                              checked={formData.producttype_id === type.id}
+                              checked={formData.producttype_id == type.id}
                             />
                           }
                           //   style={{ padding: 0 }}
@@ -1193,62 +1214,92 @@ function ProductsForm({
                 </>
               ) : null}
 
-              {formData.producttype_id.toString() === "1" ||
+              {formData.producttype_id.toString() === "2" ||
               formData.producttype_id.toString() === "3" ? (
-                <Grid item xs={6} md={3}>
-                  <div>
-                    <NumberFormat
-                      allowNegative={false}
-                      customInput={TextField}
-                      thousandSeparator={true}
-                      required
-                      fullWidth
-                      name="price"
-                      label="Price"
-                      value={formData.price || itemToEdit.price}
-                      onValueChange={({ floatValue }) => {
-                        updateFormData({ ...formData, price: floatValue });
-                        values.price = floatValue;
-                        if (floatValue > 0) {
-                          errors.price = false;
-                        } else if (floatValue === 0) {
-                          errors.price = "Enter a value greater than 0";
-                        } else {
-                          errors.price = "This field is Required";
-                        }
-                      }}
-                      onBlur={handleBlur}
-                      error={
-                        responseErrors?.price ||
-                        Boolean(touched.price && errors.price)
-                      }
-                      helperText={touched.price && errors.price}
-                    />
-
-                    {responseErrors ? (
-                      <div className={classes.inputMessage}>
-                        {responseErrors.price?.map((msg) => (
-                          <span key={msg} className={classes.errorMsg}>
-                            {msg}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                </Grid>
+                <Grid item xs={7}></Grid>
               ) : null}
 
-              {formData.producttype_id ? (
+              {formData.producttype_id.toString() === "1" ||
+              formData.producttype_id.toString() === "3" ? (
                 <>
+                  <Grid item xs={6} md={4}>
+                    <div>
+                      <NumberFormat
+                        allowNegative={false}
+                        customInput={TextField}
+                        thousandSeparator={true}
+                        required
+                        fullWidth
+                        name="price"
+                        label="Price"
+                        value={formData.price || itemToEdit.price}
+                        onValueChange={({ floatValue }) => {
+                          updateFormData({ ...formData, price: floatValue });
+                          values.price = floatValue;
+                          if (floatValue > 0) {
+                            errors.price = false;
+                          } else if (floatValue === 0) {
+                            errors.price = "Enter a value greater than 0";
+                          } else {
+                            errors.price = "This field is Required";
+                          }
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.price ||
+                          Boolean(touched.price && errors.price)
+                        }
+                        helperText={touched.price && errors.price}
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.price?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+
+                  <Grid
+                    item
+                    xs={4}
+                    md={2}
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        // justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        name="terms_services"
+                        onChange={toggleDiscount}
+                      />
+
+                      <span>Discount</span>
+                    </div>
+                  </Grid>
+
                   <Grid item xs={4} md={2}>
                     <div>
                       <NumberFormat
-                        disabled={!formData.price}
+                        disabled={!formData.price || !enableDiscount}
                         allowNegative={false}
                         customInput={TextField}
                         name="discount"
                         fullWidth
-                        label="Discount"
+                        label="Percentage %"
                         // prefix="%"
                         value={formData.discount}
                         onChange={(e) => {
@@ -1287,12 +1338,12 @@ function ProductsForm({
                   <Grid item xs={4} md={2}>
                     <div>
                       <NumberFormat
-                        disabled={!formData.price}
+                        disabled={!formData.price || !enableDiscount}
                         allowNegative={false}
                         customInput={TextField}
                         name="discount_value"
                         fullWidth
-                        label="Discount"
+                        label="Value"
                         // prefix="%"
                         // value={formData.discount}
                         onChange={(e) => {
@@ -1334,14 +1385,15 @@ function ProductsForm({
                       ) : null}
                     </div>
                   </Grid>
+                  <Grid item xs={2}></Grid>
                 </>
               ) : null}
 
-              {formData.producttype_id.toString() === "1" ? (
+              {/* {formData.producttype_id.toString() === "1" ? (
                 <Grid item xs={5}></Grid>
               ) : formData.producttype_id.toString() === "2" ? (
                 <Grid item xs={3}></Grid>
-              ) : null}
+              ) : null} */}
 
               {formData.producttype_id.toString() !== "2" ? (
                 <Grid item xs={4} md={3}>
@@ -1476,10 +1528,11 @@ function ProductsForm({
 
               {formData.producttype_id.toString() === "2" ? (
                 <Grid item xs={6}></Grid>
-              ) : formData.producttype_id.toString() === "1" ||
-                formData.producttype_id.toString() === "3" ? (
-                <Grid item xs={3}></Grid>
               ) : null}
+
+              <Grid item xs={12}>
+                <Divider my={1} />
+              </Grid>
 
               {formData.category_id &&
               formData.category_id != "43" &&
@@ -1487,7 +1540,9 @@ function ProductsForm({
               formData.category_id != "82" &&
               formData.category_id != "83" &&
               formData.category_id != "84" &&
-              formData.category_id != "85" ? (
+              formData.category_id != "85" &&
+              formData.maincategory_id &&
+              formData.maincategory_id != "5" ? (
                 <>
                   <Grid item xs={6} md={3}>
                     <div>
@@ -1722,7 +1777,9 @@ function ProductsForm({
               formData.category_id != "82" &&
               formData.category_id != "83" &&
               formData.category_id != "84" &&
-              formData.category_id != "85" ? (
+              formData.category_id != "85" &&
+              formData.maincategory_id &&
+              formData.maincategory_id != "5" ? (
                 <>
                   <Grid item xs={6} md={3}>
                     <div>
