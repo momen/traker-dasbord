@@ -30,7 +30,14 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import {
+  Add,
+  ArrowBack,
+  Delete,
+  Edit,
+  ExpandMore,
+  UnfoldLess,
+} from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import { Pagination } from "@material-ui/lab";
@@ -66,6 +73,21 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  backBtn: {
+    width: "fit-content",
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
+  backIcon: {
+    marginRight: theme.direction === "rtl" ? 0 : 5,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
   },
   toolBar: {
     display: "flex",
@@ -417,94 +439,119 @@ function PartCategory() {
 
       <Divider my={6} />
 
-      <Card mb={6}>
-        <Paper mb={2}>
-          <Toolbar className={classes.toolBar}>
-            <div style={{ display: "flex", alignItems: "flex-end" }}>
-              {userPermissions.includes("part_category_create") ? (
-                <Button
-                  className={classes.button}
-                  variant="contained"
-                  onClick={() => {
-                    setSelectedItem("");
-                    setViewMode("add");
-                    setPageHeader("New Part Category");
-                  }}
-                  startIcon={<Add />}
-                >
-                  Add Part Category
-                </Button>
-              ) : null}
+      {viewMode === "data-grid" ? (
+        <Card mb={6}>
+          <Paper mb={2}>
+            <Toolbar className={classes.toolBar}>
+              <div style={{ display: "flex", alignItems: "flex-end" }}>
+                {userPermissions.includes("part_category_create") ? (
+                  <Button
+                    className={classes.button}
+                    variant="contained"
+                    onClick={() => {
+                      setSelectedItem("");
+                      setViewMode("add");
+                      setPageHeader("New Part Category");
+                    }}
+                    startIcon={<Add />}
+                  >
+                    Add Part Category
+                  </Button>
+                ) : null}
 
-              {userPermissions.includes("part_category_delete") ? (
-                <Button
-                  startIcon={<Delete />}
-                  color="secondary"
-                  variant="contained"
-                  disabled={rowsToDelete.length < 2}
-                  onClick={() => {
-                    setOpenMassDeleteDialog(true);
-                  }}
-                  style={{ height: 40, borderRadius: 0 }}
-                >
-                  Delete Selected
-                </Button>
-              ) : null}
-            </div>
+                {userPermissions.includes("part_category_delete") ? (
+                  <Button
+                    startIcon={<Delete />}
+                    color="secondary"
+                    variant="contained"
+                    disabled={rowsToDelete.length < 2}
+                    onClick={() => {
+                      setOpenMassDeleteDialog(true);
+                    }}
+                    style={{ height: 40, borderRadius: 0 }}
+                  >
+                    Delete Selected
+                  </Button>
+                ) : null}
+              </div>
 
-            <div>
-              <Grid container spacing={1} alignItems="flex-end">
-                <Grid item>
-                  <Search />
+              <div>
+                <Grid container spacing={1} alignItems="flex-end">
+                  <Grid item>
+                    <Search />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="input-with-icon-grid"
+                      label="Search"
+                      onChange={handleSearchInput}
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <TextField
-                    id="input-with-icon-grid"
-                    label="Search"
-                    onChange={handleSearchInput}
-                  />
-                </Grid>
-              </Grid>
+              </div>
+            </Toolbar>
+          </Paper>
+          <Paper>
+            <div style={{ width: "100%" }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                page={page}
+                pageSize={pageSize}
+                rowCount={rowsCount}
+                sortingOrder={["desc", "asc"]}
+                sortModel={sortModel}
+                columnBuffer={pageSize}
+                paginationMode="server"
+                sortingMode="server"
+                components={{
+                  Pagination: CustomPagination,
+                  LoadingOverlay: CustomLoadingOverlay,
+                }}
+                loading={loading}
+                checkboxSelection
+                disableColumnMenu
+                autoHeight={true}
+                onRowClick={
+                  userPermissions.includes("part_category_show")
+                    ? ({ row }) =>
+                        history.push(`/product/part-category/${row.id}`)
+                    : null
+                }
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSize}
+                onSortModelChange={handleSortModelChange}
+                onSelectionChange={(newSelection) => {
+                  setRowsToDelete(newSelection.rowIds);
+                }}
+              />
             </div>
-          </Toolbar>
-        </Paper>
-        <Paper>
-          <div style={{ width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              page={page}
-              pageSize={pageSize}
-              rowCount={rowsCount}
-              sortingOrder={["desc", "asc"]}
-              sortModel={sortModel}
-              columnBuffer={pageSize}
-              paginationMode="server"
-              sortingMode="server"
-              components={{
-                Pagination: CustomPagination,
-                LoadingOverlay: CustomLoadingOverlay,
-              }}
-              loading={loading}
-              checkboxSelection
-              disableColumnMenu
-              autoHeight={true}
-              onRowClick={
-                userPermissions.includes("part_category_show")
-                  ? ({ row }) =>
-                      history.push(`/product/part-category/${row.id}`)
-                  : null
-              }
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSize}
-              onSortModelChange={handleSortModelChange}
-              onSelectionChange={(newSelection) => {
-                setRowsToDelete(newSelection.rowIds);
-              }}
-            />
+          </Paper>
+        </Card>
+      ) : (
+        <Card mb={6} style={{ padding: "50px 60px" }}>
+          <div
+            className={classes.backBtn}
+            onClick={() => {
+              setViewMode("data-grid");
+              setPageHeader("Part Categories");
+            }}
+          >
+            <ArrowBack className={classes.backIcon} />
+            <span>Back</span>
           </div>
-        </Paper>
-      </Card>
+
+          <Divider my={3} />
+          <PartCategoryForm
+            setPage={setPage}
+            setOpenPopup={setOpenPopup}
+            itemToEdit={selectedItem}
+            categories={categories}
+            setViewMode={setViewMode}
+            setPageHeader={setPageHeader}
+          />
+        </Card>
+      )}
       <Popup
         title={openPopupTitle}
         openPopup={openPopup}

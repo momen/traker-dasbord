@@ -16,6 +16,7 @@ import { Fragment } from "react";
 import { RotateLeft, Visibility, VisibilityOff } from "@material-ui/icons";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -71,7 +72,15 @@ const useStyles = makeStyles((theme) => ({
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
+function UsersForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  rolesList,
+  stores,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const validationSchema = Yup.object().shape({
@@ -91,6 +100,21 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
   const [autoSelectStoreError, setAutoSelectStoreError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit
+      ? "Staff Member details updated successfully."
+      : "New Staff Member added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    if (itemToEdit) {
+      setViewMode("data-grid");
+      setPageHeader("Products");
+    }
+  };
 
   const handleSubmit = async () => {
     // e.preventDefault();
@@ -327,6 +351,12 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

@@ -10,11 +10,12 @@ import {
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
-import { PhotoCamera } from "@material-ui/icons";
+import { PhotoCamera, RotateLeft } from "@material-ui/icons";
 import { CloseIcon } from "@material-ui/data-grid";
 import { Alert } from "@material-ui/lab";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -22,13 +23,39 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "40vw",
+    // width: "40vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "2px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    margin: theme.spacing(3, 2, 2),
+    width: "15%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
@@ -76,7 +103,14 @@ const validationSchema = Yup.object().shape({
     .max(255, "Description must not exceed 255 characters"),
 });
 
-function CategoriesForm({ setPage, setOpenPopup, itemToEdit, mainCategories }) {
+function CategoriesForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  mainCategories,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const formRef = useRef();
@@ -93,6 +127,21 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit, mainCategories }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit
+      ? "Category updated successfully."
+      : "New category added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    if (itemToEdit) {
+      setViewMode("data-grid");
+      setPageHeader("Categories");
+    }
+  };
 
   const handleSubmit = async () => {
     if (!formData.photo && !itemToEdit) {
@@ -211,8 +260,8 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit, mainCategories }) {
           resetForm,
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={8}>
+            <Grid container spacing={8}>
+              <Grid item xs={4}>
                 <TextField
                   name="name"
                   required
@@ -232,6 +281,16 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit, mainCategories }) {
                   helperText={touched.name && errors.name}
                 />
               </Grid>
+              <Grid item xs={8}></Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
 
               <Grid item xs={4}>
                 <div>
@@ -264,6 +323,8 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit, mainCategories }) {
                     ))}
                   </TextField>
 
+                  <Grid item xs={8}></Grid>
+
                   {responseErrors ? (
                     <div className={classes.inputMessage}>
                       {responseErrors.maincategory_id?.map((msg) => (
@@ -275,16 +336,6 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit, mainCategories }) {
                   ) : null}
                 </div>
               </Grid>
-
-              {responseErrors ? (
-                <Grid item xs={12}>
-                  {responseErrors.name?.map((msg) => (
-                    <span key={msg} className={classes.errorMsg}>
-                      {msg}
-                    </span>
-                  ))}
-                </Grid>
-              ) : null}
 
               <Grid item xs={12}>
                 <TextField
@@ -403,7 +454,7 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit, mainCategories }) {
             ) : null}
             <Grid container justify="center">
               <Button
-                className={classes.button}
+                className={classes.submitButton}
                 type="submit"
                 variant="contained"
                 color="primary"
@@ -412,7 +463,8 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit, mainCategories }) {
                 Submit
               </Button>
               <Button
-                className={classes.button}
+                className={classes.resetButton}
+                startIcon={<RotateLeft />}
                 variant="contained"
                 onClick={() => {
                   handleReset();
@@ -426,6 +478,12 @@ function CategoriesForm({ setPage, setOpenPopup, itemToEdit, mainCategories }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

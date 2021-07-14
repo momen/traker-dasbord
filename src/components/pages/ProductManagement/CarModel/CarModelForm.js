@@ -9,6 +9,8 @@ import {
 import axios from "../../../../axios";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import { RotateLeft } from "@material-ui/icons";
+import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -16,13 +18,39 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "30vw",
+    // width: "30vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "2px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    margin: theme.spacing(3, 2, 2),
+    width: "15%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
@@ -51,7 +79,14 @@ const validationSchema = Yup.object().shape({
   carmade_id: Yup.string().required(),
 });
 
-function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
+function CarModelForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  carMades,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const formRef = useRef();
@@ -61,6 +96,21 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit
+      ? "Car Model updated successfully."
+      : "New car model added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    if (itemToEdit) {
+      setViewMode("data-grid");
+      setPageHeader("Products");
+    }
+  };
 
   const handleSubmit = () => {
     setIsSubmitting(true);
@@ -122,8 +172,8 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
           resetForm,
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
+            <Grid container spacing={8}>
+              <Grid item xs={4}>
                 <TextField
                   name="carmodel"
                   required
@@ -144,6 +194,7 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
                   helperText={touched.carmodel && errors.carmodel}
                 />
               </Grid>
+              <Grid item xs={8}></Grid>
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.carmodel?.map((msg) => (
@@ -154,38 +205,34 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
                 </Grid>
               ) : null}
 
-              <Grid item xs={12}>
-                <FormControl className={classes.formControl}>
-                  {
-                    <TextField
-                      id="standard-select-currency-native"
-                      select
-                      label="Select Car Made"
-                      value={formData.carmade_id}
-                      name="carmade_id"
-                      SelectProps={{
-                        native: true,
-                      }}
-                      helperText="Please select a Car Made"
-                      fullWidth
-                      required
-                      onChange={(e) => {
-                        handleChange(e);
-                        handleStateChange(e);
-                      }}
-                      onBlur={handleBlur}
-                      error={
-                        responseErrors?.carmade_id ||
-                        Boolean(touched.carmade_id && errors.carmade_id)
-                      }
-                    >
-                      <option aria-label="None" value="" />
-                      {carMades?.map((carMade) => (
-                        <option value={carMade.id}>{carMade.car_made}</option>
-                      ))}
-                    </TextField>
+              <Grid item xs={4}>
+                <TextField
+                  id="standard-select-currency-native"
+                  select
+                  label="Select Car Made"
+                  value={formData.carmade_id}
+                  name="carmade_id"
+                  SelectProps={{
+                    native: true,
+                  }}
+                  helperText="Please select a Car Made"
+                  fullWidth
+                  required
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.carmade_id ||
+                    Boolean(touched.carmade_id && errors.carmade_id)
                   }
-                </FormControl>
+                >
+                  <option aria-label="None" value="" />
+                  {carMades?.map((carMade) => (
+                    <option value={carMade.id}>{carMade.car_made}</option>
+                  ))}
+                </TextField>
               </Grid>
               {responseErrors ? (
                 <Grid item xs={12}>
@@ -207,7 +254,7 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
             ) : null}
             <Grid container justify="center">
               <Button
-                className={classes.button}
+                className={classes.submitButton}
                 type="submit"
                 variant="contained"
                 color="primary"
@@ -216,7 +263,8 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
                 Submit
               </Button>
               <Button
-                className={classes.button}
+                className={classes.resetButton}
+                startIcon={<RotateLeft />}
                 variant="contained"
                 onClick={() => {
                   handleReset();
@@ -230,6 +278,12 @@ function CarModelForm({ setPage, setOpenPopup, itemToEdit, carMades }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

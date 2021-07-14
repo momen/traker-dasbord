@@ -189,13 +189,13 @@ function Stores() {
 
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
-    { field: "address", headerName: "Address", width: 200, flex: 1 },
     {
-      field: "moderator_name",
-      headerName: "Moderator Name",
+      field: "name",
+      headerName: "Store Name",
       width: 200,
       flex: 1,
     },
+    { field: "address", headerName: "Address", width: 200, flex: 1 },
     {
       field: "moderator_phone",
       headerName: "Moderator Phone",
@@ -525,7 +525,7 @@ function Stores() {
             className={classes.backBtn}
             onClick={() => {
               setViewMode("data-grid");
-              setPageHeader("Products");
+              setPageHeader("Stores");
             }}
           >
             <ArrowBack className={classes.backIcon} />

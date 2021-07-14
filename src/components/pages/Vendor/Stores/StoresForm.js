@@ -5,6 +5,8 @@ import Map from "../../../Map/Map";
 import NumberFormat from "react-number-format";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import { RotateLeft } from "@material-ui/icons";
+import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -18,7 +20,33 @@ const useStyles = makeStyles((theme) => ({
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "2px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    margin: theme.spacing(3, 2, 2),
+    width: "15%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
@@ -77,7 +105,14 @@ const validationSchema = Yup.object().shape({
   city_id: Yup.string().required("Please select a City"),
 });
 
-function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
+function StoresForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  countries,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const formRef = useRef();
@@ -99,6 +134,21 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [locationNotSelected, setLocationNotSelected] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit
+      ? "Store details updated successfully."
+      : "New store added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    if (itemToEdit) {
+      setViewMode("data-grid");
+      setPageHeader("Stores");
+    }
+  };
 
   const handleSubmit = async () => {
     if (!formData.lat || !formData.long) {
@@ -581,7 +631,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
             ) : null}
             <Grid container justify="center">
               <Button
-                className={classes.button}
+                className={classes.submitButton}
                 type="submit"
                 variant="contained"
                 color="primary"
@@ -590,7 +640,8 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                 Submit
               </Button>
               <Button
-                className={classes.button}
+                className={classes.resetButton}
+                startIcon={<RotateLeft />}
                 variant="contained"
                 onClick={() => {
                   handleReset();
@@ -604,6 +655,12 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

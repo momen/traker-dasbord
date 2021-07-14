@@ -28,7 +28,14 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import {
+  Add,
+  ArrowBack,
+  Delete,
+  Edit,
+  ExpandMore,
+  UnfoldLess,
+} from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import CarModelForm from "./CarModelForm";
@@ -64,6 +71,21 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  backBtn: {
+    width: "fit-content",
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
+  backIcon: {
+    marginRight: theme.direction === "rtl" ? 0 : 5,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
   },
   actionBtn: {
     padding: 5,
@@ -397,100 +419,125 @@ function CarModel() {
 
       <Divider my={6} />
 
-      <Card mb={6}>
-        <Paper mb={2}>
-          <Toolbar
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              borderRadius: "6px",
+      {viewMode === "data-grid" ? (
+        <Card mb={6}>
+          <Paper mb={2}>
+            <Toolbar
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+                borderRadius: "6px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-end" }}>
+                {userPermissions.includes("car_model_create") ? (
+                  <Button
+                    className={classes.button}
+                    variant="contained"
+                    onClick={() => {
+                      setSelectedItem("");
+                      setViewMode("add");
+                      setPageHeader("New Car Model");
+                    }}
+                    startIcon={<Add />}
+                  >
+                    Add Model
+                  </Button>
+                ) : null}
+
+                {userPermissions.includes("car_model_delete") ? (
+                  <Button
+                    startIcon={<Delete />}
+                    color="secondary"
+                    variant="contained"
+                    disabled={rowsToDelete.length < 2}
+                    onClick={() => {
+                      setOpenMassDeleteDialog(true);
+                    }}
+                    style={{ height: 40, borderRadius: 0 }}
+                  >
+                    Delete Selected
+                  </Button>
+                ) : null}
+              </div>
+
+              <div>
+                <Grid container spacing={1} alignItems="flex-end">
+                  <Grid item>
+                    <Search />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="input-with-icon-grid"
+                      label="Search"
+                      onChange={handleSearchInput}
+                    />
+                  </Grid>
+                </Grid>
+              </div>
+            </Toolbar>
+          </Paper>
+          <Paper>
+            <div style={{ width: "100%" }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                page={page}
+                pageSize={pageSize}
+                rowCount={rowsCount}
+                sortingOrder={["desc", "asc"]}
+                sortModel={sortModel}
+                columnBuffer={pageSize}
+                paginationMode="server"
+                sortingMode="server"
+                components={{
+                  Pagination: CustomPagination,
+                  LoadingOverlay: CustomLoadingOverlay,
+                }}
+                loading={loading}
+                checkboxSelection
+                disableColumnMenu
+                autoHeight={true}
+                onRowClick={
+                  userPermissions.includes("car_model_show")
+                    ? ({ row }) => history.push(`/product/car-model/${row.id}`)
+                    : null
+                }
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSize}
+                onSortModelChange={handleSortModelChange}
+                onSelectionChange={(newSelection) => {
+                  setRowsToDelete(newSelection.rowIds);
+                }}
+              />
+            </div>
+          </Paper>
+        </Card>
+      ) : (
+        <Card mb={6} style={{ padding: "50px 60px" }}>
+          <div
+            className={classes.backBtn}
+            onClick={() => {
+              setViewMode("data-grid");
+              setPageHeader("Car Models List");
             }}
           >
-            <div style={{ display: "flex", alignItems: "flex-end" }}>
-              {userPermissions.includes("car_model_create") ? (
-                <Button
-                  className={classes.button}
-                  variant="contained"
-                  onClick={() => {
-                    setSelectedItem("");
-                    setViewMode("add");
-                    setPageHeader("New Car Model");
-                  }}
-                  startIcon={<Add />}
-                >
-                  Add Model
-                </Button>
-              ) : null}
-
-              {userPermissions.includes("car_model_delete") ? (
-                <Button
-                  startIcon={<Delete />}
-                  color="secondary"
-                  variant="contained"
-                  disabled={rowsToDelete.length < 2}
-                  onClick={() => {
-                    setOpenMassDeleteDialog(true);
-                  }}
-                  style={{ height: 40, borderRadius: 0 }}
-                >
-                  Delete Selected
-                </Button>
-              ) : null}
-            </div>
-
-            <div>
-              <Grid container spacing={1} alignItems="flex-end">
-                <Grid item>
-                  <Search />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    id="input-with-icon-grid"
-                    label="Search"
-                    onChange={handleSearchInput}
-                  />
-                </Grid>
-              </Grid>
-            </div>
-          </Toolbar>
-        </Paper>
-        <Paper>
-          <div style={{ width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              page={page}
-              pageSize={pageSize}
-              rowCount={rowsCount}
-              sortingOrder={["desc", "asc"]}
-              sortModel={sortModel}
-              columnBuffer={pageSize}
-              paginationMode="server"
-              sortingMode="server"
-              components={{
-                Pagination: CustomPagination,
-                LoadingOverlay: CustomLoadingOverlay,
-              }}
-              loading={loading}
-              checkboxSelection
-              disableColumnMenu
-              autoHeight={true}
-              onRowClick={
-                userPermissions.includes("car_model_show")
-                  ? ({ row }) => history.push(`/product/car-model/${row.id}`)
-                  : null
-              }
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSize}
-              onSortModelChange={handleSortModelChange}
-              onSelectionChange={(newSelection) => {
-                setRowsToDelete(newSelection.rowIds);
-              }}
-            />
+            <ArrowBack className={classes.backIcon} />
+            <span>Back</span>
           </div>
-        </Paper>
-      </Card>
+
+          <Divider my={3} />
+          <CarModelForm
+            setPage={setPage}
+            setOpenPopup={setOpenPopup}
+            itemToEdit={selectedItem}
+            carMades={carMades}
+            setViewMode={setViewMode}
+            setPageHeader={setPageHeader}
+          />
+        </Card>
+      )}
       <Popup
         title={openPopupTitle}
         openPopup={openPopup}

@@ -30,7 +30,14 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import {
+  Add,
+  ArrowBack,
+  Delete,
+  Edit,
+  ExpandMore,
+  UnfoldLess,
+} from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import AreaForm from "./AreaForm";
@@ -66,6 +73,21 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  backBtn: {
+    width: "fit-content",
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
+  backIcon: {
+    marginRight: theme.direction === "rtl" ? 0 : 5,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
   },
   toolBar: {
     display: "flex",
@@ -187,6 +209,9 @@ function Countries() {
 
   const [countries, setCountries] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Areas");
+  const [viewMode, setViewMode] = useState("data-grid");
+
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "area_name", headerName: "Area", width: 200 },
@@ -236,10 +261,8 @@ function Countries() {
                 // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle(
-                    "Update Area Details"
-                  ); /****** Customize ******/
+                  setViewMode("edit");
+                  setPageHeader("Update Area Details");
                 }}
               >
                 Edit
@@ -417,114 +440,139 @@ function Countries() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Areas
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />
 
-      <Card mb={6}>
-        <Paper mb={2}>
-          <Toolbar className={classes.toolBar}>
-            <Grid
-              container
-              style={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "flex-end" }}>
-                {userPermissions.includes("area_create") ? (
-                  <Button
-                    className={classes.button}
-                    variant="contained"
-                    onClick={() => {
-                      setOpenPopupTitle("New Area");
-                      setOpenPopup(true);
-                      setSelectedItem("");
-                    }}
-                    startIcon={<Add />}
-                  >
-                    Add New Area
-                  </Button>
-                ) : null}
+      {viewMode === "data-grid" ? (
+        <Card mb={6}>
+          <Paper mb={2}>
+            <Toolbar className={classes.toolBar}>
+              <Grid
+                container
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-end" }}>
+                  {userPermissions.includes("area_create") ? (
+                    <Button
+                      className={classes.button}
+                      variant="contained"
+                      onClick={() => {
+                        setViewMode("add");
+                        setPageHeader("New Area");
+                        setSelectedItem("");
+                      }}
+                      startIcon={<Add />}
+                    >
+                      Add New Area
+                    </Button>
+                  ) : null}
 
-                {userPermissions.includes("area_delete") ? (
-                  <Button
-                    startIcon={<Delete />}
-                    color="secondary"
-                    variant="contained"
-                    disabled={rowsToDelete.length < 2}
-                    onClick={() => {
-                      setOpenMassDeleteDialog(true);
-                    }}
-                    style={{ height: 40, borderRadius: 0 }}
-                  >
-                    Delete Selected
-                  </Button>
-                ) : null}
-              </div>
-
-              <Grid item>
-                <div style={{ display: "flex" }}>
-                  <Grid
-                    container
-                    spacing={1}
-                    alignItems="flex-end"
-                    style={{ marginRight: "5px" }}
-                  >
-                    <Grid item>
-                      <Search />
-                    </Grid>
-                    <Grid item>
-                      <TextField
-                        id="input-with-icon-grid"
-                        label="Find Areas"
-                        onChange={handleSearchInput}
-                      />
-                    </Grid>
-                  </Grid>
+                  {userPermissions.includes("area_delete") ? (
+                    <Button
+                      startIcon={<Delete />}
+                      color="secondary"
+                      variant="contained"
+                      disabled={rowsToDelete.length < 2}
+                      onClick={() => {
+                        setOpenMassDeleteDialog(true);
+                      }}
+                      style={{ height: 40, borderRadius: 0 }}
+                    >
+                      Delete Selected
+                    </Button>
+                  ) : null}
                 </div>
+
+                <Grid item>
+                  <div style={{ display: "flex" }}>
+                    <Grid
+                      container
+                      spacing={1}
+                      alignItems="flex-end"
+                      style={{ marginRight: "5px" }}
+                    >
+                      <Grid item>
+                        <Search />
+                      </Grid>
+                      <Grid item>
+                        <TextField
+                          id="input-with-icon-grid"
+                          label="Find Areas"
+                          onChange={handleSearchInput}
+                        />
+                      </Grid>
+                    </Grid>
+                  </div>
+                </Grid>
               </Grid>
-            </Grid>
-          </Toolbar>
-        </Paper>
-        <Paper>
-          <div style={{ width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              page={page}
-              pageSize={pageSize}
-              rowCount={rowsCount}
-              sortingOrder={["desc", "asc"]}
-              sortModel={sortModel}
-              columnBuffer={pageSize}
-              paginationMode="server"
-              sortingMode="server"
-              components={{
-                Pagination: CustomPagination,
-                LoadingOverlay: CustomLoadingOverlay,
-              }}
-              loading={loading}
-              checkboxSelection
-              disableColumnMenu
-              autoHeight={true}
-              onRowClick={
-                userPermissions.includes("area_show")
-                  ? ({ row }) => history.push(`/geography/areas/${row.id}`)
-                  : null
-              }
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSize}
-              onSortModelChange={handleSortModelChange}
-              onSelectionChange={(newSelection) => {
-                setRowsToDelete(newSelection.rowIds);
-              }}
-            />
+            </Toolbar>
+          </Paper>
+          <Paper>
+            <div style={{ width: "100%" }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                page={page}
+                pageSize={pageSize}
+                rowCount={rowsCount}
+                sortingOrder={["desc", "asc"]}
+                sortModel={sortModel}
+                columnBuffer={pageSize}
+                paginationMode="server"
+                sortingMode="server"
+                components={{
+                  Pagination: CustomPagination,
+                  LoadingOverlay: CustomLoadingOverlay,
+                }}
+                loading={loading}
+                checkboxSelection
+                disableColumnMenu
+                autoHeight={true}
+                onRowClick={
+                  userPermissions.includes("area_show")
+                    ? ({ row }) => history.push(`/geography/areas/${row.id}`)
+                    : null
+                }
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSize}
+                onSortModelChange={handleSortModelChange}
+                onSelectionChange={(newSelection) => {
+                  setRowsToDelete(newSelection.rowIds);
+                }}
+              />
+            </div>
+          </Paper>
+        </Card>
+      ) : (
+        <Card mb={6} style={{ padding: "50px 60px" }}>
+          <div
+            className={classes.backBtn}
+            onClick={() => {
+              setViewMode("data-grid");
+              setPageHeader("Areas");
+            }}
+          >
+            <ArrowBack className={classes.backIcon} />
+            <span>Back</span>
           </div>
-        </Paper>
-      </Card>
+
+          <Divider my={3} />
+          <AreaForm
+            setPage={setPage}
+            setOpenPopup={setOpenPopup}
+            itemToEdit={selectedItem}
+            countries={countries}
+            setViewMode={setViewMode}
+            setPageHeader={setPageHeader}
+          />
+        </Card>
+      )}
       <Popup
         title={openPopupTitle}
         openPopup={openPopup}

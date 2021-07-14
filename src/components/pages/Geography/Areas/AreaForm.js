@@ -11,7 +11,7 @@ import {
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
-import { PhotoCamera } from "@material-ui/icons";
+import { PhotoCamera, RotateLeft } from "@material-ui/icons";
 import { CloseIcon } from "@material-ui/data-grid";
 import { Alert, Autocomplete } from "@material-ui/lab";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
@@ -19,20 +19,47 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import NumberFormat from "react-number-format";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(1),
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-    width: "40vw",
+    // alignItems: "center",
+    // width: "40vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "2px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    margin: theme.spacing(3, 2, 2),
+    width: "15%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
@@ -62,7 +89,14 @@ const useStyles = makeStyles((theme) => ({
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-function ProductsForm({ setPage, setOpenPopup, itemToEdit, countries }) {
+function ProductsForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  countries,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const [formData, updateFormData] = useState({
@@ -91,6 +125,21 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, countries }) {
   const [isSubmitting, setIsSubmitting] = useState(false); // Update on other components
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit
+      ? "Area details updated successfully."
+      : "New Area added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    if (itemToEdit) {
+      setViewMode("data-grid");
+      setPageHeader("Products");
+    }
+  };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -147,8 +196,8 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, countries }) {
           resetForm,
         }) => (
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
+            <Grid container spacing={8}>
+              <Grid item xs={4}>
                 <div>
                   <TextField
                     name="area_name"
@@ -182,10 +231,12 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                 </div>
               </Grid>
 
+              <Grid item xs={8}></Grid>
+
               {/****************************** ******************************/}
 
-              <Grid item xs={6}>
-                <div style={{ maxWidth: "100%" }}>
+              <Grid item xs={4}>
+                <div s>
                   <TextField
                     select
                     label="Country"
@@ -225,6 +276,7 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                 </div>
               </Grid>
             </Grid>
+            <Grid item xs={8}></Grid>
 
             {typeof responseErrors === "string" ? (
               <Grid item xs={12}>
@@ -235,7 +287,7 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, countries }) {
             ) : null}
             <Grid container justify="center">
               <Button
-                className={classes.button}
+                className={classes.submitButton}
                 type="submit"
                 variant="contained"
                 color="primary"
@@ -244,7 +296,8 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                 Submit
               </Button>
               <Button
-                className={classes.button}
+                className={classes.resetButton}
+                startIcon={<RotateLeft />}
                 variant="contained"
                 disabled={isSubmitting} // Update on other components
                 onClick={() => {
@@ -262,6 +315,12 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, countries }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

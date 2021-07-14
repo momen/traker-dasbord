@@ -10,6 +10,7 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import axios from "../../../../axios";
 import { RotateLeft } from "@material-ui/icons";
+import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -77,7 +78,13 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
-function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
+function CarYearForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const formRef = useRef();
@@ -86,6 +93,19 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit ? "Tag edited successfully." : "New Tag added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    if (itemToEdit) {
+      setViewMode("data-grid");
+      setPageHeader("Products");
+    }
+  };
 
   const handleSubmit = () => {
     setIsSubmitting(true);
@@ -213,6 +233,12 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }
