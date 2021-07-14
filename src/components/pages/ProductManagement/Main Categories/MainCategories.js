@@ -31,7 +31,7 @@ import { spacing } from "@material-ui/system";
 import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
-import CarYearForm from "./CarYearForm";
+import MainCategoriesForm from "./MainCategoriesForm";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
 import { useSelector } from "react-redux";
@@ -145,13 +145,13 @@ function CustomLoadingOverlay() {
   );
 }
 
-function CarYear() {
+function MainCategories() {
   const classes = useStyles();
   const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("Add Car Year"); // Customize
+  const [openPopupTitle, setOpenPopupTitle] = useState("Add Main Category"); // Customize
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
@@ -165,13 +165,18 @@ function CarYear() {
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
 
-  const [pageHeader, setPageHeader] = useState("Years List");
+  const [pageHeader, setPageHeader] = useState("Main Categories");
   const [viewMode, setViewMode] = useState("data-grid");
 
   // Customize
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
-    { field: "year", headerName: "Car Year", width: 200, flex: 1 },
+    {
+      field: "main_category_name",
+      headerName: "Category Name",
+      width: 200,
+      flex: 1,
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -201,7 +206,7 @@ function CarYear() {
               </Button>
             ) : null} */}
 
-            {userPermissions.includes("car_year_edit") ? (
+            {userPermissions.includes("main_category_update") ? (
               <Button
                 className={classes.actionBtn}
                 startIcon={<Edit />}
@@ -212,6 +217,7 @@ function CarYear() {
                 onClick={() => {
                   setSelectedItem(params.row);
                   setOpenPopup(true);
+                  setOpenPopupTitle("Edit Main Category")
                 }}
               >
                 Edit
@@ -270,13 +276,14 @@ function CarYear() {
 
   const DeleteItem = () => {
     axios
-      .delete(`/car-years/${itemToDelete}`)
+      .delete(`/main/categories/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
         setLoading(true);
         axios
           .get(
-            `/car-years?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/main/categories
+            ?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -297,7 +304,7 @@ function CarYear() {
 
   const MassDelete = () => {
     axios
-      .post(`/car-years/mass/delete`, {
+      .post(`/main/categories/mass/delete`, {
         ids: JSON.stringify(rowsToDelete),
       })
       .then((res) => {
@@ -306,7 +313,7 @@ function CarYear() {
         setLoading(true);
         axios
           .get(
-            `/car-years?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/main/categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -332,7 +339,7 @@ function CarYear() {
     if (!userIsSearching) {
       axios
         .get(
-          `/car-years?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/main/categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -345,7 +352,7 @@ function CarYear() {
     } else {
       axios
         .post(
-          `/car-years/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/main/categories/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -381,21 +388,22 @@ function CarYear() {
             }}
           >
             <div style={{ display: "flex", alignItems: "flex-end" }}>
-              {userPermissions.includes("car_year_create") ? (
+              {userPermissions.includes("main_category_create") ? (
                 <Button
                   className={classes.button}
                   variant="contained"
                   onClick={() => {
                     setOpenPopup(true);
                     setSelectedItem("");
+                    setOpenPopupTitle("Add Main Category");
                   }}
                   startIcon={<Add />}
                 >
-                  Add Year
+                  Add Main Category
                 </Button>
               ) : null}
 
-              {userPermissions.includes("car_year_delete") ? (
+              {userPermissions.includes("main_category_delete") ? (
                 <Button
                   startIcon={<Delete />}
                   color="secondary"
@@ -449,8 +457,9 @@ function CarYear() {
               disableColumnMenu
               autoHeight={true}
               onRowClick={
-                userPermissions.includes("car_year_show")
-                  ? ({ row }) => history.push(`/product/car-year/${row.id}`)
+                userPermissions.includes("main_category_show")
+                  ? ({ row }) =>
+                      history.push(`/product/main-categories/${row.id}`)
                   : null
               }
               onPageChange={handlePageChange}
@@ -468,7 +477,7 @@ function CarYear() {
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
-        <CarYearForm
+        <MainCategoriesForm
           setPage={setPage}
           setOpenPopup={setOpenPopup}
           itemToEdit={selectedItem}
@@ -544,4 +553,4 @@ function CarYear() {
   );
 }
 
-export default CarYear;
+export default MainCategories;

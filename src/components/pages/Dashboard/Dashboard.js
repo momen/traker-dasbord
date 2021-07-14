@@ -26,7 +26,7 @@ function Dashboard() {
 
   useEffect(() => {
     axios
-      .post("/fetch/basic/report", filterData)
+      .post("/vendor/day/month/filter", filterData)
       .then(({ data }) => {
         setBarChartLabels(data.period_details?.map((detail) => detail.day));
         setDashboardInfo(data);

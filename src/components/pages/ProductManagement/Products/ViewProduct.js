@@ -207,7 +207,7 @@ function ViewProduct({ match }) {
                     value={product.holesale_price}
                     displayType={"text"}
                     thousandSeparator={true}
-                    prefix={"$"}
+                    prefix={"ريال"}
                     renderText={(value) => (
                       <span className={classes.rowContent}>{value}</span>
                     )}

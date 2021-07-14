@@ -203,7 +203,8 @@ function PendingOrders() {
               </Button>
             ) : null} */}
             {userPermissions.includes("approve_orders") &&
-            params.row.status === "pending" ? (
+            params.row.status === "pending" &&
+            params.row.paid ? (
               <Button
                 style={{ marginRight: "5px" }}
                 className={classes.approveButton}

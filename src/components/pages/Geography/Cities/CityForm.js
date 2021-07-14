@@ -131,7 +131,7 @@ function ProductsForm({
     setDialogOpen(false);
     if (itemToEdit) {
       setViewMode("data-grid");
-      setPageHeader("Products");
+      setPageHeader("Cities");
     }
   };
 

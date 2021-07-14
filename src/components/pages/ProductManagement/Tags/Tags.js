@@ -206,8 +206,7 @@ function Tags() {
                 // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setViewMode("edit");
-                    setPageHeader("Edit Tag");
+                  setOpenPopup(true);
                 }}
               >
                 Edit

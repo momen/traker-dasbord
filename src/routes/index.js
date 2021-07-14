@@ -84,6 +84,9 @@ const AuditLogs = async(() =>
   import("../components/pages/UserManagement/AuditLogs/AuditLogs.js")
 );
 
+const MainCategories = async(() =>
+  import("../components/pages/ProductManagement/Main Categories/MainCategories")
+);
 const Categories = async(() =>
   import("../components/pages/ProductManagement/Categories/Categories")
 );
@@ -173,6 +176,11 @@ const ViewLog = async(() =>
   import("../components/pages/UserManagement/AuditLogs/ViewLog")
 );
 
+const ViewMainCategory = async(() =>
+  import(
+    "../components/pages/ProductManagement/Main Categories/ViewMainCategory"
+  )
+);
 const ViewCategory = async(() =>
   import("../components/pages/ProductManagement/Categories/ViewCategory")
 );
@@ -318,6 +326,14 @@ const productManagementRoutes = {
   component: null,
   children: [
     {
+      path: "/product/main-categories",
+      name: "Main Categories",
+      component: MainCategories,
+      icon: <Folder />,
+      guard: PermissionGuard,
+      permission: "main_categories_access",
+    },
+    {
       path: "/product/categories",
       name: "Categories",
       component: Categories,
@@ -377,6 +393,12 @@ const productManagementRoutes = {
   ],
   guard: ProductManagementGuard,
   permission: "product_management_access",
+};
+
+const viewMainCategory = {
+  path: "/product/main-categories/:id",
+  component: ViewMainCategory,
+  children: null,
 };
 
 const viewCategory = {
@@ -694,6 +716,7 @@ export const dashboardLayoutRoutes = [
   viewUser,
   viewStaff,
   viewLog,
+  ViewMainCategory,
   viewCategory,
   viewCarMade,
   viewCarModel,
@@ -728,9 +751,6 @@ export const sidebarRoutes = [
   productManagementRoutes,
   vendorRoutes,
   geographyRoutes,
-  viewCountry,
-  viewArea,
-  viewCity,
   advancedReportsRoute,
   storesRoute,
   pendingOrdersRoute,

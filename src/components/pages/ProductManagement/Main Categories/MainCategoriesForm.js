@@ -1,16 +1,10 @@
 import React, { useRef, useState } from "react";
-import {
-  Button,
-  FormControl,
-  Grid,
-  makeStyles,
-  TextField,
-} from "@material-ui/core";
+import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import axios from "../../../../axios";
+import NumberFormat from "react-number-format";
 import { RotateLeft } from "@material-ui/icons";
-import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -18,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    // width: "30vw",
+    width: "20vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -30,14 +24,14 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: "600",
     color: "#EF9300",
     background: "#ffffff",
-    border: "2px solid #EF9300",
+    border: "1px solid #EF9300",
     borderRadius: 0,
     "&:hover": {
       background: "#EF9300",
       color: "#ffffff",
     },
     margin: theme.spacing(3, 2, 2),
-    width: "15%",
+    width: "40%",
   },
   resetButton: {
     height: 40,
@@ -45,14 +39,14 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: "600",
     color: "#7B7B7B",
     background: "#ffffff",
-    border: "2px solid #7B7B7B",
+    border: "1px solid #7B7B7B",
     borderRadius: 0,
     // "&:hover": {
     //   background: "#EF9300",
     //   color: "#ffffff",
     // },
     margin: theme.spacing(3, 2, 2),
-    width: "15%",
+    width: "40%",
   },
   errorsContainer: {
     marginBottom: theme.spacing(1),
@@ -64,59 +58,31 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  car_made: Yup.string()
+  main_category_name: Yup.string()
     .required("This field is Required")
-    .test(
-      "No floating points",
-      "Please remove any dots",
-      (val) => !val?.includes(".")
-    )
-    .matches(/^([^0-9]*)$/, "Number are not allowed, only letters.")
     .test(
       "Not empty",
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
-  cartype_id: Yup.string().required(),
 });
 
-function CreateCarMade({
-  setPage,
-  setOpenPopup,
-  itemToEdit,
-  carTypes,
-  setViewMode,
-  setPageHeader,
-}) {
+function MainCategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
-    car_made: itemToEdit ? itemToEdit.car_made : "",
-    cartype_id: itemToEdit ? itemToEdit.cartype_id : "",
+    main_category_name: itemToEdit ? itemToEdit.main_category_name : "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogText, setDialogText] = useState(
-    itemToEdit ? "Brand updated successfully." : "New Brand added successfully."
-  );
-
-  const closeDialog = () => {
-    setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Brands List");
-    }
-  };
 
   const handleSubmit = () => {
     setIsSubmitting(true);
 
     if (itemToEdit) {
       axios
-        .put(`/car-mades/${itemToEdit.id}`, formData)
+        .post(`/main/categories/${itemToEdit.id}`, formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);
@@ -127,7 +93,7 @@ function CreateCarMade({
         });
     } else {
       axios
-        .post("/car-mades", formData)
+        .post("/main/categories", formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);
@@ -148,8 +114,7 @@ function CreateCarMade({
 
   const handleReset = () => {
     updateFormData({
-      car_made: "",
-      cartype_id: "",
+      main_category_name: "",
     });
     setResponseErrors("");
   };
@@ -171,71 +136,39 @@ function CreateCarMade({
           resetForm,
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-            <Grid container spacing={8}>
-              <Grid item xs={4}>
-                <TextField
-                  name="car_made"
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <NumberFormat
+                  allowLeadingZeros={false}
+                  customInput={TextField}
+                  name="main_category_name"
+                  decimalSeparator={null}
+                  allowNegative={false}
                   required
                   fullWidth
-                  id="car_made"
-                  label="Brand"
-                  value={formData.car_made}
-                  autoFocus
+                  label="Main Category Name"
+                  // prefix="%"
+                  value={formData.main_category_name}
                   onChange={(e) => {
+                    console.log(e.target.value);
                     handleChange(e);
                     handleStateChange(e);
                   }}
                   onBlur={handleBlur}
                   error={
-                    responseErrors?.car_made ||
-                    Boolean(touched.car_made && errors.car_made)
+                    responseErrors?.main_category_name ||
+                    Boolean(
+                      touched.main_category_name && errors.main_category_name
+                    )
                   }
-                  helperText={touched.car_made && errors.car_made}
+                  helperText={
+                    touched.main_category_name && errors.main_category_name
+                  }
                 />
               </Grid>
-              <Grid xs={8}></Grid>
               {responseErrors ? (
                 <Grid item xs={12}>
-                  {responseErrors.car_made?.map((msg) => (
-                    <span key={msg} className={classes.errorMsg}>
-                      {msg}
-                    </span>
-                  ))}
-                </Grid>
-              ) : null}
-
-              <Grid item xs={4}>
-                <TextField
-                  id="standard-select-currency-native"
-                  select
-                  label="Product Type"
-                  value={formData.cartype_id}
-                  name="cartype_id"
-                  SelectProps={{
-                    native: true,
-                  }}
-                  helperText="Please select a Product Type"
-                  fullWidth
-                  required
-                  onChange={(e) => {
-                    handleChange(e);
-                    handleStateChange(e);
-                  }}
-                  onBlur={handleBlur}
-                  error={
-                    responseErrors?.cartype_id ||
-                    Boolean(touched.cartype_id && errors.cartype_id)
-                  }
-                >
-                  <option aria-label="None" value="" />
-                  {carTypes?.map((type) => (
-                    <option value={type.id}>{type.type_name}</option>
-                  ))}
-                </TextField>
-              </Grid>
-              {responseErrors ? (
-                <Grid item xs={12}>
-                  {responseErrors.cartype_id?.map((msg) => (
+                  {responseErrors.main_category_name?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>
@@ -251,7 +184,7 @@ function CreateCarMade({
                 </span>
               </Grid>
             ) : null}
-            <Grid container justify="center">
+            <Grid container justify="center" style={{ marginTop: 10 }}>
               <Button
                 className={classes.submitButton}
                 type="submit"
@@ -277,14 +210,8 @@ function CreateCarMade({
           </form>
         )}
       </Formik>
-      <SuccessPopup
-        open={dialogOpen}
-        setOpen={setDialogOpen}
-        message={dialogText}
-        handleClose={closeDialog}
-      />
     </div>
   );
 }
 
-export default CreateCarMade;
+export default MainCategoriesForm;
