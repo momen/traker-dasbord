@@ -137,8 +137,8 @@ function ProductsForm({
         : "",
     maincategory_id: itemToEdit ? itemToEdit.category?.maincategory_id : "",
     category_id: itemToEdit ? itemToEdit.category?.id : "",
-    price: itemToEdit ? itemToEdit.price : "",
-    holesale_price: itemToEdit ? itemToEdit.holesale_price : "",
+    price: itemToEdit ? parseFloat(itemToEdit.price) : "",
+    holesale_price: itemToEdit ? parseFloat(itemToEdit.holesale_price) : "",
     no_of_orders: itemToEdit ? itemToEdit.no_of_orders : "",
 
     part_category_id: itemToEdit ? itemToEdit.part_category_id.toString() : "",
@@ -153,7 +153,7 @@ function ProductsForm({
     quantity: itemToEdit ? itemToEdit.quantity : "",
     qty_reminder: itemToEdit ? itemToEdit.qty_reminder : "",
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
-    producttype_id: itemToEdit ? itemToEdit.producttype_id.id : "",
+    producttype_id: itemToEdit ? itemToEdit.producttype_id?.id : "",
     photo: [],
   });
 
@@ -344,6 +344,7 @@ function ProductsForm({
 
   useEffect(() => {
     if (itemToEdit) {
+      alert(itemToEdit.producttype_id?.id);
       if (itemToEdit.car_made_id) {
         axios
           .get(`/car-modelslist/${itemToEdit.car_made_id}`)
@@ -1106,10 +1107,10 @@ function ProductsForm({
                     </div>
                   </RadioGroup>
                   {Boolean(touched.producttype_id && errors.producttype_id) ||
-                  responseErrors.producttype_id ? (
+                  responseErrors?.producttype_id ? (
                     <FormHelperText className={classes.error}>
                       {(touched.producttype_id && errors.producttype_id) ||
-                        responseErrors.producttype_id}
+                        responseErrors?.producttype_id}
                     </FormHelperText>
                   ) : null}
                 </FormControl>
@@ -1128,9 +1129,7 @@ function ProductsForm({
                         fullWidth
                         name="holesale_price"
                         label="Wholesale Price"
-                        value={
-                          formData.holesale_price || itemToEdit?.holesale_price
-                        }
+                        value={formData.holesale_price}
                         onValueChange={({ floatValue }) => {
                           updateFormData({
                             ...formData,
@@ -1180,7 +1179,7 @@ function ProductsForm({
                         required
                         fullWidth
                         label="Number of orders"
-                        value={formData.no_of_orders || itemToEdit.no_of_orders}
+                        value={formData.no_of_orders}
                         onValueChange={({ floatValue }) => {
                           updateFormData({
                             ...formData,
@@ -1235,7 +1234,7 @@ function ProductsForm({
                         fullWidth
                         name="price"
                         label="Price"
-                        value={formData.price || itemToEdit.price}
+                        value={formData.price}
                         onValueChange={({ floatValue }) => {
                           updateFormData({ ...formData, price: floatValue });
                           values.price = floatValue;
