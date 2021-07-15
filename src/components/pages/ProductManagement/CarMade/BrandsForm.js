@@ -119,7 +119,7 @@ function CreateCarMade({
         .put(`/car-mades/${itemToEdit.id}`, formData)
         .then((res) => {
           setPage(1);
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch(({ response }) => {
           setIsSubmitting(false);
@@ -130,7 +130,7 @@ function CreateCarMade({
         .post("/car-mades", formData)
         .then((res) => {
           setPage(1);
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch(({ response }) => {
           setIsSubmitting(false);

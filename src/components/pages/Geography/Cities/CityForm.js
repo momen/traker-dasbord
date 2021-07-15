@@ -141,7 +141,7 @@ function ProductsForm({
       await axios
         .post(`/cities/${itemToEdit.id}`, formData)
         .then((res) => {
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch((res) => {
           setIsSubmitting(false); // Update on other components
@@ -152,7 +152,7 @@ function ProductsForm({
         .post("/cities", formData)
         .then((res) => {
           setPage(1);
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch((res) => {
           setIsSubmitting(false); // Update on other components

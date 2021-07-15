@@ -120,7 +120,7 @@ function CarModelForm({
         .put(`/car-models/${itemToEdit.id}`, formData)
         .then((res) => {
           setPage(1);
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch(({ response }) => {
           setIsSubmitting(false);
@@ -131,7 +131,7 @@ function CarModelForm({
         .post("/car-models", formData)
         .then((res) => {
           setPage(1);
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch(({ response }) => {
           setIsSubmitting(false);

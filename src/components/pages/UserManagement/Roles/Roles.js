@@ -30,7 +30,14 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import {
+  Add,
+  ArrowBack,
+  Delete,
+  Edit,
+  ExpandMore,
+  UnfoldLess,
+} from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import RolesForm from "./RolesForm";
@@ -66,6 +73,21 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  backBtn: {
+    width: "fit-content",
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
+  backIcon: {
+    marginRight: theme.direction === "rtl" ? 0 : 5,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
   },
   permissionBadge: {
     background: "#00b3b3",
@@ -174,6 +196,9 @@ function Roles() {
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Roles");
+  const [viewMode, setViewMode] = useState("data-grid");
+
   const columns = [
     { field: "id", headerName: "ID", width: 50 },
     { field: "title", headerName: "Title", width: 100 },
@@ -228,8 +253,8 @@ function Roles() {
                 variant="contained"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit Role");
+                  setViewMode("edit");
+                  setPageHeader("Edit Role");
                 }}
               >
                 Edit
@@ -363,84 +388,108 @@ function Roles() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Roles
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />
 
-      <Card mb={6}>
-        <Paper mb={2}>
-          <Toolbar>
-            <div style={{ display: "flex", alignItems: "flex-end" }}>
-              {userPermissions.includes("role_create") ? (
-                <Button
-                  mb={3}
-                  className={classes.button}
-                  variant="contained"
-                  onClick={() => {
-                    setSelectedItem("");
-                    setOpenPopup(true);
-                    setOpenPopupTitle("New Role");
-                  }}
-                  startIcon={<Add />}
-                >
-                  Add Role
-                </Button>
-              ) : null}
+      {viewMode === "data-grid" ? (
+        <Card mb={6}>
+          <Paper mb={2}>
+            <Toolbar>
+              <div style={{ display: "flex", alignItems: "flex-end" }}>
+                {userPermissions.includes("role_create") ? (
+                  <Button
+                    mb={3}
+                    className={classes.button}
+                    variant="contained"
+                    onClick={() => {
+                      setSelectedItem("");
+                      setViewMode("add");
+                      setPageHeader("New Role");
+                    }}
+                    startIcon={<Add />}
+                  >
+                    Add Role
+                  </Button>
+                ) : null}
 
-              {userPermissions.includes("role_delete") ? (
-                <Button
-                  startIcon={<Delete />}
-                  color="secondary"
-                  variant="contained"
-                  disabled={rowsToDelete.length < 2}
-                  onClick={() => {
-                    setOpenMassDeleteDialog(true);
-                  }}
-                  style={{ height: 40, borderRadius: 0 }}
-                >
-                  Delete Selected
-                </Button>
-              ) : null}
+                {userPermissions.includes("role_delete") ? (
+                  <Button
+                    startIcon={<Delete />}
+                    color="secondary"
+                    variant="contained"
+                    disabled={rowsToDelete.length < 2}
+                    onClick={() => {
+                      setOpenMassDeleteDialog(true);
+                    }}
+                    style={{ height: 40, borderRadius: 0 }}
+                  >
+                    Delete Selected
+                  </Button>
+                ) : null}
+              </div>
+            </Toolbar>
+          </Paper>
+          <Paper>
+            <div style={{ width: "100%" }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                page={page}
+                pageSize={pageSize}
+                rowCount={rowsCount}
+                sortingOrder={["desc", "asc"]}
+                sortModel={sortModel}
+                columnBuffer={pageSize}
+                paginationMode="server"
+                sortingMode="server"
+                components={{
+                  Pagination: CustomPagination,
+                  LoadingOverlay: CustomLoadingOverlay,
+                }}
+                loading={loading}
+                checkboxSelection
+                disableColumnMenu
+                autoHeight={true}
+                onRowClick={
+                  userPermissions.includes("role_show")
+                    ? ({ row }) => history.push(`/user-mgt/roles/${row.id}`)
+                    : null
+                }
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSize}
+                onSortModelChange={handleSortModelChange}
+                onSelectionChange={(newSelection) => {
+                  setRowsToDelete(newSelection.rowIds);
+                }}
+              />
             </div>
-          </Toolbar>
-        </Paper>
-        <Paper>
-          <div style={{ width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              page={page}
-              pageSize={pageSize}
-              rowCount={rowsCount}
-              sortingOrder={["desc", "asc"]}
-              sortModel={sortModel}
-              columnBuffer={pageSize}
-              paginationMode="server"
-              sortingMode="server"
-              components={{
-                Pagination: CustomPagination,
-                LoadingOverlay: CustomLoadingOverlay,
-              }}
-              loading={loading}
-              checkboxSelection
-              disableColumnMenu
-              autoHeight={true}
-              onRowClick={
-                userPermissions.includes("role_show")
-                  ? ({ row }) => history.push(`/user-mgt/roles/${row.id}`)
-                  : null
-              }
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSize}
-              onSortModelChange={handleSortModelChange}
-              onSelectionChange={(newSelection) => {
-                setRowsToDelete(newSelection.rowIds);
-              }}
-            />
+          </Paper>
+        </Card>
+      ) : (
+        <Card mb={6} style={{ padding: "50px 60px" }}>
+          <div
+            className={classes.backBtn}
+            onClick={() => {
+              setViewMode("data-grid");
+              setPageHeader("Roles");
+            }}
+          >
+            <ArrowBack className={classes.backIcon} />
+            <span>Back</span>
           </div>
-        </Paper>
-      </Card>
+          <Divider my={3} />
+          <RolesForm
+            setPage={setPage}
+            setOpenPopup={setOpenPopup}
+            itemToEdit={selectedItem}
+            permissionsList={permissionsList}
+            setViewMode={setViewMode}
+            setPageHeader={setPageHeader}
+          />
+        </Card>
+      )}
       <Popup
         title={openPopupTitle}
         openPopup={openPopup}

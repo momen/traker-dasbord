@@ -42,6 +42,7 @@ const useStyles = makeStyles({
     // width: "100%",
     whiteSpace: "normal",
     wordWrap: "break-word",
+    wordBreak: "break-word",
   },
 });
 

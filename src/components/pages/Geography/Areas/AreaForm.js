@@ -147,7 +147,7 @@ function ProductsForm({
       await axios
         .post(`/areas/${itemToEdit.id}`, formData)
         .then((res) => {
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch((res) => {
           setIsSubmitting(false); // Update on other components
@@ -158,7 +158,7 @@ function ProductsForm({
         .post("/areas", formData)
         .then((res) => {
           setPage(1);
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch((res) => {
           setIsSubmitting(false); // Update on other components

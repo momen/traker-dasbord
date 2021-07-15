@@ -137,6 +137,7 @@ function UsersForm({
       .then((res) => {
         setPage(1);
         setOpenPopup(false);
+        setDialogOpen(true);
       })
       .catch(({ response }) => {
         setIsSubmitting(false);

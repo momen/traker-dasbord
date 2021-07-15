@@ -12,20 +12,58 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import SuccessPopup from "../../../SuccessPopup";
+import { RotateLeft } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(1),
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-    width: "60vw",
+    // alignItems: "center",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  selectAllBtn: {
+    marginRight: 5,
+    color: "#ffffff",
+    backgroundColor: "#EF9300",
+    height: "35px",
+    // width: "100%",
+    borderRadius: "0",
+    "&:hover": {
+      backgroundColor: "#a46500",
+    },
+  },
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "2px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    margin: theme.spacing(3, 2, 2),
+    width: "15%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
@@ -56,7 +94,14 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
-function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
+function RolesForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  permissionsList,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
   const formRef = useRef();
 
@@ -71,6 +116,19 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
   const [permissionsError, setPermissionsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit ? "Role updated successfully." : "Role added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    if (itemToEdit) {
+      setViewMode("data-grid");
+      setPageHeader("Roles");
+    }
+  };
 
   const handleSubmit = async () => {
     if (formData.permissions.length === 0) {
@@ -95,7 +153,7 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
         .put(`/roles/${itemToEdit.id}`, data)
         .then((res) => {
           // setPage(1);
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch(({ response }) => {
           setIsSubmitting(false);
@@ -107,7 +165,7 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
         .post("/roles", data)
         .then((res) => {
           setPage(1);
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch(({ response }) => {
           setIsSubmitting(false);
@@ -160,8 +218,8 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
           resetForm,
         }) => (
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
+            <Grid container spacing={8}>
+              <Grid item xs={4}>
                 <TextField
                   name="title" //Customize
                   required
@@ -188,6 +246,8 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                 />
               </Grid>
 
+              <Grid item xs={8}></Grid>
+
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.title?.map((msg) => (
@@ -200,9 +260,10 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
 
               <Grid item xs={12} spacing={2}>
                 <Button
+                  className={classes.selectAllBtn}
                   variant="outlined"
                   color="primary"
-                  style={{ marginRight: "5px" }}
+                  // style={{ marginRight: "5px", borderRadius: 0 }}
                   onClick={() => {
                     updateFormData({
                       ...formData,
@@ -214,8 +275,10 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                   Select All
                 </Button>
                 <Button
+                  className={classes.unselectAllBtn}
                   variant="contained"
                   color="secondary"
+                  style={{ borderRadius: 0, height: 35 }}
                   onClick={() => {
                     updateFormData({ ...formData, permissions: [] });
                     setPermissionsError(true);
@@ -298,7 +361,7 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
             ) : null}
             <Grid container justify="center">
               <Button
-                className={classes.button}
+                className={classes.submitButton}
                 type="submit"
                 variant="contained"
                 color="primary"
@@ -307,7 +370,8 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
                 Submit
               </Button>
               <Button
-                className={classes.button}
+                className={classes.resetButton}
+                startIcon={<RotateLeft />}
                 variant="contained"
                 onClick={() => {
                   handleReset();
@@ -323,6 +387,12 @@ function RolesForm({ setPage, setOpenPopup, itemToEdit, permissionsList }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

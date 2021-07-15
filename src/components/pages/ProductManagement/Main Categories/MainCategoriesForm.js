@@ -138,19 +138,14 @@ function MainCategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <NumberFormat
-                  allowLeadingZeros={false}
-                  customInput={TextField}
+                <TextField
                   name="main_category_name"
-                  decimalSeparator={null}
-                  allowNegative={false}
                   required
                   fullWidth
                   label="Main Category Name"
                   // prefix="%"
                   value={formData.main_category_name}
                   onChange={(e) => {
-                    console.log(e.target.value);
                     handleChange(e);
                     handleStateChange(e);
                   }}

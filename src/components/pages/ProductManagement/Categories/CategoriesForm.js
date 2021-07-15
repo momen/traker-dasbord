@@ -168,7 +168,7 @@ function CategoriesForm({
             },
           })
           .then((res) => {
-            setOpenPopup(false);
+            setDialogOpen(true);
           })
           .catch((res) => {
             setIsSubmitting(false);
@@ -183,7 +183,7 @@ function CategoriesForm({
           })
           .then((res) => {
             setPage(1);
-            setOpenPopup(false);
+            setDialogOpen(true);
           })
           .catch((res) => {
             setIsSubmitting(false);

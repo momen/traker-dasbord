@@ -178,7 +178,7 @@ function StoresForm({
       await axios
         .post(`/update/stores/${itemToEdit.id}`, data)
         .then((res) => {
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch((res) => {
           setIsSubmitting(false);
@@ -189,7 +189,7 @@ function StoresForm({
         .post("/add/stores", data)
         .then((res) => {
           setPage(1);
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch((res) => {
           setIsSubmitting(false);

@@ -148,8 +148,8 @@ function Support() {
       headerAlign: "center",
       align: "center",
     },
-    { field: "ticket_no", headerName: "Ticket Number", width: 100 },
-    { field: "title", headerName: "Title", width: 100 },
+    { field: "ticket_no", headerName: "Ticket Number", width: 100, flex: 1 },
+    { field: "title", headerName: "Title", width: 100, flex: 1 },
     { field: "priority", headerName: "Priority", width: 80 },
     { field: "case", headerName: "Status", width: 80 },
     {
@@ -160,35 +160,35 @@ function Support() {
     },
     { field: "vendor_name", headerName: "Vendor Name", width: 120 },
     { field: "order_number", headerName: "Order Number", width: 120 },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 220,
-      sortable: false,
-      disableClickEventBubbling: true,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              width: "100%",
-            }}
-          >
-            {/* {userPermissions.includes("specific_ticket_access") ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                variant="contained"
-                size="small"
-                onClick={() => history.push(`/support/ticket/${params.row.id}`)}
-              >
-                View
-              </Button>
-            ) : null} */}
-          </div>
-        );
-      },
-    },
+    // {
+    //   field: "actions",
+    //   headerName: "Actions",
+    //   width: 220,
+    //   sortable: false,
+    //   disableClickEventBubbling: true,
+    //   renderCell: (params) => {
+    //     return (
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           justifyContent: "flex-start",
+    //           width: "100%",
+    //         }}
+    //       >
+    //         {/* {userPermissions.includes("specific_ticket_access") ? (
+    //           <Button
+    //             style={{ marginRight: "5px" }}
+    //             variant="contained"
+    //             size="small"
+    //             onClick={() => history.push(`/support/ticket/${params.row.id}`)}
+    //           >
+    //             View
+    //           </Button>
+    //         ) : null} */}
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
   const handlePageSize = ({ pageSize }) => {

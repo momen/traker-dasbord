@@ -149,7 +149,7 @@ function PartCategoryForm({
             },
           })
           .then((res) => {
-            setOpenPopup(false);
+            setDialogOpen(true);
           })
           .catch((res) => {
             setIsSubmitting(false);
@@ -164,7 +164,7 @@ function PartCategoryForm({
           })
           .then((res) => {
             setPage(1);
-            setOpenPopup(false);
+            setDialogOpen(true);
           })
           .catch((res) => {
             setIsSubmitting(false);
