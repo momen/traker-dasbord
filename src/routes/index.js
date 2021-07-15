@@ -19,6 +19,7 @@ import {
 import {
   BusinessCenter,
   Category,
+  Class,
   Dashboard,
   EventNote,
   Explore,
@@ -329,7 +330,7 @@ const productManagementRoutes = {
       path: "/product/main-categories",
       name: "Main Categories",
       component: MainCategories,
-      icon: <Folder />,
+      icon: <Class />,
       guard: PermissionGuard,
       permission: "main_categories_access",
     },

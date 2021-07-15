@@ -151,6 +151,7 @@ function CustomLoadingOverlay() {
 function PendingOrders() {
   const classes = useStyles();
   const userPermissions = useSelector((state) => state.userPermissions);
+  const user = useSelector((state) => state.user);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(1);
@@ -203,6 +204,7 @@ function PendingOrders() {
               </Button>
             ) : null} */}
             {userPermissions.includes("approve_orders") &&
+            user.roles[0].id !== 1 &&
             params.row.status === "pending" &&
             params.row.paid ? (
               <Button
@@ -220,6 +222,7 @@ function PendingOrders() {
             ) : null}
 
             {userPermissions.includes("cancel_orders") &&
+            user.roles[0].id !== 1 &&
             params.row.status === "pending" ? (
               <Button
                 style={{ marginRight: "5px" }}

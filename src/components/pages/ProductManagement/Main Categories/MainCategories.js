@@ -217,7 +217,7 @@ function MainCategories() {
                 onClick={() => {
                   setSelectedItem(params.row);
                   setOpenPopup(true);
-                  setOpenPopupTitle("Edit Main Category")
+                  setOpenPopupTitle("Edit Main Category");
                 }}
               >
                 Edit
@@ -282,8 +282,7 @@ function MainCategories() {
         setLoading(true);
         axios
           .get(
-            `/main/categories
-            ?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/main/categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {

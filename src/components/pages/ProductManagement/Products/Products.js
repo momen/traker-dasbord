@@ -117,6 +117,28 @@ const useStyles = makeStyles((theme) => ({
       borderBottom: "1px solid #7B7B7B",
     },
   },
+  approveButton: {
+    background: "#ffffff",
+    color: "#90CA28",
+    border: "1px solid #90CA28",
+    borderRadius: 0,
+    height: 30,
+    "&:hover": {
+      background: "#90CA28",
+      color: "#ffffff",
+    },
+  },
+  cancelButton: {
+    background: "#ffffff",
+    color: "#E10000",
+    border: "1px solid #E10000",
+    borderRadius: 0,
+    height: 30,
+    "&:hover": {
+      background: "#E10000",
+      color: "#ffffff",
+    },
+  },
 }));
 
 function CustomPagination(props) {
@@ -225,6 +247,9 @@ function Products() {
     { field: "quantity", sort: "desc" },
   ]);
   const [rowsToDelete, setRowsToDelete] = useState([]);
+  const [openApproveDialog, setOpenApproveDialog] = useState(false);
+  const [openRejectDialog, setOpenRejectDialog] = useState(false);
+  const [productToApproveOrRejct, setProductToApproveOrRejct] = useState();
 
   const [pageHeader, setPageHeader] = useState("Products");
   const [viewMode, setViewMode] = useState("data-grid");
@@ -247,9 +272,7 @@ function Products() {
       sortable: false,
       renderCell: (params) => params.row.producttype_id?.producttype,
     },
-    { field: "price", headerName: "Price", width: 60 },
-    { field: "holesale_price", headerName: "Wholesale Price", width: 60 },
-    { field: "no_of_orders", headerName: "No of orders", width: 60 },
+    { field: "price", headerName: "Price", width: 80 },
     {
       field: "discount",
       headerName: "Discount",
@@ -258,10 +281,32 @@ function Products() {
         params.value ? `%${parseFloat(params.value).toFixed(2)}` : "N/A",
       align: "center",
     },
+    { field: "holesale_price", headerName: "Wholesale Price", width: 80 },
+    // { field: "no_of_orders", headerName: "No of orders", width: 60 },
+
+    {
+      field: "photo",
+      headerName: "Photos",
+      width: 80,
+      sortable: false,
+      renderCell: (params) => (
+        <Fragment>
+          {params.value?.map((img, index) => (
+            <img
+              key={img.uuid}
+              src={img.image}
+              alt="ph"
+              style={{ objectFit: "contain", width: 50 }}
+            />
+          ))}
+        </Fragment>
+      ),
+    },
     {
       field: "actions",
       headerName: "Actions",
       width: 170,
+      flex: 1,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -294,8 +339,6 @@ function Products() {
               <Button
                 style={{
                   marginRight: "5px",
-                  // minWidth: "50px",
-                  // maxWidth: "50px",
                 }}
                 className={classes.actionBtn}
                 startIcon={<Edit />}
@@ -317,6 +360,9 @@ function Products() {
             {userPermissions.includes("product_delete") ? (
               <Button
                 className={classes.actionBtn}
+                style={{
+                  marginRight: "5px",
+                }}
                 startIcon={<Delete />}
                 color="secondary"
                 variant="contained"
@@ -326,27 +372,40 @@ function Products() {
                 Delete
               </Button>
             ) : null}
+
+            {user.roles[0].id === 1 && !params.row.approved ? (
+              <Button
+                style={{ marginRight: "5px" }}
+                className={classes.approveButton}
+                variant="contained"
+                size="small"
+                onClick={() => {
+                  setOpenApproveDialog(true);
+                  setProductToApproveOrRejct(params.row.id);
+                }}
+              >
+                Approve
+              </Button>
+            ) : null}
+
+            {/* {user.roles[0].id === 1 && !params.row.approved ? (
+              <Button
+                style={{ marginRight: "5px" }}
+                className={classes.cancelButton}
+                variant="contained"
+                color="secondary"
+                size="small"
+                onClick={() => {
+                  setOpenRejectDialog(true);
+                  setProductToApproveOrRejct(params.row.id);
+                }}
+              >
+                Reject
+              </Button>
+            ) : null} */}
           </div>
         );
       },
-    },
-    {
-      field: "photo",
-      headerName: "Photos",
-      width: 80,
-      sortable: false,
-      renderCell: (params) => (
-        <Fragment>
-          {params.value?.map((img, index) => (
-            <img
-              key={img.uuid}
-              src={img.image}
-              alt="ph"
-              style={{ objectFit: "contain", width: 50 }}
-            />
-          ))}
-        </Fragment>
-      ),
     },
   ];
 
@@ -379,6 +438,64 @@ function Products() {
       }
       setSearchValue(search);
     }
+  };
+
+  const approveProduct = () => {
+    axios
+      .post(`/approve/products`, {
+        product_id: productToApproveOrRejct,
+      })
+      .then(() => {
+        setOpenApproveDialog(false);
+        setLoading(true);
+        axios
+          .get(
+            `/products?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
+  };
+
+  const cancelProduct = () => {
+    axios
+      .post(`/vendor/cancel/order`, {
+        order_id: productToApproveOrRejct,
+      })
+      .then(() => {
+        setOpenRejectDialog(false);
+        setLoading(true);
+        axios
+          .get(
+            `/products?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
   };
 
   const openDeleteConfirmation = (id) => {
@@ -904,6 +1021,66 @@ function Products() {
             autoFocus
           >
             Back
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openApproveDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Order Approval"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to Approve this product?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              approveProduct();
+            }}
+            color="primary"
+          >
+            Yes
+          </Button>
+          <Button
+            onClick={() => setOpenApproveDialog(false)}
+            color="secondary"
+            autoFocus
+          >
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openRejectDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Cancel Order"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to Reject this product?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              cancelProduct();
+            }}
+            color="primary"
+          >
+            Yes
+          </Button>
+          <Button
+            onClick={() => setOpenRejectDialog(false)}
+            color="secondary"
+            autoFocus
+          >
+            No
           </Button>
         </DialogActions>
       </Dialog>
