@@ -138,15 +138,15 @@ function StoresForm({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogText, setDialogText] = useState(
     itemToEdit
-      ? "Store details updated successfully."
-      : "New store added successfully."
+      ? "Branch details updated successfully."
+      : "New branch added successfully."
   );
 
   const closeDialog = () => {
     setDialogOpen(false);
     if (itemToEdit) {
       setViewMode("data-grid");
-      setPageHeader("Stores");
+      setPageHeader("Branches");
     }
   };
 

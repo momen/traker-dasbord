@@ -218,6 +218,7 @@ function Products() {
   const [manufacturers, setManufacturers] = useState([]);
   const [originCountries, setOriginCountries] = useState([]);
   const [carTypes, setCarTypes] = useState([]);
+  const [transmissionsList, setTransmissionsList] = useState([]);
   const [productTypes, setProductTypes] = useState([]);
   const [productTags, setProductTags] = useState([]);
   const [sortModel, setSortModel] = useState([
@@ -549,6 +550,21 @@ function Products() {
       });
 
     axios
+      .get("/transmissions-list")
+      .then((res) => {
+        const _transmissionsList = res.data.data.map(
+          ({ id, transmission_name }) => ({
+            id,
+            transmission_name,
+          })
+        ); // Customize
+        setTransmissionsList(_transmissionsList);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Transmissions List");
+      });
+
+    axios
       .get("/product-tagslist")
       .then((res) => {
         const _tags = res.data.data.map(({ id, name }) => ({
@@ -797,6 +813,7 @@ function Products() {
             manufacturers={manufacturers}
             originCountries={originCountries}
             carTypes={carTypes}
+            transmissionsList={transmissionsList}
             productTags={productTags}
             productTypes={productTypes}
             setViewMode={setViewMode}

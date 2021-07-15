@@ -73,7 +73,7 @@ function ViewStore({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/vendor/stores")}
+        onClick={() => history.push("/vendor/branches")}
         mb={3}
       >
         Back to list
@@ -93,7 +93,7 @@ function ViewStore({ match }) {
             </StyledTableRow>
             <StyledTableRow key={store.name}>
               <StyledTableCell component="th" scope="row">
-                Store Name
+                Branch Name
               </StyledTableCell>
               <StyledTableCell align="left">{store.name}</StyledTableCell>
             </StyledTableRow>
@@ -101,7 +101,9 @@ function ViewStore({ match }) {
               <StyledTableCell component="th" scope="row">
                 Owner (vendor)
               </StyledTableCell>
-              <StyledTableCell align="left">{store.vendor_name}</StyledTableCell>
+              <StyledTableCell align="left">
+                {store.vendor_name}
+              </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={store.address}>
               <StyledTableCell component="th" scope="row">
@@ -145,7 +147,7 @@ function ViewStore({ match }) {
         </Table>
       </TableContainer>
       {store.lat && store.long ? (
-        <div style={{ height: "60vh", marginTop: "20px"}}>
+        <div style={{ height: "60vh", marginTop: "20px" }}>
           <Map
             lattitude={parseFloat(store.lat)}
             longitude={parseFloat(store.long)}

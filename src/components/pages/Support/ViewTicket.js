@@ -42,6 +42,7 @@ const useStyles = makeStyles({
     // width: "100%",
     whiteSpace: "normal",
     wordWrap: "break-word",
+    wordBreak: "break-word",
   },
 });
 
@@ -88,41 +89,31 @@ function ViewTicket({ match }) {
               <StyledTableCell component="th" scope="row">
                 Ticket Number
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.ticket_no}
-              </StyledTableCell>
+              <StyledTableCell align="left">{ticket.ticket_no}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`title${ticket.title}`}>
               <StyledTableCell component="th" scope="row">
                 Title
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.title}
-              </StyledTableCell>
+              <StyledTableCell align="left">{ticket.title}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`priority${ticket.priority}`}>
               <StyledTableCell component="th" scope="row">
                 Priority
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.priority}
-              </StyledTableCell>
+              <StyledTableCell align="left">{ticket.priority}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`msg${ticket.id}`}>
               <StyledTableCell component="th" scope="row">
-                Message
+                <span className={classes.rowContent}>Message</span>
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.message}
-              </StyledTableCell>
+              <StyledTableCell align="left">{ticket.message}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`status${ticket.id}`}>
               <StyledTableCell component="th" scope="row">
                 Status
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.status}
-              </StyledTableCell>
+              <StyledTableCell align="left">{ticket.status}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`category${ticket.category_id}`}>
               <StyledTableCell component="th" scope="row">
@@ -156,20 +147,26 @@ function ViewTicket({ match }) {
                 {ticket.vendor_name}
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`user-${ticket.user_id}`}>
+              <StyledTableCell component="th" scope="row">
+                Username
+              </StyledTableCell>
+              <StyledTableCell align="left">{ticket.user_name}</StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`userphone-${ticket.user_phone}`}>
+              <StyledTableCell component="th" scope="row">
+                User Phone Number
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.user_phone}
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={`vendor-email-${ticket.vendor_email}`}>
               <StyledTableCell component="th" scope="row">
                 Vendor Email
               </StyledTableCell>
               <StyledTableCell align="left">
                 {ticket.vendor_email}
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`user-${ticket.user_id}`}>
-              <StyledTableCell component="th" scope="row">
-                Username
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.user_name}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>

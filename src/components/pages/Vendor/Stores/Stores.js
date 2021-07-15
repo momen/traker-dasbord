@@ -166,7 +166,7 @@ function Stores() {
   const userPermissions = useSelector((state) => state.userPermissions);
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Store");
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Branch");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
@@ -182,7 +182,7 @@ function Stores() {
   const [rowsToDelete, setRowsToDelete] = useState([]);
   const [countries, setCountries] = useState([]);
 
-  const [pageHeader, setPageHeader] = useState("Stores");
+  const [pageHeader, setPageHeader] = useState("Branches");
   const [viewMode, setViewMode] = useState("data-grid");
 
   const location = useLocation();
@@ -191,7 +191,7 @@ function Stores() {
     { field: "id", headerName: "ID", width: 55 },
     {
       field: "name",
-      headerName: "Store Name",
+      headerName: "Branch Name",
       width: 200,
       flex: 1,
     },
@@ -249,7 +249,7 @@ function Stores() {
                 onClick={() => {
                   setSelectedItem(params.row);
                   setViewMode("edit");
-                  setPageHeader("Update Store Details");
+                  setPageHeader("Update Branch Details");
                 }}
               >
                 Edit
@@ -442,11 +442,11 @@ function Stores() {
                     onClick={() => {
                       setSelectedItem("");
                       setViewMode("add");
-                      setPageHeader("New Store");
+                      setPageHeader("New Branch");
                     }}
                     startIcon={<Add />}
                   >
-                    Add Store
+                    Add Branch
                   </Button>
                 ) : null}
 
@@ -525,7 +525,7 @@ function Stores() {
             className={classes.backBtn}
             onClick={() => {
               setViewMode("data-grid");
-              setPageHeader("Stores");
+              setPageHeader("Branches");
             }}
           >
             <ArrowBack className={classes.backIcon} />
@@ -566,7 +566,7 @@ function Stores() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Store? <br />
+            Are you sure you want to delete this Branch? <br />
             If this was by accident please press Back
           </DialogContentText>
         </DialogContent>
@@ -599,7 +599,7 @@ function Stores() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete all the selected Stores? <br />
+            Are you sure you want to delete all the selected Branches? <br />
             If you wish press Yes, otherwise press Back.
           </DialogContentText>
         </DialogContent>

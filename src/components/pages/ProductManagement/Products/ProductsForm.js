@@ -111,6 +111,7 @@ function ProductsForm({
   manufacturers,
   originCountries,
   carTypes,
+  transmissionsList,
   productTypes,
   setViewMode,
   setPageHeader,
@@ -1809,8 +1810,14 @@ function ProductsForm({
                         required
                       >
                         <option aria-label="None" value="" />
-                        <option value={1}>Manual</option>
-                        <option value={2}>Automatic</option>
+                        {transmissionsList?.map((transmission) => (
+                          <option
+                            value={transmission.id}
+                            style={{ textTransform: "capitalize" }}
+                          >
+                            {transmission.transmission_name}
+                          </option>
+                        ))}
                       </TextField>
 
                       {responseErrors ? (

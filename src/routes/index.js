@@ -453,8 +453,8 @@ const vendorRoutes = {
       permission: "add_vendor_access",
     },
     {
-      path: "/vendor/stores",
-      name: "Stores",
+      path: "/vendor/branches",
+      name: "Branches",
       component: Stores,
       icon: <Store />,
       guard: PermissionGuard,
@@ -516,7 +516,7 @@ const viewVendorInvoice = {
 };
 
 const viewStore = {
-  path: "/vendor/stores/:id",
+  path: "/vendor/branches/:id",
   component: ViewStore,
   children: null,
 };
@@ -595,8 +595,8 @@ const advancedReportsRoute = {
 };
 
 const storesRoute = {
-  id: "Stores",
-  path: "/vendor/stores",
+  id: "Branches",
+  path: "/vendor/branches",
   icon: <Store />,
   component: Stores,
   children: null,
