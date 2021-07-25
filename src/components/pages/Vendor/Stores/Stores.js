@@ -27,7 +27,14 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Add, ArrowBack, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import {
+  Add,
+  ArrowBack,
+  Delete,
+  Edit,
+  ExpandMore,
+  UnfoldLess,
+} from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import StoresForm from "./StoresForm";
@@ -192,21 +199,29 @@ function Stores() {
     {
       field: "name",
       headerName: "Branch Name",
-      width: 200,
-      flex: 1,
+      width: 120,
     },
-    { field: "address", headerName: "Address", width: 200, flex: 1 },
+    {
+      field: "serial_id",
+      headerName: "Serial",
+      width: 150,
+    },
+    {
+      field: "head_center",
+      headerName: "Address Type",
+      width: 120,
+      renderCell: (params) => (params.value ? "*Billing*" : "Shipping"),
+    },
+    { field: "address", headerName: "Address", width: 150 },
     {
       field: "moderator_phone",
       headerName: "Moderator Phone",
-      width: 200,
-      flex: 1,
+      width: 120,
     },
     {
       field: "moderator_alt_phone",
       headerName: "Moderator Alt Phone",
-      width: 200,
-      flex: 1,
+      width: 120,
     },
     {
       field: "actions",

@@ -406,7 +406,7 @@ const productManagementRoutes = {
     },
     {
       path: "/product/car-types",
-      name: "Car Types",
+      name: "Vehicle Types",
       component: CarTypes,
       icon: <Commute />,
       guard: PermissionGuard,

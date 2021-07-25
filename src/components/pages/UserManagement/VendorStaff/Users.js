@@ -31,7 +31,13 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { Delete, Search, UnfoldLess, ExpandMore, ArrowBack } from "@material-ui/icons";
+import {
+  Delete,
+  Search,
+  UnfoldLess,
+  ExpandMore,
+  ArrowBack,
+} from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import UsersForm from "./UsersForm";
@@ -214,6 +220,21 @@ function Users() {
       headerName: "Name",
       width: 120,
       sortable: false,
+    },
+    {
+      field: "stores",
+      headerName: "Branches",
+      width: 200,
+      sortable: false,
+      renderCell: (params) => (
+        <div>
+          {params.value?.map((branch) => (
+            <span key={branch?.id} className={classes.roleBadge}>
+              {branch.name}
+            </span>
+          ))}
+        </div>
+      ),
     },
     {
       field: "approved",

@@ -113,13 +113,13 @@ function ViewStore({ match }) {
                 <span className={classes.rowContent}>{store.address}</span>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.moderator_name}>
+            <StyledTableRow key={store.serial_id}>
               <StyledTableCell component="th" scope="row">
-                Moderator Name
+                Serial
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>
-                  {store.moderator_name}
+                  {store.serial_id}
                 </span>
               </StyledTableCell>
             </StyledTableRow>

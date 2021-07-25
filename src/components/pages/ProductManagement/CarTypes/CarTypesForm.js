@@ -1,9 +1,21 @@
 import React, { useRef, useState } from "react";
-import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
+import {
+  Button,
+  Chip,
+  Collapse,
+  FormControl,
+  Grid,
+  IconButton,
+  makeStyles,
+  TextField,
+} from "@material-ui/core";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import axios from "../../../../axios";
 import { RotateLeft } from "@material-ui/icons";
+import SuccessPopup from "../../../SuccessPopup";
+import { Alert } from "@material-ui/lab";
+import { CloseIcon } from "@material-ui/data-grid";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -11,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "20vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -30,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     margin: theme.spacing(3, 2, 2),
-    width: "40%",
+    width: "15%",
   },
   resetButton: {
     height: 40,
@@ -45,7 +56,17 @@ const useStyles = makeStyles((theme) => ({
     //   color: "#ffffff",
     // },
     margin: theme.spacing(3, 2, 2),
-    width: "40%",
+    width: "15%",
+  },
+  uploadButton: {
+    margin: theme.spacing(3, 2, 2),
+  },
+  chip: {
+    margin: theme.spacing(3, 2, 2),
+    maxWidth: "100%",
+  },
+  uploadInput: {
+    display: "none",
   },
   errorsContainer: {
     marginBottom: theme.spacing(1),
@@ -66,41 +87,85 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
-function CarTypesForm({ setPage, setOpenPopup, itemToEdit }) {
+function CarTypesForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const formRef = useRef();
+  const uploadRef = useRef();
+
   const [formData, updateFormData] = useState({
     type_name: itemToEdit ? itemToEdit.type_name : "",
+    photo: "",
   });
+  const [imgName, setImgName] = useState("");
+  const [openAlert, setOpenAlert] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
+  const [bigImgSize, setBigImgSize] = useState(false);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit
+      ? "Car Type edited successfully."
+      : "New car type added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    if (itemToEdit) {
+      setViewMode("data-grid");
+      setPageHeader("Car Types");
+    }
+  };
 
   const handleSubmit = () => {
-    setIsSubmitting(true);
-
-    if (itemToEdit) {
-      axios
-        .post(`/car-types/${itemToEdit.id}`, formData)
-        .then((res) => {
-          setPage(1);
-          setOpenPopup(false);
-        })
-        .catch(({ response }) => {
-          setIsSubmitting(false);
-          setResponseErrors(response.data.errors);
-        });
+    if (!formData.photo && !itemToEdit) {
+      setOpenAlert(true);
     } else {
-      axios
-        .post("/car-types", formData)
-        .then((res) => {
-          setPage(1);
-          setOpenPopup(false);
-        })
-        .catch(({ response }) => {
-          setIsSubmitting(false);
-          setResponseErrors(response.data.errors);
-        });
+      let data = new FormData();
+
+      data.append("type_name", formData.type_name);
+
+      data.append("photo", formData.photo, formData.photo.name);
+
+      setIsSubmitting(true);
+
+      if (itemToEdit) {
+        axios
+          .post(`/car-types/${itemToEdit.id}`, data, {
+            headers: {
+              "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
+            },
+          })
+          .then((res) => {
+            setDialogOpen(true);
+          })
+          .catch(({ response }) => {
+            setIsSubmitting(false);
+            setResponseErrors(response.data.errors);
+          });
+      } else {
+        axios
+          .post("/car-types", data, {
+            headers: {
+              "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
+            },
+          })
+          .then((res) => {
+            setPage(1);
+            setDialogOpen(true);
+          })
+          .catch(({ response }) => {
+            setIsSubmitting(false);
+            setResponseErrors(response.data.errors);
+          });
+      }
     }
   };
 
@@ -111,11 +176,45 @@ function CarTypesForm({ setPage, setOpenPopup, itemToEdit }) {
     });
   };
 
+  const handleUpload = (e) => {
+    const imgSize = e.target.files[0]?.size / 1000; //Convert Size from bytes to kilo bytes
+
+    // Maximum Size for an Image is 2MB
+    if (imgSize > 2000) {
+      setBigImgSize(true);
+      return;
+    }
+
+    setBigImgSize(false);
+
+    setImgName(e.target.files[0].name);
+    updateFormData({
+      ...formData,
+      photo: e.target.files[0],
+    });
+    setOpenAlert(false);
+  };
+
+  const handleDeleteImage = () => {
+    updateFormData({
+      ...formData,
+      photo: "",
+    });
+
+    setImgName("");
+
+    uploadRef.current.value = "";
+    // Empty the FileList of the input file, to be able to add the file again to avoid bad user experience
+    // as we can't manipulate the FileList directly.
+  };
+
   const handleReset = () => {
     updateFormData({
       type_name: "",
     });
     setResponseErrors("");
+    setImgName("");
+    setOpenAlert(false);
   };
   return (
     <div className={classes.paper}>
@@ -135,8 +234,8 @@ function CarTypesForm({ setPage, setOpenPopup, itemToEdit }) {
           resetForm,
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
+            <Grid container spacing={8}>
+              <Grid item xs={4}>
                 <TextField
                   name="type_name"
                   required
@@ -151,15 +250,12 @@ function CarTypesForm({ setPage, setOpenPopup, itemToEdit }) {
                   onBlur={handleBlur}
                   error={
                     responseErrors?.type_name ||
-                    Boolean(
-                      touched.type_name && errors.type_name
-                    )
+                    Boolean(touched.type_name && errors.type_name)
                   }
-                  helperText={
-                    touched.type_name && errors.type_name
-                  }
+                  helperText={touched.type_name && errors.type_name}
                 />
               </Grid>
+              <Grid item xs={8}></Grid>
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.type_name?.map((msg) => (
@@ -169,6 +265,81 @@ function CarTypesForm({ setPage, setOpenPopup, itemToEdit }) {
                   ))}
                 </Grid>
               ) : null}
+
+              <Grid item xs={12} md={3}>
+                <input
+                  ref={uploadRef}
+                  accept="image/*"
+                  className={classes.uploadInput}
+                  id="icon-button-file"
+                  type="file"
+                  onChange={handleUpload}
+                />
+                <label htmlFor="icon-button-file">
+                  <Button
+                    variant="contained"
+                    color="default"
+                    className={classes.uploadButton}
+                    component="span"
+                  >
+                    Upload
+                  </Button>
+                </label>
+              </Grid>
+
+              {imgName ? (
+                <Grid item xs md={9}>
+                  <Chip
+                    className={classes.chip}
+                    // icon={<FaceIcon/>}
+                    label={imgName}
+                    onDelete={handleDeleteImage}
+                    variant="outlined"
+                  />
+                </Grid>
+              ) : null}
+
+              {bigImgSize ? (
+                <Grid item xs={12}>
+                  <p className={classes.errorMsg}>
+                    The uploaded image size shouldn't exceed 2MB.
+                  </p>
+                </Grid>
+              ) : null}
+
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.photo?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12}>
+                <FormControl>
+                  <Collapse in={openAlert}>
+                    <Alert
+                      severity="error"
+                      action={
+                        <IconButton
+                          aria-label="close"
+                          color="inherit"
+                          size="small"
+                          onClick={() => {
+                            setOpenAlert(false);
+                          }}
+                        >
+                          <CloseIcon fontSize="inherit" />
+                        </IconButton>
+                      }
+                    >
+                      Please upload an Image.
+                    </Alert>
+                  </Collapse>
+                </FormControl>
+              </Grid>
             </Grid>
 
             {typeof responseErrors === "string" ? (
@@ -204,6 +375,12 @@ function CarTypesForm({ setPage, setOpenPopup, itemToEdit }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }
