@@ -17,9 +17,11 @@ import {
   Users,
 } from "react-feather";
 import {
+  Build,
   BusinessCenter,
   Category,
   Class,
+  Commute,
   Dashboard,
   EventNote,
   Explore,
@@ -38,6 +40,7 @@ import {
   ShoppingBasket,
   Store,
   TimeToLeave,
+  TripOrigin,
   VpnKey,
 } from "@material-ui/icons";
 
@@ -105,6 +108,15 @@ const CarYear = async(() =>
 );
 const Tags = async(() =>
   import("../components/pages/ProductManagement/Tags/Tags.js")
+);
+const CarTypes = async(() =>
+  import("../components/pages/ProductManagement/CarTypes/CarTypes.js")
+);
+const Manufacturers = async(() =>
+  import("../components/pages/ProductManagement/Manufacturers/Manufacturers.js")
+);
+const Origins = async(() =>
+  import("../components/pages/ProductManagement/Origins/Origins.js")
 );
 const Products = async(() =>
   import("../components/pages/ProductManagement/Products/Products.js")
@@ -199,6 +211,15 @@ const ViewCarYear = async(() =>
 );
 const ViewProductTag = async(() =>
   import("../components/pages/ProductManagement/Tags/ViewTag")
+);
+const ViewCarType = async(() =>
+  import("../components/pages/ProductManagement/CarTypes/ViewCarType")
+);
+const ViewManufacturer = async(() =>
+  import("../components/pages/ProductManagement/Manufacturers/ViewManufacturer")
+);
+const ViewOrigin = async(() =>
+  import("../components/pages/ProductManagement/Origins/ViewOrigin")
 );
 const ViewProduct = async(() =>
   import("../components/pages/ProductManagement/Products/ViewProduct")
@@ -384,6 +405,30 @@ const productManagementRoutes = {
       permission: "product_tag_access",
     },
     {
+      path: "/product/car-types",
+      name: "Car Types",
+      component: CarTypes,
+      icon: <Commute />,
+      guard: PermissionGuard,
+      permission: "car_type_access",
+    },
+    {
+      path: "/product/manufacturers",
+      name: "Manufacturers",
+      component: Manufacturers,
+      icon: <Build />,
+      guard: PermissionGuard,
+      permission: "manufacturers_access",
+    },
+    {
+      path: "/product/origin-countries",
+      name: "Origins",
+      component: Origins,
+      icon: <TripOrigin />,
+      guard: PermissionGuard,
+      permission: "origin_countries_access",
+    },
+    {
       path: "/product/products",
       name: "Products",
       component: Products,
@@ -430,6 +475,24 @@ const viewCarYear = {
 const viewProductTag = {
   path: "/product/tags/:id",
   component: ViewProductTag,
+  children: null,
+};
+
+const viewCarType = {
+  path: "/product/car-types/:id",
+  component: ViewCarType,
+  children: null,
+};
+
+const viewManufacturer = {
+  path: "/product/manufacturers/:id",
+  component: ViewManufacturer,
+  children: null,
+};
+
+const viewOrigin = {
+  path: "/product/origin-countries/:id",
+  component: ViewOrigin,
   children: null,
 };
 
@@ -724,6 +787,9 @@ export const dashboardLayoutRoutes = [
   viewPartCategory,
   viewCarYear,
   viewProductTag,
+  viewCarType,
+  viewManufacturer,
+  viewOrigin,
   viewProduct,
   viewVendor,
   vendorOrders,
