@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../axios";
-import { Button } from "@material-ui/core";
+import { Button, TextField } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -10,6 +10,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
+import { useSelector } from "react-redux";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -31,7 +32,7 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 700,
     "& .MuiTableCell-root": {
@@ -44,12 +45,29 @@ const useStyles = makeStyles({
     wordWrap: "break-word",
     wordBreak: "break-word",
   },
-});
+  submitButton: {
+    width: 150,
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    marginTop: 15,
+  },
+}));
 
 function ViewTicket({ match }) {
   const classes = useStyles();
   const history = useHistory();
+  const { user } = useSelector((state) => state);
   const [ticket, setTicket] = useState("");
+
+  const [answer, updateAnswer] = useState("");
 
   useEffect(() => {
     axios
@@ -61,6 +79,28 @@ function ViewTicket({ match }) {
         alert("Failed to Fetch data");
       });
   }, []);
+
+  const addReply = () => {
+    if (user.roles[0].title === "Vendor") {
+      axios
+        .post("vendor/answer/ticket", {
+          ticket_id: ticket.id,
+          answer: answer,
+        })
+        .then(() => {
+          alert("Reply added successfully");
+        });
+    } else {
+      axios
+        .post("admin/answer/ticket", {
+          ticket_id: ticket.id,
+          answer: answer,
+        })
+        .then(() => {
+          alert("Reply added successfully");
+        });
+    }
+  };
 
   return (
     <Fragment>
@@ -107,7 +147,41 @@ function ViewTicket({ match }) {
               <StyledTableCell component="th" scope="row">
                 <span className={classes.rowContent}>Message</span>
               </StyledTableCell>
-              <StyledTableCell align="left">{ticket.message}</StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.message}
+
+                {(user?.roles[0].title === "Admin" &&
+                  ticket.case === "to admin") ||
+                (user?.roles[0].title === "Vendor" &&
+                  ticket.case !== "solved") ? (
+                  <>
+                    <p
+                      style={{
+                        fontWeight: "bold",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      Add Reply:
+                    </p>
+                    <TextField
+                      multiline
+                      rows={5}
+                      variant="outlined"
+                      fullWidth
+                      value={answer}
+                      onChange={(e) => updateAnswer(e.target.value)}
+                    />
+
+                    <Button
+                      className={classes.submitButton}
+                      onClick={addReply}
+                      disabled={!answer}
+                    >
+                      Submit
+                    </Button>
+                  </>
+                ) : null}
+              </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`status${ticket.id}`}>
               <StyledTableCell component="th" scope="row">

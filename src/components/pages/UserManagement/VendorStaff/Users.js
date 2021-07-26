@@ -213,7 +213,8 @@ function Users() {
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
     { field: "name", headerName: "Name", width: 100 },
-    { field: "email", headerName: "Email", width: 180 },
+    { field: "email", headerName: "Email", width: 160 },
+    { field: "serial_id", headerName: "Serial", width: 160 },
     {
       field: "stores",
       headerName: "Branches",
@@ -239,7 +240,7 @@ function Users() {
     {
       field: "actions",
       headerName: "Actions",
-      width: 220,
+      width: 150,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {

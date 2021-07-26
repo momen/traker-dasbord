@@ -209,10 +209,62 @@ function Vendors() {
     },
     {
       field: "approved",
-      headerName: "Approval",
+      headerName: "Status",
       width: 100,
       renderCell: (params) => {
-        return params.row.approved ? "Approved" : "Pending";
+        return params.row.approved ? (
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "5px",
+              color: "#90CA28",
+              border: "1px solid #90CA28",
+              height: 30,
+            }}
+          >
+            Approved
+          </span>
+        ) : params.row.rejected ? (
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "5px",
+              color: "#FFA920",
+              border: "1px solid #FFA920",
+              height: 30,
+            }}
+          >
+            Invalid Info
+          </span>
+        ) : params.row.declined ? (
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "5px",
+              color: "#CA2828",
+              border: "1px solid #CA2828",
+              height: 30,
+            }}
+          >
+            Rejected
+          </span>
+        ) : (
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "5px",
+              color: "#98A9FF",
+              border: "1px solid #98A9FF",
+              height: 30,
+            }}
+          >
+            Pending
+          </span>
+        );
       },
     },
     {

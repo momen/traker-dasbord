@@ -176,7 +176,8 @@ const Link = styled(ListItem)`
   }
 
   &.${(props) => props.activeClassName} {
-    background-color: ${'#424242'
+    background-color: ${
+      "#424242"
       // (props) =>
       // darken(0.03, props.theme.sidebar.background)
     };
@@ -302,9 +303,7 @@ const SidebarLink = ({ name, to, badge, icon, id }) => {
 };
 
 const Sidebar = ({ classes, staticContext, location, ...rest }) => {
-  const { user, userPermissions } = useSelector((state) => {
-    return { user: state.user, userPermissions: state.userPermissions };
-  });
+  const { user, userPermissions } = useSelector((state) => state);
   const dispatch = useDispatch();
 
   const initOpenRoutes = () => {
@@ -441,7 +440,25 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                   !category.children &&
                   (category.noPermissionRequired ||
                     userPermissions?.includes(category.permission)) &&
+                  user?.roles[0].title !== "Staff" &&
                   category.id !== "Logout" ? (
+                  <SidebarCategory
+                    isCollapsable={false}
+                    id={category.id}
+                    name={category.id}
+                    to={category.path}
+                    activeClassName="active"
+                    component={NavLink}
+                    icon={category.icon}
+                    exact={category.containsHome ? true : false}
+                    //To make tabs other than the home page to track navigation of it's inner tabs
+                    button
+                    // badge={category.badge}
+                  />
+                ) : (user?.roles[0].title === "Staff" &&
+                    category.id === "Dashboard") ||
+                  (user?.roles[0].title === "Staff" &&
+                    category.id === "Branches") ? (
                   <SidebarCategory
                     isCollapsable={false}
                     id={category.id}

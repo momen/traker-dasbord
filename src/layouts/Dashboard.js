@@ -73,7 +73,7 @@ const MainContent = styled(Paper)`
 const Dashboard = ({ children, routes, width }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   // const [{ userPermissions }] = useStateValue();
-  const userPermissions = useSelector((state) => state.userPermissions)
+  const userPermissions = useSelector((state) => state.userPermissions);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -94,15 +94,17 @@ const Dashboard = ({ children, routes, width }) => {
               onClose={handleDrawerToggle}
             />
           </Hidden>
-        <Hidden smDown implementation="css">
-              <Sidebar
-                routes={routes}
-                PaperProps={{ style: { width: drawerWidth } }}
-              />
+          <Hidden smDown implementation="css">
+            <Sidebar
+              routes={routes}
+              PaperProps={{ style: { width: drawerWidth } }}
+            />
           </Hidden>
         </Drawer>
         <AppContent>
-          <Header onDrawerToggle={handleDrawerToggle} />
+          <Hidden mdUp implementation="js">
+            <Header onDrawerToggle={handleDrawerToggle} />
+          </Hidden>
           <MainContent p={isWidthUp("lg", width) ? 12 : 5}>
             {children}
           </MainContent>

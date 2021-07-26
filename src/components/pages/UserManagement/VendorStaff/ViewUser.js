@@ -99,6 +99,12 @@ function ViewUser({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">{singleUser.name}</StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={singleUser.serial_id}>
+              <StyledTableCell component="th" scope="row">
+                Serial
+              </StyledTableCell>
+              <StyledTableCell align="left">{singleUser.serial_id}</StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={singleUser.email}>
               <StyledTableCell component="th" scope="row">
                 Email

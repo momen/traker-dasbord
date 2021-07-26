@@ -1,11 +1,13 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
+function InvoicesGuard({ children }) {
+  const { userPermissions, user } = useSelector((state) => state);
 
-function UserManagementGuard({ children }) {
-  const userPermissions = useSelector((state) => state.userPermissions);
-
-  return (userPermissions?.includes("show_invoices_access") ? children : null)
+  return userPermissions?.includes("show_invoices_access") &&
+    user.roles[0].title !== "Manager"
+    ? children
+    : null;
 }
 
-export default UserManagementGuard;
+export default InvoicesGuard;

@@ -121,7 +121,9 @@ function ViewProduct({ match }) {
                 Serial Number
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.serial_number}</span>
+                <span className={classes.rowContent}>
+                  {product.serial_number}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={product.serial_coding}>
@@ -129,7 +131,9 @@ function ViewProduct({ match }) {
                 Serial Encoding
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.serial_coding}</span>
+                <span className={classes.rowContent}>
+                  {product.serial_coding}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={product.name}>
@@ -325,7 +329,7 @@ function ViewProduct({ match }) {
             </StyledTableRow> */}
             <StyledTableRow key={`made-${product.car_made_id}`}>
               <StyledTableCell component="th" scope="row">
-                Car Made
+                Brand
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>

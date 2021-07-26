@@ -86,7 +86,7 @@ function ViewCarMade({ match }) {
             </StyledTableRow>
             <StyledTableRow key={carMade.car_made}>
               <StyledTableCell component="th" scope="row">
-                Car Made
+                Brand Name
               </StyledTableCell>
               <StyledTableCell align="left">{carMade.car_made}</StyledTableCell>
             </StyledTableRow>
