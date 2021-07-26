@@ -214,13 +214,6 @@ function Users() {
     { field: "id", headerName: "ID", width: 55 },
     { field: "name", headerName: "Name", width: 100 },
     { field: "email", headerName: "Email", width: 180 },
-
-    {
-      field: "name",
-      headerName: "Name",
-      width: 120,
-      sortable: false,
-    },
     {
       field: "stores",
       headerName: "Branches",

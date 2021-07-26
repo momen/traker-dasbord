@@ -105,14 +105,6 @@ function ViewUser({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">{singleUser.email}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={singleUser.email_verified_at}>
-              <StyledTableCell component="th" scope="row">
-                Email Verified At
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {singleUser.email_verified_at}
-              </StyledTableCell>
-            </StyledTableRow>
             <StyledTableRow key={`${singleUser.id} ${singleUser.title}`}>
               <StyledTableCell component="th" scope="row">
                 Role
