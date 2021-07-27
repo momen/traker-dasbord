@@ -134,6 +134,12 @@ function ViewVendorOrder({ match }) {
                 {!order ? null : order.paid ? order.paid : "No"}
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`paid`}>
+              <StyledTableCell component="th" scope="row">
+                Created At
+              </StyledTableCell>
+              <StyledTableCell align="left">{order.created_at}</StyledTableCell>
+            </StyledTableRow>
           </TableBody>
         </Table>
       </TableContainer>

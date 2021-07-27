@@ -28,6 +28,7 @@ import {
   Group,
   GroupAdd,
   GroupWork,
+  HelpOutline,
   HourglassEmpty,
   LiveHelp,
   NewReleases,
@@ -241,6 +242,13 @@ const ViewInvoice = async(() =>
 const Tickets = async(() => import("../components/pages/Support/Support"));
 const ViewTicket = async(() =>
   import("../components/pages/Support/ViewTicket")
+);
+
+const ProductQuestions = async(() =>
+  import("../components/pages/Product Questions/ProductQuestions")
+);
+const ViewProductQuestion = async(() =>
+  import("../components/pages/Product Questions/ViewProductQuestion")
 );
 
 const Help = async(() => import("../components/pages/Help/Help"));
@@ -713,6 +721,21 @@ const viewTicket = {
   children: null,
 };
 
+const productQuestionsRoute = {
+  id: "Product Inquires",
+  path: "/product/questions",
+  icon: <HelpOutline />,
+  badge: "11",
+  component: ProductQuestions,
+  children: null,
+  permission: "access_tabs_separately",
+};
+const viewProductQuestion = {
+  path: "/product/questions/:id",
+  component: ViewProductQuestion,
+  children: null,
+};
+
 const helpRoute = {
   id: "Help",
   path: "/help",
@@ -780,7 +803,7 @@ export const dashboardLayoutRoutes = [
   viewUser,
   viewStaff,
   viewLog,
-  ViewMainCategory,
+  viewMainCategory,
   viewCategory,
   viewCarMade,
   viewCarModel,
@@ -801,6 +824,8 @@ export const dashboardLayoutRoutes = [
   viewInvoice,
   ticketsRoute,
   viewTicket,
+  productQuestionsRoute,
+  viewProductQuestion,
   helpRoute,
   manageAccountRoute,
 ];
@@ -824,6 +849,7 @@ export const sidebarRoutes = [
   // ordersHistoryRoute,
   invoicesRoute,
   ticketsRoute,
+  productQuestionsRoute,
   helpRoute,
   manageAccountRoute,
   logoutRoute,

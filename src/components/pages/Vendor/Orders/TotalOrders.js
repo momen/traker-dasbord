@@ -178,6 +178,7 @@ function PendingOrders() {
     { field: "order_total", headerName: "Order Total", width: 200 },
     { field: "orderStatus", headerName: "Status", width: 150, sortable: false },
     { field: "paid", headerName: "Paid", width: 80, sortable: false },
+    { field: "created_at", headerName: "Created At", width: 150, sortable: false },
     {
       field: "actions",
       headerName: "Actions",

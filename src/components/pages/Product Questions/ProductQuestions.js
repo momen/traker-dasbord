@@ -23,8 +23,8 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
-import axios from "../../../../axios";
+import { ExpandMore, UnfoldLess } from "@material-ui/icons";
+import axios from "../../../axios";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
 import { useSelector } from "react-redux";
@@ -38,6 +38,13 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
   button: {
     background: "#4caf50",
     color: "#ffffff",
@@ -47,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
   },
   toolBar: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     width: "100%",
     borderRadius: "6px",
   },
@@ -58,15 +65,42 @@ function CustomPagination(props) {
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
+      </Select>
+    </div>
   );
 }
 
@@ -93,9 +127,9 @@ function CustomLoadingOverlay() {
   );
 }
 
-function VendorOrders({ match }) {
+function ProductQuestions() {
   const classes = useStyles();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const { userPermissions, user } = useSelector((state) => state);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(1);
@@ -114,55 +148,74 @@ function VendorOrders({ match }) {
       headerAlign: "center",
       align: "center",
     },
-    { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
-    { field: "order_total", headerName: "Order Total", width: 200 },
-    { field: "orderStatus", headerName: "Status", width: 100, sortable: false },
-    { field: "paid", headerName: "Paid", width: 80, sortable: false },
+    { field: "body_question", headerName: "Question", width: 100, flex: 1 },
     {
-      field: "created_at",
-      headerName: "Created At",
-      width: 150,
-      sortable: false,
+      field: "answer",
+      headerName: "Status",
+      width: 120,
+      renderCell: (params) =>
+        params.value ? (
+          <span style={{ color: "#90CA28", textDecoration: "underline" }}>
+            Answered
+          </span>
+        ) : (
+          <span style={{ color: "#98A9FF", textDecoration: "underline" }}>
+            Not Answered
+          </span>
+        ),
     },
     {
-      field: "actions",
-      headerName: "Actions",
-      width: 220,
-      sortable: false,
-      disableClickEventBubbling: true,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              width: "100%",
-            }}
-          >
-            {userPermissions.includes(
-              "admin_access_specific_vendor_specific_order"
-            ) ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                variant="contained"
-                size="small"
-                onClick={() =>
-                  history.push(
-                    `/vendor/vendors/${match.params.id}/vendor-orders/${params.row.id}`
-                  )
-                }
-              >
-                View
-              </Button>
-            ) : null}
-          </div>
-        );
-      },
+      field: "product",
+      headerName: "Product Name",
+      width: 100,
+      flex: 1,
+      renderCell: (params) => params.value?.name,
     },
+    {
+      field: "serial_number",
+      headerName: "Serial Number",
+      width: 100,
+      renderCell: (params) => params.row.product?.serial_coding,
+    },
+    {
+      field: "serial_coding",
+      headerName: "Serial Coding",
+      width: 100,
+      renderCell: (params) => params.row.product?.serial_coding,
+    },
+    // {
+    //   field: "actions",
+    //   headerName: "Actions",
+    //   width: 220,
+    //   sortable: false,
+    //   disableClickEventBubbling: true,
+    //   renderCell: (params) => {
+    //     return (
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           justifyContent: "flex-start",
+    //           width: "100%",
+    //         }}
+    //       >
+    //         {/* {userPermissions.includes("specific_ticket_access") ? (
+    //           <Button
+    //             style={{ marginRight: "5px" }}
+    //             variant="contained"
+    //             size="small"
+    //             onClick={() => history.push(`/support/ticket/${params.row.id}`)}
+    //           >
+    //             View
+    //           </Button>
+    //         ) : null} */}
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {
@@ -190,13 +243,14 @@ function VendorOrders({ match }) {
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
+    if (!user) return;
     setLoading(true);
     if (!userIsSearching) {
       axios
         .post(
-          `/admin/show/vendor/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/vendor/fetch/question?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
-            vendor_id: match.params.id,
+            vendor_id: user?.id,
           }
         )
         .then((res) => {
@@ -210,10 +264,9 @@ function VendorOrders({ match }) {
     } else {
       axios
         .post(
-          `/admin/search/vendor/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/search/tickets?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
-            vendor_id: match.params.id,
           }
         )
         .then((res) => {
@@ -225,23 +278,13 @@ function VendorOrders({ match }) {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel, pageSize]);
+  }, [page, searchValue, sortModel, pageSize, user]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => history.push(`/vendor/vendors`)}
-        mb={3}
-      >
-        Back to Vendors List
-      </Button>
-
-      <Divider my={3} />
       <Typography variant="h3" gutterBottom display="inline">
-        Orders
+        Product related Questions
       </Typography>
 
       <Divider my={6} />
@@ -249,30 +292,6 @@ function VendorOrders({ match }) {
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
-            <FormControl variant="outlined">
-              <Select
-                value={pageSize}
-                onChange={handlePageSize}
-                autoWidth
-                IconComponent={UnfoldLess}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "center",
-                  },
-                  transformOrigin: {
-                    vertical: "top",
-                    horizontal: "center",
-                  },
-                  getContentAnchorEl: () => null,
-                }}
-              >
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
-
             <div>
               <Grid container spacing={1} alignItems="flex-end">
                 <Grid item>
@@ -309,7 +328,13 @@ function VendorOrders({ match }) {
               loading={loading}
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("specific_ticket_access")
+                  ? ({ row }) => history.push(`/product/questions/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
             />
           </div>
@@ -319,4 +344,4 @@ function VendorOrders({ match }) {
   );
 }
 
-export default VendorOrders;
+export default ProductQuestions;

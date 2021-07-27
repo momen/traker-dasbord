@@ -61,19 +61,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ViewTicket({ match }) {
+function ViewProductQuestion({ match }) {
   const classes = useStyles();
   const history = useHistory();
   const { user } = useSelector((state) => state);
-  const [ticket, setTicket] = useState("");
+  const [question, setQuestion] = useState("");
 
   const [answer, updateAnswer] = useState("");
 
   useEffect(() => {
     axios
-      .get(`/show/ticket/${match.params.id}`)
+      .post(`/vendor/fetch/specific/question/${match.params.id}`)
       .then((res) => {
-        setTicket(res.data.data);
+        setQuestion(res.data.data);
       })
       .catch(() => {
         alert("Failed to Fetch data");
@@ -81,25 +81,14 @@ function ViewTicket({ match }) {
   }, []);
 
   const addReply = () => {
-    if (user.roles[0].title === "Vendor") {
-      axios
-        .post("vendor/answer/ticket", {
-          ticket_id: ticket.id,
-          answer: answer,
-        })
-        .then(() => {
-          alert("Reply added successfully");
-        });
-    } else {
-      axios
-        .post("admin/answer/ticket", {
-          ticket_id: ticket.id,
-          answer: answer,
-        })
-        .then(() => {
-          alert("Reply added successfully");
-        });
-    }
+    axios
+      .post("vendor/answer/question", {
+        question_id: question.id,
+        answer: answer,
+      })
+      .then(() => {
+        alert("Reply added successfully");
+      });
   };
 
   return (
@@ -107,7 +96,7 @@ function ViewTicket({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/support")}
+        onClick={() => history.push("/product/questions")}
         mb={3}
       >
         Back to list
@@ -115,7 +104,7 @@ function ViewTicket({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={ticket.id}>
+            <StyledTableRow key={question.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
@@ -123,38 +112,24 @@ function ViewTicket({ match }) {
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{ticket.id}</StyledTableCell>
+              <StyledTableCell align="left">{question.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`ticket-no${ticket.ticket_no}`}>
+            <StyledTableRow key={`ticket-no${question.body_question}`}>
               <StyledTableCell component="th" scope="row">
-                Ticket Number
-              </StyledTableCell>
-              <StyledTableCell align="left">{ticket.ticket_no}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`title${ticket.title}`}>
-              <StyledTableCell component="th" scope="row">
-                Title
-              </StyledTableCell>
-              <StyledTableCell align="left">{ticket.title}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`priority${ticket.priority}`}>
-              <StyledTableCell component="th" scope="row">
-                Priority
-              </StyledTableCell>
-              <StyledTableCell align="left">{ticket.priority}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`msg${ticket.id}`}>
-              <StyledTableCell component="th" scope="row">
-                <span className={classes.rowContent}>Message</span>
+                Question
               </StyledTableCell>
               <StyledTableCell align="left">
-                {ticket.message}
-
-                {(user?.roles[0].title === "Admin" &&
-                  ticket.case === "to admin") ||
-                (user?.roles[0].title === "Vendor" &&
-                  ticket.case !== "solved" &&
-                  ticket.case !== "to admin") ? (
+                {question.body_question}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`answer-${question.id}`}>
+              <StyledTableCell component="th" scope="row">
+                <span className={classes.rowContent}>Answer</span>
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {question.answer ? (
+                  <b>{question.answer}</b>
+                ) : (
                   <>
                     <p
                       style={{
@@ -181,67 +156,45 @@ function ViewTicket({ match }) {
                       Submit
                     </Button>
                   </>
-                ) : null}
+                )}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`status${ticket.id}`}>
+            <StyledTableRow key={`product-name-${question.product?.name}`}>
               <StyledTableCell component="th" scope="row">
-                Status
-              </StyledTableCell>
-              <StyledTableCell align="left">{ticket.status}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`category${ticket.category_id}`}>
-              <StyledTableCell component="th" scope="row">
-                Category Name
+                Product Name
               </StyledTableCell>
               <StyledTableCell align="left">
-                {ticket.category_name}
+                {question.product?.name}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`created${ticket.created_at}`}>
+            <StyledTableRow
+              key={`serial-no-${question.product?.serial_number}`}
+            >
               <StyledTableCell component="th" scope="row">
-                Created At
+                Serial Number
               </StyledTableCell>
               <StyledTableCell align="left">
-                {ticket.created_at}
+                {question.product?.serial_number}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`order-number-${ticket.order_number}`}>
+            <StyledTableRow
+              key={`serial-coding-${question.product?.serial_coding}`}
+            >
               <StyledTableCell component="th" scope="row">
-                Order Number
+                Serial Coding
               </StyledTableCell>
               <StyledTableCell align="left">
-                {ticket.order_number}
+                {question.product?.serial_coding}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`vendor-name-${ticket.vendor_name}`}>
+            <StyledTableRow
+              key={`product-description-${question.product?.description}`}
+            >
               <StyledTableCell component="th" scope="row">
-                Vendor Name
+                Description
               </StyledTableCell>
               <StyledTableCell align="left">
-                {ticket.vendor_name}
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`user-${ticket.user_id}`}>
-              <StyledTableCell component="th" scope="row">
-                Username
-              </StyledTableCell>
-              <StyledTableCell align="left">{ticket.user_name}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`userphone-${ticket.user_phone}`}>
-              <StyledTableCell component="th" scope="row">
-                User Phone Number
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.user_phone}
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`vendor-email-${ticket.vendor_email}`}>
-              <StyledTableCell component="th" scope="row">
-                Vendor Email
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.vendor_email}
+                {question.product?.description}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>
@@ -251,4 +204,4 @@ function ViewTicket({ match }) {
   );
 }
 
-export default ViewTicket;
+export default ViewProductQuestion;
