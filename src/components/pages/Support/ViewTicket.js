@@ -59,6 +59,18 @@ const useStyles = makeStyles((theme) => ({
     },
     marginTop: 15,
   },
+  solveBtn: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#90CA28",
+    background: "#ffffff",
+    border: "1px solid #90CA28",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#90CA28",
+      color: "#ffffff",
+    },
+  },
 }));
 
 function ViewTicket({ match }) {
@@ -100,6 +112,25 @@ function ViewTicket({ match }) {
           alert("Reply added successfully");
         });
     }
+  };
+
+  const solveTicket = () => {
+    axios
+      .post("solved/ticket", {
+        id: ticket.id,
+      })
+      .then(() => {
+        alert("Ticket Solved");
+        axios
+          .get(`/show/ticket/${match.params.id}`)
+          .then((res) => {
+            setTicket(res.data.data);
+          })
+          .catch(() => {
+            alert("Failed to Fetch data");
+          });
+      })
+      .catch(({ response }) => alert(response.data.errors));
   };
 
   return (
@@ -188,7 +219,7 @@ function ViewTicket({ match }) {
               <StyledTableCell component="th" scope="row">
                 Status
               </StyledTableCell>
-              <StyledTableCell align="left">{ticket.status}</StyledTableCell>
+              <StyledTableCell align="left">{ticket.case}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`category${ticket.category_id}`}>
               <StyledTableCell component="th" scope="row">
@@ -242,6 +273,22 @@ function ViewTicket({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">
                 {ticket.vendor_email}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`actions`}>
+              <StyledTableCell component="th" scope="row">
+                Actions
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.case !== "solved" ? (
+                  <Button
+                    variant="contained"
+                    className={classes.solveBtn}
+                    onClick={solveTicket}
+                  >
+                    Mark as Solved
+                  </Button>
+                ) : null}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>

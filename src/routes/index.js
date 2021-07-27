@@ -167,11 +167,20 @@ const Stores = async(() => import("../components/pages/Vendor/Stores/Stores"));
 const TotalOrders = async(() =>
   import("../components/pages/Vendor/Orders/TotalOrders")
 );
+
+const WholesaleOrders = async(() =>
+  import("../components/pages/Vendor/Wholesale Orders/TotalOrders")
+);
+
 const OrdersHistory = async(() =>
   import("../components/pages/Vendor/Orders/OrdersHistory")
 );
 const Invoices = async(() =>
   import("../components/pages/Vendor/Invoices/Invoices")
+);
+
+const WholesaleInvoices = async(() =>
+  import("../components/pages/Vendor/Wholesale Invoices/WholesaleInvoices")
 );
 
 const ViewPermission = async(() =>
@@ -237,6 +246,10 @@ const ViewOrder = async(() =>
 );
 const ViewInvoice = async(() =>
   import("../components/pages/Vendor/Invoices/ViewInvoice")
+);
+
+const ViewWholeSaleInvoice = async(() =>
+  import("../components/pages/Vendor/Wholesale Invoices/ViewInvoice")
 );
 
 const Tickets = async(() => import("../components/pages/Support/Support"));
@@ -542,12 +555,29 @@ const vendorRoutes = {
     },
 
     {
+      path: "/vendor/wholesale-orders",
+      name: "Wholesale Orders",
+      component: WholesaleOrders,
+      icon: <ShoppingBasket />,
+      guard: PermissionGuard,
+      permission: "wholesale_orders_access",
+    },
+
+    {
       path: "/vendor/invoices",
       name: "Invoices",
       component: Invoices,
       icon: <Receipt />,
       guard: PermissionGuard,
       permission: "show_invoices_access",
+    },
+    {
+      path: "/vendor/wholesale-invoices",
+      name: "Wholesale Invoices",
+      component: WholesaleInvoices,
+      icon: <Receipt />,
+      guard: PermissionGuard,
+      permission: "wholesale_invoices_access",
     },
   ],
   guard: VendorsGuard,
@@ -600,6 +630,11 @@ const viewOrder = {
 const viewInvoice = {
   path: "/vendor/invoices/:id",
   component: ViewInvoice,
+  children: null,
+};
+const viewWholesaleInvoice = {
+  path: "/vendor/wholesale-invoices/:id",
+  component: ViewWholeSaleInvoice,
   children: null,
 };
 
@@ -722,7 +757,7 @@ const viewTicket = {
 };
 
 const productQuestionsRoute = {
-  id: "Product Inquires",
+  id: "Product Inquiries",
   path: "/product/questions",
   icon: <HelpOutline />,
   badge: "11",
@@ -822,6 +857,7 @@ export const dashboardLayoutRoutes = [
   viewStore,
   viewOrder,
   viewInvoice,
+  viewWholesaleInvoice,
   ticketsRoute,
   viewTicket,
   productQuestionsRoute,

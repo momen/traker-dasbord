@@ -438,18 +438,20 @@ function ViewVendor({ match }) {
                 {vendor.tax_card_no ? (
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     {vendor.tax_card_no}
-                    <Button
-                      style={{
-                        width: "fit-content",
-                        margin: "5px 15px",
-                        marginLeft: "0px",
-                      }}
-                      className={classes.rejectBtn}
-                      variant="contained"
-                      onClick={() => openRejectionConfirmation(3)}
-                    >
-                      Reject
-                    </Button>
+                    {vendor.complete && !vendor.approved && !vendor.declined ? (
+                      <Button
+                        style={{
+                          width: "fit-content",
+                          margin: "5px 15px",
+                          marginLeft: "0px",
+                        }}
+                        className={classes.rejectBtn}
+                        variant="contained"
+                        onClick={() => openRejectionConfirmation(3)}
+                      >
+                        Reject
+                      </Button>
+                    ) : null}
                   </div>
                 ) : (
                   <span style={{ color: "#ff6700", fontWeight: "bold" }}>

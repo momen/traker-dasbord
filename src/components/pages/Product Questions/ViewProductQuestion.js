@@ -122,6 +122,14 @@ function ViewProductQuestion({ match }) {
                 {question.body_question}
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`user-${question.user_name}`}>
+              <StyledTableCell component="th" scope="row">
+                Username
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {question.user_name}
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={`answer-${question.id}`}>
               <StyledTableCell component="th" scope="row">
                 <span className={classes.rowContent}>Answer</span>

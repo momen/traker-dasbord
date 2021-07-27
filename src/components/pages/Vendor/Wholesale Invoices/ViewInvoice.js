@@ -10,7 +10,6 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
-import Map from "../../../Map/Map";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -27,6 +26,8 @@ const StyledTableRow = withStyles((theme) => ({
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
+    whiteSpace: "normal",
+    wordWrap: "break-word",
   },
 }))(TableRow);
 
@@ -37,39 +38,23 @@ const useStyles = makeStyles({
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
     },
   },
-  attributeName: {
-    width: "15%",
-  },
   rowContent: {
-    // display: "inline-block",
-    width: "100%",
-    // whiteSpace: "normal",
-    wordBreak: "break-word",
-  },
-  memberBadge: {
-    background: "#98A9FF",
-    fontWeight: "bold",
-    borderRadius: "6px",
-    padding: "5px",
-    marginRight: "5px",
-    userSelect: "none",
-  },
-  media: {
-    width: "25%",
-    objectFit: "contain",
+    // width: "100%",
+    whiteSpace: "normal",
+    wordWrap: "break-word",
   },
 });
 
-function ViewStore({ match }) {
+function ViewInvoice({ match }) {
   const classes = useStyles();
   const history = useHistory();
-  const [store, setStore] = useState("");
+  const [invoices, setInvoices] = useState("");
 
   useEffect(() => {
     axios
-      .get(`/stores/${match.params.id}`)
+      .get(`/show/invoices/${match.params.id}`)
       .then((res) => {
-        setStore(res.data.data);
+        setInvoices(res.data.data);
       })
       .catch(() => {
         alert("Failed to Fetch data");
@@ -81,7 +66,7 @@ function ViewStore({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/vendor/branches")}
+        onClick={() => history.push("/vendor/wholesale-invoices")}
         mb={3}
       >
         Back to list
@@ -89,111 +74,92 @@ function ViewStore({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={store.id}>
+            <StyledTableRow key={invoices.id}>
               <StyledTableCell
                 component="th"
                 scope="row"
-                className={classes.attributeName}
+                style={{ width: "20%" }}
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{store.id}</StyledTableCell>
+              <StyledTableCell align="left">{invoices.id}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`store-${store.vendor?.company_name}`}>
+            <StyledTableRow key={`order-id${invoices.order_id}`}>
               <StyledTableCell component="th" scope="row">
-                Company Name
+                Order ID
               </StyledTableCell>
               <StyledTableCell align="left">
-                {store.vendor?.company_name}
+                {invoices.order_id}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.name}>
+            <StyledTableRow key={`order-number${invoices.order_number}`}>
               <StyledTableCell component="th" scope="row">
-                Branch Name
-              </StyledTableCell>
-              <StyledTableCell align="left">{store.name}</StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`members`}>
-              <StyledTableCell component="th" scope="row">
-                Staff Members
+                Order Number
               </StyledTableCell>
               <StyledTableCell align="left">
-                {store.members?.map((member) => (
-                  <span key={member.id} className={classes.memberBadge}>
-                    {member.name}
-                  </span>
-                ))}
+                {invoices.order_number}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.vendor_name}>
+            <StyledTableRow key={`username-${invoices.user_name}`}>
               <StyledTableCell component="th" scope="row">
-                Owner (Vendor)
+                Username
               </StyledTableCell>
               <StyledTableCell align="left">
-                {store.vendor_name}
+                {invoices.user_name}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`vendor-type-${store.vendor_name}`}>
+            <StyledTableRow key={`username-phone`}>
               <StyledTableCell component="th" scope="row">
-                Vendor Type
+                Phone Number
               </StyledTableCell>
               <StyledTableCell align="left">
-                {store.vendor?.type == "1"
-                  ? "Retailer"
-                  : store.vendor?.type == "2"
-                  ? "Wholesaler"
-                  : "Retailer/Wholesaler"}
+                {invoices.user_address?.recipient_phone}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.address}>
+            <StyledTableRow key={`user-address`}>
               <StyledTableCell component="th" scope="row">
                 Address
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{store.address}</span>
+                {`${invoices.user_address?.home_no}, ${invoices.user_address?.street}, ${invoices.user_address?.district} - ${invoices.user_address?.city} - ${invoices.user_address?.state}`}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.serial_id}>
+            <StyledTableRow key={`vendor-name${invoices.vendor_name}`}>
               <StyledTableCell component="th" scope="row">
-                Serial
+                Vendor Name
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{store.serial_id}</span>
+                {invoices.vendor_name}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.moderator_phone}>
+
+            <StyledTableRow key={`invoice-number${invoices.invoice_number}`}>
               <StyledTableCell component="th" scope="row">
-                Moderator Phone
+                Invoice Number
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>
-                  {store.moderator_phone}
-                </span>
+                {invoices.invoice_number}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.moderator_alt_phone}>
+            <StyledTableRow key={`invoice-total${invoices.invoice_total}`}>
               <StyledTableCell component="th" scope="row">
-                Moderator Alternative Phone
+                Invoice Total
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>
-                  {store.moderator_alt_phone}
-                </span>
+                {invoices.invoice_total}
               </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`status-${invoices.status}`}>
+              <StyledTableCell component="th" scope="row">
+                Status
+              </StyledTableCell>
+              <StyledTableCell align="left">{invoices.status}</StyledTableCell>
             </StyledTableRow>
           </TableBody>
         </Table>
       </TableContainer>
-      {store.lat && store.long ? (
-        <div style={{ height: "60vh", marginTop: "20px" }}>
-          <Map
-            lattitude={parseFloat(store.lat)}
-            longitude={parseFloat(store.long)}
-          />
-        </div>
-      ) : null}
     </Fragment>
   );
 }
 
-export default ViewStore;
+export default ViewInvoice;

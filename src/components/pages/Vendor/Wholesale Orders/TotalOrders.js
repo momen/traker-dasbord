@@ -175,7 +175,7 @@ function PendingOrders() {
       align: "center",
     },
     { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
-    { field: "order_total", headerName: "Order Total", width: 200 },
+    { field: "wholesale_total", headerName: "Order Total", width: 200 },
     { field: "orderStatus", headerName: "Status", width: 150, sortable: false },
     { field: "paid", headerName: "Paid", width: 80, sortable: false },
     {
@@ -210,11 +210,10 @@ function PendingOrders() {
               </Button>
             ) : null} */}
             {userPermissions.includes("approve_orders") &&
-            user.roles[0].id !== 1 &&
             params.row.status === "pending" &&
             params.row.paid ? (
               <Button
-                style={{ marginRight: "5px" }}
+                style={{ marginRight: "7px" }}
                 className={classes.approveButton}
                 variant="contained"
                 size="small"
@@ -228,7 +227,6 @@ function PendingOrders() {
             ) : null}
 
             {userPermissions.includes("cancel_orders") &&
-            user.roles[0].id !== 1 &&
             params.row.status === "pending" ? (
               <Button
                 style={{ marginRight: "5px" }}
@@ -286,10 +284,9 @@ function PendingOrders() {
       .then(() => {
         setOpenApproveDialog(false);
         setLoading(true);
-        axios
-          .post(
-            `/show/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
-          )
+        axios(
+          `/admin/show/wholesale/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
               setPage(page - 1);
@@ -315,10 +312,9 @@ function PendingOrders() {
       .then(() => {
         setOpenCancelDialog(false);
         setLoading(true);
-        axios
-          .post(
-            `/show/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
-          )
+        axios(
+          `/admin/show/wholesale/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
               setPage(page - 1);
@@ -340,13 +336,12 @@ function PendingOrders() {
   useEffect(() => {
     setLoading(true);
     if (!userIsSearching) {
-      axios
-        .post(
-          `/show/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            fetch: statusToFilterBy,
-          }
-        )
+      axios(
+        `/admin/show/wholesale/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+        {
+          fetch: statusToFilterBy,
+        }
+      )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
@@ -378,7 +373,7 @@ function PendingOrders() {
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Orders
+        Wholesale Orders
       </Typography>
 
       <Divider my={6} />

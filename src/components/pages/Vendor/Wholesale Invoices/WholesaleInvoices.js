@@ -24,7 +24,7 @@ import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
 import { ExpandMore, UnfoldLess } from "@material-ui/icons";
-import axios from "../../../axios";
+import axios from "../../../../axios";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
 import { useSelector } from "react-redux";
@@ -127,9 +127,9 @@ function CustomLoadingOverlay() {
   );
 }
 
-function ProductQuestions() {
+function Orders() {
   const classes = useStyles();
-  const { userPermissions, user } = useSelector((state) => state);
+  const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(1);
@@ -148,42 +148,17 @@ function ProductQuestions() {
       headerAlign: "center",
       align: "center",
     },
-    { field: "body_question", headerName: "Question", width: 100, flex: 1 },
-    { field: "user_name", headerName: "User", width: 120 },
+    { field: "invoice_number", headerName: "Invoice Number", width: 120 },
+    { field: "invoice_total", headerName: "Invoice Total", width: 120 },
+    { field: "vendor_name", headerName: "Vendor Name", width: 200 },
     {
-      field: "answer",
-      headerName: "Status",
-      width: 120,
-      renderCell: (params) =>
-        params.value ? (
-          <span style={{ color: "#90CA28", textDecoration: "underline" }}>
-            Answered
-          </span>
-        ) : (
-          <span style={{ color: "#98A9FF", textDecoration: "underline" }}>
-            Not Answered
-          </span>
-        ),
-    },
-    {
-      field: "product",
-      headerName: "Product Name",
-      width: 100,
+      field: "vendor_email",
+      headerName: "Vendor Email",
       flex: 1,
-      renderCell: (params) => params.value?.name,
+      width: 150,
+      sortable: false,
     },
-    {
-      field: "serial_number",
-      headerName: "Serial Number",
-      width: 100,
-      renderCell: (params) => params.row.product?.serial_coding,
-    },
-    {
-      field: "serial_coding",
-      headerName: "Serial Coding",
-      width: 100,
-      renderCell: (params) => params.row.product?.serial_coding,
-    },
+    { field: "order_number", headerName: "Order Number", width: 150 },
     // {
     //   field: "actions",
     //   headerName: "Actions",
@@ -199,12 +174,14 @@ function ProductQuestions() {
     //           width: "100%",
     //         }}
     //       >
-    //         {/* {userPermissions.includes("specific_ticket_access") ? (
+    //         {/* {userPermissions.includes("show_specific_invoice") ? (
     //           <Button
     //             style={{ marginRight: "5px" }}
     //             variant="contained"
     //             size="small"
-    //             onClick={() => history.push(`/support/ticket/${params.row.id}`)}
+    //             onClick={() =>
+    //               history.push(`/vendor/invoices/${params.row.id}`)
+    //             }
     //           >
     //             View
     //           </Button>
@@ -244,15 +221,11 @@ function ProductQuestions() {
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
-    if (!user) return;
     setLoading(true);
     if (!userIsSearching) {
       axios
-        .post(
-          `/vendor/fetch/question?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            vendor_id: user?.id,
-          }
+        .get(
+          `/admin/show/wholesale/invoices?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -263,12 +236,13 @@ function ProductQuestions() {
           alert("Failed to Fetch data");
         });
     } else {
-      axios(
-        `/search/prod/questions?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-        {
-          search_index: searchValue,
-        }
-      )
+      axios
+        .post(
+          `/invoices/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          {
+            search_index: searchValue,
+          }
+        )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
@@ -278,13 +252,13 @@ function ProductQuestions() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel, pageSize, user]);
+  }, [page, searchValue, sortModel, pageSize]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Product related Questions
+        Invoices
       </Typography>
 
       <Divider my={6} />
@@ -329,8 +303,9 @@ function ProductQuestions() {
               disableColumnMenu
               autoHeight={true}
               onRowClick={
-                userPermissions.includes("specific_ticket_access")
-                  ? ({ row }) => history.push(`/product/questions/${row.id}`)
+                userPermissions.includes("show_specific_invoice")
+                  ? ({ row }) =>
+                      history.push(`/vendor/wholesale-invoices/${row.id}`)
                   : null
               }
               onPageChange={handlePageChange}
@@ -344,4 +319,4 @@ function ProductQuestions() {
   );
 }
 
-export default ProductQuestions;
+export default Orders;

@@ -52,6 +52,14 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  memberBadge: {
+    background: "#98A9FF",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
+  },
   footer: {
     width: "100%",
     display: "flex",
@@ -195,33 +203,53 @@ function Stores() {
   const location = useLocation();
 
   const columns = [
-    { field: "id", headerName: "ID", width: 55 },
     {
-      field: "name",
-      headerName: "Branch Name",
-      width: 120,
+      field: "company",
+      headerName: "Company",
+      width: 100,
+      renderCell: (params) => params.row.vendor?.company_name,
     },
     {
-      field: "serial_id",
-      headerName: "Serial",
-      width: 150,
+      field: "name",
+      headerName: "Branch",
+      width: 100,
+    },
+    {
+      field: "vendor_type",
+      headerName: "Vendor Type",
+      width: 120,
+      renderCell: (params) =>
+        params.row.vendor?.type == "1"
+          ? "Retailer"
+          : params.row.vendor?.type == "2"
+          ? "Wholesaler"
+          : "Retailer/Wholesaler",
     },
     {
       field: "head_center",
       headerName: "Address Type",
-      width: 120,
+      width: 100,
       renderCell: (params) => (params.value ? "*Billing*" : "Shipping"),
     },
-    { field: "address", headerName: "Address", width: 150 },
+    { field: "address", headerName: "Address", width: 100 },
     {
       field: "moderator_phone",
       headerName: "Moderator Phone",
       width: 120,
     },
     {
-      field: "moderator_alt_phone",
-      headerName: "Moderator Alt Phone",
-      width: 120,
+      field: "members",
+      headerName: "Members",
+      width: 150,
+      renderCell: (params) => (
+        <div>
+          {params.value?.map((member) => (
+            <span key={member.id} className={classes.memberBadge}>
+              {member.name}
+            </span>
+          ))}
+        </div>
+      ),
     },
     {
       field: "actions",
@@ -391,7 +419,7 @@ function Stores() {
       .catch(() => {
         alert("Failed to Fetch Countries List");
       });
-  });
+  }, []);
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {

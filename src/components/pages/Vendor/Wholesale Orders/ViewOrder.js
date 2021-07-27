@@ -77,9 +77,9 @@ function ViewOrder({ match }) {
           onClick={() => history.goBack()}
         >
           Back to{" "}
-          {lastLocation.pathname === "/vendor/total-orders"
-            ? "Total Orders"
-            : "Wholesale Orders"}
+          {lastLocation.pathname === "/vendor/wholesale-orders"
+            ? "Wholesale Orders"
+            : "Orders History"}
         </Button>
       </Container>
       <Typography variant="h3" gutterBottom display="inline">
