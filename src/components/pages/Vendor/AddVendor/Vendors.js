@@ -204,7 +204,7 @@ function Vendors() {
       headerName: "Username",
       width: 100,
       renderCell: (params) => {
-        return params.row.userid.name;
+        return params.row.userid?.name;
       },
     },
     {
