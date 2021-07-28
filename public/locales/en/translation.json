@@ -5,6 +5,7 @@
     "permissions": "Permissions",
     "roles": "Roles",
     "users": "Users",
+    "staff": "Staff",
     "logs": "Audit Logs",
     "productMgt": "Product Management",
     "mainCatgory": "Main Categories",
@@ -30,10 +31,14 @@
     "areas": "Areas",
     "cities": "Cities",
     "reports": "Reports",
+    "ads": "Advertisments",
     "tickets": "Tickets",
     "productInquiries": "Product Inquiries",
     "help": "FAQs",
     "manageAccount": "Manage Account",
     "logout": "Logout"
+  },
+  "headers": {
+    "ads": "Advertisments"
   }
 }

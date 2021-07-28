@@ -113,7 +113,7 @@ const BarChart = ({ theme, barChartLabels, sales, fromDate, toDate }) => {
         title={
           fromDate && toDate
             ? `Period: ${fromDate} ~ ${toDate}`
-            : "Period: Last week"
+            : "Period: Last 30 days"
         }
       />
       <CardContent>

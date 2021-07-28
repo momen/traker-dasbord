@@ -339,7 +339,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
     return _routes;
   };
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [openRoutes, setOpenRoutes] = useState(() => initOpenRoutes());
   // const dispatch = useDispatch();
 

@@ -33,6 +33,7 @@ import {
   Language,
   LiveHelp,
   NewReleases,
+  PermMedia,
   Public,
   QuestionAnswer,
   Receipt,
@@ -253,6 +254,9 @@ const ViewWholeSaleInvoice = async(() =>
   import("../components/pages/Vendor/Wholesale Invoices/ViewInvoice")
 );
 
+const Ads = async(() =>
+  import("../components/pages/Advertisments/Advertisments")
+);
 const Tickets = async(() => import("../components/pages/Support/Support"));
 const ViewTicket = async(() =>
   import("../components/pages/Support/ViewTicket")
@@ -314,7 +318,7 @@ const userManagementRoutes = {
     },
     {
       path: "/user-mgt/vendor-users",
-      name: "Staff",
+      name: "staff",
       component: VendorStaff,
       icon: <User />,
       guard: PermissionGuard,
@@ -742,6 +746,16 @@ const invoicesRoute = {
   permission: "access_tabs_separately",
 };
 
+const adsRoute = {
+  id: "ads",
+  path: "/ads",
+  icon: <PermMedia />,
+  badge: "11",
+  component: Ads,
+  children: null,
+  permission: "tickets_access",
+};
+
 const ticketsRoute = {
   id: "tickets",
   path: "/support",
@@ -835,6 +849,7 @@ export const dashboardLayoutRoutes = [
   viewArea,
   viewCity,
   advancedReportsRoute,
+  adsRoute,
   storesRoute,
   pendingOrdersRoute,
   // ordersHistoryRoute,
@@ -886,6 +901,7 @@ export const sidebarRoutes = [
   vendorRoutes,
   geographyRoutes,
   advancedReportsRoute,
+  adsRoute,
   storesRoute,
   pendingOrdersRoute,
   // ordersHistoryRoute,

@@ -5,6 +5,7 @@
     "permissions": "الصلاحيات",
     "roles": "الأدوار",
     "users": "المستخدمين",
+    "staff": "الموظفين",
     "logs": "السجل",
     "productMgt": "إدارة المنتجات",
     "mainCatgory": "فئات رئيسية",
@@ -30,10 +31,14 @@
     "areas": "المناطق",
     "cities": "المدن",
     "reports": "تقارير",
+    "ads": "الإعلانات",
     "tickets": "الشكاوي",
     "productInquiries": "إستفسارات عامة",
     "help": "الأسئلة الشائعة",
     "manageAccount": "إدارة الحساب",
     "logout": "تسجيل الخروج"
+  },
+  "headers": {
+    "ads": "الإعلانات"
   }
 }
