@@ -139,6 +139,7 @@ const CategoryText = styled(ListItemText)`
     color: ${(props) => props.theme.sidebar.color};
     font-size: ${(props) => props.theme.typography.body1.fontSize}px;
     padding: 0 ${(props) => props.theme.spacing(4)}px;
+    display: flex;
   }
 `;
 
@@ -151,7 +152,14 @@ const CategoryIconMore = styled(ExpandMore)`
 `;
 
 const Link = styled(ListItem)`
-  padding-left: ${(props) => props.theme.spacing(17.5)}px;
+  padding-left: ${(props) =>
+    props.theme.direction === "ltr"
+      ? (props) => props.theme.spacing(15)
+      : "0"}px;
+  padding-right: ${(props) =>
+    props.theme.direction === "rtl"
+      ? (props) => props.theme.spacing(15)
+      : "0"}px;
   padding-top: ${(props) => props.theme.spacing(2)}px;
   padding-bottom: ${(props) => props.theme.spacing(2)}px;
 
@@ -164,7 +172,10 @@ const Link = styled(ListItem)`
     font-size: 20px;
     width: 20px;
     height: 20px;
-    margin-right: 15px;
+    margin-right: ${(props) =>
+      props.theme.direction === "ltr" ? "15px" : "0px"};
+    margin-left: ${(props) =>
+      props.theme.direction === "rtl" ? "15px" : "0px"};
   }
 
   &:hover span {
@@ -193,6 +204,7 @@ const LinkText = styled(ListItemText)`
   color: ${(props) => props.theme.sidebar.color};
   span {
     font-size: ${(props) => props.theme.typography.body1.fontSize}px;
+    display: flex;
   }
   margin-top: 0;
   margin-bottom: 0;
@@ -401,7 +413,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
         </Grid>
       </SidebarFooter>
 
-      <Scrollbar>
+      <Scrollbar dir={lang === "ar" ? "rtl" : "ltr"}>
         <List disablePadding>
           <Items>
             {routes.map((category, index) => (
@@ -448,7 +460,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                   (category.noPermissionRequired ||
                     userPermissions?.includes(category.permission)) &&
                   user?.roles[0].title !== "Staff" &&
-                  category.id !== "Logout" ? (
+                  category.id !== "logout" ? (
                   <SidebarCategory
                     isCollapsable={false}
                     id={category.id}
@@ -490,7 +502,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                     // badge={category.badge}
                     onClick={toggleLanguage}
                   />
-                ) : category.id == "Logout" ? (
+                ) : category.id == "logout" ? (
                   <SidebarCategory
                     isCollapsable={false}
                     id={category.id}

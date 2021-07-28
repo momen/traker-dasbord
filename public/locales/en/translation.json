@@ -20,10 +20,20 @@
     "products": "Products",
     "vendorMgt": "Vendor Management",
     "vendors": "Vendors",
-"branches": "Branches",
+    "branches": "Branches",
     "totalOrders": "Total Orders",
     "wholesaleOrders": "Wholesale Orders",
     "invoices": "Invoices",
-    "wholesaleInvoices": "Wholesale Invoices"
+    "wholesaleInvoices": "Wholesale Invoices",
+    "geography": "Geography",
+    "countries": "Countries",
+    "areas": "Areas",
+    "cities": "Cities",
+    "reports": "Reports",
+    "tickets": "Tickets",
+    "productInquiries": "Product Inquiries",
+    "help": "FAQs",
+    "manageAccount": "Manage Account",
+    "logout": "Logout"
   }
 }

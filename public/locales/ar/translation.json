@@ -24,6 +24,16 @@
     "totalOrders": "الطلبات",
     "wholesaleOrders": "طلبات الجملة",
     "invoices": "الفواتير",
-    "wholesaleInvoices": "فواتير الجملة"
+    "wholesaleInvoices": "فواتير الجملة",
+    "geography": "الجغرافيا",
+    "countries": "الدول",
+    "areas": "المناطق",
+    "cities": "المدن",
+    "reports": "تقارير",
+    "tickets": "الشكاوي",
+    "productInquiries": "إستفسارات عامة",
+    "help": "الأسئلة الشائعة",
+    "manageAccount": "إدارة الحساب",
+    "logout": "تسجيل الخروج"
   }
 }

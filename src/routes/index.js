@@ -640,14 +640,14 @@ const viewWholesaleInvoice = {
 };
 
 const geographyRoutes = {
-  id: "Geography",
+  id: "geography",
   path: "/geography",
   icon: <Map />,
   component: null,
   children: [
     {
       path: "/geography/countries",
-      name: "Countries",
+      name: "countries",
       component: Countries,
       icon: <Public />,
       guard: PermissionGuard,
@@ -655,7 +655,7 @@ const geographyRoutes = {
     },
     {
       path: "/geography/areas",
-      name: "Areas",
+      name: "areas",
       component: Areas,
       icon: <Explore />,
       guard: PermissionGuard,
@@ -663,7 +663,7 @@ const geographyRoutes = {
     },
     {
       path: "/geography/cities",
-      name: "Cities",
+      name: "cities",
       component: Cities,
       icon: <Room />,
       guard: PermissionGuard,
@@ -693,7 +693,7 @@ const viewCity = {
 };
 
 const advancedReportsRoute = {
-  id: "Reports",
+  id: "reports",
   path: "/reports",
   icon: <Clipboard />,
   component: Reports,
@@ -703,7 +703,7 @@ const advancedReportsRoute = {
 };
 
 const storesRoute = {
-  id: "Branches",
+  id: "branches",
   path: "/vendor/branches",
   icon: <Store />,
   component: Stores,
@@ -713,7 +713,7 @@ const storesRoute = {
 };
 
 const pendingOrdersRoute = {
-  id: "Total Orders",
+  id: "totalOrders",
   path: "/vendor/total-orders",
   icon: <ShoppingBasket />,
   component: TotalOrders,
@@ -733,7 +733,7 @@ const pendingOrdersRoute = {
 // };
 
 const invoicesRoute = {
-  id: "Invoices",
+  id: "invoices",
   path: "/vendor/invoices",
   icon: <Receipt />,
   component: Invoices,
@@ -743,7 +743,7 @@ const invoicesRoute = {
 };
 
 const ticketsRoute = {
-  id: "Support",
+  id: "tickets",
   path: "/support",
   icon: <QuestionAnswer />,
   badge: "11",
@@ -758,7 +758,7 @@ const viewTicket = {
 };
 
 const productQuestionsRoute = {
-  id: "Product Inquiries",
+  id: "productInquiries",
   path: "/product/questions",
   icon: <HelpOutline />,
   badge: "11",
@@ -773,7 +773,7 @@ const viewProductQuestion = {
 };
 
 const helpRoute = {
-  id: "Help",
+  id: "help",
   path: "/help",
   icon: <LiveHelp />,
   component: Help,
@@ -782,7 +782,7 @@ const helpRoute = {
 };
 
 const manageAccountRoute = {
-  id: "Manage Account",
+  id: "manageAccount",
   path: "/profile",
   icon: <VpnKey />,
   component: ManageAccount,
@@ -798,7 +798,7 @@ const languageRoute = {
 };
 
 const logoutRoute = {
-  id: "Logout",
+  id: "logout",
   path: "/sign-in",
   icon: <LogOut />,
   children: null,
