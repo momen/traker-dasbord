@@ -30,6 +30,7 @@ import {
   GroupWork,
   HelpOutline,
   HourglassEmpty,
+  Language,
   LiveHelp,
   NewReleases,
   Public,
@@ -271,7 +272,7 @@ const ManageAccount = async(() =>
 );
 
 const dashboardRoutes = {
-  id: "Dashborad",
+  id: "main",
   path: "/",
   icon: <Dashboard />,
   badge: "8",
@@ -282,14 +283,14 @@ const dashboardRoutes = {
 };
 
 const userManagementRoutes = {
-  id: "User Management",
+  id: "userMgt",
   path: "/user-mgt",
   icon: <Group />,
   component: null,
   children: [
     {
       path: "/user-mgt/permissions",
-      name: "Permissions",
+      name: "permissions",
       component: Permissions,
       icon: <Unlock />,
       guard: PermissionGuard,
@@ -297,7 +298,7 @@ const userManagementRoutes = {
     },
     {
       path: "/user-mgt/roles",
-      name: "Roles",
+      name: "roles",
       component: Roles,
       icon: <BusinessCenter />,
       guard: PermissionGuard,
@@ -305,7 +306,7 @@ const userManagementRoutes = {
     },
     {
       path: "/user-mgt/users",
-      name: "Users",
+      name: "users",
       component: UsersComponent,
       icon: <User />,
       guard: PermissionGuard,
@@ -321,7 +322,7 @@ const userManagementRoutes = {
     },
     {
       path: "/user-mgt/logs",
-      name: "Audit Logs",
+      name: "logs",
       component: AuditLogs,
       icon: <EventNote />,
       guard: PermissionGuard,
@@ -363,14 +364,14 @@ const viewLog = {
 };
 
 const productManagementRoutes = {
-  id: "Product Management",
+  id: "productMgt",
   path: "/product",
   icon: <ShoppingCart />,
   component: null,
   children: [
     {
       path: "/product/main-categories",
-      name: "Main Categories",
+      name: "mainCatgory",
       component: MainCategories,
       icon: <Class />,
       guard: PermissionGuard,
@@ -378,7 +379,7 @@ const productManagementRoutes = {
     },
     {
       path: "/product/categories",
-      name: "Categories",
+      name: "category",
       component: Categories,
       icon: <Folder />,
       guard: PermissionGuard,
@@ -386,7 +387,7 @@ const productManagementRoutes = {
     },
     {
       path: "/product/part-category",
-      name: "Part Category",
+      name: "partCategory",
       component: PartCategory,
       icon: <Category />,
       guard: PermissionGuard,
@@ -394,7 +395,7 @@ const productManagementRoutes = {
     },
     {
       path: "/product/brands",
-      name: "Brand",
+      name: "brands",
       component: Brand,
       icon: <TimeToLeave />,
       guard: PermissionGuard,
@@ -402,7 +403,7 @@ const productManagementRoutes = {
     },
     {
       path: "/product/car-model",
-      name: "Car Model",
+      name: "models",
       component: CarModel,
       icon: <NewReleases />,
       guard: PermissionGuard,
@@ -411,7 +412,7 @@ const productManagementRoutes = {
 
     {
       path: "/product/car-year",
-      name: "Car Year",
+      name: "years",
       component: CarYear,
       icon: <Calendar />,
       guard: PermissionGuard,
@@ -419,7 +420,7 @@ const productManagementRoutes = {
     },
     {
       path: "/product/tags",
-      name: "Tags",
+      name: "tags",
       component: Tags,
       icon: <Tag />,
       guard: PermissionGuard,
@@ -427,7 +428,7 @@ const productManagementRoutes = {
     },
     {
       path: "/product/car-types",
-      name: "Vehicle Types",
+      name: "carTypes",
       component: CarTypes,
       icon: <Commute />,
       guard: PermissionGuard,
@@ -435,7 +436,7 @@ const productManagementRoutes = {
     },
     {
       path: "/product/manufacturers",
-      name: "Manufacturers",
+      name: "manufacturers",
       component: Manufacturers,
       icon: <Build />,
       guard: PermissionGuard,
@@ -443,7 +444,7 @@ const productManagementRoutes = {
     },
     {
       path: "/product/origin-countries",
-      name: "Origins",
+      name: "origins",
       component: Origins,
       icon: <TripOrigin />,
       guard: PermissionGuard,
@@ -451,7 +452,7 @@ const productManagementRoutes = {
     },
     {
       path: "/product/products",
-      name: "Products",
+      name: "products",
       component: Products,
       icon: <ShoppingBag />,
       guard: PermissionGuard,
@@ -524,14 +525,14 @@ const viewProduct = {
 };
 
 const vendorRoutes = {
-  id: "Vendor",
+  id: "vendorMgt",
   path: "/vendor",
   icon: <GroupWork />,
   component: null,
   children: [
     {
       path: "/vendor/vendors",
-      name: "Vendors",
+      name: "vendors",
       component: Vendors,
       icon: <RecentActors />,
       guard: PermissionGuard,
@@ -539,7 +540,7 @@ const vendorRoutes = {
     },
     {
       path: "/vendor/branches",
-      name: "Branches",
+      name: "branches",
       component: Stores,
       icon: <Store />,
       guard: PermissionGuard,
@@ -547,7 +548,7 @@ const vendorRoutes = {
     },
     {
       path: "/vendor/total-orders",
-      name: "Total Orders",
+      name: "totalOrders",
       component: TotalOrders,
       icon: <ShoppingBasket />,
       guard: PermissionGuard,
@@ -556,7 +557,7 @@ const vendorRoutes = {
 
     {
       path: "/vendor/wholesale-orders",
-      name: "Wholesale Orders",
+      name: "wholesaleOrders",
       component: WholesaleOrders,
       icon: <ShoppingBasket />,
       guard: PermissionGuard,
@@ -565,7 +566,7 @@ const vendorRoutes = {
 
     {
       path: "/vendor/invoices",
-      name: "Invoices",
+      name: "invoices",
       component: Invoices,
       icon: <Receipt />,
       guard: PermissionGuard,
@@ -573,7 +574,7 @@ const vendorRoutes = {
     },
     {
       path: "/vendor/wholesale-invoices",
-      name: "Wholesale Invoices",
+      name: "wholesaleInvoices",
       component: WholesaleInvoices,
       icon: <Receipt />,
       guard: PermissionGuard,
@@ -790,11 +791,16 @@ const manageAccountRoute = {
   permission: "profile_password_edit",
 };
 
+const languageRoute = {
+  id: "Language",
+  icon: <Language />,
+  children: null,
+};
+
 const logoutRoute = {
   id: "Logout",
   path: "/sign-in",
   icon: <LogOut />,
-  component: Dashborad,
   children: null,
 };
 
@@ -888,5 +894,6 @@ export const sidebarRoutes = [
   productQuestionsRoute,
   helpRoute,
   manageAccountRoute,
+  languageRoute,
   logoutRoute,
 ];

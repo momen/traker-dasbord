@@ -31,9 +31,10 @@ import { sidebarRoutes as routes } from "../routes/index";
 
 import { ReactComponent as Logo } from "../vendor/logo.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { Logout } from "../actions";
+import { Logout, setLanguage } from "../actions";
 
 import logo from "../assets/images/trkar_logo_white.svg";
+import { useTranslation } from "react-i18next";
 
 const Box = styled(MuiBox)(spacing);
 
@@ -303,7 +304,7 @@ const SidebarLink = ({ name, to, badge, icon, id }) => {
 };
 
 const Sidebar = ({ classes, staticContext, location, ...rest }) => {
-  const { user, userPermissions } = useSelector((state) => state);
+  const { user, userPermissions, lang } = useSelector((state) => state);
   const dispatch = useDispatch();
 
   const initOpenRoutes = () => {
@@ -326,7 +327,9 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
     return _routes;
   };
 
+  const { t, i18n } = useTranslation();
   const [openRoutes, setOpenRoutes] = useState(() => initOpenRoutes());
+  // const dispatch = useDispatch();
 
   const toggle = (index) => {
     // Collapse all elements
@@ -342,6 +345,10 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
     setOpenRoutes((openRoutes) =>
       Object.assign({}, openRoutes, { [index]: !openRoutes[index] })
     );
+  };
+
+  const toggleLanguage = () => {
+    dispatch(setLanguage(lang === "ar" ? "en" : "ar"));
   };
 
   const handleLogout = () => {
@@ -411,7 +418,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                       isOpen={!openRoutes[index]}
                       isCollapsable={true}
                       id={category.id}
-                      name={category.id}
+                      name={t("sidenav." + category.id) || category.id}
                       icon={category.icon}
                       button={true}
                       onClick={() => toggle(index)}
@@ -426,8 +433,8 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                         userPermissions?.includes(route.permission) ? (
                           <SidebarLink
                             key={index}
-                            id={route.name}
-                            name={route.name}
+                            id={t(`sidenav.${route.name}`) || route.name}
+                            name={t("sidenav." + route.name) || route.name}
                             to={route.path}
                             icon={route.icon}
                             // badge={route.badge}
@@ -445,7 +452,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                   <SidebarCategory
                     isCollapsable={false}
                     id={category.id}
-                    name={category.id}
+                    name={t("sidenav." + category.id) || category.id}
                     to={category.path}
                     activeClassName="active"
                     component={NavLink}
@@ -462,7 +469,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                   <SidebarCategory
                     isCollapsable={false}
                     id={category.id}
-                    name={category.id}
+                    name={t("sidenav." + category.id) || category.id}
                     to={category.path}
                     activeClassName="active"
                     component={NavLink}
@@ -472,11 +479,22 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                     button
                     // badge={category.badge}
                   />
+                ) : category.id == "Language" ? (
+                  <SidebarCategory
+                    isCollapsable={false}
+                    id={category.id}
+                    name={lang === "en" ? "العربية" : "English"}
+                    activeClassName="active"
+                    icon={category.icon}
+                    button
+                    // badge={category.badge}
+                    onClick={toggleLanguage}
+                  />
                 ) : category.id == "Logout" ? (
                   <SidebarCategory
                     isCollapsable={false}
                     id={category.id}
-                    name={category.id}
+                    name={t("sidenav." + category.id) || category.id}
                     activeClassName="active"
                     icon={category.icon}
                     button

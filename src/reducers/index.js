@@ -8,7 +8,7 @@ const CSRFReducer = (csrf = null, action) => {
   return csrf;
 };
 
-const langReducer = (lang = "ar", action) => {
+const langReducer = (lang = "en", action) => {
   if (action.type === "SET_LANG") {
     return action.payload;
   }

@@ -215,6 +215,16 @@ function Stores() {
       width: 100,
     },
     {
+      field: "serial_id",
+      headerName: "Serial",
+      width: 80,
+    },
+    {
+      field: "vendor_name",
+      headerName: "Vendor Name",
+      width: 100,
+    },
+    {
       field: "vendor_type",
       headerName: "Vendor Type",
       width: 120,
@@ -232,11 +242,7 @@ function Stores() {
       renderCell: (params) => (params.value ? "*Billing*" : "Shipping"),
     },
     { field: "address", headerName: "Address", width: 100 },
-    {
-      field: "moderator_phone",
-      headerName: "Moderator Phone",
-      width: 120,
-    },
+
     {
       field: "members",
       headerName: "Members",

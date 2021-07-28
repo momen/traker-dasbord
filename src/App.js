@@ -21,6 +21,7 @@ import { connect, useDispatch } from "react-redux";
 import { Logout } from "./actions";
 import { THEMES } from "./constants";
 import jssRTL from "jss-rtl";
+import { useTranslation } from "react-i18next";
 
 const jss = create({
   // plugins: [...jssPreset().plugins, jssRTL()],
@@ -29,9 +30,10 @@ const jss = create({
 });
 
 function App({ userToken, theme, lang }) {
-  // const userToken = useSelector((state) => state.userToken);
+  // const { lang } = useSelector((state) => state);
   // const [{ userToken, theme }, dispatch] = useStateValue();
   const dispatch = useDispatch();
+  const { t, i18n } = useTranslation();
 
   // Inject the token in the headers to be available on each request from the beginning, & this is
   // done only on the initial render.
@@ -42,7 +44,7 @@ function App({ userToken, theme, lang }) {
   // beginning as no token is provided in the headers
   useEffect(() => {
     axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-    axios.defaults.headers.common["Accept-Language"] = lang;
+    axios.defaults.headers.common["Accept-Language"] = "ar";
 
     axios.interceptors.response.use(
       (res) => {
@@ -61,6 +63,13 @@ function App({ userToken, theme, lang }) {
     );
   }, []);
 
+  useEffect(() => {
+    i18n.changeLanguage(lang);
+    document
+      .getElementById("body")
+      .setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+  }, [lang]);
+
   return (
     <React.Fragment>
       <Helmet
@@ -71,16 +80,16 @@ function App({ userToken, theme, lang }) {
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <MuiThemeProvider
             theme={createTheme(
-              THEMES.DEFAULT
+              THEMES.DEFAULT,
               // theme === "light" ? THEMES.DEFAULT : THEMES.DARK
-              // lang === "ar" ? "rtl" : "ltr"
+              lang === "ar" ? "rtl" : "ltr"
             )}
           >
             <ThemeProvider
               theme={createTheme(
-                THEMES.DEFAULT
+                THEMES.DEFAULT,
                 // theme === "light" ? THEMES.DEFAULT : THEMES.DARK
-                // lang === "ar" ? "rtl" : "ltr"
+                lang === "ar" ? "rtl" : "ltr"
               )}
             >
               <Routes />

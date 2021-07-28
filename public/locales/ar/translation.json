@@ -1,0 +1,29 @@
+{
+  "sidenav": {
+    "main": "الرئيسية",
+    "userMgt": "إدارة المستخدمين",
+    "permissions": "الصلاحيات",
+    "roles": "الأدوار",
+    "users": "المستخدمين",
+    "logs": "السجل",
+    "productMgt": "إدارة المنتجات",
+    "mainCatgory": "فئات رئيسية",
+    "category": "فئات فرعية",
+    "partCategory": "فئات فرعية ثانية",
+    "brands": "الماركات",
+    "models": "الموديلات",
+    "years": "سنين الصنع",
+    "tags": "كلمات دلالية",
+    "carTypes": "أنواع المركبات",
+    "manufacturers": "المصنعين",
+    "origins": "بلاد المنشأ",
+    "products": "المنتجات",
+    "vendorMgt": "إدارة البائعين",
+    "vendors": "البائعين",
+    "branches": "الفروع",
+    "totalOrders": "الطلبات",
+    "wholesaleOrders": "طلبات الجملة",
+    "invoices": "الفواتير",
+    "wholesaleInvoices": "فواتير الجملة"
+  }
+}

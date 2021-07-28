@@ -1,0 +1,29 @@
+{
+  "sidenav": {
+    "main": "Dashboard",
+    "userMgt": "User Management",
+    "permissions": "Permissions",
+    "roles": "Roles",
+    "users": "Users",
+    "logs": "Audit Logs",
+    "productMgt": "Product Management",
+    "mainCatgory": "Main Categories",
+    "category": "Categories",
+    "partCategory": "Part Categories",
+    "brands": "Brands",
+    "models": "Car Models",
+    "years": "Car Years",
+    "tags": "Tags",
+    "carTypes": "Vehicle Types",
+    "manufacturers": "Manufacturers",
+    "origins": "Origin Countries",
+    "products": "Products",
+    "vendorMgt": "Vendor Management",
+    "vendors": "Vendors",
+"branches": "Branches",
+    "totalOrders": "Total Orders",
+    "wholesaleOrders": "Wholesale Orders",
+    "invoices": "Invoices",
+    "wholesaleInvoices": "Wholesale Invoices"
+  }
+}

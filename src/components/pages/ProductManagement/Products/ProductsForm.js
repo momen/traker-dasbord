@@ -344,7 +344,6 @@ function ProductsForm({
 
   useEffect(() => {
     if (itemToEdit) {
-      alert(itemToEdit.producttype_id?.id);
       if (itemToEdit.car_made_id) {
         axios
           .get(`/car-modelslist/${itemToEdit.car_made_id}`)

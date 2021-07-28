@@ -335,7 +335,7 @@ function Products() {
                 View
               </Button>
             ) : null} */}
-            {userPermissions.includes("product_edit") ? (
+            {userPermissions.includes("product_edit") && params.row.approved ? (
               <Button
                 style={{
                   marginRight: "5px",
@@ -357,7 +357,8 @@ function Products() {
               </Button>
             ) : null}
 
-            {userPermissions.includes("product_delete") ? (
+            {userPermissions.includes("product_delete") &&
+            params.row.approved ? (
               <Button
                 className={classes.actionBtn}
                 style={{
