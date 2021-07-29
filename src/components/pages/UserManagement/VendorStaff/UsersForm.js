@@ -124,13 +124,13 @@ function UsersForm({
       return;
     }
 
-    setIsSubmitting(true);
-
     let data = {
       email: formData.email,
       role: parseInt(formData.role),
       stores: JSON.stringify(formData.stores.map((val) => val.id)),
     };
+
+    setIsSubmitting(true);
 
     axios
       .post("/vendor/add/staff", data)
@@ -241,12 +241,9 @@ function UsersForm({
                     required
                   >
                     <option aria-label="None" value="" />
-                    <option aria-label="None" value="Manager">
-                      Manager
-                    </option>
-                    <option aria-label="None" value="Staff">
-                      Staff
-                    </option>
+                    {rolesList?.map((role) => (
+                      <option value={role.id}>{role.title}</option>
+                    ))}
                   </TextField>
                 </div>
               </Grid>
