@@ -21,7 +21,14 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import { Add, Delete, Edit, ExpandMore, Search } from "@material-ui/icons";
+import {
+  Add,
+  Delete,
+  Edit,
+  ExpandMore,
+  GetApp,
+  Search,
+} from "@material-ui/icons";
 import { spacing } from "@material-ui/system";
 import axios from "../../../axios";
 import Popup from "../../Popup";
@@ -47,6 +54,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   button: {
+    minWidth: 150,
     height: 40,
     fontFamily: `"Almarai", sans-serif`,
     color: "#EF9300",
@@ -57,7 +65,27 @@ const useStyles = makeStyles((theme) => ({
       background: "#EF9300",
       color: "#ffffff",
     },
-    marginRight: "5px",
+  },
+  icon: {
+    marginLeft: theme.direction === "ltr" ? 10 : 0,
+    marginRight: theme.direction === "rtl" ? 10 : 0,
+  },
+  carouselImg: {
+    maxWidth: "100%",
+    maxHeight: 100,
+    objectFit: "contain",
+  },
+  btnIcon: {
+    marginLeft: theme.direction === "ltr" ? 5 : 0,
+    marginRight: theme.direction === "rtl" ? 5 : 0,
+  },
+  actionsContainer: {
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    "&:hover": {
+      color: {},
+    },
   },
   actionBtn: {
     padding: 5,
@@ -77,6 +105,24 @@ function Support() {
   const userPermissions = useSelector((state) => state.userPermissions);
   const { t } = useTranslation();
   const [FAQs, setFAQs] = useState([]);
+  const [carouselCarAds, setCarouselCarAds] = useState([]);
+  const [carouselCommercialAds, setCarouselCommercialAds] = useState([]);
+  const [carouselCarMobileAds, setCarouselCarMobileAds] = useState([]);
+  const [carouselCommercialMobileAds, setCarouselCommercialMobileAds] =
+    useState([]);
+  const [middleCarAds, setMiddleCarAds] = useState([]);
+  const [middleCommercialAds, setMiddleCommercialAds] = useState([]);
+  // const [middleCarMobileAds, setMiddleCarMobileAds] = useState([]);
+  // const [middleCommercialMobileAds, setMiddleCommercialMobileAds] = useState(
+  //   []
+  // );
+  const [bottomCarAds, setBottomCarAds] = useState([]);
+  const [bottomCommercialAds, setBottomCommercialAds] = useState([]);
+  const [bottomCarMobileAds, setBottomCarMobileAds] = useState([]);
+  const [bottomCommercialMobileAds, setBottomCommercialMobileAds] = useState(
+    []
+  );
+  const [adsPositions, setAdsPositions] = useState(null);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState(
     "New Frquently asked question"
@@ -154,38 +200,1067 @@ function Support() {
   };
 
   useEffect(() => {
-    if (openPopup || openDeleteDialog) return;
+    axios("ads/positions/list")
+      .then(({ data }) => {
+        setAdsPositions(data.data);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Ads Positions List");
+      });
+  }, []);
 
-    if (!userIsSearching) {
-      axios
-        .get(`/FAQs`)
-        .then(({ data }) => {
-          setFAQs(data.data);
-        })
-        .catch((res) => {
-          alert("Failed to Fetch data");
-        });
-    } else {
-      axios
-        .post(`/questions/search`, {
-          search_index: searchValue,
-        })
-        .then(({ data }) => {
-          setFAQs(data.data);
-        })
-        .catch(() => {
-          alert("Failed to Fetch data");
-        });
+  useEffect(() => {
+    if (adsPositions) {
+      const { id: carouselId } = adsPositions.find(
+        (position) => position.position_name === "carousel"
+      );
+      const { id: middleId } = adsPositions.find(
+        (position) => position.position_name === "middle"
+      );
+      const { id: bottomId } = adsPositions.find(
+        (position) => position.position_name === "bottom"
+      );
+
+      axios(`show/ads/position/${carouselId}`).then(({ data }) => {
+        setCarouselCarAds(
+          data.data?.filter((ad) => ad.platform === "web" && ad.cartype_id == 1)
+        );
+        setCarouselCarMobileAds(
+          data.data?.filter(
+            (ad) => ad.platform === "mobile" && ad.cartype_id == 1
+          )
+        );
+
+        setCarouselCommercialAds(
+          data.data?.filter((ad) => ad.platform === "web" && ad.cartype_id != 1)
+        );
+        setCarouselCommercialMobileAds(
+          data.data?.filter(
+            (ad) => ad.platform === "mobile" && ad.cartype_id != 1
+          )
+        );
+      });
+      axios(`show/ads/position/${middleId}`).then(({ data }) => {
+        console.log(data.data);
+        setMiddleCarAds(data.data?.filter((ad) => ad.cartype_id == 1));
+
+        setMiddleCommercialAds(data.data?.filter((ad) => ad.cartype_id != 1));
+      });
+      axios(`show/ads/position/${bottomId}`).then(({ data }) => {
+        setBottomCarAds(
+          data.data?.filter((ad) => ad.platform === "web" && ad.cartype_id == 1)
+        );
+        setBottomCarMobileAds(
+          data.data?.filter(
+            (ad) => ad.platform === "mobile" && ad.cartype_id == 1
+          )
+        );
+
+        setBottomCommercialAds(
+          data.data?.filter((ad) => ad.platform === "web" && ad.cartype_id != 1)
+        );
+        setBottomCommercialMobileAds(
+          data.data?.filter(
+            (ad) => ad.platform === "mobile" && ad.cartype_id != 1
+          )
+        );
+      });
     }
-  }, [searchValue, openPopup, openDeleteDialog]);
+  }, [searchValue, openPopup, openDeleteDialog, adsPositions]);
 
   return (
     <>
       <Typography variant="h3" gutterBottom display="inline">
-        {t('headers.ads')}
+        {t("components.ads.mainHeader")}
       </Typography>
 
       <Divider my={6} />
+
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <b>
+          <span style={{ fontSize: "1.05rem" }}>
+            {t("components.ads.top.title1")}
+          </span>
+        </b>
+        <img src="/ads-carousel-header.svg" alt="" className={classes.icon} />
+      </div>
+
+      <p style={{ fontSize: "1.02rem" }}>
+        <u> {t("components.ads.carTypesTitles.car")}</u>
+      </p>
+
+      <Grid
+        container
+        spacing={5}
+        style={{ marginTop: "10px", marginBottom: "40px" }}
+      >
+        <Grid item xs={12} sm={6}>
+          <span>{t("components.ads.top.pc_tablet_size_title")}</span>
+
+          <div
+            style={{
+              border: "1px solid #CCCCCC",
+              marginTop: 10,
+              padding: "15px 35px",
+              paddingBottom: "30px",
+            }}
+          >
+            {carouselCarAds?.map((ad) => (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img
+                  src={ad.photo?.image}
+                  alt=""
+                  className={classes.carouselImg}
+                />
+                <div
+                  style={{
+                    color: "#7B7B7B",
+                    width: "80%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div className={classes.actionsContainer}>
+                    <GetApp className={classes.btnIcon} />
+                    {t("components.ads.downloadBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Delete />
+                    {t("components.ads.deleteBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Edit />
+                    {t("components.ads.editBtnText")}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 35,
+              }}
+            >
+              <Button
+                className={classes.button}
+                variant="outlined"
+                startIcon={<Add />}
+              >
+                {t("components.ads.addBtnText")}
+              </Button>
+            </div>
+          </div>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <span>{t("components.ads.top.mobile_size_title")}</span>
+
+          <div
+            style={{
+              border: "1px solid #CCCCCC",
+              marginTop: 10,
+              padding: "15px 35px",
+              paddingBottom: "30px",
+            }}
+          >
+            {carouselCarMobileAds?.map((ad) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: 25,
+                }}
+              >
+                <img
+                  src={ad.photo?.image}
+                  alt=""
+                  className={classes.carouselImg}
+                />
+                <div
+                  style={{
+                    color: "#7B7B7B",
+                    width: "80%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 20,
+                  }}
+                >
+                  <div className={classes.actionsContainer}>
+                    <GetApp className={classes.btnIcon} />
+                    {t("components.ads.downloadBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Delete />
+                    {t("components.ads.deleteBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Edit />
+                    {t("components.ads.editBtnText")}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 35,
+              }}
+            >
+              <Button
+                className={classes.button}
+                variant="outlined"
+                startIcon={<Add />}
+              >
+                {t("components.ads.addBtnText")}
+              </Button>
+            </div>
+          </div>
+        </Grid>
+      </Grid>
+
+      <p style={{ fontSize: "1.02rem" }}>
+        <u> {t("components.ads.carTypesTitles.commercial")}</u>
+      </p>
+
+      <Grid
+        container
+        spacing={5}
+        style={{ marginTop: "10px", marginBottom: "40px" }}
+      >
+        <Grid item xs={12} sm={6}>
+          <span>{t("components.ads.top.pc_tablet_size_title")}</span>
+
+          <div
+            style={{
+              border: "1px solid #CCCCCC",
+              marginTop: 10,
+              padding: "15px 35px",
+              paddingBottom: "30px",
+            }}
+          >
+            {carouselCommercialAds?.map((ad) => (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img
+                  src={ad.photo?.image}
+                  alt=""
+                  className={classes.carouselImg}
+                />
+                <div
+                  style={{
+                    color: "#7B7B7B",
+                    width: "80%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 20,
+                  }}
+                >
+                  <div className={classes.actionsContainer}>
+                    <GetApp className={classes.btnIcon} />
+                    {t("components.ads.downloadBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Delete />
+                    {t("components.ads.deleteBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Edit />
+                    {t("components.ads.editBtnText")}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 35,
+              }}
+            >
+              <Button
+                className={classes.button}
+                variant="outlined"
+                startIcon={<Add />}
+              >
+                {t("components.ads.addBtnText")}
+              </Button>
+            </div>
+          </div>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <span>{t("components.ads.top.mobile_size_title")}</span>
+
+          <div
+            style={{
+              border: "1px solid #CCCCCC",
+              marginTop: 10,
+              padding: "15px 35px",
+              paddingBottom: "30px",
+            }}
+          >
+            {carouselCommercialMobileAds?.map((ad) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: 25,
+                }}
+              >
+                <img
+                  src={ad.photo?.image}
+                  alt=""
+                  className={classes.carouselImg}
+                />
+                <div
+                  style={{
+                    color: "#7B7B7B",
+                    width: "80%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 20,
+                  }}
+                >
+                  <div className={classes.actionsContainer}>
+                    <GetApp className={classes.btnIcon} />
+                    {t("components.ads.downloadBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Delete />
+                    {t("components.ads.deleteBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Edit />
+                    {t("components.ads.editBtnText")}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 35,
+              }}
+            >
+              <Button
+                className={classes.button}
+                variant="outlined"
+                startIcon={<Add />}
+              >
+                {t("components.ads.addBtnText")}
+              </Button>
+            </div>
+          </div>
+        </Grid>
+      </Grid>
+
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <b>
+          <span style={{ fontSize: "1.05rem" }}>
+            {t("components.ads.middle.title")}
+          </span>
+        </b>
+        <img src="/ads-middle-header.svg" alt="" className={classes.icon} />
+      </div>
+
+      <p style={{ fontSize: "1.02rem" }}>
+        <u> {t("components.ads.carTypesTitles.car")}</u>
+      </p>
+
+      <Grid
+        container
+        spacing={5}
+        style={{ marginTop: "10px", marginBottom: "40px" }}
+      >
+        <Grid
+          item
+          xs={12}
+          style={{ justifyContent: "center", alignItems: "center" }}
+        >
+          <span>{t("components.ads.middle.device_size_title")}</span>
+
+          <div
+            style={{
+              border: "1px solid #CCCCCC",
+              marginTop: 10,
+              padding: "15px 35px",
+              paddingBottom: "30px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Grid container spacing={4}>
+              <Grid item xs={4}>
+                {middleCarAds[0] ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={middleCarAds[0].photo?.image}
+                      alt=""
+                      className={classes.carouselImg}
+                    />
+                    <div
+                      style={{
+                        color: "#7B7B7B",
+                        width: "90%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginTop: 20,
+                      }}
+                    >
+                      <div className={classes.actionsContainer}>
+                        <GetApp className={classes.btnIcon} />
+                        {t("components.ads.downloadBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Delete />
+                        {t("components.ads.deleteBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Edit />
+                        {t("components.ads.editBtnText")}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      border: "1px solid #CCCCCC",
+                      width: "100%",
+                      height: "130px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {t("components.ads.uploadImageText")}
+                  </div>
+                )}
+              </Grid>
+
+              <Grid item xs={4}>
+                {middleCarAds[1] ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={middleCarAds[1].photo?.image}
+                      alt=""
+                      className={classes.carouselImg}
+                    />
+                    <div
+                      style={{
+                        color: "#7B7B7B",
+                        width: "90%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginTop: 20,
+                      }}
+                    >
+                      <div className={classes.actionsContainer}>
+                        <GetApp className={classes.btnIcon} />
+                        {t("components.ads.downloadBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Delete />
+                        {t("components.ads.deleteBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Edit />
+                        {t("components.ads.editBtnText")}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      border: "1px solid #CCCCCC",
+                      width: "100%",
+                      height: "130px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {t("components.ads.uploadImageText")}
+                  </div>
+                )}
+              </Grid>
+
+              <Grid item xs={4}>
+                {middleCarAds[2] ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={middleCarAds[2].photo?.image}
+                      alt=""
+                      className={classes.carouselImg}
+                    />
+                    <div
+                      style={{
+                        color: "#7B7B7B",
+                        width: "90%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginTop: 20,
+                      }}
+                    >
+                      <div className={classes.actionsContainer}>
+                        <GetApp className={classes.btnIcon} />
+                        {t("components.ads.downloadBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Delete />
+                        {t("components.ads.deleteBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Edit />
+                        {t("components.ads.editBtnText")}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      border: "1px solid #CCCCCC",
+                      width: "100%",
+                      height: "130px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {t("components.ads.uploadImageText")}
+                  </div>
+                )}
+              </Grid>
+            </Grid>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 35,
+              }}
+            >
+              <Button
+                className={classes.button}
+                variant="outlined"
+                startIcon={<Add />}
+              >
+                {t("components.ads.addBtnText")}
+              </Button>
+            </div>
+          </div>
+        </Grid>
+
+        <Grid item xs={12}>
+          <p style={{ fontSize: "1.02rem" }}>
+            <u> {t("components.ads.carTypesTitles.commercial")}</u>
+          </p>
+          <span>{t("components.ads.middle.device_size_title")}</span>
+
+          <div
+            style={{
+              border: "1px solid #CCCCCC",
+              marginTop: 10,
+              padding: "15px 35px",
+              paddingBottom: "30px",
+            }}
+          >
+            <Grid container spacing={4}>
+              <Grid item xs={4}>
+                {middleCommercialAds[0] ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={middleCommercialAds[0].photo?.image}
+                      alt=""
+                      className={classes.carouselImg}
+                    />
+                    <div
+                      style={{
+                        color: "#7B7B7B",
+                        width: "90%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginTop: 20,
+                      }}
+                    >
+                      <div className={classes.actionsContainer}>
+                        <GetApp className={classes.btnIcon} />
+                        {t("components.ads.downloadBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Delete />
+                        {t("components.ads.deleteBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Edit />
+                        {t("components.ads.editBtnText")}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      border: "1px solid #CCCCCC",
+                      width: "100%",
+                      height: "130px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {t("components.ads.uploadImageText")}
+                  </div>
+                )}
+              </Grid>
+
+              <Grid item xs={4}>
+                {middleCommercialAds[1] ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={middleCommercialAds[1].photo?.image}
+                      alt=""
+                      className={classes.carouselImg}
+                    />
+                    <div
+                      style={{
+                        color: "#7B7B7B",
+                        width: "90%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginTop: 20,
+                      }}
+                    >
+                      <div className={classes.actionsContainer}>
+                        <GetApp className={classes.btnIcon} />
+                        {t("components.ads.downloadBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Delete />
+                        {t("components.ads.deleteBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Edit />
+                        {t("components.ads.editBtnText")}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      border: "1px solid #CCCCCC",
+                      width: "100%",
+                      height: "130px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {t("components.ads.uploadImageText")}
+                  </div>
+                )}
+              </Grid>
+
+              <Grid item xs={4}>
+                {middleCommercialAds[2] ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={middleCommercialAds[2].photo?.image}
+                      alt=""
+                      className={classes.carouselImg}
+                    />
+                    <div
+                      style={{
+                        color: "#7B7B7B",
+                        width: "90%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginTop: 20,
+                      }}
+                    >
+                      <div className={classes.actionsContainer}>
+                        <GetApp className={classes.btnIcon} />
+                        {t("components.ads.downloadBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Delete />
+                        {t("components.ads.deleteBtnText")}
+                      </div>
+                      <div className={classes.actionsContainer}>
+                        <Edit />
+                        {t("components.ads.editBtnText")}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      border: "1px solid #CCCCCC",
+                      width: "100%",
+                      height: "130px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {t("components.ads.uploadImageText")}
+                  </div>
+                )}
+              </Grid>
+            </Grid>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 35,
+              }}
+            >
+              <Button
+                className={classes.button}
+                variant="outlined"
+                startIcon={<Add />}
+              >
+                {t("components.ads.addBtnText")}
+              </Button>
+            </div>
+          </div>
+        </Grid>
+      </Grid>
+
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <b>
+          <span style={{ fontSize: "1.05rem" }}>
+            {t("components.ads.bottom.title")}
+          </span>
+        </b>
+        <img src="/ads-bottom-header.svg" alt="" className={classes.icon} />
+      </div>
+
+      <p style={{ fontSize: "1.02rem" }}>
+        <u> {t("components.ads.carTypesTitles.car")}</u>
+      </p>
+
+      <Grid
+        container
+        spacing={5}
+        style={{ marginTop: "10px", marginBottom: "40px" }}
+      >
+        <Grid item xs={12} sm={6}>
+          <span>{t("components.ads.top.pc_tablet_size_title")}</span>
+
+          <div
+            style={{
+              border: "1px solid #CCCCCC",
+              marginTop: 10,
+              padding: "15px 35px",
+              paddingBottom: "30px",
+            }}
+          >
+            {bottomCarAds?.map((ad) => (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img
+                  src={ad.photo?.image}
+                  alt=""
+                  className={classes.carouselImg}
+                />
+                <div
+                  style={{
+                    color: "#7B7B7B",
+                    width: "80%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div className={classes.actionsContainer}>
+                    <GetApp className={classes.btnIcon} />
+                    {t("components.ads.downloadBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Delete />
+                    {t("components.ads.deleteBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Edit />
+                    {t("components.ads.editBtnText")}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 35,
+              }}
+            >
+              <Button
+                className={classes.button}
+                variant="outlined"
+                startIcon={<Add />}
+              >
+                {t("components.ads.addBtnText")}
+              </Button>
+            </div>
+          </div>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <span>{t("components.ads.top.mobile_size_title")}</span>
+
+          <div
+            style={{
+              border: "1px solid #CCCCCC",
+              marginTop: 10,
+              padding: "15px 35px",
+              paddingBottom: "30px",
+            }}
+          >
+            {bottomCarMobileAds?.map((ad) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: 25,
+                }}
+              >
+                <img
+                  src={ad.photo?.image}
+                  alt=""
+                  className={classes.carouselImg}
+                />
+                <div
+                  style={{
+                    color: "#7B7B7B",
+                    width: "80%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 20,
+                  }}
+                >
+                  <div className={classes.actionsContainer}>
+                    <GetApp className={classes.btnIcon} />
+                    {t("components.ads.downloadBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Delete />
+                    {t("components.ads.deleteBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Edit />
+                    {t("components.ads.editBtnText")}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 35,
+              }}
+            >
+              <Button
+                className={classes.button}
+                variant="outlined"
+                startIcon={<Add />}
+              >
+                {t("components.ads.addBtnText")}
+              </Button>
+            </div>
+          </div>
+        </Grid>
+      </Grid>
+
+      <p style={{ fontSize: "1.02rem" }}>
+        <u> {t("components.ads.carTypesTitles.commercial")}</u>
+      </p>
+
+      <Grid
+        container
+        spacing={5}
+        style={{ marginTop: "10px", marginBottom: "40px" }}
+      >
+        <Grid item xs={12} sm={6}>
+          <span>{t("components.ads.top.pc_tablet_size_title")}</span>
+
+          <div
+            style={{
+              border: "1px solid #CCCCCC",
+              marginTop: 10,
+              padding: "15px 35px",
+              paddingBottom: "30px",
+            }}
+          >
+            {bottomCommercialAds?.map((ad) => (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img
+                  src={ad.photo?.image}
+                  alt=""
+                  className={classes.carouselImg}
+                />
+                <div
+                  style={{
+                    color: "#7B7B7B",
+                    width: "80%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 20,
+                  }}
+                >
+                  <div className={classes.actionsContainer}>
+                    <GetApp className={classes.btnIcon} />
+                    {t("components.ads.downloadBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Delete />
+                    {t("components.ads.deleteBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Edit />
+                    {t("components.ads.editBtnText")}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 35,
+              }}
+            >
+              <Button
+                className={classes.button}
+                variant="outlined"
+                startIcon={<Add />}
+              >
+                {t("components.ads.addBtnText")}
+              </Button>
+            </div>
+          </div>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <span>{t("components.ads.top.mobile_size_title")}</span>
+
+          <div
+            style={{
+              border: "1px solid #CCCCCC",
+              marginTop: 10,
+              padding: "15px 35px",
+              paddingBottom: "30px",
+            }}
+          >
+            {bottomCommercialMobileAds?.map((ad) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: 25,
+                }}
+              >
+                <img
+                  src={ad.photo?.image}
+                  alt=""
+                  className={classes.carouselImg}
+                />
+                <div
+                  style={{
+                    color: "#7B7B7B",
+                    width: "80%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 20,
+                  }}
+                >
+                  <div className={classes.actionsContainer}>
+                    <GetApp className={classes.btnIcon} />
+                    {t("components.ads.downloadBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Delete />
+                    {t("components.ads.deleteBtnText")}
+                  </div>
+                  <div className={classes.actionsContainer}>
+                    <Edit />
+                    {t("components.ads.editBtnText")}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 35,
+              }}
+            >
+              <Button
+                className={classes.button}
+                variant="outlined"
+                startIcon={<Add />}
+              >
+                {t("components.ads.addBtnText")}
+              </Button>
+            </div>
+          </div>
+        </Grid>
+      </Grid>
 
       <Grid container flex mb={10} alignItems="flex-end">
         {/* <Grid item xs>

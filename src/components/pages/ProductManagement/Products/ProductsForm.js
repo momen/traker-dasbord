@@ -808,7 +808,6 @@ function ProductsForm({
                     }
                     helperText="Please select a Part Category"
                     fullWidth
-                    required
                   >
                     <option aria-label="None" value="" />
                     {partCategories?.map((partCategory) => (

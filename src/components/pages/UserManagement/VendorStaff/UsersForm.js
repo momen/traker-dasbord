@@ -128,7 +128,7 @@ function UsersForm({
 
     let data = {
       email: formData.email,
-      role: formData.role,
+      role: parseInt(formData.role),
       stores: JSON.stringify(formData.stores.map((val) => val.id)),
     };
 

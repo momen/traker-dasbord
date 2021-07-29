@@ -38,7 +38,32 @@
     "manageAccount": "Manage Account",
     "logout": "Logout"
   },
-  "headers": {
-    "ads": "Advertisments"
+  "components": {
+    "ads": {
+      "mainHeader": "Advertisments",
+      "top": {
+        "title1": "Carousel Images on the top of homepage (1-6 images)",
+        "pc_tablet_size_title": "PC/Tablet (1340 x 354 px)",
+        "mobile_size_title": "Mobile (330 x 160 px)"
+      },
+      "middle": {
+        "title": "Homepage middle ads (3 images)",
+        "device_size_title": "PC/Tablet & Mobile (700 x 560 px)"
+      },
+      "bottom": {
+        "title": "Homepage bottom ad (1 image)",
+        "pc_tablet_size_title": "PC/Tablet (1340 x 354 px)",
+        "mobile_size_title": "Mobile (330 x 160 px)"
+      },
+      "carTypesTitles": {
+        "car": "Car Ads",
+        "commercial": "Commercial Vehicles Ads"
+      },
+      "addBtnText": "Add",
+      "downloadBtnText": "Download",
+      "deleteBtnText": "Delete",
+      "editBtnText": "Edit",
+      "uploadImageText": "Please upload an image"
+    }
   }
 }
