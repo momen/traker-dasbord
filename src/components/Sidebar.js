@@ -474,10 +474,8 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                     button
                     // badge={category.badge}
                   />
-                ) : (user?.roles[0].title === "Staff" &&
-                    category.id === "main") ||
-                  (user?.roles[0].title === "Staff" &&
-                    category.id === "branches") ? (
+                ) : user?.roles[0].title === "Staff" &&
+                  category.id === "branches" ? (
                   <SidebarCategory
                     isCollapsable={false}
                     id={category.id}
