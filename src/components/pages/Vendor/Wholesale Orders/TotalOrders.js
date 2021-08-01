@@ -351,13 +351,9 @@ function PendingOrders() {
           alert("Failed to Fetch data");
         });
     } else {
-      axios
-        .post(
-          `/orders/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            search_index: searchValue,
-          }
-        )
+      axios(
+        `/admin/search/wholesale/orders?search_index=${searchValue}&page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+      )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);

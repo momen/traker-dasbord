@@ -11,6 +11,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
 import { useLastLocation } from "react-router-last-location";
+import { useSelector } from "react-redux";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -55,6 +56,7 @@ function ViewOrder({ match }) {
   const classes = useStyles();
   const history = useHistory();
   const lastLocation = useLastLocation();
+  const { user } = useSelector((state) => state);
   const [order, setOrder] = useState("");
 
   useEffect(() => {
@@ -74,12 +76,16 @@ function ViewOrder({ match }) {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => history.goBack()}
+          onClick={() =>
+            user?.roles[0].title === "Admin"
+              ? history.push("/vendor/wholesale-orders")
+              : history.push("/vendor/total-orders")
+          }
         >
           Back to{" "}
-          {lastLocation.pathname === "/vendor/total-orders"
-            ? "Total Orders"
-            : "Wholesale Orders"}
+          {user?.roles[0].title === "Admin"
+            ? "Wholesale Orders"
+            : "Total Orders"}
         </Button>
       </Container>
       <Typography variant="h3" gutterBottom display="inline">
