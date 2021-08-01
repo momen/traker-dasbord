@@ -331,7 +331,7 @@ function ProductsForm({
   const [dialogText, setDialogText] = useState(
     itemToEdit
       ? "Product details updated successfully."
-      : "New product added successfully."
+      : "Product info added & pending approval, once all the provided details are confirmed it will be approved."
   );
 
   const closeDialog = () => {

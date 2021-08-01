@@ -6,7 +6,13 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
-import { Group, GroupWork, LocalShipping, Money, Warning } from "@material-ui/icons";
+import {
+  Group,
+  GroupWork,
+  LocalShipping,
+  Money,
+  Warning,
+} from "@material-ui/icons";
 import { ShoppingBag } from "react-feather";
 
 const useStyles = makeStyles((theme) => ({
@@ -53,7 +59,7 @@ export default function AdminCards({ cards }) {
 
               <span style={{ color: "#7B7B7B" }}>
                 <span style={{ color: "#F67830" }}>Pending&emsp;</span>
-                {cards.actual_vendors}
+                {cards.pending_vendors}
               </span>
             </div>
           </CardContent>

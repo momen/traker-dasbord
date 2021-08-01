@@ -19,6 +19,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
 import { ArrowBack } from "@material-ui/icons";
+import { useSelector } from "react-redux";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -136,6 +137,7 @@ const useStyles = makeStyles((theme) => ({
 function ViewVendor({ match }) {
   const classes = useStyles();
   const history = useHistory();
+  const { user } = useSelector((state) => state);
   const [vendor, setVendor] = useState("");
   const [vendorTypes, setVendorTypes] = useState("");
 
@@ -247,14 +249,6 @@ function ViewVendor({ match }) {
                 <span className={classes.rowContent}>{vendor.vendor_name}</span>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.email}>
-              <StyledTableCell component="th" scope="row">
-                Email
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>{vendor.email}</span>
-              </StyledTableCell>
-            </StyledTableRow>
             <StyledTableRow key={vendor.company_name}>
               <StyledTableCell component="th" scope="row">
                 Company Name
@@ -269,6 +263,39 @@ function ViewVendor({ match }) {
                     Not provided yet
                   </span>
                 )}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={vendor.email}>
+              <StyledTableCell component="th" scope="row">
+                Email
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{vendor.email}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+
+            <StyledTableRow key={user?.phone_no}>
+              <StyledTableCell component="th" scope="row">
+                Phone Number
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{user?.phone_no}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={user?.gender}>
+              <StyledTableCell component="th" scope="row">
+                Gender
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{user?.gender}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={user?.birthdate}>
+              <StyledTableCell component="th" scope="row">
+                Date of birth
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{user?.birthdate}</span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={vendor.type}>

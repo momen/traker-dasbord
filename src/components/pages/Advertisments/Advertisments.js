@@ -76,15 +76,15 @@ const useStyles = makeStyles((theme) => ({
     objectFit: "contain",
   },
   btnIcon: {
-    marginLeft: theme.direction === "ltr" ? 5 : 0,
-    marginRight: theme.direction === "rtl" ? 5 : 0,
+    marginRight: theme.direction === "ltr" ? 5 : 0,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
   },
   actionsContainer: {
     display: "flex",
     alignItems: "center",
     cursor: "pointer",
     "&:hover": {
-      color: {},
+      textDecoration: "underline",
     },
   },
   actionBtn: {
@@ -143,9 +143,9 @@ function Support() {
     setItemToDelete(id);
   };
 
-  const DeleteQuestion = () => {
+  const DeleteAd = () => {
     axios
-      .delete(`/delete/question/${itemToDelete}`)
+      .delete(`/delete/ads/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
         setRowsToDelete(rowsToDelete.filter((id) => id !== itemToDelete));
@@ -155,49 +155,18 @@ function Support() {
       });
   };
 
-  const MassDelete = () => {
-    axios
-      .post(`/questions/mass/delete`, {
-        ids: JSON.stringify(rowsToDelete),
-      })
-      .then((res) => {
-        setOpenMassDeleteDialog(false);
-        setRowsToDelete([]);
-        axios
-          .get(`/FAQs`)
-          .then(({ data }) => {
-            setFAQs(data.data);
-          })
-          .catch(({ response }) => {
-            alert(response.data?.errors);
-          });
-      })
-      .catch(({ response }) => {
-        alert(response.data?.errors);
-      });
-  };
-
-  const handleSearchInput = (e) => {
-    let search = e.target.value;
-    if (!search || search.trim() === "") {
-      setuserIsSearching(false);
-      setSearchValue(search);
-    } else {
-      if (!userIsSearching) {
-        setuserIsSearching(true);
-      }
-      setSearchValue(search);
-    }
-  };
-
-  const toggleCheckBox = (e, faq_id) => {
-    e.stopPropagation();
-    if (e.target.checked) {
-      setRowsToDelete([...rowsToDelete, faq_id]);
-    } else {
-      setRowsToDelete(rowsToDelete.filter((id) => id !== faq_id));
-    }
-  };
+  async function downloadImage(imageSrc) {
+    const image = await fetch(imageSrc)
+    const imageBlog = await image.blob()
+    const imageURL = URL.createObjectURL(imageBlog)
+  
+    const link = document.createElement('a')
+    link.href = imageURL
+    link.download = 'image file name here'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   useEffect(() => {
     axios("ads/positions/list")
@@ -325,12 +294,15 @@ function Support() {
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
-                    <Delete />
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => openDeleteConfirmation(ad.id)}
+                  >
+                    <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
                   <div className={classes.actionsContainer}>
-                    <Edit />
+                    <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
@@ -393,12 +365,15 @@ function Support() {
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
-                    <Delete />
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => openDeleteConfirmation(ad.id)}
+                  >
+                    <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
                   <div className={classes.actionsContainer}>
-                    <Edit />
+                    <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
@@ -464,7 +439,10 @@ function Support() {
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => openDeleteConfirmation(ad.id)}
+                  >
                     <Delete />
                     {t("components.ads.deleteBtnText")}
                   </div>
@@ -532,12 +510,15 @@ function Support() {
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
-                    <Delete />
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => openDeleteConfirmation(ad.id)}
+                  >
+                    <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
                   <div className={classes.actionsContainer}>
-                    <Edit />
+                    <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
@@ -628,7 +609,12 @@ function Support() {
                         <GetApp className={classes.btnIcon} />
                         {t("components.ads.downloadBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() =>
+                          openDeleteConfirmation(middleCarAds[0].id)
+                        }
+                      >
                         <Delete />
                         {t("components.ads.deleteBtnText")}
                       </div>
@@ -682,12 +668,17 @@ function Support() {
                         <GetApp className={classes.btnIcon} />
                         {t("components.ads.downloadBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
-                        <Delete />
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() =>
+                          openDeleteConfirmation(middleCarAds[1].id)
+                        }
+                      >
+                        <Delete className={classes.btnIcon} />
                         {t("components.ads.deleteBtnText")}
                       </div>
                       <div className={classes.actionsContainer}>
-                        <Edit />
+                        <Edit className={classes.btnIcon} />
                         {t("components.ads.editBtnText")}
                       </div>
                     </div>
@@ -736,12 +727,17 @@ function Support() {
                         <GetApp className={classes.btnIcon} />
                         {t("components.ads.downloadBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
-                        <Delete />
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() =>
+                          openDeleteConfirmation(middleCarAds[2].id)
+                        }
+                      >
+                        <Delete className={classes.btnIcon} />
                         {t("components.ads.deleteBtnText")}
                       </div>
                       <div className={classes.actionsContainer}>
-                        <Edit />
+                        <Edit className={classes.btnIcon} />
                         {t("components.ads.editBtnText")}
                       </div>
                     </div>
@@ -823,12 +819,17 @@ function Support() {
                         <GetApp className={classes.btnIcon} />
                         {t("components.ads.downloadBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
-                        <Delete />
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() =>
+                          openDeleteConfirmation(middleCommercialAds[0].id)
+                        }
+                      >
+                        <Delete className={classes.btnIcon} />
                         {t("components.ads.deleteBtnText")}
                       </div>
                       <div className={classes.actionsContainer}>
-                        <Edit />
+                        <Edit className={classes.btnIcon} />
                         {t("components.ads.editBtnText")}
                       </div>
                     </div>
@@ -877,12 +878,17 @@ function Support() {
                         <GetApp className={classes.btnIcon} />
                         {t("components.ads.downloadBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
-                        <Delete />
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() =>
+                          openDeleteConfirmation(middleCommercialAds[1].id)
+                        }
+                      >
+                        <Delete className={classes.btnIcon} />
                         {t("components.ads.deleteBtnText")}
                       </div>
                       <div className={classes.actionsContainer}>
-                        <Edit />
+                        <Edit className={classes.btnIcon} />
                         {t("components.ads.editBtnText")}
                       </div>
                     </div>
@@ -931,12 +937,17 @@ function Support() {
                         <GetApp className={classes.btnIcon} />
                         {t("components.ads.downloadBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
-                        <Delete />
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() =>
+                          openDeleteConfirmation(middleCommercialAds[2].id)
+                        }
+                      >
+                        <Delete className={classes.btnIcon} />
                         {t("components.ads.deleteBtnText")}
                       </div>
                       <div className={classes.actionsContainer}>
-                        <Edit />
+                        <Edit className={classes.btnIcon} />
                         {t("components.ads.editBtnText")}
                       </div>
                     </div>
@@ -1025,12 +1036,15 @@ function Support() {
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
-                    <Delete />
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => openDeleteConfirmation(ad.id)}
+                  >
+                    <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
                   <div className={classes.actionsContainer}>
-                    <Edit />
+                    <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
@@ -1093,12 +1107,15 @@ function Support() {
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
-                    <Delete />
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => openDeleteConfirmation(ad.id)}
+                  >
+                    <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
                   <div className={classes.actionsContainer}>
-                    <Edit />
+                    <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
@@ -1164,12 +1181,15 @@ function Support() {
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
-                    <Delete />
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => openDeleteConfirmation(ad.id)}
+                  >
+                    <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
                   <div className={classes.actionsContainer}>
-                    <Edit />
+                    <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
@@ -1232,12 +1252,15 @@ function Support() {
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
-                    <Delete />
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => openDeleteConfirmation(ad.id)}
+                  >
+                    <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
                   <div className={classes.actionsContainer}>
-                    <Edit />
+                    <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
@@ -1322,17 +1345,12 @@ function Support() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Question? <br />
+            Are you sure you want to delete this Ad? <br />
             If this was by accident please press Back
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => {
-              DeleteQuestion();
-            }}
-            color="secondary"
-          >
+          <Button onClick={DeleteAd} color="secondary">
             Yes, delete
           </Button>
           <Button
@@ -1345,7 +1363,7 @@ function Support() {
         </DialogActions>
       </Dialog>
 
-      <Dialog
+      {/* <Dialog
         open={openMassDeleteDialog}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
@@ -1376,7 +1394,7 @@ function Support() {
             Back
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 }

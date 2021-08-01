@@ -131,12 +131,38 @@ function ViewOrder({ match }) {
                 {order.orderStatus}
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`recepientname-${order.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Recipient Name
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {order.shipping?.recipient_name +
+                  " " +
+                  order.shipping?.last_name}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`paymentWay-${order.orderStatus}`}>
+              <StyledTableCell component="th" scope="row">
+                Address
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {`${order.shipping?.street} St. - ${order.shipping?.district}`}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`paymentWay-${order.orderStatus}`}>
+              <StyledTableCell component="th" scope="row">
+                Payment Way
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {order.paymentway?.payment_name}
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={`paid`}>
               <StyledTableCell component="th" scope="row">
                 Paid
               </StyledTableCell>
               <StyledTableCell align="left">
-                {!order ? null : order.paid ? order.paid : "No"}
+                {!order ? null : order.paid ? "Yes" : "Pending"}
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`created_at`}>
