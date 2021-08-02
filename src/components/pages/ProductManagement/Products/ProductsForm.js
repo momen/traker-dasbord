@@ -1285,6 +1285,7 @@ function ProductsForm({
                         type="checkbox"
                         name="terms_services"
                         onChange={toggleDiscount}
+                        checked={enableDiscount}
                       />
 
                       <span>Discount</span>
@@ -1294,7 +1295,10 @@ function ProductsForm({
                   <Grid item xs={4} md={2}>
                     <div>
                       <NumberFormat
-                        disabled={!formData.price || !enableDiscount}
+                        disabled={
+                          !formData.price ||
+                          (!enableDiscount && !itemToEdit?.discount)
+                        }
                         allowNegative={false}
                         customInput={TextField}
                         name="discount"
@@ -1338,7 +1342,10 @@ function ProductsForm({
                   <Grid item xs={4} md={2}>
                     <div>
                       <NumberFormat
-                        disabled={!formData.price || !enableDiscount}
+                        disabled={
+                          !formData.price ||
+                          (!enableDiscount && !itemToEdit?.discount)
+                        }
                         allowNegative={false}
                         customInput={TextField}
                         name="discount_value"

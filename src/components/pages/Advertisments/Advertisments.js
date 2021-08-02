@@ -123,6 +123,9 @@ function Support() {
     []
   );
   const [adsPositions, setAdsPositions] = useState(null);
+  const [carouselId, setCarouselId] = useState(null);
+  const [middleId, setMiddleId] = useState(null);
+  const [bottomId, setBottomId] = useState(null);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState("New Ad");
   const [searchValue, setSearchValue] = useState();
@@ -132,6 +135,8 @@ function Support() {
   const [itemToDelete, setItemToDelete] = useState("");
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
+
+  const [formInitials, setFormInitials] = useState({});
 
   //For better UI/UX to have the first letter capitalised incase the First Word was entered in lowercase.
   const uppercaseFirstLetter = (str) => str[0].toUpperCase() + str.slice(1);
@@ -170,6 +175,18 @@ function Support() {
   useEffect(() => {
     axios("ads/positions/list")
       .then(({ data }) => {
+        const { id: _carouselId } = data.data.find(
+          (position) => position.position_name === "carousel"
+        );
+        const { id: _middleId } = data.data.find(
+          (position) => position.position_name === "middle"
+        );
+        const { id: _bottomId } = data.data.find(
+          (position) => position.position_name === "bottom"
+        );
+        setCarouselId(_carouselId);
+        setMiddleId(_middleId);
+        setBottomId(_bottomId);
         setAdsPositions(data.data);
       })
       .catch(() => {
@@ -179,15 +196,15 @@ function Support() {
 
   useEffect(() => {
     if (adsPositions) {
-      const { id: carouselId } = adsPositions.find(
-        (position) => position.position_name === "carousel"
-      );
-      const { id: middleId } = adsPositions.find(
-        (position) => position.position_name === "middle"
-      );
-      const { id: bottomId } = adsPositions.find(
-        (position) => position.position_name === "bottom"
-      );
+      // const { id: carouselId } = adsPositions.find(
+      //   (position) => position.position_name === "carousel"
+      // );
+      // const { id: middleId } = adsPositions.find(
+      //   (position) => position.position_name === "middle"
+      // );
+      // const { id: bottomId } = adsPositions.find(
+      //   (position) => position.position_name === "bottom"
+      // );
 
       axios(`show/ads/position/${carouselId}`).then(({ data }) => {
         setCarouselCarAds(
@@ -274,7 +291,14 @@ function Support() {
             }}
           >
             {carouselCarAds?.map((ad) => (
-              <div style={{ display: "flex", alignItems: "center" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <img
                   src={ad.photo?.image}
                   alt=""
@@ -287,6 +311,7 @@ function Support() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    marginTop: 20,
                   }}
                 >
                   <div
@@ -332,6 +357,12 @@ function Support() {
                   onClick={() => {
                     setOpenPopup(true);
                     setSelectedItem("");
+                    setFormInitials({
+                      ad_name: `carousel-car-${carouselCarAds?.length + 1}`,
+                      ad_position: carouselId,
+                      cartype_id: 1,
+                      platform: "web",
+                    });
                   }}
                 >
                   {t("components.ads.addBtnText")}
@@ -419,6 +450,14 @@ function Support() {
                   onClick={() => {
                     setOpenPopup(true);
                     setSelectedItem("");
+                    setFormInitials({
+                      ad_name: `carousel-car-mobile-${
+                        carouselCarMobileAds?.length + 1
+                      }`,
+                      ad_position: carouselId,
+                      cartype_id: 1,
+                      platform: "mobile",
+                    });
                   }}
                 >
                   {t("components.ads.addBtnText")}
@@ -450,7 +489,14 @@ function Support() {
             }}
           >
             {carouselCommercialAds?.map((ad) => (
-              <div style={{ display: "flex", alignItems: "center" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <img
                   src={ad.photo?.image}
                   alt=""
@@ -509,6 +555,14 @@ function Support() {
                   onClick={() => {
                     setOpenPopup(true);
                     setSelectedItem("");
+                    setFormInitials({
+                      ad_name: `carousel-commercial${
+                        carouselCommercialAds?.length + 1
+                      }`,
+                      ad_position: carouselId,
+                      cartype_id: 3,
+                      platform: "web",
+                    });
                   }}
                 >
                   {t("components.ads.addBtnText")}
@@ -596,6 +650,14 @@ function Support() {
                   onClick={() => {
                     setOpenPopup(true);
                     setSelectedItem("");
+                    setFormInitials({
+                      ad_name: `carousel-commercial-mobile${
+                        carouselCommercialMobileAds?.length + 1
+                      }`,
+                      ad_position: carouselId,
+                      cartype_id: 3,
+                      platform: "mobile",
+                    });
                   }}
                 >
                   {t("components.ads.addBtnText")}
@@ -782,6 +844,7 @@ function Support() {
                     style={{
                       display: "flex",
                       flexDirection: "column",
+                      justifyContent: "center",
                       alignItems: "center",
                     }}
                   >
@@ -857,6 +920,12 @@ function Support() {
                   onClick={() => {
                     setOpenPopup(true);
                     setSelectedItem("");
+                    setFormInitials({
+                      ad_name: `middle-car${middleCarAds?.length + 1}`,
+                      ad_position: middleId,
+                      cartype_id: 1,
+                      platform: "web",
+                    });
                   }}
                 >
                   {t("components.ads.addBtnText")}
@@ -1094,6 +1163,14 @@ function Support() {
                   onClick={() => {
                     setOpenPopup(true);
                     setSelectedItem("");
+                    setFormInitials({
+                      ad_name: `middle-car-commercial${
+                        middleCommercialAds?.length + 1
+                      }`,
+                      ad_position: middleId,
+                      cartype_id: 3,
+                      platform: "web",
+                    });
                   }}
                 >
                   {t("components.ads.addBtnText")}
@@ -1134,7 +1211,14 @@ function Support() {
             }}
           >
             {bottomCarAds?.map((ad) => (
-              <div style={{ display: "flex", alignItems: "center" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <img
                   src={ad.photo?.image}
                   alt=""
@@ -1147,6 +1231,7 @@ function Support() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    marginTop: 20,
                   }}
                 >
                   <div className={classes.actionsContainer}>
@@ -1189,6 +1274,12 @@ function Support() {
                   onClick={() => {
                     setOpenPopup(true);
                     setSelectedItem("");
+                    setFormInitials({
+                      ad_name: "bottom-car",
+                      ad_position: bottomId,
+                      cartype_id: 1,
+                      platform: "web",
+                    });
                   }}
                 >
                   {t("components.ads.addBtnText")}
@@ -1273,6 +1364,12 @@ function Support() {
                   onClick={() => {
                     setOpenPopup(true);
                     setSelectedItem("");
+                    setFormInitials({
+                      ad_name: "bottom-car-mobile",
+                      ad_position: bottomId,
+                      cartype_id: 1,
+                      platform: "mobile",
+                    });
                   }}
                 >
                   {t("components.ads.addBtnText")}
@@ -1304,7 +1401,14 @@ function Support() {
             }}
           >
             {bottomCommercialAds?.map((ad) => (
-              <div style={{ display: "flex", alignItems: "center" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <img
                   src={ad.photo?.image}
                   alt=""
@@ -1360,6 +1464,12 @@ function Support() {
                   onClick={() => {
                     setOpenPopup(true);
                     setSelectedItem("");
+                    setFormInitials({
+                      ad_name: "bottom-commercial",
+                      ad_position: bottomId,
+                      cartype_id: 3,
+                      platform: "web",
+                    });
                   }}
                 >
                   {t("components.ads.addBtnText")}
@@ -1444,6 +1554,12 @@ function Support() {
                   onClick={() => {
                     setOpenPopup(true);
                     setSelectedItem("");
+                    setFormInitials({
+                      ad_name: "bottom-commercial-mobile",
+                      ad_position: bottomId,
+                      cartype_id: 3,
+                      platform: "mobile",
+                    });
                   }}
                 >
                   {t("components.ads.addBtnText")}
@@ -1509,7 +1625,11 @@ function Support() {
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
-        <AdsForm setOpenPopup={setOpenPopup} itemToEdit={selectedItem} />
+        <AdsForm
+          setOpenPopup={setOpenPopup}
+          itemToEdit={selectedItem}
+          initialData={formInitials}
+        />
       </Popup>
 
       <Dialog

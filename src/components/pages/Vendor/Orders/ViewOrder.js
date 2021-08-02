@@ -222,7 +222,8 @@ function ViewOrder({ match }) {
                       Discount
                     </StyledTableCell>
                     <StyledTableCell align="left">
-                      %{detail.discount}
+                      %{detail.discount} &emsp;{" "}
+                      {(detail.discount / 100) * detail.price} ريال
                     </StyledTableCell>
                   </StyledTableRow>
                   <StyledTableRow
@@ -235,20 +236,44 @@ function ViewOrder({ match }) {
                       {detail.total}
                     </StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`store-name${detail.store_name}`}>
-                    <StyledTableCell component="th" scope="row">
-                      Store Name
-                    </StyledTableCell>
-                    <StyledTableCell align="left">
-                      {detail.store_name}
-                    </StyledTableCell>
-                  </StyledTableRow>
                   <StyledTableRow key={`vendor-name${detail.vendor_name}`}>
                     <StyledTableCell component="th" scope="row">
                       Vendor Name
                     </StyledTableCell>
                     <StyledTableCell align="left">
                       {detail.vendor_name}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`vendor-company-${detail.id}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Company
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.company}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`vendor-email-${detail.id}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Vendor Email
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.vendor_email}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`vendor-phone-${detail.id}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Vendor Phone
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.phone}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`store-name${detail.store_name}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Store Name
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.store_name}
                     </StyledTableCell>
                   </StyledTableRow>
                 </TableBody>

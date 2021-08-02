@@ -245,6 +245,24 @@ function ViewTicket({ match }) {
                 {ticket.order_number}
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`order-payment-${ticket.order_number}`}>
+              <StyledTableCell component="th" scope="row">
+                Payment Way
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.payment?.payment_name}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`address-${ticket.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Shipping Address
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.shipping
+                  ? `${ticket.shipping?.street} St. - ${ticket.shipping?.district}, ${ticket.shipping?.city?.city_name}, ${ticket.shipping?.state?.country_name}`
+                  : "No Address provided"}
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={`vendor-name-${ticket.vendor_name}`}>
               <StyledTableCell component="th" scope="row">
                 Vendor Name

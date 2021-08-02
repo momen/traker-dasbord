@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@material-ui/core";
 import axios from "../../../axios";
-import { PhotoCamera, RotateLeft } from "@material-ui/icons";
+import { RotateLeft } from "@material-ui/icons";
 import { CloseIcon } from "@material-ui/data-grid";
 import { Alert } from "@material-ui/lab";
 import * as Yup from "yup";
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    // width: "40vw",
+    width: "30vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     margin: theme.spacing(3, 2, 2),
-    width: "15%",
+    width: "30%",
   },
   resetButton: {
     height: 40,
@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
     //   color: "#ffffff",
     // },
     margin: theme.spacing(3, 2, 2),
-    width: "15%",
+    width: "30%",
   },
   uploadButton: {
     margin: theme.spacing(3, 2, 2),
@@ -79,47 +79,31 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .required("This field is Required")
+  ad_name: Yup.string().required(),
+  ad_position: Yup.string().required(),
+  ad_url: Yup.string()
+    .required("URL is Required")
     .test(
       "Not empty",
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
-  maincategory_id: Yup.string().required(),
-  description: Yup.string()
-    .notRequired()
-    .test(
-      "Minimum 5 chars without spaces",
-      "Please enter 5 characters excluding spaces",
-      (val) => val?.trim().length >= 5
-    )
-    .test(
-      "Not empty",
-      "Please remove any spaces at the beginning",
-      (val) => val?.trim() !== ""
-    )
-    .min(5, "Description must be at least 5 characters")
-    .max(255, "Description must not exceed 255 characters"),
+  platform: Yup.string().required(),
+  cartype_id: Yup.string().required(),
 });
 
-function AdsForm({
-  setPage,
-  setOpenPopup,
-  itemToEdit,
-  mainCategories,
-  setViewMode,
-  setPageHeader,
-}) {
+function AdsForm({ initialData, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
 
   const formRef = useRef();
   const uploadRef = useRef();
 
   const [formData, updateFormData] = useState({
-    name: itemToEdit ? itemToEdit.name : "",
-    maincategory_id: itemToEdit ? itemToEdit.maincategory_id : "",
-    description: itemToEdit ? itemToEdit.description : "",
+    ad_name: itemToEdit ? itemToEdit.ad_name : initialData.ad_name,
+    ad_position: itemToEdit ? itemToEdit.ad_position : initialData.ad_position,
+    ad_url: itemToEdit ? itemToEdit.ad_url : "",
+    cartype_id: itemToEdit ? itemToEdit.cartype_id : initialData.cartype_id,
+    platform: itemToEdit ? itemToEdit.platform : initialData.platform,
     photo: "",
   });
   const [imgName, setImgName] = useState("");
@@ -128,32 +112,32 @@ function AdsForm({
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
 
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogText, setDialogText] = useState(
-    itemToEdit
-      ? "Category updated successfully."
-      : "New category added successfully."
-  );
+  // const [dialogOpen, setDialogOpen] = useState(false);
+  // const [dialogText, setDialogText] = useState(
+  //   itemToEdit
+  //     ? "Category updated successfully."
+  //     : "New category added successfully."
+  // );
 
-  const closeDialog = () => {
-    setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Categories");
-    }
-  };
+  // const closeDialog = () => {
+  //   setDialogOpen(false);
+  //   if (itemToEdit) {
+  //     setViewMode("data-grid");
+  //     setPageHeader("Categories");
+  //   }
+  // };
 
   const handleSubmit = async () => {
     if (!formData.photo && !itemToEdit) {
       setOpenAlert(true);
     } else {
       let data = new FormData();
-      data.append("name", formData.name);
-      data.append("maincategory_id", formData.maincategory_id);
+      data.append("ad_name", formData.ad_name);
+      data.append("ad_position", formData.ad_position);
+      data.append("ad_url", formData.ad_url);
+      data.append("cartype_id", formData.cartype_id);
+      data.append("platform", formData.platform);
 
-      if (formData.description) {
-        data.append("description", formData.description);
-      }
       if (formData.photo) {
         data.append("photo", formData.photo, formData.photo.name);
       }
@@ -162,13 +146,13 @@ function AdsForm({
 
       if (itemToEdit) {
         await axios
-          .post(`/product-categories/${itemToEdit.id}`, data, {
+          .post(`/update/ads/${itemToEdit.id}`, data, {
             headers: {
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })
           .then((res) => {
-            setDialogOpen(true);
+            setOpenPopup(false);
           })
           .catch((res) => {
             setIsSubmitting(false);
@@ -176,14 +160,13 @@ function AdsForm({
           });
       } else {
         await axios
-          .post("/product-categories", data, {
+          .post("/add/ads", data, {
             headers: {
               "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
             },
           })
           .then((res) => {
-            setPage(1);
-            setDialogOpen(true);
+            setOpenPopup(false);
           })
           .catch((res) => {
             setIsSubmitting(false);
@@ -234,9 +217,7 @@ function AdsForm({
 
   const handleReset = () => {
     updateFormData({
-      name: "",
-      maincategory_id: "",
-      description: "",
+      ad_url: "",
     });
     setResponseErrors("");
     setImgName("");
@@ -261,14 +242,14 @@ function AdsForm({
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
             <Grid container spacing={8}>
-              <Grid item xs={4}>
+              <Grid item xs={12}>
                 <TextField
-                  name="name"
+                  name="ad_url"
                   required
                   fullWidth
-                  id="name"
-                  label="Category Name"
-                  value={formData.name}
+                  id="ad_url"
+                  label="Ad URL (Link to be redirected to when clicking on)"
+                  value={formData.ad_url}
                   autoFocus
                   onChange={(e) => {
                     handleChange(e);
@@ -276,92 +257,15 @@ function AdsForm({
                   }}
                   onBlur={handleBlur}
                   error={
-                    responseErrors?.name || Boolean(touched.name && errors.name)
+                    responseErrors?.ad_url ||
+                    Boolean(touched.ad_url && errors.ad_url)
                   }
-                  helperText={touched.name && errors.name}
+                  helperText={touched.ad_url && errors.ad_url}
                 />
               </Grid>
-              <Grid item xs={8}></Grid>
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.name?.map((msg) => (
-                    <span key={msg} className={classes.errorMsg}>
-                      {msg}
-                    </span>
-                  ))}
-                </Grid>
-              ) : null}
-
-              <Grid item xs={4}>
-                <div>
-                  <TextField
-                    select
-                    label="Main Category"
-                    value={formData.maincategory_id}
-                    name="maincategory_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.maincategory_id ||
-                      Boolean(touched.maincategory_id && errors.maincategory_id)
-                    }
-                    helperText="Please select a Main Category"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {mainCategories?.map((category) => (
-                      <option value={category.id}>
-                        {category.main_category_name}
-                      </option>
-                    ))}
-                  </TextField>
-
-                  <Grid item xs={8}></Grid>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.maincategory_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={12}>
-                <TextField
-                  id="description"
-                  name="description"
-                  label="Description"
-                  multiline
-                  rowsMax={8}
-                  value={formData.description}
-                  fullWidth
-                  onChange={(e) => {
-                    handleChange(e);
-                    handleStateChange(e);
-                  }}
-                  onBlur={handleBlur}
-                  error={
-                    responseErrors?.description ||
-                    Boolean(touched.description && errors.description)
-                  }
-                  helperText={touched.description && errors.description}
-                />
-              </Grid>
-
-              {responseErrors ? (
-                <Grid item xs={12}>
-                  {responseErrors.description?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>
@@ -478,12 +382,12 @@ function AdsForm({
           </form>
         )}
       </Formik>
-      <SuccessPopup
+      {/* <SuccessPopup
         open={dialogOpen}
         setOpen={setDialogOpen}
         message={dialogText}
         handleClose={closeDialog}
-      />
+      /> */}
     </div>
   );
 }
