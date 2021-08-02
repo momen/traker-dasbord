@@ -141,12 +141,12 @@ function ViewOrder({ match }) {
                   order.shipping?.last_name}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`paymentWay-${order.orderStatus}`}>
+            <StyledTableRow key={`address-${order.id}`}>
               <StyledTableCell component="th" scope="row">
                 Address
               </StyledTableCell>
               <StyledTableCell align="left">
-                {`${order.shipping?.street} St. - ${order.shipping?.district}`}
+                {`${order.shipping?.street} St. - ${order.shipping?.district}, ${order.shipping?.city?.city_name}, ${order.shipping?.state?.country_name}`}
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`paymentWay-${order.orderStatus}`}>

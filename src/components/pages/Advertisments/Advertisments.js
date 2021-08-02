@@ -32,7 +32,7 @@ import {
 import { spacing } from "@material-ui/system";
 import axios from "../../../axios";
 import Popup from "../../Popup";
-import FAQ_Form from "./FAQ_Form";
+import AdsForm from "./AdsForm";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
@@ -124,9 +124,7 @@ function Support() {
   );
   const [adsPositions, setAdsPositions] = useState(null);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState(
-    "New Frquently asked question"
-  );
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Ad");
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
@@ -305,28 +303,41 @@ function Support() {
                     <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => {
+                      setSelectedItem(ad);
+                      setOpenPopup(true);
+                      setOpenPopupTitle("Edit Ad");
+                    }}
+                  >
                     <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
               </div>
             ))}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: 35,
-              }}
-            >
-              <Button
-                className={classes.button}
-                variant="outlined"
-                startIcon={<Add />}
+            {carouselCarAds?.length < 6 ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 35,
+                }}
               >
-                {t("components.ads.addBtnText")}
-              </Button>
-            </div>
+                <Button
+                  className={classes.button}
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                  }}
+                >
+                  {t("components.ads.addBtnText")}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -347,7 +358,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  marginBottom: 25,
+                  // marginBottom: 25,
                 }}
               >
                 <img
@@ -379,28 +390,41 @@ function Support() {
                     <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => {
+                      setSelectedItem(ad);
+                      setOpenPopup(true);
+                      setOpenPopupTitle("Edit Ad");
+                    }}
+                  >
                     <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
               </div>
             ))}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: 35,
-              }}
-            >
-              <Button
-                className={classes.button}
-                variant="outlined"
-                startIcon={<Add />}
+            {carouselCarMobileAds?.length < 6 ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 35,
+                }}
               >
-                {t("components.ads.addBtnText")}
-              </Button>
-            </div>
+                <Button
+                  className={classes.button}
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                  }}
+                >
+                  {t("components.ads.addBtnText")}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </Grid>
       </Grid>
@@ -456,28 +480,41 @@ function Support() {
                     <Delete />
                     {t("components.ads.deleteBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => {
+                      setSelectedItem(ad);
+                      setOpenPopup(true);
+                      setOpenPopupTitle("Edit Ad");
+                    }}
+                  >
                     <Edit />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
               </div>
             ))}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: 35,
-              }}
-            >
-              <Button
-                className={classes.button}
-                variant="outlined"
-                startIcon={<Add />}
+            {carouselCommercialAds.length < 6 ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 35,
+                }}
               >
-                {t("components.ads.addBtnText")}
-              </Button>
-            </div>
+                <Button
+                  className={classes.button}
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                  }}
+                >
+                  {t("components.ads.addBtnText")}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -498,7 +535,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  marginBottom: 25,
+                  // marginBottom: 25,
                 }}
               >
                 <img
@@ -530,28 +567,41 @@ function Support() {
                     <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => {
+                      setSelectedItem(ad);
+                      setOpenPopup(true);
+                      setOpenPopupTitle("Edit Ad");
+                    }}
+                  >
                     <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
               </div>
             ))}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: 35,
-              }}
-            >
-              <Button
-                className={classes.button}
-                variant="outlined"
-                startIcon={<Add />}
+            {carouselCommercialMobileAds?.length < 6 ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 35,
+                }}
               >
-                {t("components.ads.addBtnText")}
-              </Button>
-            </div>
+                <Button
+                  className={classes.button}
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                  }}
+                >
+                  {t("components.ads.addBtnText")}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </Grid>
       </Grid>
@@ -631,7 +681,14 @@ function Support() {
                         <Delete />
                         {t("components.ads.deleteBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() => {
+                          setSelectedItem(middleCarAds[0]);
+                          setOpenPopup(true);
+                          setOpenPopupTitle("Edit Ad");
+                        }}
+                      >
                         <Edit />
                         {t("components.ads.editBtnText")}
                       </div>
@@ -690,7 +747,14 @@ function Support() {
                         <Delete className={classes.btnIcon} />
                         {t("components.ads.deleteBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() => {
+                          setSelectedItem(middleCarAds[1]);
+                          setOpenPopup(true);
+                          setOpenPopupTitle("Edit Ad");
+                        }}
+                      >
                         <Edit className={classes.btnIcon} />
                         {t("components.ads.editBtnText")}
                       </div>
@@ -749,7 +813,14 @@ function Support() {
                         <Delete className={classes.btnIcon} />
                         {t("components.ads.deleteBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() => {
+                          setSelectedItem(middleCarAds[2]);
+                          setOpenPopup(true);
+                          setOpenPopupTitle("Edit Ad");
+                        }}
+                      >
                         <Edit className={classes.btnIcon} />
                         {t("components.ads.editBtnText")}
                       </div>
@@ -771,21 +842,27 @@ function Support() {
                 )}
               </Grid>
             </Grid>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: 35,
-              }}
-            >
-              <Button
-                className={classes.button}
-                variant="outlined"
-                startIcon={<Add />}
+            {middleCarAds?.length < 3 ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 35,
+                }}
               >
-                {t("components.ads.addBtnText")}
-              </Button>
-            </div>
+                <Button
+                  className={classes.button}
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                  }}
+                >
+                  {t("components.ads.addBtnText")}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </Grid>
 
@@ -841,7 +918,14 @@ function Support() {
                         <Delete className={classes.btnIcon} />
                         {t("components.ads.deleteBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() => {
+                          setSelectedItem(middleCommercialAds[0]);
+                          setOpenPopup(true);
+                          setOpenPopupTitle("Edit Ad");
+                        }}
+                      >
                         <Edit className={classes.btnIcon} />
                         {t("components.ads.editBtnText")}
                       </div>
@@ -900,7 +984,14 @@ function Support() {
                         <Delete className={classes.btnIcon} />
                         {t("components.ads.deleteBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() => {
+                          setSelectedItem(middleCommercialAds[1]);
+                          setOpenPopup(true);
+                          setOpenPopupTitle("Edit Ad");
+                        }}
+                      >
                         <Edit className={classes.btnIcon} />
                         {t("components.ads.editBtnText")}
                       </div>
@@ -959,7 +1050,14 @@ function Support() {
                         <Delete className={classes.btnIcon} />
                         {t("components.ads.deleteBtnText")}
                       </div>
-                      <div className={classes.actionsContainer}>
+                      <div
+                        className={classes.actionsContainer}
+                        onClick={() => {
+                          setSelectedItem(middleCommercialAds[2]);
+                          setOpenPopup(true);
+                          setOpenPopupTitle("Edit Ad");
+                        }}
+                      >
                         <Edit className={classes.btnIcon} />
                         {t("components.ads.editBtnText")}
                       </div>
@@ -981,21 +1079,27 @@ function Support() {
                 )}
               </Grid>
             </Grid>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: 35,
-              }}
-            >
-              <Button
-                className={classes.button}
-                variant="outlined"
-                startIcon={<Add />}
+            {middleCommercialAds?.length < 3 ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 35,
+                }}
               >
-                {t("components.ads.addBtnText")}
-              </Button>
-            </div>
+                <Button
+                  className={classes.button}
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                  }}
+                >
+                  {t("components.ads.addBtnText")}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </Grid>
       </Grid>
@@ -1056,28 +1160,41 @@ function Support() {
                     <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => {
+                      setSelectedItem(ad);
+                      setOpenPopup(true);
+                      setOpenPopupTitle("Edit Ad");
+                    }}
+                  >
                     <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
               </div>
             ))}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: 35,
-              }}
-            >
-              <Button
-                className={classes.button}
-                variant="outlined"
-                startIcon={<Add />}
+            {!bottomCarAds?.length ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 35,
+                }}
               >
-                {t("components.ads.addBtnText")}
-              </Button>
-            </div>
+                <Button
+                  className={classes.button}
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                  }}
+                >
+                  {t("components.ads.addBtnText")}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -1098,7 +1215,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  marginBottom: 25,
+                  // marginBottom: 25,
                 }}
               >
                 <img
@@ -1127,28 +1244,41 @@ function Support() {
                     <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => {
+                      setSelectedItem(ad);
+                      setOpenPopup(true);
+                      setOpenPopupTitle("Edit Ad");
+                    }}
+                  >
                     <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
               </div>
             ))}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: 35,
-              }}
-            >
-              <Button
-                className={classes.button}
-                variant="outlined"
-                startIcon={<Add />}
+            {!bottomCarMobileAds?.length ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 35,
+                }}
               >
-                {t("components.ads.addBtnText")}
-              </Button>
-            </div>
+                <Button
+                  className={classes.button}
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                  }}
+                >
+                  {t("components.ads.addBtnText")}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </Grid>
       </Grid>
@@ -1201,28 +1331,41 @@ function Support() {
                     <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => {
+                      setSelectedItem(ad);
+                      setOpenPopup(true);
+                      setOpenPopupTitle("Edit Ad");
+                    }}
+                  >
                     <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
               </div>
             ))}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: 35,
-              }}
-            >
-              <Button
-                className={classes.button}
-                variant="outlined"
-                startIcon={<Add />}
+            {!bottomCommercialAds?.length ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 35,
+                }}
               >
-                {t("components.ads.addBtnText")}
-              </Button>
-            </div>
+                <Button
+                  className={classes.button}
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                  }}
+                >
+                  {t("components.ads.addBtnText")}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -1243,7 +1386,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  marginBottom: 25,
+                  // marginBottom: 25,
                 }}
               >
                 <img
@@ -1272,28 +1415,41 @@ function Support() {
                     <Delete className={classes.btnIcon} />
                     {t("components.ads.deleteBtnText")}
                   </div>
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => {
+                      setSelectedItem(ad);
+                      setOpenPopup(true);
+                      setOpenPopupTitle("Edit Ad");
+                    }}
+                  >
                     <Edit className={classes.btnIcon} />
                     {t("components.ads.editBtnText")}
                   </div>
                 </div>
               </div>
             ))}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: 35,
-              }}
-            >
-              <Button
-                className={classes.button}
-                variant="outlined"
-                startIcon={<Add />}
+            {!bottomCommercialMobileAds?.length ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: 35,
+                }}
               >
-                {t("components.ads.addBtnText")}
-              </Button>
-            </div>
+                <Button
+                  className={classes.button}
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                  }}
+                >
+                  {t("components.ads.addBtnText")}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </Grid>
       </Grid>
@@ -1347,6 +1503,14 @@ function Support() {
           </Grid>
         </Grid> */}
       </Grid>
+
+      <Popup
+        title={openPopupTitle}
+        openPopup={openPopup}
+        setOpenPopup={setOpenPopup}
+      >
+        <AdsForm setOpenPopup={setOpenPopup} itemToEdit={selectedItem} />
+      </Popup>
 
       <Dialog
         open={openDeleteDialog}

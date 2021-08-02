@@ -150,7 +150,8 @@ function Support() {
     },
     { field: "ticket_no", headerName: "Ticket Number", width: 100, flex: 1 },
     { field: "title", headerName: "Title", width: 100, flex: 1 },
-    { field: "priority", headerName: "Priority", width: 80 },
+    { field: "created_at", headerName: "Created at", width: 150 },
+    // { field: "priority", headerName: "Priority", width: 80 },
     { field: "case", headerName: "Status", width: 80 },
     {
       field: "category_name",

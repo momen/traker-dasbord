@@ -121,7 +121,7 @@ function ViewInvoice({ match }) {
                 Address
               </StyledTableCell>
               <StyledTableCell align="left">
-                {`${invoices.user_address?.home_no}, ${invoices.user_address?.street}, ${invoices.user_address?.district} - ${invoices.user_address?.city} - ${invoices.user_address?.state}`}
+                {`${invoices.user_address?.home_no}, ${invoices.user_address?.street}, ${invoices.user_address?.district} - ${invoices.user_address?.city?.city_name} - ${invoices.user_address?.state?.country_name}`}
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`vendor-name${invoices.vendor_name}`}>
@@ -149,11 +149,29 @@ function ViewInvoice({ match }) {
                 {invoices.invoice_total}
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow
+              key={`payment-way${invoices.payment?.payment_name}`}
+            >
+              <StyledTableCell component="th" scope="row">
+                Payment Way
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {invoices.payment?.payment_name}
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={`status-${invoices.status}`}>
               <StyledTableCell component="th" scope="row">
                 Status
               </StyledTableCell>
               <StyledTableCell align="left">{invoices.status}</StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`date-${invoices.created_at}`}>
+              <StyledTableCell component="th" scope="row">
+                Created At
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {invoices.created_at}
+              </StyledTableCell>
             </StyledTableRow>
           </TableBody>
         </Table>
