@@ -245,6 +245,14 @@ function ViewTicket({ match }) {
                 {ticket.order_number}
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`order-number-${ticket.order_number}`}>
+              <StyledTableCell component="th" scope="row">
+                Products
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.orderDetails?.map((order) => order.product_name + ", ")}
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={`order-payment-${ticket.order_number}`}>
               <StyledTableCell component="th" scope="row">
                 Payment Way
