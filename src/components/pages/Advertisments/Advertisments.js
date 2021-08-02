@@ -155,17 +155,18 @@ function Support() {
       });
   };
 
-  async function downloadImage(imageSrc) {
-    const image = await fetch(imageSrc)
-    const imageBlog = await image.blob()
-    const imageURL = URL.createObjectURL(imageBlog)
-  
-    const link = document.createElement('a')
-    link.href = imageURL
-    link.download = 'image file name here'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  async function downloadImage(imageObject) {
+    // alert(imageObject.url);
+    const image = await fetch(imageObject.image);
+    const imageBlog = await image.blob();
+    const imageURL = URL.createObjectURL(imageBlog);
+
+    const link = document.createElement("a");
+    link.href = imageURL;
+    link.download = imageObject.file_name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   useEffect(() => {
@@ -290,7 +291,10 @@ function Support() {
                     alignItems: "center",
                   }}
                 >
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => downloadImage(ad.photo)}
+                  >
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
@@ -361,7 +365,10 @@ function Support() {
                     marginTop: 20,
                   }}
                 >
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => downloadImage(ad.photo)}
+                  >
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
@@ -435,7 +442,10 @@ function Support() {
                     marginTop: 20,
                   }}
                 >
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => downloadImage(ad.photo)}
+                  >
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
@@ -506,7 +516,10 @@ function Support() {
                     marginTop: 20,
                   }}
                 >
-                  <div className={classes.actionsContainer}>
+                  <div
+                    className={classes.actionsContainer}
+                    onClick={() => downloadImage(ad.photo)}
+                  >
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
                   </div>
