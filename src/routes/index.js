@@ -778,7 +778,7 @@ const productQuestionsRoute = {
   badge: "11",
   component: ProductQuestions,
   children: null,
-  permission: "access_tabs_separately",
+  permission: "fetch_vendor_questions",
 };
 const viewProductQuestion = {
   path: "/product/questions/:id",

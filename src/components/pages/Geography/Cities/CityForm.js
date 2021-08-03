@@ -129,10 +129,8 @@ function ProductsForm({
 
   const closeDialog = () => {
     setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Cities");
-    }
+    setViewMode("data-grid");
+    setPageHeader("Cities");
   };
 
   const handleSubmit = async () => {

@@ -137,10 +137,8 @@ function CategoriesForm({
 
   const closeDialog = () => {
     setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Categories");
-    }
+    setViewMode("data-grid");
+    setPageHeader("Categories");
   };
 
   const handleSubmit = async () => {

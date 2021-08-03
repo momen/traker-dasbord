@@ -135,10 +135,8 @@ function ProductsForm({
 
   const closeDialog = () => {
     setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Areas");
-    }
+    setViewMode("data-grid");
+    setPageHeader("Areas");
   };
 
   const handleSubmit = async () => {

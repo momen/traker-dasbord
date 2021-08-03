@@ -106,10 +106,8 @@ function CarModelForm({
 
   const closeDialog = () => {
     setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Car Models List");
-    }
+    setViewMode("data-grid");
+    setPageHeader("Car Models List");
   };
 
   const handleSubmit = () => {

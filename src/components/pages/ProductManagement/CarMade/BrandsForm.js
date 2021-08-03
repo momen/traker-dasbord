@@ -105,10 +105,8 @@ function CreateCarMade({
 
   const closeDialog = () => {
     setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Brands List");
-    }
+    setViewMode("data-grid");
+    setPageHeader("Brands List");
   };
 
   const handleSubmit = () => {

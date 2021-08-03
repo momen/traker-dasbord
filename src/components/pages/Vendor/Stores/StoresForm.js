@@ -144,10 +144,8 @@ function StoresForm({
 
   const closeDialog = () => {
     setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Branches");
-    }
+    setViewMode("data-grid");
+    setPageHeader("Branches");
   };
 
   const handleSubmit = async () => {

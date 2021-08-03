@@ -118,10 +118,8 @@ function CarTypesForm({
 
   const closeDialog = () => {
     setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Car Types");
-    }
+    setViewMode("data-grid");
+    setPageHeader("Car Types");
   };
 
   const handleSubmit = () => {

@@ -124,10 +124,8 @@ function RolesForm({
 
   const closeDialog = () => {
     setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Roles");
-    }
+    setViewMode("data-grid");
+    setPageHeader("Roles");
   };
 
   const handleSubmit = async () => {

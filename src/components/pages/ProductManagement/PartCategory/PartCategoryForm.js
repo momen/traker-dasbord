@@ -122,10 +122,8 @@ function PartCategoryForm({
 
   const closeDialog = () => {
     setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Part Categories");
-    }
+    setViewMode("data-grid");
+    setPageHeader("Part Categories");
   };
 
   const handleSubmit = async () => {

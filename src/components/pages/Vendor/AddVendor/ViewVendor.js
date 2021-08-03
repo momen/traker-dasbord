@@ -169,9 +169,7 @@ function ViewVendor({ match }) {
         vendor_id: vendor.id,
       })
       .then(() => {
-        axios.get(`/add-vendors/${match.params.id}`).then((res) => {
-          setVendor(res.data.data);
-        });
+        history.push("/vendor/vendors");
       })
       .catch(({ response }) => alert(response.data.errors));
   };

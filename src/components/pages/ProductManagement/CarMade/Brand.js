@@ -415,7 +415,7 @@ function CarMade() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode]);
 
   return (
     <React.Fragment>

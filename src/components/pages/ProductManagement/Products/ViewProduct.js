@@ -280,7 +280,7 @@ function ViewProduct({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>
-                  {product.discount ? `% ${product.discount}` : "N/A"}
+                  {product.discount ? `% ${product.discount}` : "Not applied"}
                 </span>
                 &emsp;
                 <span className={classes.rowContent}>

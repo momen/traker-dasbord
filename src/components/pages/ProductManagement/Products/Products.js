@@ -278,7 +278,7 @@ function Products() {
       headerName: "Discount",
       width: 60,
       renderCell: (params) =>
-        params.value ? `%${parseFloat(params.value).toFixed(2)}` : "N/A",
+        params.value ? `%${parseFloat(params.value).toFixed(2)}` : "%0",
       align: "center",
     },
     { field: "holesale_price", headerName: "Wholesale Price", width: 80 },

@@ -382,7 +382,7 @@ function Roles() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, openPopup, sortModel, pageSize]);
+  }, [page, openPopup, sortModel, pageSize, viewMode]);
 
   return (
     <React.Fragment>

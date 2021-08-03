@@ -110,10 +110,8 @@ function UsersForm({
 
   const closeDialog = () => {
     setDialogOpen(false);
-    if (itemToEdit) {
-      setViewMode("data-grid");
-      setPageHeader("Staff");
-    }
+    setViewMode("data-grid");
+    setPageHeader("Staff");
   };
 
   const handleSubmit = async () => {

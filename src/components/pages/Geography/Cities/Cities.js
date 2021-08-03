@@ -433,7 +433,7 @@ function Countries() {
           alert("Failed to Search");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode]);
 
   return (
     <React.Fragment>
