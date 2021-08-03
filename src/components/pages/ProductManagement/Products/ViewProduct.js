@@ -74,6 +74,16 @@ const useStyles = makeStyles({
     marginRight: "5px",
     userSelect: "none",
   },
+  modelsBadge: {
+    background: "#C0D9D9",
+    color: "#000000",
+    fontSize: "12px",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
+  },
 });
 
 function ViewProduct({ match }) {
@@ -248,10 +258,20 @@ function ViewProduct({ match }) {
             </StyledTableRow>
             <StyledTableRow key={`quantity-${product.quantity}`}>
               <StyledTableCell component="th" scope="row">
-                Quantity
+                Available Quantity
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>{product.quantity}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`reminderQuantity-${product.qty_reminder}`}>
+              <StyledTableCell component="th" scope="row">
+                Reminder Quantity
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>
+                  {product.qty_reminder}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`discount-${product.discount}`}>
@@ -338,6 +358,21 @@ function ViewProduct({ match }) {
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>
                   {product.car_made?.car_made}
+                </span>
+              </StyledTableCell>
+            </StyledTableRow>
+
+            <StyledTableRow key={`models-${product.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Models
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>
+                  {product.car_model?.map((model) => (
+                    <span key={model.id} className={classes.modelsBadge}>
+                      {model.carmodel}
+                    </span>
+                  ))}
                 </span>
               </StyledTableCell>
             </StyledTableRow>

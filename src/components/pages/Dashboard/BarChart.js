@@ -110,11 +110,7 @@ const BarChart = ({ theme, barChartLabels, sales, fromDate, toDate }) => {
         //     <MoreVertical />
         //   </IconButton>
         // }
-        title={
-          fromDate && toDate
-            ? `Period: ${fromDate} ~ ${toDate}`
-            : "Period: Last 30 days"
-        }
+        title={fromDate && toDate ? `Period: ${fromDate} ~ ${toDate}` : null}
       />
       <CardContent>
         <ChartWrapper>

@@ -244,7 +244,7 @@ function Products() {
   const [productTypes, setProductTypes] = useState([]);
   const [productTags, setProductTags] = useState([]);
   const [sortModel, setSortModel] = useState([
-    { field: "quantity", sort: "desc" },
+    { field: "", sort: "asc" },
   ]);
   const [rowsToDelete, setRowsToDelete] = useState([]);
   const [openApproveDialog, setOpenApproveDialog] = useState(false);

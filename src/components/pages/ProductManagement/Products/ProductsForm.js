@@ -139,7 +139,7 @@ function ProductsForm({
     category_id: itemToEdit ? itemToEdit.category?.id : "",
     price: itemToEdit ? parseFloat(itemToEdit.price) : "",
     holesale_price: itemToEdit ? parseFloat(itemToEdit.holesale_price) : "",
-    no_of_orders: itemToEdit ? itemToEdit.no_of_orders : "",
+    no_of_orders: itemToEdit ? parseInt(itemToEdit.no_of_orders) : "",
 
     part_category_id: itemToEdit ? itemToEdit.part_category_id.toString() : "",
     manufacturer_id: itemToEdit ? itemToEdit.manufacturer?.id : "",
@@ -150,8 +150,8 @@ function ProductsForm({
       ? itemToEdit.tags.map(({ id, name }) => ({ id, name }))
       : [],
     store_id: itemToEdit ? itemToEdit.store_id : "",
-    quantity: itemToEdit ? itemToEdit.quantity : "",
-    qty_reminder: itemToEdit ? itemToEdit.qty_reminder : "",
+    quantity: itemToEdit ? parseInt(itemToEdit.quantity) : "",
+    qty_reminder: itemToEdit ? parseInt(itemToEdit.qty_reminder) : "",
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
     producttype_id: itemToEdit ? itemToEdit.producttype_id?.id : "",
     photo: [],
@@ -189,15 +189,15 @@ function ProductsForm({
       ),
     producttype_id: Yup.string().required(),
     holesale_price:
-      formData.producttype_id.toString() === "2" ||
-      formData.producttype_id.toString() === "3"
+      formData.producttype_id.toString() == "2" ||
+      formData.producttype_id.toString() == "3"
         ? Yup.number()
             .min(1, "Enter a value greater than 0")
             .required("This field is Required")
         : Yup.string().nullable().notRequired(),
     no_of_orders:
-      formData.producttype_id.toString() === "2" ||
-      formData.producttype_id.toString() === "3"
+      formData.producttype_id.toString() == "2" ||
+      formData.producttype_id.toString() == "3"
         ? Yup.number()
             .min(1, "Minimum value should be 1")
             .required("This field is Required")
@@ -245,8 +245,8 @@ function ProductsForm({
       .min(1, "Minimum value for discount is 0%")
       .max(formData.price * 0.8, "Maximum value for discount is 80%"),
     price:
-      formData.producttype_id.toString() === "1" ||
-      formData.producttype_id.toString() === "3"
+      formData.producttype_id.toString() == "1" ||
+      formData.producttype_id.toString() == "3"
         ? Yup.number()
             .required("This field is Required")
             .min(1, "Enter a value greater than 0")
@@ -284,10 +284,11 @@ function ProductsForm({
         : Yup.string().nullable().notRequired(),
     store_id: Yup.string().required(),
     quantity:
-      formData.producttype_id.toString() !== "2"
+      formData.producttype_id.toString() != "2"
         ? Yup.number()
-            .min(5, "Minimum value should be 5")
             .required("This field is Required")
+            .nullable()
+            .min(5, "Minimum value should be 5")
         : Yup.number().nullable().notRequired(),
     qty_reminder: Yup.number().required("This field is Required"),
     description: Yup.string()
@@ -306,7 +307,9 @@ function ProductsForm({
       .max(255, "Description must not exceed 255 characters"),
   });
 
-  const [enableDiscount, setEnableDiscount] = useState(false);
+  const [enableDiscount, setEnableDiscount] = useState(
+    itemToEdit.discount ? true : false
+  );
 
   const [imagesToDelete, setImagesToDelete] = useState("");
 
@@ -521,6 +524,7 @@ function ProductsForm({
 
   // Update Function Name on other components
   const handleStateChange = (e) => {
+    if (e.target.name === "quantity") console.log(e.target.value);
     const updatedData = formData;
     if (e.target.name === "producttype_id" && e.target.value == "1") {
       delete updatedData.holesale_price;
@@ -1134,13 +1138,11 @@ function ProductsForm({
                             holesale_price: Math.round(floatValue),
                           });
                           values.holesale_price = Math.round(floatValue);
-                          if (floatValue > 0) {
-                            errors.holesale_price = false;
+                          if (!floatValue) {
+                            errors.holesale_price = "This field is Required";
                           } else if (floatValue === 0) {
                             errors.holesale_price =
                               "Enter a value greater than 0";
-                          } else {
-                            errors.holesale_price = "This field is Required";
                           }
                         }}
                         onBlur={handleBlur}
@@ -1181,15 +1183,13 @@ function ProductsForm({
                         onValueChange={({ floatValue }) => {
                           updateFormData({
                             ...formData,
-                            no_of_orders: floatValue,
+                            no_of_orders: Math.round(floatValue),
                           });
                           values.no_of_orders = floatValue;
-                          if (floatValue >= 5) {
-                            errors.no_of_orders = false;
-                          } else if (floatValue) {
-                            errors.no_of_orders = "Minimum value should be 1";
-                          } else {
+                          if (!floatValue) {
                             errors.no_of_orders = "This field is Required";
+                          } else if (floatValue < 1) {
+                            errors.no_of_orders = "Minimum value should be 1";
                           }
                         }}
                         onBlur={handleBlur}
@@ -1236,12 +1236,10 @@ function ProductsForm({
                         onValueChange={({ floatValue }) => {
                           updateFormData({ ...formData, price: floatValue });
                           values.price = floatValue;
-                          if (floatValue > 0) {
-                            errors.price = false;
-                          } else if (floatValue === 0) {
-                            errors.price = "Enter a value greater than 0";
-                          } else {
+                          if (!floatValue) {
                             errors.price = "This field is Required";
+                          } else if (floatValue < 1) {
+                            errors.price = "Enter a value greater than 0";
                           }
                         }}
                         onBlur={handleBlur}
@@ -1352,7 +1350,7 @@ function ProductsForm({
                         fullWidth
                         label="Value"
                         // prefix="%"
-                        // value={formData.discount}
+                        value={(formData.discount / 100) * formData.price}
                         onChange={(e) => {
                           updateFormData({
                             ...formData,
@@ -1420,13 +1418,9 @@ function ProductsForm({
                           quantity: Math.round(floatValue),
                         });
                         values.quantity = Math.round(floatValue);
-                        if (floatValue >= 5) {
-                          errors.quantity = false;
-                        } else if (floatValue) {
-                          errors.quantity = "Minimum value should be 5";
-                        } else {
-                          errors.quantity = "This field is Required";
-                        }
+                        // if (!floatValue) {
+                        //   errors.quantity = "This field is Required";
+                        // }
                       }}
                       onBlur={handleBlur}
                       error={
@@ -1465,13 +1459,11 @@ function ProductsForm({
                         qty_reminder: Math.round(floatValue),
                       });
                       values.qty_reminder = Math.round(floatValue);
-                      if (floatValue >= 5) {
-                        errors.qty_reminder = false;
-                      } else if (floatValue) {
-                        errors.qty_reminder = "Minimum value should be 5";
-                      } else {
-                        errors.qty_reminder = "This field is Required";
-                      }
+                      // if (!floatValue) {
+                      //   errors.qty_reminder = "This field is Required";
+                      // } else if (floatValue < 5) {
+                      //   errors.qty_reminder = "Minimum value should be 5";
+                      // }
                     }}
                     onBlur={handleBlur}
                     error={
@@ -2045,6 +2037,7 @@ function ProductsForm({
             <Grid container justify="center">
               <Button
                 className={classes.submitButton}
+                onClick={() => console.log(errors)}
                 type="submit"
                 variant="contained"
                 color="primary"
