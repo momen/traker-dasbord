@@ -6,7 +6,17 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
-import { Group, GroupWork, HelpOutline, HourglassEmpty, LocalShipping, MonetizationOn, Money, ShoppingBasket, Warning } from "@material-ui/icons";
+import {
+  Group,
+  GroupWork,
+  HelpOutline,
+  HourglassEmpty,
+  LocalShipping,
+  MonetizationOn,
+  Money,
+  ShoppingBasket,
+  Warning,
+} from "@material-ui/icons";
 import { ShoppingBag } from "react-feather";
 
 const useStyles = makeStyles((theme) => ({
@@ -87,7 +97,9 @@ export default function VendorCards({ cards }) {
               Sales
             </Typography>
             <div className={classes.cardInfo}>
-              <div style={{ color: "#7B7B7B" }}>{cards.total_sale}</div>
+              <div style={{ color: "#7B7B7B" }}>
+                {new Intl.NumberFormat().format(cards.total_sale)} SAR
+              </div>
             </div>
           </CardContent>
         </Card>

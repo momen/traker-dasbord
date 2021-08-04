@@ -133,13 +133,13 @@ export default function AdminCards({ cards }) {
             </Typography>
             <div className={classes.multiInfoCard}>
               <span style={{ color: "#7B7B7B" }}>
-                <b style={{ color: "#90CA28" }}>Total&emsp;</b>
-                {cards.total_sale}
+                <b style={{ color: "#90CA28" }}>Total&nbsp;&nbsp;</b>
+                {new Intl.NumberFormat().format(cards.total_sale)}
               </span>
 
               <span style={{ color: "#7B7B7B" }}>
-                <b style={{ color: "#90CA28" }}>Wholesale&emsp;</b>
-                {cards.wholesale_total_sale}
+                <b style={{ color: "#90CA28" }}>Wholesale&nbsp;&nbsp;</b>
+                {new Intl.NumberFormat().format(cards.wholesale_total_sale)}
               </span>
             </div>
           </CardContent>

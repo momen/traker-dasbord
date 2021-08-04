@@ -137,7 +137,7 @@ const useStyles = makeStyles((theme) => ({
 function ViewVendor({ match }) {
   const classes = useStyles();
   const history = useHistory();
-  const { user } = useSelector((state) => state);
+  const { user, lang } = useSelector((state) => state);
   const [vendor, setVendor] = useState("");
   const [vendorTypes, setVendorTypes] = useState("");
 
@@ -231,19 +231,23 @@ function ViewVendor({ match }) {
               >
                 ID
               </StyledTableCell>
-              <StyledTableCell align="left">{vendor.id}</StyledTableCell>
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+                {vendor.id}
+              </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={vendor.serial}>
               <StyledTableCell component="th" scope="row">
                 Serial
               </StyledTableCell>
-              <StyledTableCell align="left">{vendor.serial}</StyledTableCell>
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+                {vendor.serial}
+              </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={vendor.vendor_name}>
               <StyledTableCell component="th" scope="row">
                 Vendor
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 <span className={classes.rowContent}>{vendor.vendor_name}</span>
               </StyledTableCell>
             </StyledTableRow>
@@ -251,7 +255,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Company Name
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 {vendor.company_name ? (
                   <span className={classes.rowContent}>
                     {vendor.company_name}
@@ -267,7 +271,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Email
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 <span className={classes.rowContent}>{vendor.email}</span>
               </StyledTableCell>
             </StyledTableRow>
@@ -276,31 +280,38 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Phone Number
               </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>{user?.phone_no}</span>
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+                <span className={classes.rowContent}>{vendor?.phone}</span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={user?.gender}>
               <StyledTableCell component="th" scope="row">
                 Gender
               </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>{user?.gender}</span>
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+                <span
+                  className={classes.rowContent}
+                  style={{ textTransform: "capitalize" }}
+                >
+                  {vendor?.gender}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={user?.birthdate}>
               <StyledTableCell component="th" scope="row">
                 Date of birth
               </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>{user?.birthdate}</span>
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+                <span className={classes.rowContent}>
+                  {vendor?.date_of_birth}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={vendor.type}>
               <StyledTableCell component="th" scope="row">
                 Type
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 {vendor.type == 1
                   ? "Retailer"
                   : vendor.type == 2
@@ -314,7 +325,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Status
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 {vendor.approved ? (
                   <span
                     style={{
@@ -378,7 +389,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Commercial Number
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 {vendor.commercial_no ? (
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     {vendor.commercial_no}
@@ -410,7 +421,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Commercial Document
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {vendor.commercialDocs?.file_name}
                   {vendor.commercialDocs?.image ? (
@@ -459,7 +470,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Tax Card Number
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 {vendor.tax_card_no ? (
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     {vendor.tax_card_no}
@@ -490,7 +501,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Tax Document
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {vendor.taxCardDocs?.file_name}
                   {vendor.taxCardDocs?.image ? (
@@ -537,7 +548,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Wholesale Document
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <span> {vendor.wholesaleDocs?.file_name}</span>
                   {vendor.wholesaleDocs?.image ? (
@@ -584,7 +595,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Bank Account
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 {vendor.bank_account ? (
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     {vendor.bank_account}
@@ -615,7 +626,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Bank Document
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {vendor.bankDocs?.file_name}
                   {vendor.bankDocs?.image ? (
@@ -662,7 +673,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Logo
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 <img
                   src={vendor.images?.image}
                   alt={vendor.images?.file_name}
@@ -675,7 +686,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Actions
               </StyledTableCell>
-              <StyledTableCell align="left">
+              <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 {vendor.complete ? (
                   <>
                     {!vendor.approved && vendor.complete ? (
