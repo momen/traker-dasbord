@@ -160,7 +160,9 @@ function PendingOrders() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
+  const [sortModel, setSortModel] = useState([
+    { field: "status", sort: "desc" },
+  ]);
   const [openApproveDialog, setOpenApproveDialog] = useState(false);
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const [orderToApproveOrCancel, setOrderToApproveOrCancel] = useState();
@@ -174,10 +176,36 @@ function PendingOrders() {
       headerAlign: "center",
       align: "center",
     },
-    { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
-    { field: "wholesale_total", headerName: "Order Total", width: 200 },
-    { field: "orderStatus", headerName: "Status", width: 150, sortable: false },
-    { field: "paid", headerName: "Paid", width: 80, sortable: false },
+    {
+      field: "order_number",
+      headerName: "Order Number",
+      width: 150,
+    },
+    {
+      field: "wholesale_total",
+      headerName: "Order Total",
+      width: 150,
+      renderCell: (params) => `${new Intl.NumberFormat().format(params.value)} SAR`,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "paid",
+      headerName: "Paid",
+      width: 80,
+      sortable: false,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <div style={{ width: "100%", textAlign: "center" }}>
+          {params.value ? "Yes" : "No"}
+        </div>
+      ),
+    },
     {
       field: "created_at",
       headerName: "Created At",
