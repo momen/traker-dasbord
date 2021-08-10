@@ -17,6 +17,7 @@ import axios from "../../../../axios";
 import { CloudUpload, PhotoCamera } from "@material-ui/icons";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -63,7 +64,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
+function VendorsForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  users,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const formRef = useRef();
@@ -95,6 +103,21 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
   const [bigTaxDoc, setBigTaxDoc] = useState(false);
   const [taxDocName, setTaxDocName] = useState("");
   const [taxDocNotFound, setTaxDocNotFound] = useState(false);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit
+      ? "Vendor details updated successfully."
+      : "Vendor added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    if (itemToEdit) {
+      setViewMode("data-grid");
+      setPageHeader("Vendors");
+    }
+  };
 
   const validationSchema = Yup.object().shape({
     vendor_name: Yup.string()
@@ -236,7 +259,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
       setIsSubmitting(true);
 
       if (itemToEdit) {
-      data.append("email", formData.email);
+        data.append("email", formData.email);
         await axios
           .post(`/add-vendors/${itemToEdit.id}`, data, {
             headers: {
@@ -244,7 +267,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
             },
           })
           .then((res) => {
-            setOpenPopup(false);
+            setDialogOpen(true);
           })
           .catch((res) => {
             setIsSubmitting(false);
@@ -259,7 +282,7 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
           })
           .then((res) => {
             setPage(1);
-            setOpenPopup(false);
+            setDialogOpen(true);
           })
           .catch((res) => {
             setIsSubmitting(false);
@@ -805,6 +828,12 @@ function VendorsForm({ setPage, setOpenPopup, itemToEdit, users }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

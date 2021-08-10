@@ -46,6 +46,14 @@ const useStyles = makeStyles({
     // whiteSpace: "normal",
     wordBreak: "break-word",
   },
+  memberBadge: {
+    background: "#98A9FF",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
+  },
   media: {
     width: "25%",
     objectFit: "contain",
@@ -73,7 +81,7 @@ function ViewStore({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/vendor/stores")}
+        onClick={() => history.push("/vendor/branches")}
         mb={3}
       >
         Back to list
@@ -91,17 +99,51 @@ function ViewStore({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">{store.id}</StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`store-${store.vendor?.company_name}`}>
+              <StyledTableCell component="th" scope="row">
+                Company Name
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {store.vendor?.company_name}
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={store.name}>
               <StyledTableCell component="th" scope="row">
-                Store Name
+                Branch Name
               </StyledTableCell>
               <StyledTableCell align="left">{store.name}</StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`members`}>
+              <StyledTableCell component="th" scope="row">
+                Staff Members
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {store.members?.map((member) => (
+                  <span key={member.id} className={classes.memberBadge}>
+                    {member.name}
+                  </span>
+                ))}
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={store.vendor_name}>
               <StyledTableCell component="th" scope="row">
-                Owner (vendor)
+                Owner (Vendor)
               </StyledTableCell>
-              <StyledTableCell align="left">{store.vendor_name}</StyledTableCell>
+              <StyledTableCell align="left">
+                {store.vendor_name}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`vendor-type-${store.vendor_name}`}>
+              <StyledTableCell component="th" scope="row">
+                Vendor Type
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {store.vendor?.type == "1"
+                  ? "Retailer"
+                  : store.vendor?.type == "2"
+                  ? "Wholesaler"
+                  : "Retailer/Wholesaler"}
+              </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={store.address}>
               <StyledTableCell component="th" scope="row">
@@ -111,14 +153,12 @@ function ViewStore({ match }) {
                 <span className={classes.rowContent}>{store.address}</span>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={store.moderator_name}>
+            <StyledTableRow key={store.serial_id}>
               <StyledTableCell component="th" scope="row">
-                Moderator Name
+                Serial
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>
-                  {store.moderator_name}
-                </span>
+                <span className={classes.rowContent}>{store.serial_id}</span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={store.moderator_phone}>
@@ -145,7 +185,7 @@ function ViewStore({ match }) {
         </Table>
       </TableContainer>
       {store.lat && store.long ? (
-        <div style={{ height: "60vh", marginTop: "20px"}}>
+        <div style={{ height: "60vh", marginTop: "20px" }}>
           <Map
             lattitude={parseFloat(store.lat)}
             longitude={parseFloat(store.long)}

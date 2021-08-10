@@ -25,7 +25,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import { ExpandMore, UnfoldLess } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import AddPermission from "./AddPermission";
@@ -39,9 +39,16 @@ const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+  },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
   },
   button: {
     background: "#4caf50",
@@ -50,22 +57,49 @@ const useStyles = makeStyles({
       background: "#388e3c",
     },
   },
-});
+}));
 
 function CustomPagination(props) {
   const { state, api } = props;
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
+      </Select>
+    </div>
   );
 }
 
@@ -94,7 +128,7 @@ function CustomLoadingOverlay() {
 
 function Permissions() {
   const classes = useStyles();
-  const userPermissions  = useSelector((state) =>  state.userPermissions) 
+  const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -109,7 +143,13 @@ function Permissions() {
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 55, headerAlign: 'center', align:'center' },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 55,
+      headerAlign: "center",
+      align: "center",
+    },
     { field: "title", headerName: "Title", width: 200, flex: 1 },
     {
       field: "actions",
@@ -126,7 +166,7 @@ function Permissions() {
               width: "100%",
             }}
           >
-            {userPermissions.includes("permission_show") ? (
+            {/* {userPermissions.includes("permission_show") ? (
               <Button
                 id="view-permissions-btn"
                 style={{ marginRight: "5px" }}
@@ -137,15 +177,15 @@ function Permissions() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
           </div>
         );
       },
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {
@@ -209,7 +249,7 @@ function Permissions() {
       <Divider my={6} />
 
       <Card mb={6}>
-        <Paper mb={2}>
+        {/* <Paper mb={2}>
           <Toolbar>
             <FormControl variant="outlined">
               <Select
@@ -235,7 +275,7 @@ function Permissions() {
               </Select>
             </FormControl>
           </Toolbar>
-        </Paper>
+        </Paper> */}
         <Paper>
           <div style={{ width: "100%" }}>
             <DataGrid
@@ -256,7 +296,13 @@ function Permissions() {
               loading={loading}
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("permission_show")
+                  ? ({ row }) => history.push(`/user-mgt/permissions/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
             />
           </div>

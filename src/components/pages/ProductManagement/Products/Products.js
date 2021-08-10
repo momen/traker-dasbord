@@ -30,7 +30,14 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import {
+  Add,
+  ArrowBack,
+  Delete,
+  Edit,
+  ExpandMore,
+  UnfoldLess,
+} from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import ProductsForm from "./ProductsForm";
@@ -47,13 +54,40 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
   button: {
-    background: "#4caf50",
-    color: "#ffffff",
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
     "&:hover": {
-      background: "#388e3c",
+      background: "#EF9300",
+      color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  backBtn: {
+    width: "fit-content",
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
+  backIcon: {
+    marginRight: theme.direction === "rtl" ? 0 : 5,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
   },
   toolBar: {
     display: "flex",
@@ -72,6 +106,39 @@ const useStyles = makeStyles((theme) => ({
     marginRight: "5px",
     userSelect: "none",
   },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
+  },
+  approveButton: {
+    background: "#ffffff",
+    color: "#90CA28",
+    border: "1px solid #90CA28",
+    borderRadius: 0,
+    height: 30,
+    "&:hover": {
+      background: "#90CA28",
+      color: "#ffffff",
+    },
+  },
+  cancelButton: {
+    background: "#ffffff",
+    color: "#E10000",
+    border: "1px solid #E10000",
+    borderRadius: 0,
+    height: 30,
+    "&:hover": {
+      background: "#E10000",
+      color: "#ffffff",
+    },
+  },
 }));
 
 function CustomPagination(props) {
@@ -79,15 +146,48 @@ function CustomPagination(props) {
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10} className={classes.dropdownOption}>
+          10 records / page
+        </MenuItem>
+        <MenuItem value={25} className={classes.dropdownOption}>
+          25 records / page
+        </MenuItem>
+        <MenuItem value={100} className={classes.dropdownOption}>
+          100 records / page
+        </MenuItem>
+      </Select>
+    </div>
   );
 }
 
@@ -140,44 +240,50 @@ function Products() {
   const [manufacturers, setManufacturers] = useState([]);
   const [originCountries, setOriginCountries] = useState([]);
   const [carTypes, setCarTypes] = useState([]);
+  const [transmissionsList, setTransmissionsList] = useState([]);
   const [productTypes, setProductTypes] = useState([]);
   const [productTags, setProductTags] = useState([]);
   const [sortModel, setSortModel] = useState([
-    { field: "quantity", sort: "desc" },
+    { field: "", sort: "asc" },
   ]);
   const [rowsToDelete, setRowsToDelete] = useState([]);
+  const [openApproveDialog, setOpenApproveDialog] = useState(false);
+  const [openRejectDialog, setOpenRejectDialog] = useState(false);
+  const [productToApproveOrRejct, setProductToApproveOrRejct] = useState();
+
+  const [pageHeader, setPageHeader] = useState("Products");
+  const [viewMode, setViewMode] = useState("data-grid");
 
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
     { field: "name", headerName: "Name", width: 80 },
     { field: "serial_number", headerName: "Serial Number", width: 100 },
-    { field: "serial_coding", headerName: "Serial Encoding", width: 100 },
+    {
+      field: "store_name",
+      headerName: "Store",
+      width: 100,
+      renderCell: (params) => params.row.store?.name,
+    },
     { field: "quantity", headerName: "Quantity", width: 70 },
     {
       field: "product_type",
-      headerName: "Product Type",
-      width: 80,
+      headerName: "Type",
+      width: 65,
       sortable: false,
       renderCell: (params) => params.row.producttype_id?.producttype,
     },
-    { field: "price", headerName: "Price", width: 70 },
-    { field: "holesale_price", headerName: "Wholesale Price", width: 70 },
-    { field: "no_of_orders", headerName: "No of orders", width: 70 },
+    { field: "price", headerName: "Price", width: 80 },
     {
       field: "discount",
       headerName: "Discount",
       width: 60,
       renderCell: (params) =>
-        params.value ? `%${parseFloat(params.value).toFixed(2)}` : "N/A",
+        params.value ? `%${parseFloat(params.value).toFixed(2)}` : "%0",
       align: "center",
     },
-    {
-      field: "category",
-      headerName: "Category",
-      width: 80,
-      sortable: false,
-      renderCell: (params) => params.row.category?.name,
-    },
+    { field: "holesale_price", headerName: "Wholesale Price", width: 80 },
+    // { field: "no_of_orders", headerName: "No of orders", width: 60 },
+
     {
       field: "photo",
       headerName: "Photos",
@@ -200,6 +306,7 @@ function Products() {
       field: "actions",
       headerName: "Actions",
       width: 170,
+      flex: 1,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -212,7 +319,7 @@ function Products() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("product_show") ? (
+            {/* {userPermissions.includes("product_show") ? (
               <Button
                 style={{
                   marginRight: "5px",
@@ -227,30 +334,37 @@ function Products() {
               >
                 View
               </Button>
-            ) : null}
-            {userPermissions.includes("product_edit") ? (
+            ) : null} */}
+            {userPermissions.includes("product_edit") && params.row.approved ? (
               <Button
                 style={{
                   marginRight: "5px",
-                  minWidth: "50px",
-                  maxWidth: "50px",
                 }}
+                className={classes.actionBtn}
+                startIcon={<Edit />}
                 color="primary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit Product"); /****** Customize ******/
+                  // setOpenPopup(true);
+                  // setOpenPopupTitle("Edit Product");
+                  setViewMode("edit");
+                  setPageHeader("Edit Product");
                 }}
               >
                 Edit
               </Button>
             ) : null}
 
-            {userPermissions.includes("product_delete") ? (
+            {userPermissions.includes("product_delete") &&
+            params.row.approved ? (
               <Button
-                style={{ minWidth: "50px", maxWidth: "50px" }}
+                className={classes.actionBtn}
+                style={{
+                  marginRight: "5px",
+                }}
+                startIcon={<Delete />}
                 color="secondary"
                 variant="contained"
                 size="small"
@@ -259,14 +373,45 @@ function Products() {
                 Delete
               </Button>
             ) : null}
+
+            {user.roles[0].id === 1 && !params.row.approved ? (
+              <Button
+                style={{ marginRight: "5px" }}
+                className={classes.approveButton}
+                variant="contained"
+                size="small"
+                onClick={() => {
+                  setOpenApproveDialog(true);
+                  setProductToApproveOrRejct(params.row.id);
+                }}
+              >
+                Approve
+              </Button>
+            ) : null}
+
+            {/* {user.roles[0].id === 1 && !params.row.approved ? (
+              <Button
+                style={{ marginRight: "5px" }}
+                className={classes.cancelButton}
+                variant="contained"
+                color="secondary"
+                size="small"
+                onClick={() => {
+                  setOpenRejectDialog(true);
+                  setProductToApproveOrRejct(params.row.id);
+                }}
+              >
+                Reject
+              </Button>
+            ) : null} */}
           </div>
         );
       },
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handleColumnToFilter = (event) => {
@@ -294,6 +439,64 @@ function Products() {
       }
       setSearchValue(search);
     }
+  };
+
+  const approveProduct = () => {
+    axios
+      .post(`/approve/products`, {
+        product_id: productToApproveOrRejct,
+      })
+      .then(() => {
+        setOpenApproveDialog(false);
+        setLoading(true);
+        axios
+          .get(
+            `/products?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
+  };
+
+  const cancelProduct = () => {
+    axios
+      .post(`/vendor/cancel/order`, {
+        order_id: productToApproveOrRejct,
+      })
+      .then(() => {
+        setOpenRejectDialog(false);
+        setLoading(true);
+        axios
+          .get(
+            `/products?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          )
+          .then((res) => {
+            if (Math.ceil(res.data.total / pageSize) < page) {
+              setPage(page - 1);
+            }
+            setRowsCount(res.data.total);
+            setRows(res.data.data);
+            setLoading(false);
+          })
+          .catch(({ response }) => {
+            alert(response.data?.errors);
+          });
+      })
+      .catch(({ response }) => {
+        alert(response.data?.errors);
+      });
   };
 
   const openDeleteConfirmation = (id) => {
@@ -465,6 +668,21 @@ function Products() {
       });
 
     axios
+      .get("/transmissions-list")
+      .then((res) => {
+        const _transmissionsList = res.data.data.map(
+          ({ id, transmission_name }) => ({
+            id,
+            transmission_name,
+          })
+        ); // Customize
+        setTransmissionsList(_transmissionsList);
+      })
+      .catch(() => {
+        alert("Failed to Fetch Transmissions List");
+      });
+
+    axios
       .get("/product-tagslist")
       .then((res) => {
         const _tags = res.data.data.map(({ id, name }) => ({
@@ -495,6 +713,7 @@ function Products() {
   // or whenever the page changes (Pagination)
   useEffect(() => {
     if (openPopup) return;
+    if (viewMode !== "data-grid") return;
     setLoading(true);
     if (!userIsSearching) {
       axios
@@ -527,182 +746,200 @@ function Products() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Products
+        {pageHeader}
       </Typography>
-
       <Divider my={6} />
 
-      <Grid container flex>
-        {userPermissions.includes("product_create") ? (
-          <Button
-            mb={3}
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              setOpenPopupTitle("New Product");
-              setOpenPopup(true);
-              setSelectedItem("");
-            }}
-          >
-            Add Product
-          </Button>
-        ) : null}
+      {viewMode === "data-grid" ? (
+        <Card mb={6}>
+          <Paper mb={2}>
+            <Toolbar className={classes.toolBar}>
+              <Grid
+                container
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-end" }}>
+                  {userPermissions.includes("product_create") ? (
+                    <Button
+                      className={classes.button}
+                      variant="contained"
+                      onClick={() => {
+                        // setOpenPopupTitle("New Product");
+                        // setOpenPopup(true);
+                        setViewMode("add");
+                        setPageHeader("Add Product");
+                        setSelectedItem("");
+                      }}
+                      startIcon={<Add />}
+                    >
+                      Add Product
+                    </Button>
+                  ) : null}
 
-        {userPermissions.includes("product_delete") ? (
-          <Button
-            mb={3}
-            color="secondary"
-            variant="contained"
-            disabled={rowsToDelete.length < 2}
-            onClick={() => {
-              setOpenMassDeleteDialog(true);
-            }}
-          >
-            Delete Selected
-          </Button>
-        ) : null}
-      </Grid>
+                  {userPermissions.includes("product_delete") ? (
+                    <Button
+                      startIcon={<Delete />}
+                      color="secondary"
+                      variant="contained"
+                      disabled={rowsToDelete.length < 2}
+                      onClick={() => {
+                        setOpenMassDeleteDialog(true);
+                      }}
+                      style={{ height: 40, borderRadius: 0 }}
+                    >
+                      Delete Selected
+                    </Button>
+                  ) : null}
+                </div>
 
-      <Card mb={6}>
-        <Paper mb={2}>
-          <Toolbar className={classes.toolBar}>
-            <Grid
-              container
-              style={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Grid item>
-                <FormControl variant="outlined">
-                  <Select
-                    value={pageSize}
-                    onChange={handlePageSize}
-                    autoWidth
-                    IconComponent={UnfoldLess}
-                    MenuProps={{
-                      anchorOrigin: {
-                        vertical: "bottom",
-                        horizontal: "center",
-                      },
-                      transformOrigin: {
-                        vertical: "top",
-                        horizontal: "center",
-                      },
-                      getContentAnchorEl: () => null,
-                    }}
-                  >
-                    <MenuItem value={10}>10</MenuItem>
-                    <MenuItem value={25}>25</MenuItem>
-                    <MenuItem value={100}>100</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item>
-                <div style={{ display: "flex" }}>
-                  <Grid
-                    container
-                    spacing={1}
-                    alignItems="flex-end"
-                    style={{ marginRight: "5px" }}
-                  >
-                    <Grid item>
-                      <Search />
+                <Grid item>
+                  <div style={{ display: "flex" }}>
+                    <Grid
+                      container
+                      spacing={1}
+                      alignItems="flex-end"
+                      style={{ marginRight: "5px" }}
+                    >
+                      <Grid item>
+                        <Search />
+                      </Grid>
+                      <Grid item>
+                        <TextField
+                          id="input-with-icon-grid"
+                          label="Search by column"
+                          onChange={handleSearchInput}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item>
-                      <TextField
-                        id="input-with-icon-grid"
-                        label="Search by column"
-                        onChange={handleSearchInput}
-                      />
-                    </Grid>
-                  </Grid>
 
-                  <Grid style={{ alignSelf: "flex-end" }}>
-                    <FormControl variant="outlined" size="small">
-                      <Select
-                        autoWidth
-                        value={columnToFilter}
-                        onChange={handleColumnToFilter}
-                        displayEmpty
-                        size="small"
-                        IconComponent={UnfoldLess}
-                        MenuProps={{
-                          anchorOrigin: {
-                            vertical: "bottom",
-                            horizontal: "center",
-                          },
-                          transformOrigin: {
-                            vertical: "top",
-                            horizontal: "center",
-                          },
-                          getContentAnchorEl: () => null,
-                        }}
-                      >
-                        {/* <MenuItem value="" disabled>
+                    <Grid style={{ alignSelf: "flex-end" }}>
+                      <FormControl variant="outlined" size="small">
+                        <Select
+                          autoWidth
+                          value={columnToFilter}
+                          onChange={handleColumnToFilter}
+                          displayEmpty
+                          size="small"
+                          IconComponent={UnfoldLess}
+                          MenuProps={{
+                            anchorOrigin: {
+                              vertical: "bottom",
+                              horizontal: "center",
+                            },
+                            transformOrigin: {
+                              vertical: "top",
+                              horizontal: "center",
+                            },
+                            getContentAnchorEl: () => null,
+                          }}
+                        >
+                          {/* <MenuItem value="" disabled>
                           Select a column to filter by
                         </MenuItem> */}
-                        <MenuItem value={""}>Generic Search</MenuItem>
-                        <MenuItem value={"name"}>Product Name</MenuItem>
-                        <MenuItem value={"quantity"}>Quantity</MenuItem>
-                        <MenuItem value={"price"}>Price</MenuItem>
-                        <MenuItem value={"car_made"}>Car Made</MenuItem>
-                        <MenuItem value={"car_model"}>Car Model</MenuItem>
-                        <MenuItem value={"year"}>Car Year</MenuItem>
-                        <MenuItem value={"category_id"}>Category</MenuItem>
-                        <MenuItem value={"part_category"}>
-                          Part Category
-                        </MenuItem>
-                        {user?.roles[0].title === "Admin" ? (
-                          <MenuItem value={"vendor_id"}>Vendor Name</MenuItem>
-                        ) : null}
-                        <MenuItem value={"store_id"}>Store Name</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </div>
+                          <MenuItem value={""}>Generic Search</MenuItem>
+                          <MenuItem value={"name"}>Product Name</MenuItem>
+                          <MenuItem value={"quantity"}>Quantity</MenuItem>
+                          <MenuItem value={"price"}>Price</MenuItem>
+                          <MenuItem value={"car_made"}>Car Made</MenuItem>
+                          <MenuItem value={"car_model"}>Car Model</MenuItem>
+                          <MenuItem value={"year"}>Car Year</MenuItem>
+                          <MenuItem value={"category_id"}>Category</MenuItem>
+                          <MenuItem value={"part_category"}>
+                            Part Category
+                          </MenuItem>
+                          {user?.roles[0].title === "Admin" ? (
+                            <MenuItem value={"vendor_id"}>Vendor Name</MenuItem>
+                          ) : null}
+                          <MenuItem value={"store_id"}>Store Name</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </div>
+                </Grid>
               </Grid>
-            </Grid>
-          </Toolbar>
-        </Paper>
-        <Paper>
-          <div style={{ width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              page={page}
-              pageSize={pageSize}
-              rowCount={rowsCount}
-              sortingOrder={["desc", "asc"]}
-              sortModel={sortModel}
-              columnBuffer={pageSize}
-              paginationMode="server"
-              sortingMode="server"
-              components={{
-                Pagination: CustomPagination,
-                LoadingOverlay: CustomLoadingOverlay,
-              }}
-              loading={loading}
-              checkboxSelection
-              disableColumnMenu
-              autoHeight={true}
-              onPageChange={handlePageChange}
-              onSortModelChange={handleSortModelChange}
-              onSelectionChange={(newSelection) => {
-                setRowsToDelete(newSelection.rowIds);
-              }}
-            />
+            </Toolbar>
+          </Paper>
+          <Paper>
+            <div style={{ width: "100%" }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                page={page}
+                pageSize={pageSize}
+                rowCount={rowsCount}
+                sortingOrder={["desc", "asc"]}
+                sortModel={sortModel}
+                columnBuffer={pageSize}
+                paginationMode="server"
+                sortingMode="server"
+                components={{
+                  Pagination: CustomPagination,
+                  LoadingOverlay: CustomLoadingOverlay,
+                }}
+                loading={loading}
+                checkboxSelection
+                disableColumnMenu
+                autoHeight={true}
+                onRowClick={
+                  userPermissions.includes("product_show")
+                    ? ({ row }) => history.push(`/product/products/${row.id}`)
+                    : null
+                }
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSize}
+                onSortModelChange={handleSortModelChange}
+                onSelectionChange={(newSelection) => {
+                  setRowsToDelete(newSelection.rowIds);
+                }}
+              />
+            </div>
+          </Paper>
+        </Card>
+      ) : (
+        <Card mb={6} style={{ padding: "50px 60px" }}>
+          <div
+            className={classes.backBtn}
+            onClick={() => {
+              setViewMode("data-grid");
+              setPageHeader("Products");
+            }}
+          >
+            <ArrowBack className={classes.backIcon} />
+            <span>Back</span>
           </div>
-        </Paper>
-      </Card>
+
+          <Divider my={3} />
+          <ProductsForm
+            setPage={setPage}
+            setOpenPopup={setOpenPopup}
+            itemToEdit={selectedItem}
+            stores={stores}
+            mainCategories={mainCategories}
+            categories={categories}
+            carMades={carMades}
+            carYears={carYears}
+            manufacturers={manufacturers}
+            originCountries={originCountries}
+            carTypes={carTypes}
+            transmissionsList={transmissionsList}
+            productTags={productTags}
+            productTypes={productTypes}
+            setViewMode={setViewMode}
+            setPageHeader={setPageHeader}
+          />
+        </Card>
+      )}
+
       <Popup
         title={openPopupTitle}
         openPopup={openPopup}
@@ -724,7 +961,6 @@ function Products() {
           productTypes={productTypes}
         />
       </Popup>
-
       <Dialog
         open={openDeleteDialog}
         aria-labelledby="alert-dialog-title"
@@ -757,7 +993,6 @@ function Products() {
           </Button>
         </DialogActions>
       </Dialog>
-
       <Dialog
         open={openMassDeleteDialog}
         aria-labelledby="alert-dialog-title"
@@ -787,6 +1022,66 @@ function Products() {
             autoFocus
           >
             Back
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openApproveDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Order Approval"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to Approve this product?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              approveProduct();
+            }}
+            color="primary"
+          >
+            Yes
+          </Button>
+          <Button
+            onClick={() => setOpenApproveDialog(false)}
+            color="secondary"
+            autoFocus
+          >
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openRejectDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Cancel Order"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to Reject this product?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              cancelProduct();
+            }}
+            color="primary"
+          >
+            Yes
+          </Button>
+          <Button
+            onClick={() => setOpenRejectDialog(false)}
+            color="secondary"
+            autoFocus
+          >
+            No
           </Button>
         </DialogActions>
       </Dialog>

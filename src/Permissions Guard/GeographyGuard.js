@@ -2,14 +2,8 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Redirect } from "react-router";
 
-function UserManagementGuard({ children }) {
-  const { user, userToken, userPermissions } = useSelector((state) => {
-    return {
-      user: state.user,
-      userToken: state.userToken,
-      userPermissions: state.userPermissions,
-    };
-  });
+function GeographyGuard({ children }) {
+  const { user, userToken, userPermissions } = useSelector((state) => state);
 
   if (!userToken) {
     alert("Expired");
@@ -19,4 +13,4 @@ function UserManagementGuard({ children }) {
   return userPermissions?.includes("countries_access") ? children : null;
 }
 
-export default UserManagementGuard;
+export default GeographyGuard;

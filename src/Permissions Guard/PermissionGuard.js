@@ -2,9 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 function PermissionGuard({ children, permission }) {
-  const { user, userToken, userPermissions } = useSelector((state) => {
-    return { user: state.user, userToken: state.userToken, userPermissions: state.userPermissions };
-  });
+  const { user, userToken, userPermissions } = useSelector((state) => state);
 
   if (!user && userToken) {
     return null;

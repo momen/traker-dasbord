@@ -31,7 +31,10 @@ import { sidebarRoutes as routes } from "../routes/index";
 
 import { ReactComponent as Logo } from "../vendor/logo.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { Logout } from "../actions";
+import { Logout, setLanguage } from "../actions";
+
+import logo from "../assets/images/trkar_logo_white.svg";
+import { useTranslation } from "react-i18next";
 
 const Box = styled(MuiBox)(spacing);
 
@@ -66,7 +69,7 @@ const Brand = styled(ListItem)`
   min-height: 56px;
   padding-left: ${(props) => props.theme.spacing(6)}px;
   padding-right: ${(props) => props.theme.spacing(6)}px;
-  justify-content: center;
+  justify-content: flex-start;
   cursor: pointer;
 
   ${(props) => props.theme.breakpoints.up("sm")} {
@@ -114,7 +117,6 @@ const Category = styled(ListItem)`
     font-size: 20px;
     width: 20px;
     height: 20px;
-    opacity: 0.5;
   }
 
   &:hover {
@@ -122,8 +124,8 @@ const Category = styled(ListItem)`
   }
 
   &.${(props) => props.activeClassName} {
-    background-color: ${(props) =>
-      darken(0.03, props.theme.sidebar.background)};
+    background-color: ${(props) => "#424242"};
+    // darken(0.03, props.theme.sidebar.background)};
 
     span {
       color: ${(props) => props.theme.sidebar.color};
@@ -137,6 +139,7 @@ const CategoryText = styled(ListItemText)`
     color: ${(props) => props.theme.sidebar.color};
     font-size: ${(props) => props.theme.typography.body1.fontSize}px;
     padding: 0 ${(props) => props.theme.spacing(4)}px;
+    display: flex;
   }
 `;
 
@@ -149,7 +152,14 @@ const CategoryIconMore = styled(ExpandMore)`
 `;
 
 const Link = styled(ListItem)`
-  padding-left: ${(props) => props.theme.spacing(17.5)}px;
+  padding-left: ${(props) =>
+    props.theme.direction === "ltr"
+      ? (props) => props.theme.spacing(15)
+      : "0"}px;
+  padding-right: ${(props) =>
+    props.theme.direction === "rtl"
+      ? (props) => props.theme.spacing(15)
+      : "0"}px;
   padding-top: ${(props) => props.theme.spacing(2)}px;
   padding-bottom: ${(props) => props.theme.spacing(2)}px;
 
@@ -162,8 +172,10 @@ const Link = styled(ListItem)`
     font-size: 20px;
     width: 20px;
     height: 20px;
-    opacity: 0.5;
-    margin-right: 15px;
+    margin-right: ${(props) =>
+      props.theme.direction === "ltr" ? "15px" : "0px"};
+    margin-left: ${(props) =>
+      props.theme.direction === "rtl" ? "15px" : "0px"};
   }
 
   &:hover span {
@@ -176,8 +188,11 @@ const Link = styled(ListItem)`
   }
 
   &.${(props) => props.activeClassName} {
-    background-color: ${(props) =>
-      darken(0.03, props.theme.sidebar.background)};
+    background-color: ${
+      "#424242"
+      // (props) =>
+      // darken(0.03, props.theme.sidebar.background)
+    };
 
     span {
       color: ${(props) => props.theme.sidebar.color};
@@ -189,6 +204,7 @@ const LinkText = styled(ListItemText)`
   color: ${(props) => props.theme.sidebar.color};
   span {
     font-size: ${(props) => props.theme.typography.body1.fontSize}px;
+    display: flex;
   }
   margin-top: 0;
   margin-bottom: 0;
@@ -300,9 +316,7 @@ const SidebarLink = ({ name, to, badge, icon, id }) => {
 };
 
 const Sidebar = ({ classes, staticContext, location, ...rest }) => {
-  const { user, userPermissions } = useSelector((state) => {
-    return { user: state.user, userPermissions: state.userPermissions };
-  });
+  const { user, userPermissions, lang } = useSelector((state) => state);
   const dispatch = useDispatch();
 
   const initOpenRoutes = () => {
@@ -325,7 +339,9 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
     return _routes;
   };
 
+  const { t } = useTranslation();
   const [openRoutes, setOpenRoutes] = useState(() => initOpenRoutes());
+  // const dispatch = useDispatch();
 
   const toggle = (index) => {
     // Collapse all elements
@@ -341,6 +357,10 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
     setOpenRoutes((openRoutes) =>
       Object.assign({}, openRoutes, { [index]: !openRoutes[index] })
     );
+  };
+
+  const toggleLanguage = () => {
+    dispatch(setLanguage(lang === "ar" ? "en" : "ar"));
   };
 
   const handleLogout = () => {
@@ -360,12 +380,40 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
   return (
     <Drawer variant="permanent" {...rest}>
       <Brand component={NavLink} to="/" button>
-        <BrandIcon />{" "}
-        <Box ml={1}>
+        {/* <BrandIcon />{" "} */}
+        <img src={logo} alt="" srcset="" style={{ width: "100px" }} />
+        {/* <Box ml={1}>
           TRKAR <BrandChip label="PRO" />
-        </Box>
+        </Box> */}
       </Brand>
-      <Scrollbar>
+      <SidebarFooter>
+        <Grid container spacing={2}>
+          <Grid item>
+            <SidebarFooterBadge
+              overlap="circle"
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              variant="dot"
+            >
+              <Avatar alt={user?.name} src="" />
+            </SidebarFooterBadge>
+          </Grid>
+          <Grid item>
+            <b>
+              <SidebarFooterText variant="username">
+                {user?.name}
+              </SidebarFooterText>
+            </b>
+            <SidebarFooterSubText variant="caption">
+              {user?.email}
+            </SidebarFooterSubText>
+          </Grid>
+        </Grid>
+      </SidebarFooter>
+
+      <Scrollbar dir={lang === "ar" ? "rtl" : "ltr"}>
         <List disablePadding>
           <Items>
             {routes.map((category, index) => (
@@ -382,7 +430,7 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                       isOpen={!openRoutes[index]}
                       isCollapsable={true}
                       id={category.id}
-                      name={category.id}
+                      name={t("sidenav." + category.id) || category.id}
                       icon={category.icon}
                       button={true}
                       onClick={() => toggle(index)}
@@ -397,8 +445,8 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                         userPermissions?.includes(route.permission) ? (
                           <SidebarLink
                             key={index}
-                            id={route.name}
-                            name={route.name}
+                            id={t(`sidenav.${route.name}`) || route.name}
+                            name={t("sidenav." + route.name) || route.name}
                             to={route.path}
                             icon={route.icon}
                             // badge={route.badge}
@@ -411,11 +459,12 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                   !category.children &&
                   (category.noPermissionRequired ||
                     userPermissions?.includes(category.permission)) &&
-                  category.id !== "Logout" ? (
+                  user?.roles[0].title !== "Staff" &&
+                  category.id !== "logout" ? (
                   <SidebarCategory
                     isCollapsable={false}
                     id={category.id}
-                    name={category.id}
+                    name={t("sidenav." + category.id) || category.id}
                     to={category.path}
                     activeClassName="active"
                     component={NavLink}
@@ -425,11 +474,37 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
                     button
                     // badge={category.badge}
                   />
-                ) : category.id == "Logout" ? (
+                ) : user?.roles[0].title === "Staff" &&
+                  category.id === "branches" ? (
                   <SidebarCategory
                     isCollapsable={false}
                     id={category.id}
-                    name={category.id}
+                    name={t("sidenav." + category.id) || category.id}
+                    to={category.path}
+                    activeClassName="active"
+                    component={NavLink}
+                    icon={category.icon}
+                    exact={category.containsHome ? true : false}
+                    //To make tabs other than the home page to track navigation of it's inner tabs
+                    button
+                    // badge={category.badge}
+                  />
+                ) : category.id == "Language" ? (
+                  <SidebarCategory
+                    isCollapsable={false}
+                    id={category.id}
+                    name={lang === "en" ? "العربية" : "English"}
+                    activeClassName="active"
+                    icon={category.icon}
+                    button
+                    // badge={category.badge}
+                    onClick={toggleLanguage}
+                  />
+                ) : category.id == "logout" ? (
+                  <SidebarCategory
+                    isCollapsable={false}
+                    id={category.id}
+                    name={t("sidenav." + category.id) || category.id}
                     activeClassName="active"
                     icon={category.icon}
                     button
@@ -442,28 +517,6 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
           </Items>
         </List>
       </Scrollbar>
-      <SidebarFooter>
-        <Grid container spacing={2}>
-          <Grid item>
-            <SidebarFooterBadge
-              overlap="circle"
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              variant="dot"
-            >
-              <Avatar alt={user?.name} src="/static/img/avatars/avatar-1.jpg" />
-            </SidebarFooterBadge>
-          </Grid>
-          <Grid item>
-            <SidebarFooterText variant="body2">{user?.name}</SidebarFooterText>
-            <SidebarFooterSubText variant="caption">
-              {user?.email}
-            </SidebarFooterSubText>
-          </Grid>
-        </Grid>
-      </SidebarFooter>
     </Drawer>
   );
 };

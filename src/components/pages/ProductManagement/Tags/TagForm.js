@@ -9,6 +9,8 @@ import {
 import * as Yup from "yup";
 import { Formik } from "formik";
 import axios from "../../../../axios";
+import { RotateLeft } from "@material-ui/icons";
+import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -16,15 +18,41 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "30vw",
+    width: "20vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
     margin: theme.spacing(3, 2, 2),
-    width: "15%",
+    width: "40%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "1px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
+    margin: theme.spacing(3, 2, 2),
+    width: "40%",
   },
   errorsContainer: {
     marginBottom: theme.spacing(1),
@@ -50,7 +78,13 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
-function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
+function CarYearForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const formRef = useRef();
@@ -59,6 +93,19 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit ? "Tag edited successfully." : "New Tag added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    if (itemToEdit) {
+      setViewMode("data-grid");
+      setPageHeader("Tags List");
+    }
+  };
 
   const handleSubmit = () => {
     setIsSubmitting(true);
@@ -121,7 +168,7 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
           resetForm,
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
+            <Grid container spacing={8}>
               <Grid item xs={12}>
                 <TextField
                   name="name"
@@ -160,9 +207,9 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
                 </span>
               </Grid>
             ) : null}
-            <Grid container justify="center">
+            <Grid container justify="center" style={{ marginTop: 10 }}>
               <Button
-                className={classes.button}
+                className={classes.submitButton}
                 type="submit"
                 variant="contained"
                 color="primary"
@@ -171,7 +218,8 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
                 Submit
               </Button>
               <Button
-                className={classes.button}
+                className={classes.resetButton}
+                startIcon={<RotateLeft />}
                 variant="contained"
                 onClick={() => {
                   handleReset();
@@ -185,6 +233,12 @@ function CarYearForm({ setPage, setOpenPopup, itemToEdit }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

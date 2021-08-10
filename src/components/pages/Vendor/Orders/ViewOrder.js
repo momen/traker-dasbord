@@ -11,6 +11,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
 import { useLastLocation } from "react-router-last-location";
+import { useSelector } from "react-redux";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -55,6 +56,7 @@ function ViewOrder({ match }) {
   const classes = useStyles();
   const history = useHistory();
   const lastLocation = useLastLocation();
+  const { user } = useSelector((state) => state);
   const [order, setOrder] = useState("");
 
   useEffect(() => {
@@ -74,12 +76,16 @@ function ViewOrder({ match }) {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => history.goBack()}
+          onClick={() =>
+            user?.roles[0].title === "Admin"
+              ? history.push("/vendor/wholesale-orders")
+              : history.push("/vendor/total-orders")
+          }
         >
           Back to{" "}
-          {lastLocation.pathname === "/vendor/total-orders"
-            ? "Total Orders"
-            : "Orders History"}
+          {user?.roles[0].title === "Admin"
+            ? "Wholesale Orders"
+            : "Total Orders"}
         </Button>
       </Container>
       <Typography variant="h3" gutterBottom display="inline">
@@ -125,13 +131,45 @@ function ViewOrder({ match }) {
                 {order.orderStatus}
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`recepientname-${order.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Recipient Name
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {order.shipping?.recipient_name +
+                  " " +
+                  order.shipping?.last_name}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`address-${order.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Address
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {`${order.shipping?.street} St. - ${order.shipping?.district}, ${order.shipping?.city?.city_name}, ${order.shipping?.state?.country_name}`}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`paymentWay-${order.orderStatus}`}>
+              <StyledTableCell component="th" scope="row">
+                Payment Way
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {order.paymentway?.payment_name}
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={`paid`}>
               <StyledTableCell component="th" scope="row">
                 Paid
               </StyledTableCell>
               <StyledTableCell align="left">
-                {!order ? null : order.paid ? order.paid : "No"}
+                {!order ? null : order.paid ? "Yes" : "Pending"}
               </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`created_at`}>
+              <StyledTableCell component="th" scope="row">
+                Created At
+              </StyledTableCell>
+              <StyledTableCell align="left">{order.created_at}</StyledTableCell>
             </StyledTableRow>
           </TableBody>
         </Table>
@@ -184,7 +222,8 @@ function ViewOrder({ match }) {
                       Discount
                     </StyledTableCell>
                     <StyledTableCell align="left">
-                      %{detail.discount}
+                      %{detail.discount} &emsp;{" "}
+                      {(detail.discount / 100) * detail.price} ريال
                     </StyledTableCell>
                   </StyledTableRow>
                   <StyledTableRow
@@ -197,20 +236,44 @@ function ViewOrder({ match }) {
                       {detail.total}
                     </StyledTableCell>
                   </StyledTableRow>
-                  <StyledTableRow key={`store-name${detail.store_name}`}>
-                    <StyledTableCell component="th" scope="row">
-                      Store Name
-                    </StyledTableCell>
-                    <StyledTableCell align="left">
-                      {detail.store_name}
-                    </StyledTableCell>
-                  </StyledTableRow>
                   <StyledTableRow key={`vendor-name${detail.vendor_name}`}>
                     <StyledTableCell component="th" scope="row">
                       Vendor Name
                     </StyledTableCell>
                     <StyledTableCell align="left">
                       {detail.vendor_name}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`vendor-company-${detail.id}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Company
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.company}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`vendor-email-${detail.id}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Vendor Email
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.vendor_email}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`vendor-phone-${detail.id}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Vendor Phone
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.phone}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  <StyledTableRow key={`store-name${detail.store_name}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Store Name
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      {detail.store_name}
                     </StyledTableCell>
                   </StyledTableRow>
                 </TableBody>

@@ -23,7 +23,7 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import { ExpandMore, UnfoldLess } from "@material-ui/icons";
 import axios from "../../../../axios";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
@@ -38,6 +38,13 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
   button: {
     background: "#4caf50",
     color: "#ffffff",
@@ -47,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
   },
   toolBar: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     width: "100%",
     borderRadius: "6px",
   },
@@ -58,15 +65,42 @@ function CustomPagination(props) {
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
+      </Select>
+    </div>
   );
 }
 
@@ -107,52 +141,59 @@ function Orders() {
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 60, headerAlign: 'center', align:'center' },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 60,
+      headerAlign: "center",
+      align: "center",
+    },
     { field: "invoice_number", headerName: "Invoice Number", width: 120 },
-    { field: "invoice_total", headerName: "Invoice Total", width: 100 },
-    { field: "vendor_name", headerName: "Vendor Name", width: 120 },
+    { field: "invoice_total", headerName: "Invoice Total", width: 120 },
+    { field: "vendor_name", headerName: "Vendor Name", width: 200 },
     {
       field: "vendor_email",
       headerName: "Vendor Email",
+      flex:1,
       width: 150,
       sortable: false,
     },
     { field: "order_number", headerName: "Order Number", width: 150 },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 220,
-      sortable: false,
-      disableClickEventBubbling: true,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              width: "100%",
-            }}
-          >
-            {userPermissions.includes("show_specific_invoice") ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                variant="contained"
-                size="small"
-                onClick={() =>
-                  history.push(`/vendor/invoices/${params.row.id}`)
-                }
-              >
-                View
-              </Button>
-            ) : null}
-          </div>
-        );
-      },
-    },
+    // {
+    //   field: "actions",
+    //   headerName: "Actions",
+    //   width: 220,
+    //   sortable: false,
+    //   disableClickEventBubbling: true,
+    //   renderCell: (params) => {
+    //     return (
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           justifyContent: "flex-start",
+    //           width: "100%",
+    //         }}
+    //       >
+    //         {/* {userPermissions.includes("show_specific_invoice") ? (
+    //           <Button
+    //             style={{ marginRight: "5px" }}
+    //             variant="contained"
+    //             size="small"
+    //             onClick={() =>
+    //               history.push(`/vendor/invoices/${params.row.id}`)
+    //             }
+    //           >
+    //             View
+    //           </Button>
+    //         ) : null} */}
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {
@@ -225,30 +266,6 @@ function Orders() {
       <Card mb={6}>
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
-            <FormControl variant="outlined">
-              <Select
-                value={pageSize}
-                onChange={handlePageSize}
-                autoWidth
-                IconComponent={UnfoldLess}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "center",
-                  },
-                  transformOrigin: {
-                    vertical: "top",
-                    horizontal: "center",
-                  },
-                  getContentAnchorEl: () => null,
-                }}
-              >
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
-
             <div>
               <Grid container spacing={1} alignItems="flex-end">
                 <Grid item>
@@ -285,7 +302,13 @@ function Orders() {
               loading={loading}
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("show_specific_invoice")
+                  ? ({ row }) => history.push(`/vendor/invoices/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
             />
           </div>

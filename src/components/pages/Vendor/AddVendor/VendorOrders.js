@@ -107,11 +107,23 @@ function VendorOrders({ match }) {
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 60, headerAlign: 'center', align:'center' },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 60,
+      headerAlign: "center",
+      align: "center",
+    },
     { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
     { field: "order_total", headerName: "Order Total", width: 200 },
     { field: "orderStatus", headerName: "Status", width: 100, sortable: false },
     { field: "paid", headerName: "Paid", width: 80, sortable: false },
+    {
+      field: "created_at",
+      headerName: "Created At",
+      width: 150,
+      sortable: false,
+    },
     {
       field: "actions",
       headerName: "Actions",

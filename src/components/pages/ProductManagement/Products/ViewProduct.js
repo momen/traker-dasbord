@@ -74,6 +74,16 @@ const useStyles = makeStyles({
     marginRight: "5px",
     userSelect: "none",
   },
+  modelsBadge: {
+    background: "#C0D9D9",
+    color: "#000000",
+    fontSize: "12px",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
+  },
 });
 
 function ViewProduct({ match }) {
@@ -121,7 +131,9 @@ function ViewProduct({ match }) {
                 Serial Number
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.serial_number}</span>
+                <span className={classes.rowContent}>
+                  {product.serial_number}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={product.serial_coding}>
@@ -129,7 +141,9 @@ function ViewProduct({ match }) {
                 Serial Encoding
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.serial_coding}</span>
+                <span className={classes.rowContent}>
+                  {product.serial_coding}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={product.name}>
@@ -207,7 +221,7 @@ function ViewProduct({ match }) {
                     value={product.holesale_price}
                     displayType={"text"}
                     thousandSeparator={true}
-                    prefix={"$"}
+                    prefix={"ريال"}
                     renderText={(value) => (
                       <span className={classes.rowContent}>{value}</span>
                     )}
@@ -244,10 +258,20 @@ function ViewProduct({ match }) {
             </StyledTableRow>
             <StyledTableRow key={`quantity-${product.quantity}`}>
               <StyledTableCell component="th" scope="row">
-                Quantity
+                Available Quantity
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>{product.quantity}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`reminderQuantity-${product.qty_reminder}`}>
+              <StyledTableCell component="th" scope="row">
+                Reminder Quantity
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>
+                  {product.qty_reminder}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`discount-${product.discount}`}>
@@ -256,7 +280,11 @@ function ViewProduct({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>
-                  {product.discount ? product.discount : "N/A"}
+                  {product.discount ? `% ${product.discount}` : "Not applied"}
+                </span>
+                &emsp;
+                <span className={classes.rowContent}>
+                  {(product.discount / 100) * product.price} ريال
                 </span>
               </StyledTableCell>
             </StyledTableRow>
@@ -325,11 +353,26 @@ function ViewProduct({ match }) {
             </StyledTableRow> */}
             <StyledTableRow key={`made-${product.car_made_id}`}>
               <StyledTableCell component="th" scope="row">
-                Car Made
+                Brand
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>
                   {product.car_made?.car_made}
+                </span>
+              </StyledTableCell>
+            </StyledTableRow>
+
+            <StyledTableRow key={`models-${product.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Models
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>
+                  {product.car_model?.map((model) => (
+                    <span key={model.id} className={classes.modelsBadge}>
+                      {model.carmodel}
+                    </span>
+                  ))}
                 </span>
               </StyledTableCell>
             </StyledTableRow>

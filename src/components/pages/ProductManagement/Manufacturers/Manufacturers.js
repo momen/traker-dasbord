@@ -19,17 +19,19 @@ import {
   LinearProgress,
   Grid,
   TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
+  DialogContent,
   DialogContentText,
+  DialogTitle,
+  Dialog,
 } from "@material-ui/core";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import { Add, Delete, Edit, ExpandMore, UnfoldLess } from "@material-ui/icons";
+import Popup from "../../../Popup";
 import axios from "../../../../axios";
+import ManufacturersForm from "./ManufacturersForm";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
 import { useSelector } from "react-redux";
@@ -43,18 +45,36 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
-  button: {
-    background: "#4caf50",
-    color: "#ffffff",
-    "&:hover": {
-      background: "#388e3c",
-    },
-  },
-  toolBar: {
+  footer: {
+    width: "100%",
     display: "flex",
     justifyContent: "space-between",
-    width: "100%",
-    borderRadius: "6px",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
+  button: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    marginRight: "5px",
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
   },
 }));
 
@@ -63,15 +83,42 @@ function CustomPagination(props) {
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
+      </Select>
+    </div>
   );
 }
 
@@ -98,38 +145,42 @@ function CustomLoadingOverlay() {
   );
 }
 
-function PendingOrders() {
+function Manufacturers() {
   const classes = useStyles();
   const userPermissions = useSelector((state) => state.userPermissions);
   const history = useHistory();
   const [rows, setRows] = useState([]);
+  const [openPopup, setOpenPopup] = useState(false);
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Manufacturer"); // Customize
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
+  const [selectedItem, setSelectedItem] = useState("");
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState("");
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
-  const [openApproveDialog, setOpenApproveDialog] = useState(false);
-  const [openCancelDialog, setOpenCancelDialog] = useState(false);
-  const [orderToApproveOrCancel, setOrderToApproveOrCancel] = useState();
+  const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
+  const [rowsToDelete, setRowsToDelete] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Manufacturers");
+  const [viewMode, setViewMode] = useState("data-grid");
+
+  // Customize
   const columns = [
+    { field: "id", headerName: "ID", width: 70 },
     {
-      field: "id",
-      headerName: "ID",
-      width: 60,
-      headerAlign: "center",
-      align: "center",
+      field: "manufacturer_name",
+      headerName: "Manufacturer Name",
+      width: 200,
+      flex: 1,
     },
-    { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
-    { field: "order_total", headerName: "Order Total", width: 200 },
-    { field: "orderStatus", headerName: "Status", width: 100, sortable: false },
-    { field: "paid", headerName: "Paid", width: 80, sortable: false },
     {
       field: "actions",
       headerName: "Actions",
-      width: 280,
+      width: 250,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -139,46 +190,50 @@ function PendingOrders() {
               display: "flex",
               justifyContent: "flex-start",
               width: "100%",
+              // padding: "5px"
             }}
           >
-            {userPermissions.includes("show_specific_order") ? (
+            {/* {userPermissions.includes("car_year_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
                 size="small"
-                onClick={() => history.push(`/vendor/orders/${params.row.id}`)}
+                onClick={() =>
+                  history.push(`/product/car-year/${params.row.id}`)
+                }
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
 
-            {userPermissions.includes("approve_orders") ? (
+            {userPermissions.includes("manufacturers_update") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Edit />}
                 style={{ marginRight: "5px" }}
-                className={classes.button}
+                color="primary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => {
-                  setOpenApproveDialog(true);
-                  setOrderToApproveOrCancel(params.row.id);
+                  setSelectedItem(params.row);
+                  setOpenPopup(true);
+                  setOpenPopupTitle("Edit Manufacturer");
                 }}
               >
-                Approve Order
+                Edit
               </Button>
             ) : null}
 
-            {userPermissions.includes("cancel_orders") ? (
+            {userPermissions.includes("manufacturers_delete") ? (
               <Button
-                style={{ marginRight: "5px" }}
-                variant="contained"
+                className={classes.actionBtn}
+                startIcon={<Delete />}
                 color="secondary"
+                variant="contained"
                 size="small"
-                onClick={() => {
-                  setOpenCancelDialog(true);
-                  setOrderToApproveOrCancel(params.row.id);
-                }}
+                onClick={() => openDeleteConfirmation(params.row.id)}
               >
-                Cancel Order
+                Delete
               </Button>
             ) : null}
           </div>
@@ -187,8 +242,8 @@ function PendingOrders() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {
@@ -214,18 +269,20 @@ function PendingOrders() {
     }
   };
 
-  const approveOrder = () => {
+  const openDeleteConfirmation = (id) => {
+    setOpenDeleteDialog(true);
+    setItemToDelete(id);
+  };
+
+  const DeleteItem = () => {
     axios
-      .post(`/vendor/approve/orders`, {
-        order_id: orderToApproveOrCancel,
-        status: 1,
-      })
-      .then(() => {
-        setOpenApproveDialog(false);
+      .delete(`/manufacturers/${itemToDelete}`)
+      .then((res) => {
+        setOpenDeleteDialog(false);
         setLoading(true);
         axios
           .get(
-            `/orders/need/approval?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/manufacturers?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -244,17 +301,18 @@ function PendingOrders() {
       });
   };
 
-  const cancelOrder = () => {
+  const MassDelete = () => {
     axios
-      .post(`/vendor/cancel/order`, {
-        order_id: orderToApproveOrCancel,
+      .post(`/manufacturers/mass/delete`, {
+        ids: JSON.stringify(rowsToDelete),
       })
-      .then(() => {
-        setOpenCancelDialog(false);
+      .then((res) => {
+        setOpenMassDeleteDialog(false);
+        setRowsToDelete([]);
         setLoading(true);
         axios
           .get(
-            `/orders/need/approval?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/manufacturers?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -275,11 +333,12 @@ function PendingOrders() {
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
+    if (openPopup) return;
     setLoading(true);
     if (!userIsSearching) {
       axios
         .get(
-          `/orders/need/approval?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/manufacturers?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -292,7 +351,7 @@ function PendingOrders() {
     } else {
       axios
         .post(
-          `/orders/need/approval/search?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
+          `/manufacturers/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
           {
             search_index: searchValue,
           }
@@ -306,43 +365,58 @@ function PendingOrders() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel, pageSize]);
+  }, [page, searchValue, openPopup, sortModel, pageSize]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Orders
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />
 
       <Card mb={6}>
         <Paper mb={2}>
-          <Toolbar className={classes.toolBar}>
-            <FormControl variant="outlined">
-              <Select
-                value={pageSize}
-                onChange={handlePageSize}
-                autoWidth
-                IconComponent={UnfoldLess}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "center",
-                  },
-                  transformOrigin: {
-                    vertical: "top",
-                    horizontal: "center",
-                  },
-                  getContentAnchorEl: () => null,
-                }}
-              >
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
+          <Toolbar
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              borderRadius: "6px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "flex-end" }}>
+              {userPermissions.includes("manufacturers_add") ? (
+                <Button
+                  className={classes.button}
+                  variant="contained"
+                  onClick={() => {
+                    setOpenPopup(true);
+                    setSelectedItem("");
+                    setOpenPopupTitle("New Manufacturer");
+                  }}
+                  startIcon={<Add />}
+                >
+                  New Manufacturer
+                </Button>
+              ) : null}
+
+              {userPermissions.includes("manufacturers_delete") ? (
+                <Button
+                  startIcon={<Delete />}
+                  color="secondary"
+                  variant="contained"
+                  disabled={rowsToDelete.length < 2}
+                  onClick={() => {
+                    setOpenMassDeleteDialog(true);
+                  }}
+                  style={{ height: 40, borderRadius: 0 }}
+                >
+                  Delete Selected
+                </Button>
+              ) : null}
+            </div>
 
             <div>
               <Grid container spacing={1} alignItems="flex-end">
@@ -378,71 +452,100 @@ function PendingOrders() {
                 LoadingOverlay: CustomLoadingOverlay,
               }}
               loading={loading}
+              checkboxSelection
               disableColumnMenu
               autoHeight={true}
+              onRowClick={
+                userPermissions.includes("manufacturers_show")
+                  ? ({ row }) =>
+                      history.push(`/product/manufacturers/${row.id}`)
+                  : null
+              }
               onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSize}
               onSortModelChange={handleSortModelChange}
+              onSelectionChange={(newSelection) => {
+                setRowsToDelete(newSelection.rowIds);
+              }}
             />
           </div>
         </Paper>
       </Card>
+      <Popup
+        title={openPopupTitle}
+        openPopup={openPopup}
+        setOpenPopup={setOpenPopup}
+      >
+        <ManufacturersForm
+          setPage={setPage}
+          setOpenPopup={setOpenPopup}
+          itemToEdit={selectedItem}
+        />
+      </Popup>
 
       <Dialog
-        open={openApproveDialog}
+        open={openDeleteDialog}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Order Approval"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Confirmation"}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to Approve this order?
+            Are you sure you want to delete this Manufacturer? <br />
+            If this was by accident please press Back
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => {
-              approveOrder();
+              DeleteItem();
             }}
             color="secondary"
           >
-            Yes
+            Yes, delete
           </Button>
           <Button
-            onClick={() => setOpenApproveDialog(false)}
+            onClick={() => setOpenDeleteDialog(false)}
             color="primary"
             autoFocus
           >
-            No
+            Back
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog
-        open={openCancelDialog}
+        open={openMassDeleteDialog}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Cancel Order"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Confirmation"}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to Cancel this order?
+            Are you sure you want to delete all the selected Manufacturers?{" "}
+            <br />
+            If you wish press Yes, otherwise press Back.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => {
-              cancelOrder();
+              MassDelete();
             }}
             color="secondary"
           >
-            Yes
+            Yes, delete
           </Button>
           <Button
-            onClick={() => setOpenCancelDialog(false)}
+            onClick={() => setOpenMassDeleteDialog(false)}
             color="primary"
             autoFocus
           >
-            No
+            Back
           </Button>
         </DialogActions>
       </Dialog>
@@ -450,4 +553,4 @@ function PendingOrders() {
   );
 }
 
-export default PendingOrders;
+export default Manufacturers;

@@ -1,14 +1,9 @@
 import React, { useRef, useState } from "react";
-import {
-  Button,
-  FormControl,
-  Grid,
-  makeStyles,
-  TextField,
-} from "@material-ui/core";
+import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import axios from "../../../../axios";
+import { RotateLeft } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -16,15 +11,41 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "30vw",
+    width: "20vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
     margin: theme.spacing(3, 2, 2),
-    width: "15%",
+    width: "40%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "1px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
+    margin: theme.spacing(3, 2, 2),
+    width: "40%",
   },
   errorsContainer: {
     marginBottom: theme.spacing(1),
@@ -36,29 +57,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = Yup.object().shape({
-  car_made: Yup.string()
+  country_name: Yup.string()
     .required("This field is Required")
-    .test(
-      "No floating points",
-      "Please remove any dots",
-      (val) => !val?.includes(".")
-    )
-    .matches(/^([^0-9]*)$/, "Number are not allowed, only letters.")
     .test(
       "Not empty",
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
-  categoryid_id: Yup.string().required(),
 });
 
-function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
+function OriginsForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
-    car_made: itemToEdit ? itemToEdit.car_made : "",
-    categoryid_id: itemToEdit ? itemToEdit.categoryid_id : "",
+    country_name: itemToEdit ? itemToEdit.country_name : "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
@@ -68,7 +81,7 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
 
     if (itemToEdit) {
       axios
-        .put(`/car-mades/${itemToEdit.id}`, formData)
+        .post(`/update/origin/countries/${itemToEdit.id}`, formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);
@@ -79,7 +92,7 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
         });
     } else {
       axios
-        .post("/car-mades", formData)
+        .post("/add/origin/countries", formData)
         .then((res) => {
           setPage(1);
           setOpenPopup(false);
@@ -100,8 +113,7 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
 
   const handleReset = () => {
     updateFormData({
-      car_made: "",
-      categoryid_id: "",
+      country_name: "",
     });
     setResponseErrors("");
   };
@@ -118,79 +130,33 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
           handleChange,
           handleBlur,
           touched,
-          values,
-          status,
           resetForm,
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  name="car_made"
+                  name="country_name"
                   required
                   fullWidth
-                  id="car_made"
-                  label="Car Made"
-                  value={formData.car_made}
-                  autoFocus
+                  label="Origin Country Name"
+                  // prefix="%"
+                  value={formData.country_name}
                   onChange={(e) => {
                     handleChange(e);
                     handleStateChange(e);
                   }}
                   onBlur={handleBlur}
                   error={
-                    responseErrors?.car_made ||
-                    Boolean(touched.car_made && errors.car_made)
+                    responseErrors?.country_name ||
+                    Boolean(touched.country_name && errors.country_name)
                   }
-                  helperText={touched.car_made && errors.car_made}
+                  helperText={touched.country_name && errors.country_name}
                 />
               </Grid>
               {responseErrors ? (
                 <Grid item xs={12}>
-                  {responseErrors.car_made?.map((msg) => (
-                    <span key={msg} className={classes.errorMsg}>
-                      {msg}
-                    </span>
-                  ))}
-                </Grid>
-              ) : null}
-
-              <Grid item xs={12}>
-                <FormControl className={classes.formControl}>
-                  {
-                    <TextField
-                      id="standard-select-currency-native"
-                      select
-                      label="Category"
-                      value={formData.categoryid_id}
-                      name="categoryid_id"
-                      SelectProps={{
-                        native: true,
-                      }}
-                      helperText="Please select a Category"
-                      fullWidth
-                      required
-                      onChange={(e) => {
-                        handleChange(e);
-                        handleStateChange(e);
-                      }}
-                      onBlur={handleBlur}
-                      error={
-                        responseErrors?.categoryid_id ||
-                        Boolean(touched.categoryid_id && errors.categoryid_id)
-                      }
-                    >
-                      <option aria-label="None" value="" />
-                      {categories?.map((category) => (
-                        <option value={category.id}>{category.name}</option>
-                      ))}
-                    </TextField>
-                  }
-                </FormControl>
-              </Grid>
-              {responseErrors ? (
-                <Grid item xs={12}>
-                  {responseErrors.categoryid_id?.map((msg) => (
+                  {responseErrors.country_name?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>
@@ -206,9 +172,9 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
                 </span>
               </Grid>
             ) : null}
-            <Grid container justify="center">
+            <Grid container justify="center" style={{ marginTop: 10 }}>
               <Button
-                className={classes.button}
+                className={classes.submitButton}
                 type="submit"
                 variant="contained"
                 color="primary"
@@ -217,7 +183,8 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
                 Submit
               </Button>
               <Button
-                className={classes.button}
+                className={classes.resetButton}
+                startIcon={<RotateLeft />}
                 variant="contained"
                 onClick={() => {
                   handleReset();
@@ -235,4 +202,4 @@ function CreateCarMade({ setPage, setOpenPopup, itemToEdit, categories }) {
   );
 }
 
-export default CreateCarMade;
+export default OriginsForm;

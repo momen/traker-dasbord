@@ -11,7 +11,7 @@ import {
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
-import { PhotoCamera } from "@material-ui/icons";
+import { PhotoCamera, RotateLeft } from "@material-ui/icons";
 import { CloseIcon } from "@material-ui/data-grid";
 import { Alert, Autocomplete } from "@material-ui/lab";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
@@ -19,20 +19,47 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import NumberFormat from "react-number-format";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(1),
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-    width: "30vw",
+    // alignItems: "center",
+    // width: "30vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "2px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    margin: theme.spacing(3, 2, 2),
+    width: "15%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
@@ -62,7 +89,14 @@ const useStyles = makeStyles((theme) => ({
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-function ProductsForm({ setPage, setOpenPopup, itemToEdit, areas = [] }) {
+function ProductsForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  areas = [],
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const [formData, updateFormData] = useState({
@@ -88,13 +122,24 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, areas = [] }) {
   const [isSubmitting, setIsSubmitting] = useState(false); // Update on other components
   const [responseErrors, setResponseErrors] = useState("");
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit ? "City edited successfully." : "New City added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setViewMode("data-grid");
+    setPageHeader("Cities");
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     if (itemToEdit) {
       await axios
         .post(`/cities/${itemToEdit.id}`, formData)
         .then((res) => {
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch((res) => {
           setIsSubmitting(false); // Update on other components
@@ -105,7 +150,7 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, areas = [] }) {
         .post("/cities", formData)
         .then((res) => {
           setPage(1);
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch((res) => {
           setIsSubmitting(false); // Update on other components
@@ -142,8 +187,8 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, areas = [] }) {
           resetForm,
         }) => (
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
+            <Grid container spacing={8}>
+              <Grid item xs={4}>
                 <div>
                   <TextField
                     name="city_name"
@@ -178,8 +223,10 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, areas = [] }) {
               </Grid>
               {/****************************** ******************************/}
 
-              <Grid item xs={6}>
-                <div style={{ maxWidth: "100%" }}>
+              <Grid item xs={8}></Grid>
+
+              <Grid item xs={4}>
+                <div>
                   <TextField
                     select
                     label="Area"
@@ -218,6 +265,8 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, areas = [] }) {
                   ) : null}
                 </div>
               </Grid>
+
+              <Grid xs={8}></Grid>
             </Grid>
 
             {typeof responseErrors === "string" ? (
@@ -229,7 +278,7 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, areas = [] }) {
             ) : null}
             <Grid container justify="center">
               <Button
-                className={classes.button}
+                className={classes.submitButton}
                 type="submit"
                 variant="contained"
                 color="primary"
@@ -238,7 +287,8 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, areas = [] }) {
                 Submit
               </Button>
               <Button
-                className={classes.button}
+                className={classes.resetButton}
+                startIcon={<RotateLeft />}
                 variant="contained"
                 disabled={isSubmitting} // Update on other components
                 onClick={() => {
@@ -256,6 +306,12 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit, areas = [] }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

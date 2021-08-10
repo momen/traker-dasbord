@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../axios";
-import { Button } from "@material-ui/core";
+import { Button, TextField } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -10,6 +10,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
+import { useSelector } from "react-redux";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -31,7 +32,7 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 700,
     "& .MuiTableCell-root": {
@@ -42,13 +43,43 @@ const useStyles = makeStyles({
     // width: "100%",
     whiteSpace: "normal",
     wordWrap: "break-word",
+    wordBreak: "break-word",
   },
-});
+  submitButton: {
+    width: 150,
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    marginTop: 15,
+  },
+  solveBtn: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#90CA28",
+    background: "#ffffff",
+    border: "1px solid #90CA28",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#90CA28",
+      color: "#ffffff",
+    },
+  },
+}));
 
 function ViewTicket({ match }) {
   const classes = useStyles();
   const history = useHistory();
+  const { user } = useSelector((state) => state);
   const [ticket, setTicket] = useState("");
+
+  const [answer, updateAnswer] = useState("");
 
   useEffect(() => {
     axios
@@ -60,6 +91,47 @@ function ViewTicket({ match }) {
         alert("Failed to Fetch data");
       });
   }, []);
+
+  const addReply = () => {
+    if (user.roles[0].title === "Vendor") {
+      axios
+        .post("vendor/answer/ticket", {
+          ticket_id: ticket.id,
+          answer: answer,
+        })
+        .then(() => {
+          alert("Reply added successfully");
+        });
+    } else {
+      axios
+        .post("admin/answer/ticket", {
+          ticket_id: ticket.id,
+          answer: answer,
+        })
+        .then(() => {
+          alert("Reply added successfully");
+        });
+    }
+  };
+
+  const solveTicket = () => {
+    axios
+      .post("solved/ticket", {
+        id: ticket.id,
+      })
+      .then(() => {
+        alert("Ticket Solved");
+        axios
+          .get(`/show/ticket/${match.params.id}`)
+          .then((res) => {
+            setTicket(res.data.data);
+          })
+          .catch(() => {
+            alert("Failed to Fetch data");
+          });
+      })
+      .catch(({ response }) => alert(response.data.errors));
+  };
 
   return (
     <Fragment>
@@ -88,41 +160,66 @@ function ViewTicket({ match }) {
               <StyledTableCell component="th" scope="row">
                 Ticket Number
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.ticket_no}
-              </StyledTableCell>
+              <StyledTableCell align="left">{ticket.ticket_no}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`title${ticket.title}`}>
               <StyledTableCell component="th" scope="row">
                 Title
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.title}
-              </StyledTableCell>
+              <StyledTableCell align="left">{ticket.title}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`priority${ticket.priority}`}>
               <StyledTableCell component="th" scope="row">
                 Priority
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.priority}
-              </StyledTableCell>
+              <StyledTableCell align="left">{ticket.priority}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`msg${ticket.id}`}>
               <StyledTableCell component="th" scope="row">
-                Message
+                <span className={classes.rowContent}>Message</span>
               </StyledTableCell>
               <StyledTableCell align="left">
                 {ticket.message}
+
+                {(user?.roles[0].title === "Admin" &&
+                  ticket.case === "to admin") ||
+                (user?.roles[0].title === "Vendor" &&
+                  ticket.case !== "solved" &&
+                  ticket.case !== "to admin") ? (
+                  <>
+                    <p
+                      style={{
+                        fontWeight: "bold",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      Add Reply:
+                    </p>
+                    <TextField
+                      multiline
+                      rows={5}
+                      variant="outlined"
+                      fullWidth
+                      value={answer}
+                      onChange={(e) => updateAnswer(e.target.value)}
+                    />
+
+                    <Button
+                      className={classes.submitButton}
+                      onClick={addReply}
+                      disabled={!answer}
+                    >
+                      Submit
+                    </Button>
+                  </>
+                ) : null}
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`status${ticket.id}`}>
               <StyledTableCell component="th" scope="row">
                 Status
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.status}
-              </StyledTableCell>
+              <StyledTableCell align="left">{ticket.case}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`category${ticket.category_id}`}>
               <StyledTableCell component="th" scope="row">
@@ -148,12 +245,52 @@ function ViewTicket({ match }) {
                 {ticket.order_number}
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`order-number-${ticket.order_number}`}>
+              <StyledTableCell component="th" scope="row">
+                Products
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.orderDetails?.map((order) => order.product_name + ", ")}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`order-payment-${ticket.order_number}`}>
+              <StyledTableCell component="th" scope="row">
+                Payment Way
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.payment?.payment_name}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`address-${ticket.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Shipping Address
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.shipping
+                  ? `${ticket.shipping?.street} St. - ${ticket.shipping?.district}, ${ticket.shipping?.city?.city_name}, ${ticket.shipping?.state?.country_name}`
+                  : "No Address provided"}
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={`vendor-name-${ticket.vendor_name}`}>
               <StyledTableCell component="th" scope="row">
                 Vendor Name
               </StyledTableCell>
               <StyledTableCell align="left">
                 {ticket.vendor_name}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`user-${ticket.user_id}`}>
+              <StyledTableCell component="th" scope="row">
+                Username
+              </StyledTableCell>
+              <StyledTableCell align="left">{ticket.user_name}</StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`userphone-${ticket.user_phone}`}>
+              <StyledTableCell component="th" scope="row">
+                User Phone Number
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.user_phone}
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`vendor-email-${ticket.vendor_email}`}>
@@ -164,12 +301,20 @@ function ViewTicket({ match }) {
                 {ticket.vendor_email}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`user-${ticket.user_id}`}>
+            <StyledTableRow key={`actions`}>
               <StyledTableCell component="th" scope="row">
-                Username
+                Actions
               </StyledTableCell>
               <StyledTableCell align="left">
-                {ticket.user_name}
+                {ticket.case !== "solved" ? (
+                  <Button
+                    variant="contained"
+                    className={classes.solveBtn}
+                    onClick={solveTicket}
+                  >
+                    Mark as Solved
+                  </Button>
+                ) : null}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>

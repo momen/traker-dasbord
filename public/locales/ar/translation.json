@@ -1,0 +1,69 @@
+{
+  "sidenav": {
+    "main": "الرئيسية",
+    "userMgt": "إدارة المستخدمين",
+    "permissions": "الصلاحيات",
+    "roles": "الأدوار",
+    "users": "المستخدمين",
+    "staff": "الموظفين",
+    "logs": "السجل",
+    "productMgt": "إدارة المنتجات",
+    "mainCatgory": "فئات رئيسية",
+    "category": "فئات فرعية",
+    "partCategory": "فئات فرعية ثانية",
+    "brands": "الماركات",
+    "models": "الموديلات",
+    "years": "سنين الصنع",
+    "tags": "كلمات دلالية",
+    "carTypes": "أنواع المركبات",
+    "manufacturers": "المصنعين",
+    "origins": "بلاد المنشأ",
+    "products": "المنتجات",
+    "vendorMgt": "إدارة البائعين",
+    "vendors": "البائعين",
+    "branches": "الفروع",
+    "totalOrders": "الطلبات",
+    "wholesaleOrders": "طلبات الجملة",
+    "invoices": "الفواتير",
+    "wholesaleInvoices": "فواتير الجملة",
+    "geography": "الجغرافيا",
+    "countries": "الدول",
+    "areas": "المناطق",
+    "cities": "المدن",
+    "reports": "تقارير",
+    "ads": "الإعلانات",
+    "tickets": "الشكاوي",
+    "productInquiries": "إستفسارات عامة",
+    "help": "الأسئلة الشائعة",
+    "manageAccount": "إدارة الحساب",
+    "logout": "تسجيل الخروج"
+  },
+  "components": {
+    "ads": {
+      "mainHeader": "الإعلانات",
+      "top": {
+        "title1": "معرض الصور في رأس الصفحة (عدد 1-6)",
+        "pc_tablet_size_title": "الحاسب الشخصي (1340 x 354 px)",
+        "mobile_size_title": "الجوال (330 x 160 px)"
+      },
+      "middle": {
+        "title": "إعلانات منتصف الصفحة( عدد 3)",
+        "device_size_title": "الحاسب الشخصي والجوال (700 x 560 px)"
+      },
+      "bottom": {
+        "title": "إعلان آخر الصفحة ( عدد 1)",
+        "pc_tablet_size_title": "الحاسب الشخصي (1340 x 354 px)",
+        "mobile_size_title": "الجوال (330 x 160 px)"
+      },
+      "carTypesTitles": {
+        "car": "اعلانات سيارات الركوب",
+        "commercial": "اعلانات المركبات التجارية"
+      },
+      "addBtnText": "إضافة",
+      "downloadBtnText": "تحميل",
+      "deleteBtnText": "حذف",
+      "editBtnText": "تعديل",
+      "uploadImageText": "يرجى إضافة صورة"
+    }
+  }
+}

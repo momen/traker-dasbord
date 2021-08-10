@@ -66,7 +66,7 @@ function ViewCarMade({ match }) {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => history.push("/product/car-made")}
+        onClick={() => history.push("/product/brands")}
         mb={3}
       >
         Back to list
@@ -86,7 +86,7 @@ function ViewCarMade({ match }) {
             </StyledTableRow>
             <StyledTableRow key={carMade.car_made}>
               <StyledTableCell component="th" scope="row">
-                Car Made
+                Brand Name
               </StyledTableCell>
               <StyledTableCell align="left">{carMade.car_made}</StyledTableCell>
             </StyledTableRow>

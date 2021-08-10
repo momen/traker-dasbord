@@ -30,7 +30,14 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import {
+  Add,
+  ArrowBack,
+  Delete,
+  Edit,
+  ExpandMore,
+  UnfoldLess,
+} from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import CityForm from "./CityForm";
@@ -47,13 +54,39 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
   button: {
-    background: "#4caf50",
-    color: "#ffffff",
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
     "&:hover": {
-      background: "#388e3c",
+      background: "#EF9300",
+      color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  backBtn: {
+    width: "fit-content",
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
+  backIcon: {
+    marginRight: theme.direction === "rtl" ? 0 : 5,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
   },
   toolBar: {
     display: "flex",
@@ -61,7 +94,6 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     borderRadius: "6px",
   },
-
   categoriesBadge: {
     background: "#e5c08b",
     color: "#000000",
@@ -72,6 +104,17 @@ const useStyles = makeStyles((theme) => ({
     marginRight: "5px",
     userSelect: "none",
   },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
+  },
 }));
 
 function CustomPagination(props) {
@@ -79,15 +122,42 @@ function CustomPagination(props) {
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
+      </Select>
+    </div>
   );
 }
 
@@ -137,6 +207,9 @@ function Countries() {
 
   const [areas, setAreas] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Cities");
+  const [viewMode, setViewMode] = useState("data-grid");
+
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "city_name", headerName: "City", width: 200 },
@@ -159,7 +232,7 @@ function Countries() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("city_show") ? (
+            {/* {userPermissions.includes("city_show") ? (
               <Button
                 style={{
                   marginRight: "5px",
@@ -173,20 +246,22 @@ function Countries() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
             {userPermissions.includes("city_update") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Edit />}
                 style={{
                   marginRight: "5px",
                   minWidth: "70px",
                 }}
                 color="primary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit City"); /****** Customize ******/
+                  setViewMode("edit");
+                  setPageHeader("Edit City");
                 }}
               >
                 Edit
@@ -195,10 +270,12 @@ function Countries() {
 
             {userPermissions.includes("city_delete") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Delete />}
                 style={{ minWidth: "70px" }}
                 color="secondary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
@@ -210,8 +287,8 @@ function Countries() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handleColumnToFilter = (event) => {
@@ -356,139 +433,144 @@ function Countries() {
           alert("Failed to Search");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Cities
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />
 
-      <Grid container flex>
-        {userPermissions.includes("city_create") ? (
-          <Button
-            mb={3}
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              setOpenPopupTitle("New City");
-              setOpenPopup(true);
-              setSelectedItem("");
-            }}
-          >
-            Add City
-          </Button>
-        ) : null}
+      {viewMode === "data-grid" ? (
+        <Card mb={6}>
+          <Paper mb={2}>
+            <Toolbar className={classes.toolBar}>
+              <Grid
+                container
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-end" }}>
+                  {userPermissions.includes("city_create") ? (
+                    <Button
+                      className={classes.button}
+                      variant="contained"
+                      onClick={() => {
+                        setViewMode("add");
+                        setPageHeader("New City");
+                        setSelectedItem("");
+                      }}
+                      startIcon={<Add />}
+                    >
+                      Add City
+                    </Button>
+                  ) : null}
 
-        {userPermissions.includes("city_delete") ? (
-          <Button
-            mb={3}
-            color="secondary"
-            variant="contained"
-            disabled={rowsToDelete.length < 2}
-            onClick={() => {
-              setOpenMassDeleteDialog(true);
-            }}
-          >
-            Delete Selected
-          </Button>
-        ) : null}
-      </Grid>
-
-      <Card mb={6}>
-        <Paper mb={2}>
-          <Toolbar className={classes.toolBar}>
-            <Grid
-              container
-              style={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Grid item>
-                <FormControl variant="outlined">
-                  <Select
-                    value={pageSize}
-                    onChange={handlePageSize}
-                    autoWidth
-                    IconComponent={UnfoldLess}
-                    MenuProps={{
-                      anchorOrigin: {
-                        vertical: "bottom",
-                        horizontal: "center",
-                      },
-                      transformOrigin: {
-                        vertical: "top",
-                        horizontal: "center",
-                      },
-                      getContentAnchorEl: () => null,
-                    }}
-                  >
-                    <MenuItem value={10}>10</MenuItem>
-                    <MenuItem value={25}>25</MenuItem>
-                    <MenuItem value={100}>100</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item>
-                <div style={{ display: "flex" }}>
-                  <Grid
-                    container
-                    spacing={1}
-                    alignItems="flex-end"
-                    style={{ marginRight: "5px" }}
-                  >
-                    <Grid item>
-                      <Search />
-                    </Grid>
-                    <Grid item>
-                      <TextField
-                        id="input-with-icon-grid"
-                        label="Find countries"
-                        onChange={handleSearchInput}
-                      />
-                    </Grid>
-                  </Grid>
+                  {userPermissions.includes("city_delete") ? (
+                    <Button
+                      startIcon={<Delete />}
+                      color="secondary"
+                      variant="contained"
+                      disabled={rowsToDelete.length < 2}
+                      onClick={() => {
+                        setOpenMassDeleteDialog(true);
+                      }}
+                      style={{ borderRadius: 0 }}
+                    >
+                      Delete Selected
+                    </Button>
+                  ) : null}
                 </div>
+
+                <Grid item>
+                  <div style={{ display: "flex" }}>
+                    <Grid
+                      container
+                      spacing={1}
+                      alignItems="flex-end"
+                      style={{ marginRight: "5px" }}
+                    >
+                      <Grid item>
+                        <Search />
+                      </Grid>
+                      <Grid item>
+                        <TextField
+                          id="input-with-icon-grid"
+                          label="Find cities"
+                          onChange={handleSearchInput}
+                        />
+                      </Grid>
+                    </Grid>
+                  </div>
+                </Grid>
               </Grid>
-            </Grid>
-          </Toolbar>
-        </Paper>
-        <Paper>
-          <div style={{ width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              page={page}
-              pageSize={pageSize}
-              rowCount={rowsCount}
-              sortingOrder={["desc", "asc"]}
-              sortModel={sortModel}
-              columnBuffer={pageSize}
-              paginationMode="server"
-              sortingMode="server"
-              components={{
-                Pagination: CustomPagination,
-                LoadingOverlay: CustomLoadingOverlay,
-              }}
-              loading={loading}
-              checkboxSelection
-              disableColumnMenu
-              autoHeight={true}
-              onPageChange={handlePageChange}
-              onSortModelChange={handleSortModelChange}
-              onSelectionChange={(newSelection) => {
-                setRowsToDelete(newSelection.rowIds);
-              }}
-            />
+            </Toolbar>
+          </Paper>
+          <Paper>
+            <div style={{ width: "100%" }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                page={page}
+                pageSize={pageSize}
+                rowCount={rowsCount}
+                sortingOrder={["desc", "asc"]}
+                sortModel={sortModel}
+                columnBuffer={pageSize}
+                paginationMode="server"
+                sortingMode="server"
+                components={{
+                  Pagination: CustomPagination,
+                  LoadingOverlay: CustomLoadingOverlay,
+                }}
+                loading={loading}
+                checkboxSelection
+                disableColumnMenu
+                autoHeight={true}
+                onRowClick={
+                  userPermissions.includes("city_show")
+                    ? ({ row }) => history.push(`/geography/cities/${row.id}`)
+                    : null
+                }
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSize}
+                onSortModelChange={handleSortModelChange}
+                onSelectionChange={(newSelection) => {
+                  setRowsToDelete(newSelection.rowIds);
+                }}
+              />
+            </div>
+          </Paper>
+        </Card>
+      ) : (
+        <Card mb={6} style={{ padding: "50px 60px" }}>
+          <div
+            className={classes.backBtn}
+            onClick={() => {
+              setViewMode("data-grid");
+              setPageHeader("Cities");
+            }}
+          >
+            <ArrowBack className={classes.backIcon} />
+            <span>Back</span>
           </div>
-        </Paper>
-      </Card>
+          <Divider my={3} />
+          <CityForm
+            setPage={setPage}
+            setOpenPopup={setOpenPopup}
+            itemToEdit={selectedItem}
+            areas={areas}
+            setViewMode={setViewMode}
+            setPageHeader={setPageHeader}
+          />
+        </Card>
+      )}
       <Popup
         title={openPopupTitle}
         openPopup={openPopup}

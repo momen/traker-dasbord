@@ -50,6 +50,10 @@ const typography = {
   body1: {
     fontSize: 13,
   },
+  username: {
+    fontSize: 13,
+    fontWeight: 600,
+  },
   button: {
     textTransform: "none",
   },

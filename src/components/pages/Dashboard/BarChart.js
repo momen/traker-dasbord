@@ -29,7 +29,7 @@ const ChartWrapper = styled.div`
 `;
 
 const BarChart = ({ theme, barChartLabels, sales, fromDate, toDate }) => {
-  const firstDatasetColor = theme.palette?.secondary.main;
+  const firstDatasetColor = "#90CA28";
   const secondDatasetColor =
     theme.palette?.type === "dark"
       ? "rgba(255, 255, 255, 0.5)"
@@ -110,11 +110,7 @@ const BarChart = ({ theme, barChartLabels, sales, fromDate, toDate }) => {
         //     <MoreVertical />
         //   </IconButton>
         // }
-        title={
-          fromDate && toDate
-            ? `Period: ${fromDate} ~ ${toDate}`
-            : "Period: Last week"
-        }
+        title={fromDate && toDate ? `Period: ${fromDate} ~ ${toDate}` : null}
       />
       <CardContent>
         <ChartWrapper>

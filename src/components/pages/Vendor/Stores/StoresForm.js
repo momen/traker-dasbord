@@ -5,6 +5,8 @@ import Map from "../../../Map/Map";
 import NumberFormat from "react-number-format";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import { RotateLeft } from "@material-ui/icons";
+import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -18,7 +20,33 @@ const useStyles = makeStyles((theme) => ({
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "2px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    margin: theme.spacing(3, 2, 2),
+    width: "15%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
@@ -77,7 +105,14 @@ const validationSchema = Yup.object().shape({
   city_id: Yup.string().required("Please select a City"),
 });
 
-function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
+function StoresForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  countries,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const formRef = useRef();
@@ -99,6 +134,19 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [locationNotSelected, setLocationNotSelected] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit
+      ? "Branch details updated successfully."
+      : "New branch added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setViewMode("data-grid");
+    setPageHeader("Branches");
+  };
 
   const handleSubmit = async () => {
     if (!formData.lat || !formData.long) {
@@ -128,7 +176,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
       await axios
         .post(`/update/stores/${itemToEdit.id}`, data)
         .then((res) => {
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch((res) => {
           setIsSubmitting(false);
@@ -139,7 +187,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
         .post("/add/stores", data)
         .then((res) => {
           setPage(1);
-          setOpenPopup(false);
+          setDialogOpen(true);
         })
         .catch((res) => {
           setIsSubmitting(false);
@@ -188,7 +236,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
           resetForm,
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
+            <Grid container spacing={8}>
               <Grid item xs={4}>
                 <div>
                   <TextField
@@ -222,6 +270,8 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                   ) : null}
                 </div>
               </Grid>
+
+              <Grid item xs={8}></Grid>
 
               <Grid item xs={4}>
                 <div>
@@ -303,6 +353,8 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                   ) : null}
                 </div>
               </Grid>
+
+              <Grid item xs={4}></Grid>
 
               <Grid item xs={4}>
                 <TextField
@@ -491,7 +543,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                 </TextField>
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid item xs={12} style={{ marginTop: -32 }}>
                 <div>
                   <TextField
                     name="address"
@@ -524,11 +576,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                 </div>
               </Grid>
 
-              <Grid item>
-                <label htmlFor="stores-map" style={{ marginTop: "10px" }}>
-                  Select your store location
-                </label>
-              </Grid>
+              {/* <Grid item></Grid> */}
 
               <Grid
                 item
@@ -539,7 +587,19 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                   marginBottom: "10px",
                 }}
               >
-                <div style={{ height: "60vh" }}>
+                <label
+                  htmlFor="stores-map"
+                  style={{ marginTop: "10px", fontWeight: "bold" }}
+                >
+                  Select your store location
+                </label>
+                <div
+                  style={{
+                    height: "50vh",
+                    marginTop: "10px",
+                    position: "relative",
+                  }}
+                >
                   <Map
                     id="stores-map"
                     lattitude={formData.lat ? parseFloat(formData.lat) : null}
@@ -547,6 +607,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                     formData={formData}
                     updateFormData={updateFormData}
                     setLocationNotSelected={setLocationNotSelected}
+                    showSearch={true}
                   />
                 </div>
               </Grid>
@@ -568,7 +629,7 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
             ) : null}
             <Grid container justify="center">
               <Button
-                className={classes.button}
+                className={classes.submitButton}
                 type="submit"
                 variant="contained"
                 color="primary"
@@ -577,7 +638,8 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
                 Submit
               </Button>
               <Button
-                className={classes.button}
+                className={classes.resetButton}
+                startIcon={<RotateLeft />}
                 variant="contained"
                 onClick={() => {
                   handleReset();
@@ -591,6 +653,12 @@ function StoresForm({ setPage, setOpenPopup, itemToEdit, countries }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

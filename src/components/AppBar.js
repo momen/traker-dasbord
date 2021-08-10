@@ -117,7 +117,7 @@ const AppBarComponent = ({ onDrawerToggle }) => {
             </Grid> */}
             <Grid item xs />
             <Grid item>
-              {currentTheme.darkTheme ? (
+              {/* {currentTheme.darkTheme ? (
                 <span>Dark Theme</span>
               ) : (
                 <span>Light Theme</span>
@@ -127,7 +127,7 @@ const AppBarComponent = ({ onDrawerToggle }) => {
                 onChange={handleChange}
                 name="darkTheme"
                 inputProps={{ "aria-label": "secondary checkbox" }}
-              />
+              /> */}
               {/* <MessagesDropdown />
               <NotificationsDropdown /> */}
               {/* <LanguagesDropdown /> */}

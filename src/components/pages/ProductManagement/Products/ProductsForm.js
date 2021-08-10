@@ -4,14 +4,20 @@ import {
   Checkbox,
   Chip,
   Collapse,
+  Divider as MuiDivider,
   FormControl,
+  FormControlLabel,
+  FormHelperText,
   Grid,
   IconButton,
   makeStyles,
+  Radio,
+  RadioGroup,
+  styled,
   TextField,
 } from "@material-ui/core";
 import axios from "../../../../axios";
-import { PhotoCamera } from "@material-ui/icons";
+import { PhotoCamera, RotateLeft } from "@material-ui/icons";
 import { CloseIcon } from "@material-ui/data-grid";
 import { Alert, Autocomplete } from "@material-ui/lab";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
@@ -19,6 +25,10 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import NumberFormat from "react-number-format";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import SuccessPopup from "../../../SuccessPopup";
+import { spacing } from "@material-ui/system";
+
+const Divider = styled(MuiDivider)(spacing);
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -26,13 +36,39 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "60vw",
+    // width: "60vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "2px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    margin: theme.spacing(3, 2, 2),
+    width: "15%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
@@ -75,48 +111,56 @@ function ProductsForm({
   manufacturers,
   originCountries,
   carTypes,
+  transmissionsList,
   productTypes,
+  setViewMode,
+  setPageHeader,
 }) {
   const classes = useStyles();
   const uploadRef = useRef();
 
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
-    description: itemToEdit ? itemToEdit.description : "",
-    car_made_id: itemToEdit ? itemToEdit.car_made_id : "",
+    description: itemToEdit ? itemToEdit.description || "" : "",
+    car_made_id: itemToEdit ? itemToEdit.car_made_id || "" : "",
     models: itemToEdit
       ? itemToEdit.car_model?.map(({ id, carmodel }) => ({
           id,
           carmodel,
         }))
       : [],
-    year_from: itemToEdit ? itemToEdit.year_from?.id : "",
-    year_to: itemToEdit ? itemToEdit.year_to?.id : "",
+    year_from: itemToEdit ? itemToEdit.year_from?.id || "" : "",
+    year_to: itemToEdit ? itemToEdit.year_to?.id || "" : "",
     discount:
       itemToEdit?.discount && itemToEdit?.discount > 0
         ? itemToEdit.discount
         : "",
     maincategory_id: itemToEdit ? itemToEdit.category?.maincategory_id : "",
     category_id: itemToEdit ? itemToEdit.category?.id : "",
-    price: itemToEdit ? itemToEdit.price : "",
-    holesale_price: itemToEdit ? itemToEdit.holesale_price : "",
-    no_of_orders: itemToEdit ? itemToEdit.no_of_orders : "",
+    price: itemToEdit ? parseFloat(itemToEdit.price) : "",
+    holesale_price: itemToEdit ? parseFloat(itemToEdit.holesale_price) : "",
+    no_of_orders: itemToEdit ? parseInt(itemToEdit.no_of_orders) : "",
 
     part_category_id: itemToEdit ? itemToEdit.part_category_id.toString() : "",
     manufacturer_id: itemToEdit ? itemToEdit.manufacturer?.id : "",
     prodcountry_id: itemToEdit ? itemToEdit.origin_country?.id : "",
-    transmission_id: itemToEdit ? itemToEdit.transmission_id : "",
+    transmission_id: itemToEdit ? itemToEdit.transmission_id || "" : "",
     cartype_id: itemToEdit ? itemToEdit.cartype_id : "",
     tags: itemToEdit
       ? itemToEdit.tags.map(({ id, name }) => ({ id, name }))
       : [],
     store_id: itemToEdit ? itemToEdit.store_id : "",
-    quantity: itemToEdit ? itemToEdit.quantity : "",
-    qty_reminder: itemToEdit ? itemToEdit.qty_reminder : "",
+    quantity: itemToEdit ? parseInt(itemToEdit.quantity) : "",
+    qty_reminder: itemToEdit ? parseInt(itemToEdit.qty_reminder) : "",
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
-    producttype_id: itemToEdit ? itemToEdit.producttype_id.id : "",
+    producttype_id: itemToEdit ? itemToEdit.producttype_id?.id : "",
     photo: [],
   });
+
+  const [carModels, setCarModels] = useState(null);
+  const [categories, setCategories] = useState(null);
+  const [partCategories, setPartCategories] = useState(null);
+  const [toYears, setToYears] = useState([]);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string()
@@ -145,83 +189,107 @@ function ProductsForm({
       ),
     producttype_id: Yup.string().required(),
     holesale_price:
-      formData.producttype_id.toString() === "2" ||
-      formData.producttype_id.toString() === "3"
+      formData.producttype_id.toString() == "2" ||
+      formData.producttype_id.toString() == "3"
         ? Yup.number()
             .min(1, "Enter a value greater than 0")
             .required("This field is Required")
         : Yup.string().nullable().notRequired(),
     no_of_orders:
-      formData.producttype_id.toString() === "2" ||
-      formData.producttype_id.toString() === "3"
+      formData.producttype_id.toString() == "2" ||
+      formData.producttype_id.toString() == "3"
         ? Yup.number()
             .min(1, "Minimum value should be 1")
             .required("This field is Required")
         : Yup.string().nullable().notRequired(),
     car_made_id:
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "43" &&
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     year_from:
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "43" &&
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     year_to:
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "43" &&
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     discount: Yup.number()
-      .min(5, "Minimum value for discount is 5%")
+      .min(1, "Minimum value for discount is 0%")
       .max(80, "Maximum value for discount is 80%"),
+    discount_value: Yup.number()
+      .min(1, "Minimum value for discount is 0%")
+      .max(formData.price * 0.8, "Maximum value for discount is 80%"),
     price:
-      formData.producttype_id.toString() === "1" ||
-      formData.producttype_id.toString() === "3"
+      formData.producttype_id.toString() == "1" ||
+      formData.producttype_id.toString() == "3"
         ? Yup.number()
             .required("This field is Required")
             .min(1, "Enter a value greater than 0")
         : Yup.string().nullable().notRequired(),
     maincategory_id: Yup.string().required(),
     category_id: Yup.string().required(),
-    part_category_id: Yup.string().required(),
+    part_category_id: partCategories?.length
+      ? Yup.string().required()
+      : Yup.string().nullable().notRequired(),
     manufacturer_id: Yup.string().required(),
     prodcountry_id: Yup.string().required(),
     transmission_id:
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "43" &&
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     cartype_id:
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "43" &&
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
     store_id: Yup.string().required(),
-    quantity: Yup.number()
-      .min(5, "Minimum value should be 5")
-      .required("This field is Required"),
+    quantity:
+      formData.producttype_id.toString() != "2"
+        ? Yup.number()
+            .required("This field is Required")
+            .nullable()
+            .min(5, "Minimum value should be 5")
+        : Yup.number().nullable().notRequired(),
     qty_reminder: Yup.number().required("This field is Required"),
     description: Yup.string()
       .required("This field is Required")
@@ -239,16 +307,19 @@ function ProductsForm({
       .max(255, "Description must not exceed 255 characters"),
   });
 
-  const [carModels, setCarModels] = useState(null);
-  const [categories, setCategories] = useState(null);
-  const [partCategories, setPartCategories] = useState(null);
-  const [toYears, setToYears] = useState([]);
+  const [enableDiscount, setEnableDiscount] = useState(
+    itemToEdit.discount ? true : false
+  );
 
   const [imagesToDelete, setImagesToDelete] = useState("");
 
   const [productImages, setProductImages] = useState(() =>
     itemToEdit
-      ? itemToEdit.photo.map(({ id, file_name }) => ({ id, file_name }))
+      ? itemToEdit.photo.map(({ id, file_name, image }) => ({
+          id,
+          file_name,
+          image,
+        }))
       : null
   );
 
@@ -259,20 +330,35 @@ function ProductsForm({
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit
+      ? "Product details updated successfully."
+      : "Product info added & pending approval, once all the provided details are confirmed it will be approved."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setViewMode("data-grid");
+    setPageHeader("Products");
+  };
+
   useEffect(() => {
     if (itemToEdit) {
-      axios
-        .get(`/car-modelslist/${itemToEdit.car_made_id}`)
-        .then((res) => {
-          const _carModels = res.data.data.map(({ id, carmodel }) => ({
-            id,
-            carmodel,
-          })); // Customize
-          setCarModels(_carModels);
-        })
-        .catch(() => {
-          alert("Failed to Fetch Brands List");
-        });
+      if (itemToEdit.car_made_id) {
+        axios
+          .get(`/car-modelslist/${itemToEdit.car_made_id}`)
+          .then((res) => {
+            const _carModels = res.data.data.map(({ id, carmodel }) => ({
+              id,
+              carmodel,
+            })); // Customize
+            setCarModels(_carModels);
+          })
+          .catch(() => {
+            alert("Failed to Fetch Models List");
+          });
+      }
 
       axios
         .get(`/categorieslist/${itemToEdit.category?.maincategory_id}`)
@@ -302,27 +388,35 @@ function ProductsForm({
           alert("Failed to Fetch Part Categories List");
         });
 
+      if (itemToEdit.year_from) {
         const fromYear = carYears.find(
           (carYear) => carYear.id == itemToEdit.year_from?.id
         );
         setToYears(
           carYears.filter(
-            (year) =>
-              parseInt(year.year) >= parseInt(fromYear.year)
+            (year) => parseInt(year.year) >= parseInt(fromYear.year)
           )
         );
+      }
     }
   }, []);
+
+  const toggleDiscount = () => {
+    setEnableDiscount(!enableDiscount);
+  };
 
   const handleSubmit = async () => {
     if (
       formData.models.length === 0 &&
       formData.category_id &&
-      formData.category_id !== "81" &&
-      formData.category_id !== "82" &&
-      formData.category_id !== "83" &&
-      formData.category_id !== "84" &&
-      formData.category_id !== "85"
+      formData.category_id != "43" &&
+      formData.category_id != "81" &&
+      formData.category_id != "82" &&
+      formData.category_id != "83" &&
+      formData.category_id != "84" &&
+      formData.category_id != "85" &&
+      formData.maincategory_id &&
+      formData.maincategory_id != "5"
     ) {
       setAutoSelectModelError(true);
       return;
@@ -345,10 +439,17 @@ function ProductsForm({
       setIsSubmitting(false);
     } else {
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === "photo") return;
+        if (
+          key === "photo" ||
+          (key === "quantity" && formData.producttype_id == 2)
+        )
+          return;
         if (key === "tags" || key === "models") {
           data.append(key, JSON.stringify(value.map((val) => val.id)));
-        } else if (key === "discount" && !value) {
+        } else if (
+          (key === "discount" && !value) ||
+          (key === "discount" && !enableDiscount)
+        ) {
           data.append(key, 0);
         } else {
           data.append(key, value);
@@ -381,12 +482,17 @@ function ProductsForm({
                 })
                 .then((res) => {
                   setOpenPopup(false);
+                  setDialogOpen(true);
+                  setIsSubmitting(false);
                 })
                 .catch((res) => {
                   setResponseErrors(res.response.data.errors);
+                  setIsSubmitting(false);
                 });
             } else {
               setOpenPopup(false);
+              setIsSubmitting(false);
+              setDialogOpen(true);
             }
           })
           .catch((res) => {
@@ -403,6 +509,8 @@ function ProductsForm({
           .then((res) => {
             setPage(1);
             setOpenPopup(false);
+            setDialogOpen(true);
+            setIsSubmitting(false);
           })
           .catch((res) => {
             setIsSubmitting(false); // Update on other components
@@ -414,6 +522,7 @@ function ProductsForm({
 
   // Update Function Name on other components
   const handleStateChange = (e) => {
+    if (e.target.name === "quantity") console.log(e.target.value);
     const updatedData = formData;
     if (e.target.name === "producttype_id" && e.target.value == "1") {
       delete updatedData.holesale_price;
@@ -529,6 +638,12 @@ function ProductsForm({
     setOpenAlert(false);
     setBigImgSize(false);
   };
+
+  const vendorTypes = [
+    { id: 2, title: "Wholesale" },
+    { id: 1, title: "Retail" },
+    { id: 3, title: "Both" },
+  ];
   return (
     <div className={classes.paper}>
       <Formik
@@ -542,406 +657,13 @@ function ProductsForm({
           handleChange,
           handleBlur,
           touched,
+          setFieldValue,
           values,
           resetForm,
         }) => (
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={6} sm={4}>
-                <div>
-                  <TextField
-                    name="name"
-                    required
-                    fullWidth
-                    id="name"
-                    label="Product Name"
-                    value={values.name}
-                    autoFocus
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.name ||
-                      Boolean(touched.name && errors.name)
-                    }
-                    helperText={touched.name && errors.name}
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.name?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={6} sm={4}>
-                <div>
-                  <TextField
-                    name="serial_number"
-                    required
-                    fullWidth
-                    id="serial_number"
-                    label="Serial Number"
-                    value={formData.serial_number}
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.serial_number ||
-                      Boolean(touched.serial_number && errors.serial_number)
-                    }
-                    helperText={touched.serial_number && errors.serial_number}
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.serial_number?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={6} sm={4}>
-                <div>
-                  <TextField
-                    select
-                    label="Product Type"
-                    value={formData.producttype_id}
-                    name="producttype_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.producttype_id ||
-                      Boolean(touched.producttype_id && errors.producttype_id)
-                    }
-                    helperText="Please select a Product Type"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {productTypes?.map((type) => (
-                      <option value={type.id}>{type.producttype}</option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.producttype_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={12}></Grid>
-
-              {formData.producttype_id.toString() === "2" ||
-              formData.producttype_id.toString() === "3" ? (
-                <>
-                  <Grid item xs={6} md={3}>
-                    <div>
-                      <NumberFormat
-                        allowNegative={false}
-                        customInput={TextField}
-                        thousandSeparator={true}
-                        required
-                        fullWidth
-                        name="holesale_price"
-                        label="Wholesale Price"
-                        value={
-                          formData.holesale_price || itemToEdit?.holesale_price
-                        }
-                        onValueChange={({ floatValue }) => {
-                          updateFormData({
-                            ...formData,
-                            holesale_price: Math.round(floatValue),
-                          });
-                          values.holesale_price = Math.round(floatValue);
-                          if (floatValue > 0) {
-                            errors.holesale_price = false;
-                          } else if (floatValue === 0) {
-                            errors.holesale_price =
-                              "Enter a value greater than 0";
-                          } else {
-                            errors.holesale_price = "This field is Required";
-                          }
-                        }}
-                        onBlur={handleBlur}
-                        error={
-                          responseErrors?.holesale_price ||
-                          Boolean(
-                            touched.holesale_price && errors.holesale_price
-                          )
-                        }
-                        helperText={
-                          touched.holesale_price && errors.holesale_price
-                        }
-                      />
-
-                      {responseErrors ? (
-                        <div className={classes.inputMessage}>
-                          {responseErrors.holesale_price?.map((msg) => (
-                            <span key={msg} className={classes.errorMsg}>
-                              {msg}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
-                    </div>
-                  </Grid>
-
-                  <Grid item xs={6} md={3} lg={2}>
-                    <div>
-                      <NumberFormat
-                        allowNegative={false}
-                        customInput={TextField}
-                        thousandSeparator={true}
-                        name="no_of_orders"
-                        required
-                        fullWidth
-                        label="Number of orders"
-                        value={formData.no_of_orders || itemToEdit.no_of_orders}
-                        onValueChange={({ floatValue }) => {
-                          updateFormData({
-                            ...formData,
-                            no_of_orders: floatValue,
-                          });
-                          values.no_of_orders = floatValue;
-                          if (floatValue >= 5) {
-                            errors.no_of_orders = false;
-                          } else if (floatValue) {
-                            errors.no_of_orders = "Minimum value should be 1";
-                          } else {
-                            errors.no_of_orders = "This field is Required";
-                          }
-                        }}
-                        onBlur={handleBlur}
-                        error={
-                          responseErrors?.no_of_orders ||
-                          Boolean(touched.no_of_orders && errors.no_of_orders)
-                        }
-                        helperText={touched.no_of_orders && errors.no_of_orders}
-                      />
-
-                      {responseErrors ? (
-                        <div className={classes.inputMessage}>
-                          {responseErrors.no_of_orders?.map((msg) => (
-                            <span key={msg} className={classes.errorMsg}>
-                              {msg}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
-                    </div>
-                  </Grid>
-                </>
-              ) : null}
-
-              {formData.producttype_id.toString() === "1" ||
-              formData.producttype_id.toString() === "3" ? (
-                <Grid item xs={6} md={3}>
-                  <div>
-                    <NumberFormat
-                      allowNegative={false}
-                      customInput={TextField}
-                      thousandSeparator={true}
-                      required
-                      fullWidth
-                      name="price"
-                      label="Price"
-                      value={formData.price || itemToEdit.price}
-                      onValueChange={({ floatValue }) => {
-                        updateFormData({ ...formData, price: floatValue });
-                        values.price = floatValue;
-                        if (floatValue > 0) {
-                          errors.price = false;
-                        } else if (floatValue === 0) {
-                          errors.price = "Enter a value greater than 0";
-                        } else {
-                          errors.price = "This field is Required";
-                        }
-                      }}
-                      onBlur={handleBlur}
-                      error={
-                        responseErrors?.price ||
-                        Boolean(touched.price && errors.price)
-                      }
-                      helperText={touched.price && errors.price}
-                    />
-
-                    {responseErrors ? (
-                      <div className={classes.inputMessage}>
-                        {responseErrors.price?.map((msg) => (
-                          <span key={msg} className={classes.errorMsg}>
-                            {msg}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                </Grid>
-              ) : null}
-
-              {formData.producttype_id ? (
-                <Grid item xs={4} md={2}>
-                  <div>
-                    <NumberFormat
-                      allowNegative={false}
-                      customInput={TextField}
-                      name="discount"
-                      fullWidth
-                      label="Discount"
-                      // prefix="%"
-                      value={formData.discount}
-                      onChange={(e) => {
-                        updateFormData({
-                          ...formData,
-                          discount: e.target.value
-                            ? parseFloat(e.target.value)
-                            : "",
-                        });
-                        handleChange(e);
-                      }}
-                      onBlur={handleBlur}
-                      error={
-                        responseErrors?.discount ||
-                        Boolean(touched.discount && errors.discount)
-                      }
-                      helperText={
-                        (touched.discount && errors.discount) ||
-                        "Min 5% & Max 80%"
-                      }
-                      InputProps={{ inputProps: { min: 5 } }}
-                    />
-
-                    {responseErrors ? (
-                      <div className={classes.inputMessage}>
-                        {responseErrors.discount?.map((msg) => (
-                          <span key={msg} className={classes.errorMsg}>
-                            {msg}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                </Grid>
-              ) : null}
-
-              <Grid item xs={12}></Grid>
-
-              <Grid item xs={4} md={3}>
-                <div>
-                  <NumberFormat
-                    allowNegative={false}
-                    customInput={TextField}
-                    thousandSeparator={true}
-                    name="quantity"
-                    required
-                    fullWidth
-                    label="Qunatity"
-                    value={formData.quantity}
-                    onValueChange={({ floatValue }) => {
-                      updateFormData({
-                        ...formData,
-                        quantity: Math.round(floatValue),
-                      });
-                      values.quantity = Math.round(floatValue);
-                      if (floatValue >= 5) {
-                        errors.quantity = false;
-                      } else if (floatValue) {
-                        errors.quantity = "Minimum value should be 5";
-                      } else {
-                        errors.quantity = "This field is Required";
-                      }
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.quantity ||
-                      Boolean(touched.quantity && errors.quantity)
-                    }
-                    helperText={touched.quantity && errors.quantity}
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.quantity?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={4} md={3}>
-                <div>
-                  <NumberFormat
-                    allowNegative={false}
-                    customInput={TextField}
-                    thousandSeparator={true}
-                    name="qty_reminder"
-                    required
-                    fullWidth
-                    label="Reminder Quantity"
-                    value={formData.qty_reminder}
-                    onValueChange={({ floatValue }) => {
-                      updateFormData({
-                        ...formData,
-                        qty_reminder: Math.round(floatValue),
-                      });
-                      values.qty_reminder = Math.round(floatValue);
-                      if (floatValue >= 5) {
-                        errors.qty_reminder = false;
-                      } else if (floatValue) {
-                        errors.qty_reminder = "Minimum value should be 5";
-                      } else {
-                        errors.qty_reminder = "This field is Required";
-                      }
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.qty_reminder ||
-                      Boolean(touched.qty_reminder && errors.qty_reminder)
-                    }
-                    helperText={touched.qty_reminder && errors.qty_reminder}
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.qty_reminder?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={6} md={3}>
+            <Grid container spacing={8}>
+              <Grid item xs={6} md={4}>
                 <div>
                   <TextField
                     select
@@ -1002,7 +724,7 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={6} md={3}>
+              <Grid item xs={6} md={4}>
                 <div>
                   <TextField
                     disabled={!formData.maincategory_id}
@@ -1063,7 +785,7 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={6} md={3}>
+              <Grid item xs={6} md={4}>
                 <div>
                   <TextField
                     disabled={!partCategories}
@@ -1088,7 +810,6 @@ function ProductsForm({
                     }
                     helperText="Please select a Part Category"
                     fullWidth
-                    required
                   >
                     <option aria-label="None" value="" />
                     {partCategories?.map((partCategory) => (
@@ -1110,12 +831,715 @@ function ProductsForm({
                 </div>
               </Grid>
 
+              <Grid item xs={6} sm={6}>
+                <div>
+                  <TextField
+                    name="name"
+                    required
+                    fullWidth
+                    id="name"
+                    label="Product Name"
+                    value={values.name}
+                    // autoFocus
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.name ||
+                      Boolean(touched.name && errors.name)
+                    }
+                    helperText={touched.name && errors.name}
+                  />
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.name?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} sm={6}>
+                <div>
+                  <TextField
+                    name="serial_number"
+                    required
+                    fullWidth
+                    id="serial_number"
+                    label="Serial Number"
+                    value={formData.serial_number}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.serial_number ||
+                      Boolean(touched.serial_number && errors.serial_number)
+                    }
+                    helperText={touched.serial_number && errors.serial_number}
+                  />
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.serial_number?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} md={6}>
+                <div>
+                  <TextField
+                    select
+                    label="Manufacturer"
+                    value={formData.manufacturer_id}
+                    name="manufacturer_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.manufacturer_id ||
+                      Boolean(touched.manufacturer_id && errors.manufacturer_id)
+                    }
+                    helperText="Please select a Manufacturer"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {manufacturers?.map((manufacturer) => (
+                      <option value={manufacturer.id}>
+                        {manufacturer.manufacturer_name}
+                      </option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.manufacturer_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} md={6}>
+                <div>
+                  <TextField
+                    select
+                    label="Country of Origin"
+                    value={formData.prodcountry_id}
+                    name="prodcountry_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.prodcountry_id ||
+                      Boolean(touched.prodcountry_id && errors.prodcountry_id)
+                    }
+                    helperText="Please select a Country"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {originCountries?.map((country) => (
+                      <option value={country.id}>{country.country_name}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.prodcountry_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={12}>
+                <div style={{ minWidth: "100%", maxWidth: "100%" }}>
+                  <TextField
+                    variant="outlined"
+                    name="description"
+                    required
+                    label="Description"
+                    multiline
+                    rows={5}
+                    rowsMax={8}
+                    value={formData.description}
+                    fullWidth
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.description ||
+                      Boolean(touched.description && errors.description)
+                    }
+                    helperText={touched.description && errors.description}
+                  />
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.description?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Divider my={1} />
+              </Grid>
+
+              <Grid item xs={12}>
+                {/* <div>
+                  <TextField
+                    select
+                    label="Product Type"
+                    value={formData.producttype_id}
+                    name="producttype_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.producttype_id ||
+                      Boolean(touched.producttype_id && errors.producttype_id)
+                    }
+                    helperText="Please select a Product Type"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {productTypes?.map((type) => (
+                      <option value={type.id}>{type.producttype}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.producttype_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div> */}
+
+                <b>
+                  {" "}
+                  <p className={classes.inputLabel}>Product Type</p>
+                </b>
+                <FormControl component="fieldset">
+                  {/* <FormLabel component="legend">Gender</FormLabel> */}
+                  <RadioGroup
+                    aria-label="vendor-type"
+                    name="producttype_id"
+                    value={formData.producttype_id}
+                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      handleChange(e);
+                      updateFormData({
+                        ...formData,
+                        producttype_id: e.target.value,
+                      });
+                    }}
+                  >
+                    <div style={{ display: "flex" }}>
+                      {vendorTypes?.map((type) => (
+                        <FormControlLabel
+                          key={`vendor-type-${type.id}`}
+                          // style={{ marginLeft: "30px" }}
+                          value={type.id}
+                          control={
+                            <Radio
+                              style={{
+                                alignSelf: "flex-start",
+                                color: "#424242",
+                              }}
+                              checked={formData.producttype_id == type.id}
+                            />
+                          }
+                          //   style={{ padding: 0 }}
+                          label={
+                            <span className={classes.radioLabel}>
+                              {type.title}
+                            </span>
+                          }
+                        />
+                      ))}
+                    </div>
+                  </RadioGroup>
+                  {Boolean(touched.producttype_id && errors.producttype_id) ||
+                  responseErrors?.producttype_id ? (
+                    <FormHelperText className={classes.error}>
+                      {(touched.producttype_id && errors.producttype_id) ||
+                        responseErrors?.producttype_id}
+                    </FormHelperText>
+                  ) : null}
+                </FormControl>
+              </Grid>
+
+              {formData.producttype_id.toString() === "2" ||
+              formData.producttype_id.toString() === "3" ? (
+                <>
+                  <Grid item xs={6} md={3}>
+                    <div>
+                      <NumberFormat
+                        allowNegative={false}
+                        customInput={TextField}
+                        thousandSeparator={true}
+                        required
+                        fullWidth
+                        name="holesale_price"
+                        label="Wholesale Price"
+                        value={formData.holesale_price}
+                        onValueChange={({ floatValue }) => {
+                          updateFormData({
+                            ...formData,
+                            holesale_price: Math.round(floatValue),
+                          });
+                          values.holesale_price = Math.round(floatValue);
+                          if (!floatValue) {
+                            errors.holesale_price = "This field is Required";
+                          } else if (floatValue === 0) {
+                            errors.holesale_price =
+                              "Enter a value greater than 0";
+                          }
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.holesale_price ||
+                          Boolean(
+                            touched.holesale_price && errors.holesale_price
+                          )
+                        }
+                        helperText={
+                          touched.holesale_price && errors.holesale_price
+                        }
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.holesale_price?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+
+                  <Grid item xs={6} md={3} lg={2}>
+                    <div>
+                      <NumberFormat
+                        allowNegative={false}
+                        customInput={TextField}
+                        thousandSeparator={true}
+                        name="no_of_orders"
+                        required
+                        fullWidth
+                        label="Number of orders"
+                        value={formData.no_of_orders}
+                        onValueChange={({ floatValue }) => {
+                          updateFormData({
+                            ...formData,
+                            no_of_orders: Math.round(floatValue),
+                          });
+                          values.no_of_orders = floatValue;
+                          if (!floatValue) {
+                            errors.no_of_orders = "This field is Required";
+                          } else if (floatValue < 1) {
+                            errors.no_of_orders = "Minimum value should be 1";
+                          }
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.no_of_orders ||
+                          Boolean(touched.no_of_orders && errors.no_of_orders)
+                        }
+                        helperText={touched.no_of_orders && errors.no_of_orders}
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.no_of_orders?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
+
+              {formData.producttype_id.toString() === "2" ||
+              formData.producttype_id.toString() === "3" ? (
+                <Grid item xs={7}></Grid>
+              ) : null}
+
+              {formData.producttype_id.toString() === "1" ||
+              formData.producttype_id.toString() === "3" ? (
+                <>
+                  <Grid item xs={6} md={4}>
+                    <div>
+                      <NumberFormat
+                        allowNegative={false}
+                        customInput={TextField}
+                        thousandSeparator={true}
+                        required
+                        fullWidth
+                        name="price"
+                        label="Price"
+                        value={formData.price}
+                        onValueChange={({ floatValue }) => {
+                          updateFormData({ ...formData, price: floatValue });
+                          values.price = floatValue;
+                          if (!floatValue) {
+                            errors.price = "This field is Required";
+                          } else if (floatValue < 1) {
+                            errors.price = "Enter a value greater than 0";
+                          }
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.price ||
+                          Boolean(touched.price && errors.price)
+                        }
+                        helperText={touched.price && errors.price}
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.price?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+
+                  <Grid
+                    item
+                    xs={4}
+                    md={2}
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        // justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        name="terms_services"
+                        onChange={toggleDiscount}
+                        checked={enableDiscount}
+                      />
+
+                      <span>Discount</span>
+                    </div>
+                  </Grid>
+
+                  <Grid item xs={4} md={2}>
+                    <div>
+                      <NumberFormat
+                        disabled={
+                          !formData.price ||
+                          (!enableDiscount && !itemToEdit?.discount)
+                        }
+                        allowNegative={false}
+                        customInput={TextField}
+                        name="discount"
+                        fullWidth
+                        label="Percentage %"
+                        // prefix="%"
+                        value={formData.discount}
+                        onChange={(e) => {
+                          updateFormData({
+                            ...formData,
+                            discount: e.target.value
+                              ? parseFloat(e.target.value)
+                              : "",
+                          });
+                          handleChange(e);
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.discount ||
+                          Boolean(touched.discount && errors.discount)
+                        }
+                        helperText={
+                          (touched.discount && errors.discount) ||
+                          "Min 1% & Max 80%"
+                        }
+                        InputProps={{ inputProps: { min: 5 } }}
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.discount?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+
+                  <Grid item xs={4} md={2}>
+                    <div>
+                      <NumberFormat
+                        disabled={
+                          !formData.price ||
+                          (!enableDiscount && !itemToEdit?.discount)
+                        }
+                        allowNegative={false}
+                        customInput={TextField}
+                        name="discount_value"
+                        fullWidth
+                        label="Value"
+                        // prefix="%"
+                        value={(formData.discount / 100) * formData.price}
+                        onChange={(e) => {
+                          updateFormData({
+                            ...formData,
+                            discount: e.target.value
+                              ? parseFloat(
+                                  (e.target.value / formData.price) * 100
+                                )
+                              : "",
+                          });
+                          setFieldValue("discount", e.target.value);
+                          if (!touched.discount) {
+                            touched.discount = true;
+                          }
+                          handleChange(e);
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.discount ||
+                          Boolean(
+                            touched.discount_value && errors.discount_value
+                          )
+                        }
+                        helperText={
+                          (touched.discount_value && errors.discount_value) ||
+                          "Min 1% & Max 80%"
+                        }
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.discount?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+                  <Grid item xs={2}></Grid>
+                </>
+              ) : null}
+
+              {/* {formData.producttype_id.toString() === "1" ? (
+                <Grid item xs={5}></Grid>
+              ) : formData.producttype_id.toString() === "2" ? (
+                <Grid item xs={3}></Grid>
+              ) : null} */}
+
+              {formData.producttype_id.toString() !== "2" ? (
+                <Grid item xs={4} md={3}>
+                  <div>
+                    <NumberFormat
+                      allowNegative={false}
+                      customInput={TextField}
+                      thousandSeparator={true}
+                      name="quantity"
+                      required
+                      fullWidth
+                      label="Qunatity"
+                      value={formData.quantity}
+                      onValueChange={({ floatValue }) => {
+                        updateFormData({
+                          ...formData,
+                          quantity: Math.round(floatValue),
+                        });
+                        values.quantity = Math.round(floatValue);
+                        // if (!floatValue) {
+                        //   errors.quantity = "This field is Required";
+                        // }
+                      }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.quantity ||
+                        Boolean(touched.quantity && errors.quantity)
+                      }
+                      helperText={touched.quantity && errors.quantity}
+                    />
+
+                    {responseErrors ? (
+                      <div className={classes.inputMessage}>
+                        {responseErrors.quantity?.map((msg) => (
+                          <span key={msg} className={classes.errorMsg}>
+                            {msg}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </Grid>
+              ) : null}
+              <Grid item xs={4} md={3}>
+                <div>
+                  <NumberFormat
+                    allowNegative={false}
+                    customInput={TextField}
+                    thousandSeparator={true}
+                    name="qty_reminder"
+                    required
+                    fullWidth
+                    label="Reminder Quantity"
+                    value={formData.qty_reminder}
+                    onValueChange={({ floatValue }) => {
+                      updateFormData({
+                        ...formData,
+                        qty_reminder: Math.round(floatValue),
+                      });
+                      values.qty_reminder = Math.round(floatValue);
+                      // if (!floatValue) {
+                      //   errors.qty_reminder = "This field is Required";
+                      // } else if (floatValue < 5) {
+                      //   errors.qty_reminder = "Minimum value should be 5";
+                      // }
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.qty_reminder ||
+                      Boolean(touched.qty_reminder && errors.qty_reminder)
+                    }
+                    helperText={touched.qty_reminder && errors.qty_reminder}
+                  />
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.qty_reminder?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} md={3}>
+                <div>
+                  <TextField
+                    select
+                    label="Store"
+                    value={formData.store_id}
+                    name="store_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.store_id ||
+                      Boolean(touched.store_id && errors.store_id)
+                    }
+                    helperText="Please select a Store"
+                    fullWidth
+                  >
+                    <option aria-label="None" value="" />
+                    {stores?.map((store) => (
+                      <option value={store.id}>{store.name}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.store_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              {formData.producttype_id.toString() === "2" ? (
+                <Grid item xs={6}></Grid>
+              ) : null}
+
+              <Grid item xs={12}>
+                <Divider my={1} />
+              </Grid>
+
               {formData.category_id &&
-              formData.category_id !== "81" &&
-              formData.category_id !== "82" &&
-              formData.category_id !== "83" &&
-              formData.category_id !== "84" &&
-              formData.category_id !== "85" ? (
+              formData.category_id != "43" &&
+              formData.category_id != "81" &&
+              formData.category_id != "82" &&
+              formData.category_id != "83" &&
+              formData.category_id != "84" &&
+              formData.category_id != "85" &&
+              formData.maincategory_id &&
+              formData.maincategory_id != "5" ? (
                 <>
                   <Grid item xs={6} md={3}>
                     <div>
@@ -1126,7 +1550,11 @@ function ProductsForm({
                         name="car_made_id"
                         onChange={(e) => {
                           handleChange(e);
-                          handleStateChange(e);
+                          updateFormData({
+                            ...formData,
+                            car_made_id: e.target.value,
+                            models: [],
+                          });
                           if (e.target.value) {
                             axios
                               .get(`/car-modelslist/${e.target.value}`)
@@ -1138,13 +1566,17 @@ function ProductsForm({
                                   })
                                 ); // Customize
                                 setCarModels(_carModels);
-                                console.log(_carModels);
                               })
                               .catch(() => {
                                 alert("Failed to Fetch Brands List");
                               });
                           } else {
                             setCarModels(null);
+                            updateFormData({
+                              ...formData,
+                              car_made_id: "",
+                              models: [],
+                            });
                           }
                         }}
                         SelectProps={{
@@ -1157,7 +1589,6 @@ function ProductsForm({
                         }
                         helperText="Please select a Brand"
                         fullWidth
-                        required
                       >
                         <option aria-label="None" value="" />
                         {carMades?.map((carMade) => (
@@ -1177,7 +1608,7 @@ function ProductsForm({
                     </div>
                   </Grid>
 
-                  <Grid item xs={9} md={6}>
+                  <Grid item xs={9} md={9}>
                     <div>
                       <Autocomplete
                         disabled={!formData.car_made_id}
@@ -1273,7 +1704,6 @@ function ProductsForm({
                         }
                         helperText="Please select a Year"
                         fullWidth
-                        required
                       >
                         <option aria-label="None" value="" />
                         {carYears?.map((carYear) => (
@@ -1315,7 +1745,6 @@ function ProductsForm({
                         }
                         helperText="Please select a Year"
                         fullWidth
-                        required
                       >
                         <option aria-label="None" value="" />
                         {toYears.map((carYear) => (
@@ -1339,137 +1768,15 @@ function ProductsForm({
 
               {/****************************** ******************************/}
 
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    label="Store"
-                    value={formData.store_id}
-                    name="store_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.store_id ||
-                      Boolean(touched.store_id && errors.store_id)
-                    }
-                    helperText="Please select a Store"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {stores?.map((store) => (
-                      <option value={store.id}>{store.name}</option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.store_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    label="Manufacturer"
-                    value={formData.manufacturer_id}
-                    name="manufacturer_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.manufacturer_id ||
-                      Boolean(touched.manufacturer_id && errors.manufacturer_id)
-                    }
-                    helperText="Please select a Manufacturer"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {manufacturers?.map((manufacturer) => (
-                      <option value={manufacturer.id}>
-                        {manufacturer.manufacturer_name}
-                      </option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.manufacturer_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    select
-                    label="Country of Origin"
-                    value={formData.prodcountry_id}
-                    name="prodcountry_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.prodcountry_id ||
-                      Boolean(touched.prodcountry_id && errors.prodcountry_id)
-                    }
-                    helperText="Please select a Country"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {originCountries?.map((country) => (
-                      <option value={country.id}>{country.country_name}</option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.prodcountry_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
               {formData.category_id &&
-              formData.category_id !== "81" &&
-              formData.category_id !== "82" &&
-              formData.category_id !== "83" &&
-              formData.category_id !== "84" &&
-              formData.category_id !== "85" ? (
+              formData.category_id != "43" &&
+              formData.category_id != "81" &&
+              formData.category_id != "82" &&
+              formData.category_id != "83" &&
+              formData.category_id != "84" &&
+              formData.category_id != "85" &&
+              formData.maincategory_id &&
+              formData.maincategory_id != "5" ? (
                 <>
                   <Grid item xs={6} md={3}>
                     <div>
@@ -1497,8 +1804,14 @@ function ProductsForm({
                         required
                       >
                         <option aria-label="None" value="" />
-                        <option value={1}>Manual</option>
-                        <option value={2}>Automatic</option>
+                        {transmissionsList?.map((transmission) => (
+                          <option
+                            value={transmission.id}
+                            style={{ textTransform: "capitalize" }}
+                          >
+                            {transmission.transmission_name}
+                          </option>
+                        ))}
                       </TextField>
 
                       {responseErrors ? (
@@ -1512,51 +1825,48 @@ function ProductsForm({
                       ) : null}
                     </div>
                   </Grid>
-
-                  <Grid item xs={6} md={3}>
-                    <div>
-                      <TextField
-                        select
-                        label="Car Types"
-                        value={formData.cartype_id}
-                        name="cartype_id"
-                        onChange={(e) => {
-                          handleChange(e);
-                          handleStateChange(e);
-                        }}
-                        SelectProps={{
-                          native: true,
-                        }}
-                        onBlur={handleBlur}
-                        error={
-                          responseErrors?.cartype_id ||
-                          Boolean(touched.cartype_id && errors.cartype_id)
-                        }
-                        helperText="Please select a Car Type"
-                        fullWidth
-                        required
-                      >
-                        <option aria-label="None" value="" />
-                        {carTypes?.map((carType) => (
-                          <option value={carType.id}>
-                            {carType.type_name}
-                          </option>
-                        ))}
-                      </TextField>
-
-                      {responseErrors ? (
-                        <div className={classes.inputMessage}>
-                          {responseErrors.cartype_id?.map((msg) => (
-                            <span key={msg} className={classes.errorMsg}>
-                              {msg}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
-                    </div>
-                  </Grid>
                 </>
               ) : null}
+
+              <Grid item xs={6} md={3}>
+                <div>
+                  <TextField
+                    select
+                    label="Car Types"
+                    value={formData.cartype_id}
+                    name="cartype_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.cartype_id ||
+                      Boolean(touched.cartype_id && errors.cartype_id)
+                    }
+                    helperText="Please select a Car Type"
+                    fullWidth
+                  >
+                    <option aria-label="None" value="" />
+                    {carTypes?.map((carType) => (
+                      <option value={carType.id}>{carType.type_name}</option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.cartype_id?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
 
               <Grid item xs={12}>
                 <div>
@@ -1621,40 +1931,6 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={12}>
-                <div style={{ minWidth: "100%", maxWidth: "100%" }}>
-                  <TextField
-                    name="description"
-                    required
-                    label="Description"
-                    multiline
-                    rowsMax={8}
-                    value={formData.description}
-                    fullWidth
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.description ||
-                      Boolean(touched.description && errors.description)
-                    }
-                    helperText={touched.description && errors.description}
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.description?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
               <Grid item xs={12} lg={2}>
                 <input
                   ref={uploadRef}
@@ -1679,7 +1955,7 @@ function ProductsForm({
               </Grid>
 
               <Grid item xs>
-                {productImages?.map((img) => {
+                {productImages?.map((img, index) => {
                   // console.log(imagesToDelete);
                   return (
                     <Chip
@@ -1690,9 +1966,10 @@ function ProductsForm({
                       variant="outlined"
                       color={img.deleted ? "secondary" : "primary"}
                     />
+                    // <img src={img.image} alt={`img-${index}`} />
                   );
                 })}
-                {formData.photo?.map((img) => (
+                {formData.photo?.map((img, index) => (
                   <Chip
                     className={classes.chip}
                     // icon={<FaceIcon/>}
@@ -1700,6 +1977,7 @@ function ProductsForm({
                     onDelete={() => handleDeleteImage(img.name)}
                     variant="outlined"
                   />
+                  // <img src={img.image} alt={`img-${index}`} />
                 ))}
               </Grid>
 
@@ -1756,7 +2034,8 @@ function ProductsForm({
             ) : null}
             <Grid container justify="center">
               <Button
-                className={classes.button}
+                className={classes.submitButton}
+                onClick={() => console.log(errors)}
                 type="submit"
                 variant="contained"
                 color="primary"
@@ -1765,8 +2044,9 @@ function ProductsForm({
                 Submit
               </Button>
               <Button
-                className={classes.button}
+                className={classes.resetButton}
                 variant="contained"
+                startIcon={<RotateLeft />}
                 disabled={isSubmitting} // Update on other components
                 onClick={() => {
                   handleReset();
@@ -1783,6 +2063,12 @@ function ProductsForm({
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

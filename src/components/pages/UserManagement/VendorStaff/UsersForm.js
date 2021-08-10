@@ -13,23 +13,50 @@ import { Autocomplete } from "@material-ui/lab";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import { Fragment } from "react";
-import { Visibility, VisibilityOff } from "@material-ui/icons";
+import { RotateLeft, Visibility, VisibilityOff } from "@material-ui/icons";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import SuccessPopup from "../../../SuccessPopup";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(1),
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-    width: "30vw",
+    // alignItems: "center",
+    // width: "30vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  button: {
+  submitButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "2px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+    margin: theme.spacing(3, 2, 2),
+    width: "15%",
+  },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
@@ -45,7 +72,15 @@ const useStyles = makeStyles((theme) => ({
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
+function UsersForm({
+  setPage,
+  setOpenPopup,
+  itemToEdit,
+  rolesList,
+  stores,
+  setViewMode,
+  setPageHeader,
+}) {
   const classes = useStyles();
 
   const validationSchema = Yup.object().shape({
@@ -66,6 +101,19 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState(
+    itemToEdit
+      ? "Staff Member details updated successfully."
+      : "New Staff Member added successfully."
+  );
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setViewMode("data-grid");
+    setPageHeader("Staff");
+  };
+
   const handleSubmit = async () => {
     // e.preventDefault();
 
@@ -74,19 +122,20 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
       return;
     }
 
-    setIsSubmitting(true);
-
     let data = {
       email: formData.email,
-      role: formData.role,
+      role: parseInt(formData.role),
       stores: JSON.stringify(formData.stores.map((val) => val.id)),
     };
+
+    setIsSubmitting(true);
 
     axios
       .post("/vendor/add/staff", data)
       .then((res) => {
         setPage(1);
         setOpenPopup(false);
+        setDialogOpen(true);
       })
       .catch(({ response }) => {
         setIsSubmitting(false);
@@ -139,8 +188,8 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
           resetForm,
         }) => (
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={8}>
+            <Grid container spacing={8}>
+              <Grid item xs={5}>
                 <TextField
                   name="email" //Customize
                   required
@@ -164,7 +213,9 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
                 />
               </Grid>
 
-              <Grid item xs={4}>
+              <Grid item xs={7}></Grid>
+
+              <Grid item xs={5}>
                 <div>
                   <TextField
                     select
@@ -188,15 +239,14 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
                     required
                   >
                     <option aria-label="None" value="" />
-                    <option aria-label="None" value="Manager">
-                      Manager
-                    </option>
-                    <option aria-label="None" value="Staff">
-                      Staff
-                    </option>
+                    {rolesList?.map((role) => (
+                      <option value={role.id}>{role.title}</option>
+                    ))}
                   </TextField>
                 </div>
               </Grid>
+
+              <Grid item xs={7}></Grid>
 
               <Grid item xs={12}>
                 <div>
@@ -270,7 +320,7 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
               ) : null}
               <Grid container justify="center">
                 <Button
-                  className={classes.button}
+                  className={classes.submitButton}
                   type="submit"
                   variant="contained"
                   color="primary"
@@ -279,7 +329,8 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
                   Submit
                 </Button>
                 <Button
-                  className={classes.button}
+                  className={classes.resetButton}
+                  startIcon={<RotateLeft />}
                   variant="contained"
                   onClick={() => {
                     handleReset();
@@ -296,6 +347,12 @@ function UsersForm({ setPage, setOpenPopup, itemToEdit, rolesList, stores }) {
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </div>
   );
 }

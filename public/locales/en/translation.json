@@ -1,0 +1,69 @@
+{
+  "sidenav": {
+    "main": "Dashboard",
+    "userMgt": "User Management",
+    "permissions": "Permissions",
+    "roles": "Roles",
+    "users": "Users",
+    "staff": "Staff",
+    "logs": "Audit Logs",
+    "productMgt": "Product Management",
+    "mainCatgory": "Main Categories",
+    "category": "Categories",
+    "partCategory": "Part Categories",
+    "brands": "Brands",
+    "models": "Car Models",
+    "years": "Car Years",
+    "tags": "Tags",
+    "carTypes": "Vehicle Types",
+    "manufacturers": "Manufacturers",
+    "origins": "Origin Countries",
+    "products": "Products",
+    "vendorMgt": "Vendor Management",
+    "vendors": "Vendors",
+    "branches": "Branches",
+    "totalOrders": "Total Orders",
+    "wholesaleOrders": "Wholesale Orders",
+    "invoices": "Invoices",
+    "wholesaleInvoices": "Wholesale Invoices",
+    "geography": "Geography",
+    "countries": "Countries",
+    "areas": "Areas",
+    "cities": "Cities",
+    "reports": "Reports",
+    "ads": "Advertisments",
+    "tickets": "Tickets",
+    "productInquiries": "Product Inquiries",
+    "help": "FAQs",
+    "manageAccount": "Manage Account",
+    "logout": "Logout"
+  },
+  "components": {
+    "ads": {
+      "mainHeader": "Advertisments",
+      "top": {
+        "title1": "Carousel Images on the top of homepage (1-6 images)",
+        "pc_tablet_size_title": "PC/Tablet (1340 x 354 px)",
+        "mobile_size_title": "Mobile (330 x 160 px)"
+      },
+      "middle": {
+        "title": "Homepage middle ads (3 images)",
+        "device_size_title": "PC/Tablet & Mobile (700 x 560 px)"
+      },
+      "bottom": {
+        "title": "Homepage bottom ad (1 image)",
+        "pc_tablet_size_title": "PC/Tablet (1340 x 354 px)",
+        "mobile_size_title": "Mobile (330 x 160 px)"
+      },
+      "carTypesTitles": {
+        "car": "Car Ads",
+        "commercial": "Commercial Vehicles Ads"
+      },
+      "addBtnText": "Add",
+      "downloadBtnText": "Download",
+      "deleteBtnText": "Delete",
+      "editBtnText": "Edit",
+      "uploadImageText": "Please upload an image"
+    }
+  }
+}

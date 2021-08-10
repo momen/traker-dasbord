@@ -30,7 +30,14 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import {
+  Add,
+  ArrowBack,
+  Delete,
+  Edit,
+  ExpandMore,
+  UnfoldLess,
+} from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import CategoriesForm from "./CategoriesForm";
@@ -47,19 +54,57 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
   button: {
-    background: "#4caf50",
-    color: "#ffffff",
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
     "&:hover": {
-      background: "#388e3c",
+      background: "#EF9300",
+      color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  backBtn: {
+    width: "fit-content",
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
+  backIcon: {
+    marginRight: theme.direction === "rtl" ? 0 : 5,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
   },
   toolBar: {
     display: "flex",
     justifyContent: "space-between",
     width: "100%",
     borderRadius: "6px",
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
   },
 }));
 
@@ -68,15 +113,42 @@ function CustomPagination(props) {
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
+      </Select>
+    </div>
   );
 }
 
@@ -126,6 +198,9 @@ function Categories() {
 
   const [mainCategories, setMainCategories] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Categories");
+  const [viewMode, setViewMode] = useState("data-grid");
+
   const columns = [
     { field: "id", headerName: "ID", width: 60 },
     { field: "name", headerName: "Name", width: 150 },
@@ -164,7 +239,7 @@ function Categories() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("product_category_show") ? (
+            {/* {userPermissions.includes("product_category_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
@@ -175,17 +250,19 @@ function Categories() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
             {userPermissions.includes("product_category_edit") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Edit />}
                 style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle("Edit Category"); /****** Customize ******/
+                  setViewMode("edit");
+                  setPageHeader("Edit Category");
                 }}
               >
                 Edit
@@ -194,9 +271,11 @@ function Categories() {
 
             {userPermissions.includes("product_category_delete") ? (
               <Button
+                className={classes.actionBtn}
+                startIcon={<Delete />}
                 color="secondary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
@@ -208,8 +287,8 @@ function Categories() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {
@@ -348,121 +427,129 @@ function Categories() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Categories
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />
 
-      <Grid container>
-        {userPermissions.includes("product_category_create") ? (
-          <Button
-            mb={3}
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              setOpenPopupTitle("New Category");
-              setOpenPopup(true);
-              setSelectedItem("");
-            }}
-          >
-            Add Category
-          </Button>
-        ) : null}
+      {viewMode === "data-grid" ? (
+        <Card mb={6}>
+          <Paper mb={2}>
+            <Toolbar className={classes.toolBar}>
+              <div style={{ display: "flex", alignItems: "flex-end" }}>
+                {userPermissions.includes("product_category_create") ? (
+                  <Button
+                    className={classes.button}
+                    variant="contained"
+                    onClick={() => {
+                      setViewMode("add");
+                      setPageHeader("New Category");
+                      setSelectedItem("");
+                    }}
+                    startIcon={<Add />}
+                  >
+                    Add Category
+                  </Button>
+                ) : null}
 
-        {userPermissions.includes("product_category_delete") ? (
-          <Button
-            mb={3}
-            color="secondary"
-            variant="contained"
-            disabled={rowsToDelete.length < 2}
-            onClick={() => {
-              setOpenMassDeleteDialog(true);
-            }}
-          >
-            Delete Selected
-          </Button>
-        ) : null}
-      </Grid>
+                {userPermissions.includes("product_category_delete") ? (
+                  <Button
+                    startIcon={<Delete />}
+                    color="secondary"
+                    variant="contained"
+                    disabled={rowsToDelete.length < 2}
+                    onClick={() => {
+                      setOpenMassDeleteDialog(true);
+                    }}
+                    style={{ height: 40, borderRadius: 0 }}
+                  >
+                    Delete Selected
+                  </Button>
+                ) : null}
+              </div>
 
-      <Card mb={6}>
-        <Paper mb={2}>
-          <Toolbar className={classes.toolBar}>
-            <FormControl variant="outlined">
-              <Select
-                value={pageSize}
-                onChange={handlePageSize}
-                autoWidth
-                IconComponent={UnfoldLess}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "center",
-                  },
-                  transformOrigin: {
-                    vertical: "top",
-                    horizontal: "center",
-                  },
-                  getContentAnchorEl: () => null,
+              <div>
+                <Grid container spacing={1} alignItems="flex-end">
+                  <Grid item>
+                    <Search />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="input-with-icon-grid"
+                      label="Search"
+                      onChange={handleSearchInput}
+                    />
+                  </Grid>
+                </Grid>
+              </div>
+            </Toolbar>
+          </Paper>
+          <Paper>
+            <div style={{ width: "100%" }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                page={page}
+                pageSize={pageSize}
+                rowCount={rowsCount}
+                sortingOrder={["desc", "asc"]}
+                sortModel={sortModel}
+                columnBuffer={pageSize}
+                paginationMode="server"
+                sortingMode="server"
+                components={{
+                  Pagination: CustomPagination,
+                  LoadingOverlay: CustomLoadingOverlay,
                 }}
-              >
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
-
-            <div>
-              <Grid container spacing={1} alignItems="flex-end">
-                <Grid item>
-                  <Search />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    id="input-with-icon-grid"
-                    label="Search"
-                    onChange={handleSearchInput}
-                  />
-                </Grid>
-              </Grid>
+                loading={loading}
+                checkboxSelection
+                disableColumnMenu
+                autoHeight={true}
+                onRowClick={
+                  userPermissions.includes("product_category_show")
+                    ? ({ row }) => history.push(`/product/categories/${row.id}`)
+                    : null
+                }
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSize}
+                onSortModelChange={handleSortModelChange}
+                onSelectionChange={(newSelection) => {
+                  setRowsToDelete(newSelection.rowIds);
+                }}
+              />
             </div>
-          </Toolbar>
-        </Paper>
-        <Paper>
-          <div style={{ width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              page={page}
-              pageSize={pageSize}
-              rowCount={rowsCount}
-              sortingOrder={["desc", "asc"]}
-              sortModel={sortModel}
-              columnBuffer={pageSize}
-              paginationMode="server"
-              sortingMode="server"
-              components={{
-                Pagination: CustomPagination,
-                LoadingOverlay: CustomLoadingOverlay,
-              }}
-              loading={loading}
-              checkboxSelection
-              disableColumnMenu
-              autoHeight={true}
-              onPageChange={handlePageChange}
-              onSortModelChange={handleSortModelChange}
-              onSelectionChange={(newSelection) => {
-                setRowsToDelete(newSelection.rowIds);
-              }}
-            />
+          </Paper>
+        </Card>
+      ) : (
+        <Card mb={6} style={{ padding: "50px 60px" }}>
+          <div
+            className={classes.backBtn}
+            onClick={() => {
+              setViewMode("data-grid");
+              setPageHeader("Categories");
+            }}
+          >
+            <ArrowBack className={classes.backIcon} />
+            <span>Back</span>
           </div>
-        </Paper>
-      </Card>
+
+          <Divider my={3} />
+          <CategoriesForm
+            setPage={setPage}
+            setOpenPopup={setOpenPopup}
+            itemToEdit={selectedItem}
+            mainCategories={mainCategories}
+            setViewMode={setViewMode}
+            setPageHeader={setPageHeader}
+          />
+        </Card>
+      )}
       <Popup
         title={openPopupTitle}
         openPopup={openPopup}

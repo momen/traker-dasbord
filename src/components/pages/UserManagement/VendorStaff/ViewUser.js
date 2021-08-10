@@ -38,8 +38,8 @@ const useStyles = makeStyles({
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
     },
   },
-  attributeName:{
-    width:"15%",
+  attributeName: {
+    width: "15%",
   },
   roleBadge: {
     background: "#FFBF00",
@@ -56,7 +56,7 @@ const useStyles = makeStyles({
 function ViewUser({ match }) {
   const classes = useStyles();
   const history = useHistory();
-  const [singleUser, setSingleUser] = useState("");  //Customize
+  const [singleUser, setSingleUser] = useState(""); //Customize
 
   //Customize
   useEffect(() => {
@@ -94,43 +94,46 @@ function ViewUser({ match }) {
               <StyledTableCell align="left">{singleUser.id}</StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={singleUser.name}>
-              <StyledTableCell
-                component="th"
-                scope="row"
-              >
+              <StyledTableCell component="th" scope="row">
                 Username
               </StyledTableCell>
               <StyledTableCell align="left">{singleUser.name}</StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={singleUser.serial_id}>
+              <StyledTableCell component="th" scope="row">
+                Serial
+              </StyledTableCell>
+              <StyledTableCell align="left">{singleUser.serial_id}</StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={singleUser.email}>
-              <StyledTableCell
-                component="th"
-                scope="row"
-              >
+              <StyledTableCell component="th" scope="row">
                 Email
               </StyledTableCell>
               <StyledTableCell align="left">{singleUser.email}</StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={singleUser.email_verified_at}>
-              <StyledTableCell
-                component="th"
-                scope="row"
-              >
-                Email Verified At
-              </StyledTableCell>
-              <StyledTableCell align="left">{singleUser.email_verified_at}</StyledTableCell>
-            </StyledTableRow>
             <StyledTableRow key={`${singleUser.id} ${singleUser.title}`}>
-              <StyledTableCell
-                component="th"
-                scope="row"
-              >
-                Roles
+              <StyledTableCell component="th" scope="row">
+                Role
               </StyledTableCell>
               <StyledTableCell align="left">
-                  <span key={singleUser.roles?.id} className={classes.roleBadge}>
-                    {singleUser.roles?.title}
-                  </span>
+                <span key={singleUser.roles?.id} className={classes.roleBadge}>
+                  {singleUser.roles?.title}
+                </span>
+              </StyledTableCell>
+            </StyledTableRow>
+
+            <StyledTableRow key={singleUser.email_verified_at}>
+              <StyledTableCell component="th" scope="row">
+                Branches assigned to
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <div>
+                  {singleUser.stores?.map((branch) => (
+                    <span key={branch?.id} className={classes.roleBadge}>
+                      {branch.name}
+                    </span>
+                  ))}
+                </div>
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>

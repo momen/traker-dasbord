@@ -41,6 +41,7 @@ function Map({
   formData,
   updateFormData,
   setLocationNotSelected,
+  showSearch,
 }) {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
@@ -89,8 +90,12 @@ function Map({
 
   return (
     <>
-      <Locate panTo={panTo} />
-      <Search panTo={panTo} />
+      {showSearch ? (
+        <>
+          <Locate panTo={panTo} />
+          <Search panTo={panTo} />
+        </>
+      ) : null}
 
       <GoogleMap
         id="map"
@@ -196,13 +201,16 @@ function Search({ panTo }) {
           value={value}
           onChange={handleInput}
           disabled={!ready}
-          placeholder="Search your for store location"
+          placeholder="Search for your store location"
         />
         <ComboboxPopover>
           <ComboboxList>
             {status === "OK" &&
-              data.map(({ id, description }) => (
-                <ComboboxOption key={id} value={description} />
+              data.map(({ id, description }, index) => (
+                <ComboboxOption
+                  key={`map-${id}-i-${index}`}
+                  value={description}
+                />
               ))}
           </ComboboxList>
         </ComboboxPopover>

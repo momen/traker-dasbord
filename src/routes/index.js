@@ -17,17 +17,23 @@ import {
   Users,
 } from "react-feather";
 import {
+  Build,
   BusinessCenter,
   Category,
+  Class,
+  Commute,
   Dashboard,
   EventNote,
   Explore,
   Group,
   GroupAdd,
   GroupWork,
+  HelpOutline,
   HourglassEmpty,
+  Language,
   LiveHelp,
   NewReleases,
+  PermMedia,
   Public,
   QuestionAnswer,
   Receipt,
@@ -37,6 +43,7 @@ import {
   ShoppingBasket,
   Store,
   TimeToLeave,
+  TripOrigin,
   VpnKey,
 } from "@material-ui/icons";
 
@@ -84,6 +91,9 @@ const AuditLogs = async(() =>
   import("../components/pages/UserManagement/AuditLogs/AuditLogs.js")
 );
 
+const MainCategories = async(() =>
+  import("../components/pages/ProductManagement/Main Categories/MainCategories")
+);
 const Categories = async(() =>
   import("../components/pages/ProductManagement/Categories/Categories")
 );
@@ -101,6 +111,15 @@ const CarYear = async(() =>
 );
 const Tags = async(() =>
   import("../components/pages/ProductManagement/Tags/Tags.js")
+);
+const CarTypes = async(() =>
+  import("../components/pages/ProductManagement/CarTypes/CarTypes.js")
+);
+const Manufacturers = async(() =>
+  import("../components/pages/ProductManagement/Manufacturers/Manufacturers.js")
+);
+const Origins = async(() =>
+  import("../components/pages/ProductManagement/Origins/Origins.js")
 );
 const Products = async(() =>
   import("../components/pages/ProductManagement/Products/Products.js")
@@ -147,14 +166,23 @@ const Reports = async(() =>
 );
 
 const Stores = async(() => import("../components/pages/Vendor/Stores/Stores"));
-const PendingOrders = async(() =>
-  import("../components/pages/Vendor/Orders/PendingOrders")
+const TotalOrders = async(() =>
+  import("../components/pages/Vendor/Orders/TotalOrders")
 );
+
+const WholesaleOrders = async(() =>
+  import("../components/pages/Vendor/Wholesale Orders/TotalOrders")
+);
+
 const OrdersHistory = async(() =>
   import("../components/pages/Vendor/Orders/OrdersHistory")
 );
 const Invoices = async(() =>
   import("../components/pages/Vendor/Invoices/Invoices")
+);
+
+const WholesaleInvoices = async(() =>
+  import("../components/pages/Vendor/Wholesale Invoices/WholesaleInvoices")
 );
 
 const ViewPermission = async(() =>
@@ -173,6 +201,11 @@ const ViewLog = async(() =>
   import("../components/pages/UserManagement/AuditLogs/ViewLog")
 );
 
+const ViewMainCategory = async(() =>
+  import(
+    "../components/pages/ProductManagement/Main Categories/ViewMainCategory"
+  )
+);
 const ViewCategory = async(() =>
   import("../components/pages/ProductManagement/Categories/ViewCategory")
 );
@@ -191,6 +224,15 @@ const ViewCarYear = async(() =>
 const ViewProductTag = async(() =>
   import("../components/pages/ProductManagement/Tags/ViewTag")
 );
+const ViewCarType = async(() =>
+  import("../components/pages/ProductManagement/CarTypes/ViewCarType")
+);
+const ViewManufacturer = async(() =>
+  import("../components/pages/ProductManagement/Manufacturers/ViewManufacturer")
+);
+const ViewOrigin = async(() =>
+  import("../components/pages/ProductManagement/Origins/ViewOrigin")
+);
 const ViewProduct = async(() =>
   import("../components/pages/ProductManagement/Products/ViewProduct")
 );
@@ -208,9 +250,23 @@ const ViewInvoice = async(() =>
   import("../components/pages/Vendor/Invoices/ViewInvoice")
 );
 
+const ViewWholeSaleInvoice = async(() =>
+  import("../components/pages/Vendor/Wholesale Invoices/ViewInvoice")
+);
+
+const Ads = async(() =>
+  import("../components/pages/Advertisments/Advertisments")
+);
 const Tickets = async(() => import("../components/pages/Support/Support"));
 const ViewTicket = async(() =>
   import("../components/pages/Support/ViewTicket")
+);
+
+const ProductQuestions = async(() =>
+  import("../components/pages/Product Questions/ProductQuestions")
+);
+const ViewProductQuestion = async(() =>
+  import("../components/pages/Product Questions/ViewProductQuestion")
 );
 
 const Help = async(() => import("../components/pages/Help/Help"));
@@ -220,7 +276,7 @@ const ManageAccount = async(() =>
 );
 
 const dashboardRoutes = {
-  id: "Dashborad",
+  id: "main",
   path: "/",
   icon: <Dashboard />,
   badge: "8",
@@ -231,14 +287,14 @@ const dashboardRoutes = {
 };
 
 const userManagementRoutes = {
-  id: "User Management",
+  id: "userMgt",
   path: "/user-mgt",
   icon: <Group />,
   component: null,
   children: [
     {
       path: "/user-mgt/permissions",
-      name: "Permissions",
+      name: "permissions",
       component: Permissions,
       icon: <Unlock />,
       guard: PermissionGuard,
@@ -246,7 +302,7 @@ const userManagementRoutes = {
     },
     {
       path: "/user-mgt/roles",
-      name: "Roles",
+      name: "roles",
       component: Roles,
       icon: <BusinessCenter />,
       guard: PermissionGuard,
@@ -254,7 +310,7 @@ const userManagementRoutes = {
     },
     {
       path: "/user-mgt/users",
-      name: "Users",
+      name: "users",
       component: UsersComponent,
       icon: <User />,
       guard: PermissionGuard,
@@ -262,7 +318,7 @@ const userManagementRoutes = {
     },
     {
       path: "/user-mgt/vendor-users",
-      name: "Staff",
+      name: "staff",
       component: VendorStaff,
       icon: <User />,
       guard: PermissionGuard,
@@ -270,7 +326,7 @@ const userManagementRoutes = {
     },
     {
       path: "/user-mgt/logs",
-      name: "Audit Logs",
+      name: "logs",
       component: AuditLogs,
       icon: <EventNote />,
       guard: PermissionGuard,
@@ -312,22 +368,38 @@ const viewLog = {
 };
 
 const productManagementRoutes = {
-  id: "Product Management",
+  id: "productMgt",
   path: "/product",
   icon: <ShoppingCart />,
   component: null,
   children: [
     {
+      path: "/product/main-categories",
+      name: "mainCatgory",
+      component: MainCategories,
+      icon: <Class />,
+      guard: PermissionGuard,
+      permission: "main_categories_access",
+    },
+    {
       path: "/product/categories",
-      name: "Categories",
+      name: "category",
       component: Categories,
       icon: <Folder />,
       guard: PermissionGuard,
       permission: "product_category_access",
     },
     {
+      path: "/product/part-category",
+      name: "partCategory",
+      component: PartCategory,
+      icon: <Category />,
+      guard: PermissionGuard,
+      permission: "part_category_access",
+    },
+    {
       path: "/product/brands",
-      name: "Brand",
+      name: "brands",
       component: Brand,
       icon: <TimeToLeave />,
       guard: PermissionGuard,
@@ -335,23 +407,16 @@ const productManagementRoutes = {
     },
     {
       path: "/product/car-model",
-      name: "Car Model",
+      name: "models",
       component: CarModel,
       icon: <NewReleases />,
       guard: PermissionGuard,
       permission: "car_model_access",
     },
-    {
-      path: "/product/part-category",
-      name: "Part Category",
-      component: PartCategory,
-      icon: <Category />,
-      guard: PermissionGuard,
-      permission: "part_category_access",
-    },
+
     {
       path: "/product/car-year",
-      name: "Car Year",
+      name: "years",
       component: CarYear,
       icon: <Calendar />,
       guard: PermissionGuard,
@@ -359,15 +424,39 @@ const productManagementRoutes = {
     },
     {
       path: "/product/tags",
-      name: "Tags",
+      name: "tags",
       component: Tags,
       icon: <Tag />,
       guard: PermissionGuard,
       permission: "product_tag_access",
     },
     {
+      path: "/product/car-types",
+      name: "carTypes",
+      component: CarTypes,
+      icon: <Commute />,
+      guard: PermissionGuard,
+      permission: "car_type_access",
+    },
+    {
+      path: "/product/manufacturers",
+      name: "manufacturers",
+      component: Manufacturers,
+      icon: <Build />,
+      guard: PermissionGuard,
+      permission: "manufacturers_access",
+    },
+    {
+      path: "/product/origin-countries",
+      name: "origins",
+      component: Origins,
+      icon: <TripOrigin />,
+      guard: PermissionGuard,
+      permission: "origin_countries_access",
+    },
+    {
       path: "/product/products",
-      name: "Products",
+      name: "products",
       component: Products,
       icon: <ShoppingBag />,
       guard: PermissionGuard,
@@ -376,6 +465,12 @@ const productManagementRoutes = {
   ],
   guard: ProductManagementGuard,
   permission: "product_management_access",
+};
+
+const viewMainCategory = {
+  path: "/product/main-categories/:id",
+  component: ViewMainCategory,
+  children: null,
 };
 
 const viewCategory = {
@@ -409,6 +504,24 @@ const viewProductTag = {
   children: null,
 };
 
+const viewCarType = {
+  path: "/product/car-types/:id",
+  component: ViewCarType,
+  children: null,
+};
+
+const viewManufacturer = {
+  path: "/product/manufacturers/:id",
+  component: ViewManufacturer,
+  children: null,
+};
+
+const viewOrigin = {
+  path: "/product/origin-countries/:id",
+  component: ViewOrigin,
+  children: null,
+};
+
 const viewProduct = {
   path: "/product/products/:id",
   component: ViewProduct,
@@ -416,22 +529,22 @@ const viewProduct = {
 };
 
 const vendorRoutes = {
-  id: "Vendor",
+  id: "vendorMgt",
   path: "/vendor",
   icon: <GroupWork />,
   component: null,
   children: [
     {
       path: "/vendor/vendors",
-      name: "Vendors",
+      name: "vendors",
       component: Vendors,
       icon: <RecentActors />,
       guard: PermissionGuard,
       permission: "add_vendor_access",
     },
     {
-      path: "/vendor/stores",
-      name: "Stores",
+      path: "/vendor/branches",
+      name: "branches",
       component: Stores,
       icon: <Store />,
       guard: PermissionGuard,
@@ -439,20 +552,37 @@ const vendorRoutes = {
     },
     {
       path: "/vendor/total-orders",
-      name: "Total Orders",
-      component: PendingOrders,
+      name: "totalOrders",
+      component: TotalOrders,
       icon: <ShoppingBasket />,
       guard: PermissionGuard,
       permission: "show_orders_access",
     },
 
     {
+      path: "/vendor/wholesale-orders",
+      name: "wholesaleOrders",
+      component: WholesaleOrders,
+      icon: <ShoppingBasket />,
+      guard: PermissionGuard,
+      permission: "wholesale_orders_access",
+    },
+
+    {
       path: "/vendor/invoices",
-      name: "Invoices",
+      name: "invoices",
       component: Invoices,
       icon: <Receipt />,
       guard: PermissionGuard,
       permission: "show_invoices_access",
+    },
+    {
+      path: "/vendor/wholesale-invoices",
+      name: "wholesaleInvoices",
+      component: WholesaleInvoices,
+      icon: <Receipt />,
+      guard: PermissionGuard,
+      permission: "wholesale_invoices_access",
     },
   ],
   guard: VendorsGuard,
@@ -493,7 +623,7 @@ const viewVendorInvoice = {
 };
 
 const viewStore = {
-  path: "/vendor/stores/:id",
+  path: "/vendor/branches/:id",
   component: ViewStore,
   children: null,
 };
@@ -507,16 +637,21 @@ const viewInvoice = {
   component: ViewInvoice,
   children: null,
 };
+const viewWholesaleInvoice = {
+  path: "/vendor/wholesale-invoices/:id",
+  component: ViewWholeSaleInvoice,
+  children: null,
+};
 
 const geographyRoutes = {
-  id: "Geography",
+  id: "geography",
   path: "/geography",
   icon: <Map />,
   component: null,
   children: [
     {
       path: "/geography/countries",
-      name: "Countries",
+      name: "countries",
       component: Countries,
       icon: <Public />,
       guard: PermissionGuard,
@@ -524,7 +659,7 @@ const geographyRoutes = {
     },
     {
       path: "/geography/areas",
-      name: "Areas",
+      name: "areas",
       component: Areas,
       icon: <Explore />,
       guard: PermissionGuard,
@@ -532,7 +667,7 @@ const geographyRoutes = {
     },
     {
       path: "/geography/cities",
-      name: "Cities",
+      name: "cities",
       component: Cities,
       icon: <Room />,
       guard: PermissionGuard,
@@ -562,7 +697,7 @@ const viewCity = {
 };
 
 const advancedReportsRoute = {
-  id: "Reports",
+  id: "reports",
   path: "/reports",
   icon: <Clipboard />,
   component: Reports,
@@ -572,8 +707,8 @@ const advancedReportsRoute = {
 };
 
 const storesRoute = {
-  id: "Stores",
-  path: "/vendor/stores",
+  id: "branches",
+  path: "/vendor/branches",
   icon: <Store />,
   component: Stores,
   children: null,
@@ -582,10 +717,10 @@ const storesRoute = {
 };
 
 const pendingOrdersRoute = {
-  id: "Total Orders",
+  id: "totalOrders",
   path: "/vendor/total-orders",
   icon: <ShoppingBasket />,
-  component: PendingOrders,
+  component: TotalOrders,
   children: null,
   guard: OrdersGuard,
   permission: "access_tabs_separately",
@@ -602,7 +737,7 @@ const pendingOrdersRoute = {
 // };
 
 const invoicesRoute = {
-  id: "Invoices",
+  id: "invoices",
   path: "/vendor/invoices",
   icon: <Receipt />,
   component: Invoices,
@@ -611,8 +746,18 @@ const invoicesRoute = {
   permission: "access_tabs_separately",
 };
 
+const adsRoute = {
+  id: "ads",
+  path: "/ads",
+  icon: <PermMedia />,
+  badge: "11",
+  component: Ads,
+  children: null,
+  permission: "tickets_access",
+};
+
 const ticketsRoute = {
-  id: "Support",
+  id: "tickets",
   path: "/support",
   icon: <QuestionAnswer />,
   badge: "11",
@@ -626,8 +771,23 @@ const viewTicket = {
   children: null,
 };
 
+const productQuestionsRoute = {
+  id: "productInquiries",
+  path: "/product/questions",
+  icon: <HelpOutline />,
+  badge: "11",
+  component: ProductQuestions,
+  children: null,
+  permission: "fetch_vendor_questions",
+};
+const viewProductQuestion = {
+  path: "/product/questions/:id",
+  component: ViewProductQuestion,
+  children: null,
+};
+
 const helpRoute = {
-  id: "Help",
+  id: "help",
   path: "/help",
   icon: <LiveHelp />,
   component: Help,
@@ -636,7 +796,7 @@ const helpRoute = {
 };
 
 const manageAccountRoute = {
-  id: "Manage Account",
+  id: "manageAccount",
   path: "/profile",
   icon: <VpnKey />,
   component: ManageAccount,
@@ -645,11 +805,16 @@ const manageAccountRoute = {
   permission: "profile_password_edit",
 };
 
+const languageRoute = {
+  id: "Language",
+  icon: <Language />,
+  children: null,
+};
+
 const logoutRoute = {
-  id: "Logout",
+  id: "logout",
   path: "/sign-in",
   icon: <LogOut />,
-  component: Dashborad,
   children: null,
 };
 
@@ -684,6 +849,7 @@ export const dashboardLayoutRoutes = [
   viewArea,
   viewCity,
   advancedReportsRoute,
+  adsRoute,
   storesRoute,
   pendingOrdersRoute,
   // ordersHistoryRoute,
@@ -693,12 +859,16 @@ export const dashboardLayoutRoutes = [
   viewUser,
   viewStaff,
   viewLog,
+  viewMainCategory,
   viewCategory,
   viewCarMade,
   viewCarModel,
   viewPartCategory,
   viewCarYear,
   viewProductTag,
+  viewCarType,
+  viewManufacturer,
+  viewOrigin,
   viewProduct,
   viewVendor,
   vendorOrders,
@@ -708,8 +878,11 @@ export const dashboardLayoutRoutes = [
   viewStore,
   viewOrder,
   viewInvoice,
+  viewWholesaleInvoice,
   ticketsRoute,
   viewTicket,
+  productQuestionsRoute,
+  viewProductQuestion,
   helpRoute,
   manageAccountRoute,
 ];
@@ -727,16 +900,16 @@ export const sidebarRoutes = [
   productManagementRoutes,
   vendorRoutes,
   geographyRoutes,
-  viewCountry,
-  viewArea,
-  viewCity,
   advancedReportsRoute,
+  adsRoute,
   storesRoute,
   pendingOrdersRoute,
   // ordersHistoryRoute,
   invoicesRoute,
   ticketsRoute,
+  productQuestionsRoute,
   helpRoute,
   manageAccountRoute,
+  languageRoute,
   logoutRoute,
 ];

@@ -27,7 +27,14 @@ import {
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
 import { spacing } from "@material-ui/system";
-import { UnfoldLess } from "@material-ui/icons";
+import {
+  Add,
+  ArrowBack,
+  Delete,
+  Edit,
+  ExpandMore,
+  UnfoldLess,
+} from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
 import StoresForm from "./StoresForm";
@@ -41,34 +48,107 @@ const Divider = styled(MuiDivider)(spacing);
 const Paper = styled(MuiPaper)(spacing);
 const Button = styled(MuiButton)(spacing);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
+  memberBadge: {
+    background: "#98A9FF",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
+  },
+  footer: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: theme.direction === "rtl" ? 25 : 40,
+    paddingLeft: theme.direction === "rtl" ? 40 : 25,
+  },
   button: {
-    background: "#4caf50",
-    color: "#ffffff",
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
     "&:hover": {
-      background: "#388e3c",
+      background: "#EF9300",
+      color: "#ffffff",
     },
     marginRight: "5px",
   },
-});
+  backBtn: {
+    width: "fit-content",
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    color: "#424242",
+    fontWeight: "bold",
+    "&:hover": {
+      color: "#7B7B7B",
+    },
+  },
+  backIcon: {
+    marginRight: theme.direction === "rtl" ? 0 : 5,
+    marginLeft: theme.direction === "rtl" ? 5 : 0,
+  },
+  actionBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
+  },
+}));
 
 function CustomPagination(props) {
   const { state, api } = props;
   const classes = useStyles();
 
   return (
-    <Pagination
-      className={classes.root}
-      color="primary"
-      page={state.pagination.page}
-      count={state.pagination.pageCount}
-      showFirstButton={true}
-      showLastButton={true}
-      onChange={(event, value) => api.current.setPage(value)}
-    />
+    <div className={classes.footer}>
+      <Pagination
+        className={classes.root}
+        color="primary"
+        page={state.pagination.page}
+        count={state.pagination.pageCount}
+        showFirstButton={true}
+        showLastButton={true}
+        onChange={(event, value) => api.current.setPage(value)}
+        variant="outlined"
+        shape="rounded"
+      />
+      <Select
+        style={{ height: 35 }}
+        variant="outlined"
+        value={state.pagination.pageSize}
+        onChange={(e) => api.current.setPageSize(e.target.value)}
+        displayEmpty
+        IconComponent={ExpandMore}
+        MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "center",
+          },
+          getContentAnchorEl: null,
+        }}
+      >
+        <MenuItem value={10}>10 records / page</MenuItem>
+        <MenuItem value={25}>25 records / page</MenuItem>
+        <MenuItem value={100}>100 records / page</MenuItem>
+      </Select>
+    </div>
   );
 }
 
@@ -101,7 +181,7 @@ function Stores() {
   const userPermissions = useSelector((state) => state.userPermissions);
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [openPopupTitle, setOpenPopupTitle] = useState("New Store");
+  const [openPopupTitle, setOpenPopupTitle] = useState("New Branch");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rowsCount, setRowsCount] = useState(0);
@@ -117,28 +197,65 @@ function Stores() {
   const [rowsToDelete, setRowsToDelete] = useState([]);
   const [countries, setCountries] = useState([]);
 
+  const [pageHeader, setPageHeader] = useState("Branches");
+  const [viewMode, setViewMode] = useState("data-grid");
+
   const location = useLocation();
 
   const columns = [
-    { field: "id", headerName: "ID", width: 55 },
-    { field: "address", headerName: "Address", width: 200, flex: 1 },
     {
-      field: "moderator_name",
-      headerName: "Moderator Name",
-      width: 200,
-      flex: 1,
+      field: "company",
+      headerName: "Company",
+      width: 100,
+      renderCell: (params) => params.row.vendor?.company_name,
     },
     {
-      field: "moderator_phone",
-      headerName: "Moderator Phone",
-      width: 200,
-      flex: 1,
+      field: "name",
+      headerName: "Branch",
+      width: 100,
     },
     {
-      field: "moderator_alt_phone",
-      headerName: "Moderator Alt Phone",
-      width: 200,
-      flex: 1,
+      field: "serial_id",
+      headerName: "Serial",
+      width: 80,
+    },
+    {
+      field: "vendor_name",
+      headerName: "Vendor Name",
+      width: 100,
+    },
+    {
+      field: "vendor_type",
+      headerName: "Vendor Type",
+      width: 120,
+      renderCell: (params) =>
+        params.row.vendor?.type == "1"
+          ? "Retailer"
+          : params.row.vendor?.type == "2"
+          ? "Wholesaler"
+          : "Retailer/Wholesaler",
+    },
+    {
+      field: "head_center",
+      headerName: "Address Type",
+      width: 100,
+      renderCell: (params) => (params.value ? "*Billing*" : "Shipping"),
+    },
+    { field: "address", headerName: "Address", width: 100 },
+
+    {
+      field: "members",
+      headerName: "Members",
+      width: 150,
+      renderCell: (params) => (
+        <div>
+          {params.value?.map((member) => (
+            <span key={member.id} className={classes.memberBadge}>
+              {member.name}
+            </span>
+          ))}
+        </div>
+      ),
     },
     {
       field: "actions",
@@ -157,7 +274,7 @@ function Stores() {
               // padding: "5px"
             }}
           >
-            {userPermissions.includes("stores_show") ? (
+            {/* {userPermissions.includes("stores_show") ? (
               <Button
                 style={{ marginRight: "5px" }}
                 variant="contained"
@@ -169,19 +286,19 @@ function Stores() {
               >
                 View
               </Button>
-            ) : null}
+            ) : null} */}
             {userPermissions.includes("stores_edit") ? (
               <Button
                 style={{ marginRight: "5px" }}
-                color="primary"
+                className={classes.actionBtn}
+                startIcon={<Edit />}
+                // color="primary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => {
                   setSelectedItem(params.row);
-                  setOpenPopup(true);
-                  setOpenPopupTitle(
-                    "Update Store Details"
-                  ); /****** Customize ******/
+                  setViewMode("edit");
+                  setPageHeader("Update Branch Details");
                 }}
               >
                 Edit
@@ -190,9 +307,11 @@ function Stores() {
 
             {userPermissions.includes("stores_delete") ? (
               <Button
-                color="secondary"
+                className={classes.actionBtn}
+                startIcon={<Delete />}
+                // color="secondary"
                 variant="contained"
-                size="small"
+                // size="small"
                 onClick={() => openDeleteConfirmation(params.row.id)}
               >
                 Delete
@@ -204,8 +323,8 @@ function Stores() {
     },
   ];
 
-  const handlePageSize = (event) => {
-    setPageSize(event.target.value);
+  const handlePageSize = ({ pageSize }) => {
+    setPageSize(pageSize);
   };
 
   const handlePageChange = ({ page }) => {
@@ -306,7 +425,7 @@ function Stores() {
       .catch(() => {
         alert("Failed to Fetch Countries List");
       });
-  });
+  }, []);
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
@@ -342,128 +461,137 @@ function Stores() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode]);
 
   return (
     <React.Fragment>
       <Helmet title="Data Grid" />
       <Typography variant="h3" gutterBottom display="inline">
-        Stores
+        {pageHeader}
       </Typography>
 
       <Divider my={6} />
 
-      <Grid container flex>
-        {userPermissions.includes("stores_create") ? (
-          <Button
-            mb={3}
-            className={classes.button}
-            variant="contained"
-            onClick={() => {
-              setOpenPopupTitle("New Store");
-              setOpenPopup(true);
-              setSelectedItem("");
-            }}
-          >
-            Add Store
-          </Button>
-        ) : null}
+      {viewMode === "data-grid" ? (
+        <Card mb={6}>
+          <Paper mb={2}>
+            <Toolbar
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+                borderRadius: "3px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-end" }}>
+                {userPermissions.includes("stores_create") ? (
+                  <Button
+                    className={classes.button}
+                    variant="contained"
+                    onClick={() => {
+                      setSelectedItem("");
+                      setViewMode("add");
+                      setPageHeader("New Branch");
+                    }}
+                    startIcon={<Add />}
+                  >
+                    Add Branch
+                  </Button>
+                ) : null}
 
-        {userPermissions.includes("stores_delete") ? (
-          <Button
-            mb={3}
-            color="secondary"
-            variant="contained"
-            disabled={rowsToDelete.length < 2}
-            onClick={() => {
-              setOpenMassDeleteDialog(true);
-            }}
-          >
-            Delete Selected
-          </Button>
-        ) : null}
-      </Grid>
+                {userPermissions.includes("stores_delete") ? (
+                  <Button
+                    startIcon={<Delete />}
+                    color="secondary"
+                    variant="contained"
+                    disabled={rowsToDelete.length < 2}
+                    onClick={() => {
+                      setOpenMassDeleteDialog(true);
+                    }}
+                    style={{ height: 40, borderRadius: 0 }}
+                  >
+                    Delete Selected
+                  </Button>
+                ) : null}
+              </div>
 
-      <Card mb={6}>
-        <Paper mb={2}>
-          <Toolbar
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              borderRadius: "3px",
-            }}
-          >
-            <FormControl variant="outlined">
-              <Select
-                value={pageSize}
-                onChange={handlePageSize}
-                autoWidth
-                IconComponent={UnfoldLess}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "center",
-                  },
-                  transformOrigin: {
-                    vertical: "top",
-                    horizontal: "center",
-                  },
-                  getContentAnchorEl: () => null,
+              <div>
+                <Grid container spacing={1} alignItems="flex-end">
+                  <Grid item>
+                    <Search />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="input-with-icon-grid"
+                      label="Search"
+                      onChange={handleSearchInput}
+                    />
+                  </Grid>
+                </Grid>
+              </div>
+            </Toolbar>
+          </Paper>
+          <Paper>
+            <div style={{ width: "100%" }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                page={page}
+                pageSize={pageSize}
+                rowCount={rowsCount}
+                sortingOrder={["desc", "asc"]}
+                sortModel={sortModel}
+                columnBuffer={pageSize}
+                paginationMode="server"
+                sortingMode="server"
+                components={{
+                  Pagination: CustomPagination,
+                  LoadingOverlay: CustomLoadingOverlay,
                 }}
-              >
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
-
-            <div>
-              <Grid container spacing={1} alignItems="flex-end">
-                <Grid item>
-                  <Search />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    id="input-with-icon-grid"
-                    label="Search"
-                    onChange={handleSearchInput}
-                  />
-                </Grid>
-              </Grid>
+                loading={loading}
+                checkboxSelection
+                disableColumnMenu
+                autoHeight={true}
+                onRowClick={
+                  userPermissions.includes("stores_show")
+                    ? ({ row }) =>
+                        history.push(`${location.pathname}/${row.id}`)
+                    : null
+                }
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSize}
+                onSortModelChange={handleSortModelChange}
+                onSelectionChange={(newSelection) => {
+                  setRowsToDelete(newSelection.rowIds);
+                }}
+              />
             </div>
-          </Toolbar>
-        </Paper>
-        <Paper>
-          <div style={{ width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              page={page}
-              pageSize={pageSize}
-              rowCount={rowsCount}
-              sortingOrder={["desc", "asc"]}
-              sortModel={sortModel}
-              columnBuffer={pageSize}
-              paginationMode="server"
-              sortingMode="server"
-              components={{
-                Pagination: CustomPagination,
-                LoadingOverlay: CustomLoadingOverlay,
-              }}
-              loading={loading}
-              checkboxSelection
-              disableColumnMenu
-              autoHeight={true}
-              onPageChange={handlePageChange}
-              onSortModelChange={handleSortModelChange}
-              onSelectionChange={(newSelection) => {
-                setRowsToDelete(newSelection.rowIds);
-              }}
-            />
+          </Paper>
+        </Card>
+      ) : (
+        <Card mb={6} style={{ padding: "50px 60px" }}>
+          <div
+            className={classes.backBtn}
+            onClick={() => {
+              setViewMode("data-grid");
+              setPageHeader("Branches");
+            }}
+          >
+            <ArrowBack className={classes.backIcon} />
+            <span>Back</span>
           </div>
-        </Paper>
-      </Card>
+
+          <Divider my={3} />
+          <StoresForm
+            setPage={setPage}
+            setOpenPopup={setOpenPopup}
+            itemToEdit={selectedItem}
+            countries={countries}
+            setViewMode={setViewMode}
+            setPageHeader={setPageHeader}
+          />
+        </Card>
+      )}
       <Popup
         title={openPopupTitle}
         openPopup={openPopup}
@@ -487,7 +615,7 @@ function Stores() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this Store? <br />
+            Are you sure you want to delete this Branch? <br />
             If this was by accident please press Back
           </DialogContentText>
         </DialogContent>
@@ -520,7 +648,7 @@ function Stores() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete all the selected Stores? <br />
+            Are you sure you want to delete all the selected Branches? <br />
             If you wish press Yes, otherwise press Back.
           </DialogContentText>
         </DialogContent>
