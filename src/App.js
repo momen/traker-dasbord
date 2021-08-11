@@ -44,7 +44,7 @@ function App({ userToken, theme, lang }) {
   // beginning as no token is provided in the headers
   useEffect(() => {
     axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-    axios.defaults.headers.common["Accept-Language"] = "ar";
+    axios.defaults.headers.common["Accept-Language"] = lang;
 
     axios.interceptors.response.use(
       (res) => {
@@ -68,6 +68,8 @@ function App({ userToken, theme, lang }) {
     document
       .getElementById("body")
       .setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+
+    axios.defaults.headers.common["Accept-Language"] = lang;
   }, [lang]);
 
   return (
