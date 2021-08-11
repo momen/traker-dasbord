@@ -243,9 +243,7 @@ function Products() {
   const [transmissionsList, setTransmissionsList] = useState([]);
   const [productTypes, setProductTypes] = useState([]);
   const [productTags, setProductTags] = useState([]);
-  const [sortModel, setSortModel] = useState([
-    { field: "", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "", sort: "asc" }]);
   const [rowsToDelete, setRowsToDelete] = useState([]);
   const [openApproveDialog, setOpenApproveDialog] = useState(false);
   const [openRejectDialog, setOpenRejectDialog] = useState(false);
@@ -257,7 +255,7 @@ function Products() {
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
     { field: "name", headerName: "Name", width: 80 },
-    { field: "serial_number", headerName: "Serial Number", width: 100 },
+    { field: "serial_coding", headerName: "Serial", width: 100 },
     {
       field: "store_name",
       headerName: "Store",
@@ -270,7 +268,12 @@ function Products() {
       headerName: "Type",
       width: 65,
       sortable: false,
-      renderCell: (params) => params.row.producttype_id?.producttype,
+      renderCell: (params) => (
+        <span style={{ textTransform: "capitalize" }}>
+          {" "}
+          {params.row.product_type?.producttype}
+        </span>
+      ),
     },
     { field: "price", headerName: "Price", width: 80 },
     {

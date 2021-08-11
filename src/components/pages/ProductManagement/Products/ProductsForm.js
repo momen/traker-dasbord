@@ -153,7 +153,7 @@ function ProductsForm({
     quantity: itemToEdit ? parseInt(itemToEdit.quantity) : "",
     qty_reminder: itemToEdit ? parseInt(itemToEdit.qty_reminder) : "",
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
-    producttype_id: itemToEdit ? itemToEdit.producttype_id?.id : "",
+    producttype_id: itemToEdit ? itemToEdit.product_type?.id : "",
     photo: [],
   });
 
