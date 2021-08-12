@@ -187,7 +187,10 @@ function ViewProduct({ match }) {
                 Product Type
               </StyledTableCell>
               <StyledTableCell align="left">
-                <p className={classes.rowContent}>
+                <p
+                  className={classes.rowContent}
+                  style={{ textTransform: "capitalize" }}
+                >
                   {product.producttype_id?.producttype}
                 </p>
               </StyledTableCell>

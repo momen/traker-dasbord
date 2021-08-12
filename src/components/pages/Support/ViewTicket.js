@@ -301,7 +301,7 @@ function ViewTicket({ match }) {
                 {ticket.vendor_email}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`actions`}>
+            {/* <StyledTableRow key={`actions`}>
               <StyledTableCell component="th" scope="row">
                 Actions
               </StyledTableCell>
@@ -316,7 +316,7 @@ function ViewTicket({ match }) {
                   </Button>
                 ) : null}
               </StyledTableCell>
-            </StyledTableRow>
+            </StyledTableRow> */}
           </TableBody>
         </Table>
       </TableContainer>
