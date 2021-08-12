@@ -379,7 +379,7 @@ function CarMade() {
       .catch(() => {
         alert("Failed to Fetch Car Types List");
       });
-  }, []);
+  }, [lang]);
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {

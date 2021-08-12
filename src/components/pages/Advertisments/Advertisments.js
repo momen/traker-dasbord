@@ -102,7 +102,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Support() {
   const classes = useStyles();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const { userPermissions, lang } = useSelector((state) => state);
   const { t } = useTranslation();
   const [FAQs, setFAQs] = useState([]);
   const [carouselCarAds, setCarouselCarAds] = useState([]);
@@ -251,7 +251,7 @@ function Support() {
         );
       });
     }
-  }, [searchValue, openPopup, openDeleteDialog, adsPositions]);
+  }, [searchValue, openPopup, openDeleteDialog, adsPositions, lang]);
 
   return (
     <>

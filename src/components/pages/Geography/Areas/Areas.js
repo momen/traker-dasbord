@@ -188,7 +188,7 @@ function CustomLoadingOverlay() {
 
 function Countries() {
   const classes = useStyles();
-  const { userPermissions, user } = useSelector((state) => state);
+  const { userPermissions, user, lang } = useSelector((state) => state);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -397,7 +397,7 @@ function Countries() {
       .catch(() => {
         alert("Failed to Fetch data");
       });
-  }, []);
+  }, [lang]);
 
   // Request the page records either on the initial render, data changed (added/edited/deleted)
   // or whenever the page changes (Pagination)
@@ -434,7 +434,7 @@ function Countries() {
           alert("Failed to Search");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode,lang]);
 
   return (
     <React.Fragment>

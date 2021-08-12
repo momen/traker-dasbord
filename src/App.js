@@ -68,8 +68,6 @@ function App({ userToken, theme, lang }) {
     document
       .getElementById("body")
       .setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
-
-    axios.defaults.headers.common["Accept-Language"] = lang;
   }, [lang]);
 
   return (

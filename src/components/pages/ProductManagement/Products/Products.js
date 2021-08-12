@@ -710,7 +710,7 @@ function Products() {
       .catch(() => {
         alert("Failed to Fetch Product Types List");
       });
-  }, []);
+  }, [lang]);
 
   // Request the page records either on the initial render, data changed (added/edited/deleted)
   // or whenever the page changes (Pagination)

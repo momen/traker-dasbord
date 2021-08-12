@@ -166,7 +166,7 @@ function CustomLoadingOverlay() {
 
 function Countries() {
   const classes = useStyles();
-  const { userPermissions, user } = useSelector((state) => state);
+  const { userPermissions, lang } = useSelector((state) => state);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -389,7 +389,7 @@ function Countries() {
           alert("Failed to Search");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, lang]);
 
   return (
     <React.Fragment>

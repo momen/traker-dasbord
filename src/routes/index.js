@@ -753,7 +753,7 @@ const adsRoute = {
   badge: "11",
   component: Ads,
   children: null,
-  permission: "tickets_access",
+  permission: "advertisements_access",
 };
 
 const ticketsRoute = {

@@ -392,7 +392,7 @@ function PartCategory() {
       .catch(() => {
         alert("Failed to Fetch data");
       });
-  }, []);
+  }, [lang]);
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {

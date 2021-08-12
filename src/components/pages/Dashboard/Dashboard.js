@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Dashboard() {
   const classes = useStyles();
-  const { user } = useSelector((state) => state);
+  const { user, lang } = useSelector((state) => state);
   const [barChartLabels, setBarChartLabels] = useState("");
   const [dashboardInfo, setDashboardInfo] = useState({});
   const [sales, setSales] = useState([]);
@@ -67,7 +67,7 @@ function Dashboard() {
       .catch((res) => {
         alert("Failed to Fetch data");
       });
-  }, [filterData]);
+  }, [filterData, lang]);
 
   return (
     <>
