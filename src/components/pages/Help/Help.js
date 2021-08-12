@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Support() {
   const classes = useStyles();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const { userPermissions, lang } = useSelector((state) => state);
   const [FAQs, setFAQs] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState(
@@ -175,7 +175,7 @@ function Support() {
           alert("Failed to Fetch data");
         });
     }
-  }, [searchValue, openPopup, openDeleteDialog]);
+  }, [searchValue, openPopup, openDeleteDialog, lang]);
 
   return (
     <>

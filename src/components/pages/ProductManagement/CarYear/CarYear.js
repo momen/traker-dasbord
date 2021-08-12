@@ -147,7 +147,7 @@ function CustomLoadingOverlay() {
 
 function CarYear() {
   const classes = useStyles();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const { userPermissions, lang } = useSelector((state) => state);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -359,7 +359,7 @@ function CarYear() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, lang]);
 
   return (
     <React.Fragment>

@@ -150,7 +150,7 @@ function CustomLoadingOverlay() {
 
 function PendingOrders() {
   const classes = useStyles();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const { userPermissions, lang } = useSelector((state) => state);
   const user = useSelector((state) => state.user);
   const history = useHistory();
   const [rows, setRows] = useState([]);
@@ -185,7 +185,8 @@ function PendingOrders() {
       field: "wholesale_total",
       headerName: "Order Total",
       width: 150,
-      renderCell: (params) => `${new Intl.NumberFormat().format(params.value)} SAR`,
+      renderCell: (params) =>
+        `${new Intl.NumberFormat().format(params.value)} SAR`,
     },
     {
       field: "status",
@@ -391,7 +392,7 @@ function PendingOrders() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel, pageSize, statusToFilterBy]);
+  }, [page, searchValue, sortModel, pageSize, statusToFilterBy, lang]);
 
   return (
     <React.Fragment>

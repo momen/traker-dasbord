@@ -129,7 +129,7 @@ function CustomLoadingOverlay() {
 
 function Support() {
   const classes = useStyles();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const { userPermissions, lang } = useSelector((state) => state);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(1);
@@ -252,7 +252,7 @@ function Support() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel, pageSize]);
+  }, [page, searchValue, sortModel, pageSize, lang]);
 
   return (
     <React.Fragment>

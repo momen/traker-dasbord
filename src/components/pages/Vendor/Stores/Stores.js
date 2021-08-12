@@ -178,7 +178,7 @@ function CustomLoadingOverlay() {
 function Stores() {
   const classes = useStyles();
   const history = useHistory();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const { userPermissions, lang } = useSelector((state) => state);
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState("New Branch");
@@ -461,7 +461,7 @@ function Stores() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode, lang]);
 
   return (
     <React.Fragment>

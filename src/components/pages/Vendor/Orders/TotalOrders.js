@@ -150,7 +150,7 @@ function CustomLoadingOverlay() {
 
 function PendingOrders() {
   const classes = useStyles();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const { userPermissions, lang } = useSelector((state) => state);
   const user = useSelector((state) => state.user);
   const history = useHistory();
   const [rows, setRows] = useState([]);
@@ -371,7 +371,7 @@ function PendingOrders() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, sortModel, pageSize, statusToFilterBy]);
+  }, [page, searchValue, sortModel, pageSize, statusToFilterBy, lang]);
 
   return (
     <React.Fragment>

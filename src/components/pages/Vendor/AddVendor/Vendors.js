@@ -170,7 +170,7 @@ function CustomLoadingOverlay() {
 function Vendors() {
   const classes = useStyles();
   const history = useHistory();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const { userPermissions, lang } = useSelector((state) => state);
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState("New Vendor");
@@ -548,7 +548,7 @@ function Vendors() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, lang]);
 
   return (
     <React.Fragment>

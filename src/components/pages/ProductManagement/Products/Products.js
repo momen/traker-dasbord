@@ -216,7 +216,7 @@ function CustomLoadingOverlay() {
 
 function Products() {
   const classes = useStyles();
-  const { userPermissions, user } = useSelector((state) => state);
+  const { userPermissions, user, lang } = useSelector((state) => state);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -243,9 +243,7 @@ function Products() {
   const [transmissionsList, setTransmissionsList] = useState([]);
   const [productTypes, setProductTypes] = useState([]);
   const [productTags, setProductTags] = useState([]);
-  const [sortModel, setSortModel] = useState([
-    { field: "", sort: "asc" },
-  ]);
+  const [sortModel, setSortModel] = useState([{ field: "", sort: "asc" }]);
   const [rowsToDelete, setRowsToDelete] = useState([]);
   const [openApproveDialog, setOpenApproveDialog] = useState(false);
   const [openRejectDialog, setOpenRejectDialog] = useState(false);
@@ -746,7 +744,7 @@ function Products() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode, lang]);
 
   return (
     <React.Fragment>
