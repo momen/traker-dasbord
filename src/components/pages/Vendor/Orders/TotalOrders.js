@@ -160,7 +160,7 @@ function PendingOrders() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
+  const [sortModel, setSortModel] = useState([{ field: "", sort: "asc" }]);
   const [openApproveDialog, setOpenApproveDialog] = useState(false);
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const [orderToApproveOrCancel, setOrderToApproveOrCancel] = useState();
@@ -210,8 +210,10 @@ function PendingOrders() {
               </Button>
             ) : null} */}
             {userPermissions.includes("approve_orders") &&
-            user.roles[0].id !== 1 &&
-            params.row.need_approval ? (
+            user.roles[0].id != 1 &&
+            params.row.need_approval &&
+            !params.row.expired &&
+            !params.row.status === "cancelled" ? (
               <Button
                 style={{ marginRight: "5px" }}
                 className={classes.approveButton}
@@ -228,7 +230,8 @@ function PendingOrders() {
 
             {userPermissions.includes("cancel_orders") &&
             user.roles[0].id !== 1 &&
-            params.row.status === "pending" ? (
+            params.row.status === "pending" &&
+            params.row.need_approval ? (
               <Button
                 style={{ marginRight: "5px" }}
                 className={classes.cancelButton}
