@@ -215,7 +215,7 @@ function PendingOrders() {
             user.roles[0].id != 1 &&
             params.row.need_approval &&
             !params.row.expired &&
-            !params.row.status === "cancelled" ? (
+            params.row.status !== "cancelled" ? (
               <Button
                 style={{ marginRight: "5px" }}
                 className={classes.approveButton}
