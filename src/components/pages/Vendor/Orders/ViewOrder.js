@@ -154,7 +154,7 @@ function ViewOrder({ match }) {
                 Payment Way
               </StyledTableCell>
               <StyledTableCell align="left">
-                {order.paymentway?.payment_name}
+                {order.payment?.payment_name}
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`paid`}>
