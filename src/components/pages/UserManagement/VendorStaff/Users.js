@@ -37,6 +37,7 @@ import {
   UnfoldLess,
   ExpandMore,
   ArrowBack,
+  Edit,
 } from "@material-ui/icons";
 import Popup from "../../../Popup";
 import axios from "../../../../axios";
@@ -185,7 +186,7 @@ function CustomLoadingOverlay() {
 
 function Users() {
   const classes = useStyles();
-  const userPermissions = useSelector((state) => state.userPermissions);
+  const { userPermissions, lang } = useSelector((state) => state);
   const history = useHistory();
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
@@ -214,6 +215,12 @@ function Users() {
     { field: "id", headerName: "ID", width: 55 },
     { field: "name", headerName: "Name", width: 100 },
     { field: "email", headerName: "Email", width: 160 },
+    {
+      field: "roles",
+      headerName: "Role",
+      width: 100,
+      renderCell: (params) => params.value?.title,
+    },
     { field: "serial_id", headerName: "Serial", width: 160 },
     {
       field: "stores",
@@ -279,6 +286,24 @@ function Users() {
                 View
               </Button>
             ) : null} */}
+
+            {userPermissions.includes("user_edit_by_vendor") ? (
+              <Button
+                className={classes.actionBtn}
+                startIcon={<Edit />}
+                style={{ marginRight: "5px" }}
+                color="primary"
+                variant="contained"
+                // size="small"
+                onClick={() => {
+                  setSelectedItem(params.row);
+                  setOpenPopup(true);
+                  setOpenPopupTitle("Edit User");
+                }}
+              >
+                Edit
+              </Button>
+            ) : null}
 
             {userPermissions.includes("user_delete_by_vendor") ? (
               <Button
@@ -436,7 +461,7 @@ function Users() {
       .catch(() => {
         alert("Failed to Fetch Stores List");
       });
-  }, []);
+  }, [lang]);
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
@@ -472,7 +497,7 @@ function Users() {
           alert("Failed to Fetch data");
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode]);
+  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode, lang]);
 
   return (
     <React.Fragment>
@@ -591,6 +616,7 @@ function Users() {
             stores={stores}
             setViewMode={setViewMode}
             setPageHeader={setPageHeader}
+            itemToEdit={selectedItem}
           />
         </Card>
       )}
@@ -604,6 +630,7 @@ function Users() {
           setOpenPopup={setOpenPopup}
           rolesList={rolesList}
           stores={stores}
+          itemToEdit={selectedItem}
         />
       </Popup>
       <Dialog

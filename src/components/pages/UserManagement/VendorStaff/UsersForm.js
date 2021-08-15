@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     // alignItems: "center",
-    // width: "30vw",
+    width: "40vw",
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     margin: theme.spacing(3, 2, 2),
-    width: "15%",
+    width: "20%",
   },
   resetButton: {
     height: 40,
@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
     //   color: "#ffffff",
     // },
     margin: theme.spacing(3, 2, 2),
-    width: "15%",
+    width: "20%",
   },
   errorsContainer: {
     marginBottom: theme.spacing(1),
@@ -84,18 +84,24 @@ function UsersForm({
   const classes = useStyles();
 
   const validationSchema = Yup.object().shape({
-    role: Yup.string().required(),
+    role: !itemToEdit ? Yup.string().required() : Yup.string().notRequired(),
+    roles: itemToEdit ? Yup.string().required() : Yup.string().notRequired(),
     email: Yup.string()
       .required("This field is Required.")
       .email("Please enter a valid Email"),
+    name: itemToEdit
+      ? Yup.string().required("This field is Required.")
+      : Yup.string().notRequired(),
   });
 
   const formRef = useRef();
   //Customize
   const [formData, updateFormData] = useState({
-    email: "",
+    email: itemToEdit?.email || "",
+    name: itemToEdit?.name || "",
     role: "",
-    stores: [],
+    roles: itemToEdit?.roles.id || "",
+    stores: itemToEdit?.stores || [],
   });
   const [autoSelectStoreError, setAutoSelectStoreError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -117,30 +123,51 @@ function UsersForm({
   const handleSubmit = async () => {
     // e.preventDefault();
 
-    if (formData.stores.length === 0) {
+    if (formData.stores.length === 0 && !itemToEdit) {
       setAutoSelectStoreError(true);
       return;
     }
 
-    let data = {
-      email: formData.email,
-      role: parseInt(formData.role),
-      stores: JSON.stringify(formData.stores.map((val) => val.id)),
-    };
+    // let data = {
+    //   email: formData.email,
+    //   role: parseInt(formData.role),
+    //   stores: JSON.stringify(formData.stores.map((val) => val.id)),
+    // };
+
+    let data = {};
+    // if (!itemToEdit) {
+    data.email = formData.email;
+    // }
 
     setIsSubmitting(true);
 
-    axios
-      .post("/vendor/add/staff", data)
-      .then((res) => {
-        setPage(1);
-        setOpenPopup(false);
-        setDialogOpen(true);
-      })
-      .catch(({ response }) => {
-        setIsSubmitting(false);
-        setResponseErrors(response.data.errors);
-      });
+    if (itemToEdit) {
+      data.name = formData.name;
+      data.roles = parseInt(formData.roles);
+      axios
+        .put(`/users/${itemToEdit.id}`, data)
+        .then((res) => {
+          setOpenPopup(false);
+        })
+        .catch(({ response }) => {
+          setIsSubmitting(false);
+          setResponseErrors(response.data.errors);
+        });
+    } else {
+      data.role = parseInt(formData.role);
+      data.stores = JSON.stringify(formData.stores.map((val) => val.id));
+      axios
+        .post("/vendor/add/staff", data)
+        .then((res) => {
+          setPage(1);
+          setOpenPopup(false);
+          setDialogOpen(true);
+        })
+        .catch(({ response }) => {
+          setIsSubmitting(false);
+          setResponseErrors(response.data.errors);
+        });
+    }
   };
 
   const handleStateChange = (e) => {
@@ -189,7 +216,32 @@ function UsersForm({
         }) => (
           <form onSubmit={handleSubmit}>
             <Grid container spacing={8}>
-              <Grid item xs={5}>
+              {itemToEdit ? (
+                <Grid item xs={6}>
+                  <TextField
+                    name="name" //Customize
+                    required
+                    fullWidth
+                    id="name" //Customize
+                    label="Username" //Customize
+                    value={formData.name} //Customize
+                    autoFocus
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.name ||
+                      Boolean(touched.name && errors.name)
+                    }
+                    helperText={
+                      (touched.name && errors.name) || responseErrors?.name
+                    }
+                  />
+                </Grid>
+              ) : null}
+              <Grid item xs={6}>
                 <TextField
                   name="email" //Customize
                   required
@@ -212,104 +264,136 @@ function UsersForm({
                   }
                 />
               </Grid>
-
-              <Grid item xs={7}></Grid>
-
-              <Grid item xs={5}>
-                <div>
-                  <TextField
-                    select
-                    label="Role"
-                    value={formData.role}
-                    name="role"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.role ||
-                      Boolean(touched.role && errors.role)
-                    }
-                    helperText={"Please select a Role"}
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {rolesList?.map((role) => (
-                      <option value={role.id}>{role.title}</option>
-                    ))}
-                  </TextField>
-                </div>
-              </Grid>
-
-              <Grid item xs={7}></Grid>
-
-              <Grid item xs={12}>
-                <div>
-                  <Autocomplete
-                    multiple
-                    // filterSelectedOptions
-                    options={stores ? stores : []}
-                    value={formData.stores}
-                    getOptionSelected={(option, value) =>
-                      option.id === value.id
-                    }
-                    disableCloseOnSelect
-                    getOptionLabel={(option) => option.name}
-                    renderOption={(option, { selected }) => (
-                      <React.Fragment>
-                        <Checkbox
-                          icon={icon}
-                          checkedIcon={checkedIcon}
-                          style={{ marginRight: 8 }}
-                          checked={selected}
-                        />
-                        {option.name}
-                      </React.Fragment>
-                    )}
-                    fullWidth
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="stores"
-                        variant="outlined"
-                        label="Stores *"
-                        placeholder="Assign stores for this user"
-                        fullWidth
-                        error={responseErrors?.stores || autoSelectStoreError}
-                        helperText="At least one Store must be selected."
-                      />
-                    )}
-                    onBlur={() => {
-                      if (formData.stores.length === 0) {
-                        setAutoSelectStoreError(true);
+              {/* <Grid item xs={7}></Grid>{" "} */}
+              {itemToEdit ? (
+                <Grid item xs={6}>
+                  <div>
+                    <TextField
+                      select
+                      label="Role"
+                      value={formData.roles}
+                      name="roles"
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleStateChange(e);
+                      }}
+                      SelectProps={{
+                        native: true,
+                      }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.roles ||
+                        Boolean(touched.roles && errors.roles)
                       }
-                    }}
-                    onChange={(e, val) => {
-                      updateAutoCompleteStores(e, val);
-                      if (val.length === 0) {
-                        setAutoSelectStoreError(true);
-                      } else {
-                        setAutoSelectStoreError(false);
-                      }
-                    }}
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.stores?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
+                      helperText={"Please select a Role"}
+                      fullWidth
+                      required
+                    >
+                      <option aria-label="None" value="" />
+                      {rolesList?.map((role) => (
+                        <option value={role.id}>{role.title}</option>
                       ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
+                    </TextField>
+                  </div>
+                </Grid>
+              ) : (
+                <Grid item xs={6}>
+                  <div>
+                    <TextField
+                      select
+                      label="Role"
+                      value={formData.role}
+                      name="role"
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleStateChange(e);
+                      }}
+                      SelectProps={{
+                        native: true,
+                      }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.role ||
+                        Boolean(touched.role && errors.role)
+                      }
+                      helperText={"Please select a Role"}
+                      fullWidth
+                      required
+                    >
+                      <option aria-label="None" value="" />
+                      {rolesList?.map((role) => (
+                        <option value={role.id}>{role.title}</option>
+                      ))}
+                    </TextField>
+                  </div>
+                </Grid>
+              )}
+              {/* <Grid item xs={7}></Grid> */}
+
+              {!itemToEdit ? (
+                <Grid item xs={12}>
+                  <div>
+                    <Autocomplete
+                      multiple
+                      // filterSelectedOptions
+                      options={stores ? stores : []}
+                      value={formData.stores}
+                      getOptionSelected={(option, value) =>
+                        option.id === value.id
+                      }
+                      disableCloseOnSelect
+                      getOptionLabel={(option) => option.name}
+                      renderOption={(option, { selected }) => (
+                        <React.Fragment>
+                          <Checkbox
+                            icon={icon}
+                            checkedIcon={checkedIcon}
+                            style={{ marginRight: 8 }}
+                            checked={selected}
+                          />
+                          {option.name}
+                        </React.Fragment>
+                      )}
+                      fullWidth
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          name="stores"
+                          variant="outlined"
+                          label="Stores *"
+                          placeholder="Assign stores for this user"
+                          fullWidth
+                          error={responseErrors?.stores || autoSelectStoreError}
+                          helperText="At least one Store must be selected."
+                        />
+                      )}
+                      onBlur={() => {
+                        if (formData.stores.length === 0) {
+                          setAutoSelectStoreError(true);
+                        }
+                      }}
+                      onChange={(e, val) => {
+                        updateAutoCompleteStores(e, val);
+                        if (val.length === 0) {
+                          setAutoSelectStoreError(true);
+                        } else {
+                          setAutoSelectStoreError(false);
+                        }
+                      }}
+                    />
+
+                    {responseErrors ? (
+                      <div className={classes.inputMessage}>
+                        {responseErrors.stores?.map((msg) => (
+                          <span key={msg} className={classes.errorMsg}>
+                            {msg}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </Grid>
+              ) : null}
 
               {typeof responseErrors === "string" ? (
                 <Grid item xs={12}>
