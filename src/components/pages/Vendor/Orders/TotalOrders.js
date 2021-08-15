@@ -160,7 +160,9 @@ function PendingOrders() {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState();
   const [userIsSearching, setuserIsSearching] = useState(false);
-  const [sortModel, setSortModel] = useState([{ field: "", sort: "asc" }]);
+  const [sortModel, setSortModel] = useState([
+    { field: "status", sort: "desc" },
+  ]);
   const [openApproveDialog, setOpenApproveDialog] = useState(false);
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const [orderToApproveOrCancel, setOrderToApproveOrCancel] = useState();

@@ -100,6 +100,7 @@ function ViewInvoice({ match }) {
                 {invoices.order_number}
               </StyledTableCell>
             </StyledTableRow>
+
             <StyledTableRow key={`username-${invoices.user_name}`}>
               <StyledTableCell component="th" scope="row">
                 Username
@@ -159,12 +160,12 @@ function ViewInvoice({ match }) {
                 {invoices.payment?.payment_name}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`status-${invoices.status}`}>
+            {/* <StyledTableRow key={`status-${invoices.status}`}>
               <StyledTableCell component="th" scope="row">
                 Status
               </StyledTableCell>
               <StyledTableCell align="left">{invoices.status}</StyledTableCell>
-            </StyledTableRow>
+            </StyledTableRow> */}
             <StyledTableRow key={`date-${invoices.created_at}`}>
               <StyledTableCell component="th" scope="row">
                 Created At

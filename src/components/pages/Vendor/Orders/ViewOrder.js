@@ -50,6 +50,16 @@ const useStyles = makeStyles({
     whiteSpace: "normal",
     wordWrap: "break-word",
   },
+  productsBadge: {
+    background: "#C0D9D9",
+    color: "#000000",
+    fontSize: "12px",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
+  },
 });
 
 function ViewOrder({ match }) {
@@ -121,6 +131,21 @@ function ViewOrder({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">
                 {order.order_total}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`products-${order.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Products
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {order?.orderDetails?.map((product) => (
+                  <span
+                    key={product.product_id}
+                    className={classes.productsBadge}
+                  >
+                    {product.product_name}
+                  </span>
+                ))}
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`status${order.orderStatus}`}>

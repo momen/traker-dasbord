@@ -50,6 +50,16 @@ const useStyles = makeStyles({
     whiteSpace: "normal",
     wordWrap: "break-word",
   },
+  productsBadge: {
+    background: "#C0D9D9",
+    color: "#000000",
+    fontSize: "12px",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
+  },
 });
 
 function ViewOrder({ match }) {
