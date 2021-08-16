@@ -60,6 +60,16 @@ const useStyles = makeStyles((theme) => ({
     marginRight: "5px",
     userSelect: "none",
   },
+  billingAddress: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "5px",
+    color: "#FFA920",
+    border: "1px solid #FFA920",
+    width: "100%",
+    height: 30,
+  },
   footer: {
     width: "100%",
     display: "flex",
@@ -239,7 +249,12 @@ function Stores() {
       field: "head_center",
       headerName: "Address Type",
       width: 100,
-      renderCell: (params) => (params.value ? "*Billing*" : "Shipping"),
+      renderCell: (params) =>
+        params.value ? (
+          <div className={classes.billingAddress}>Billing</div>
+        ) : (
+          <span>Shipping</span>
+        ),
     },
     { field: "address", headerName: "Address", width: 100 },
 

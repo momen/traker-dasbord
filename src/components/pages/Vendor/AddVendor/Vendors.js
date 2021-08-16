@@ -216,50 +216,58 @@ function Vendors() {
           <span
             style={{
               display: "flex",
+              justifyContent: "center",
               alignItems: "center",
+              width: "100%",
+              height: 30,
               padding: "5px",
               color: "#90CA28",
               border: "1px solid #90CA28",
-              height: 30,
             }}
           >
             Approved
           </span>
-        ) : params.row.rejected ? (
+        ) : !params.row.complete ? (
           <span
             style={{
               display: "flex",
+              justifyContent: "center",
               alignItems: "center",
+              width: "100%",
+              height: 30,
               padding: "5px",
               color: "#FFA920",
               border: "1px solid #FFA920",
-              height: 30,
             }}
           >
-            Invalid Info
+            In complete
           </span>
-        ) : params.row.declined ? (
-          <span
+        ) : params.row.rejected ? (
+          <div
             style={{
               display: "flex",
+              justifyContent: "center",
               alignItems: "center",
+              width: "100%",
+              height: 30,
               padding: "5px",
               color: "#CA2828",
               border: "1px solid #CA2828",
-              height: 30,
             }}
           >
-            Rejected
-          </span>
+            Invalid Info
+          </div>
         ) : (
           <span
             style={{
               display: "flex",
+              justifyContent: "center",
               alignItems: "center",
+              width: "100%",
+              height: 30,
               padding: "5px",
               color: "#98A9FF",
               border: "1px solid #98A9FF",
-              height: 30,
             }}
           >
             Pending

@@ -245,7 +245,7 @@ function ViewTicket({ match }) {
                 {ticket.order_number}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`order-number-${ticket.order_number}`}>
+            <StyledTableRow key={`order-products-${ticket.order_number}`}>
               <StyledTableCell component="th" scope="row">
                 Products
               </StyledTableCell>
