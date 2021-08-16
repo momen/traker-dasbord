@@ -100,7 +100,7 @@ function UsersForm({
     email: itemToEdit?.email || "",
     name: itemToEdit?.name || "",
     role: "",
-    roles: itemToEdit?.roles.id || "",
+    roles: itemToEdit?.roles?.id || "",
     stores: itemToEdit?.stores || [],
   });
   const [autoSelectStoreError, setAutoSelectStoreError] = useState(false);
