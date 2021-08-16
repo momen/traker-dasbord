@@ -192,7 +192,7 @@ function Roles() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [permissionsList, setPermissionsList] = useState("");
-  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "desc" }]);
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
 

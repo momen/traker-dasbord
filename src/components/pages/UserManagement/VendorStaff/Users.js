@@ -204,7 +204,7 @@ function Users() {
   const [itemToDelete, setItemToDelete] = useState("");
   const [rolesList, setRolesList] = useState("");
   const [stores, setStores] = useState([]);
-  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "desc" }]);
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
 

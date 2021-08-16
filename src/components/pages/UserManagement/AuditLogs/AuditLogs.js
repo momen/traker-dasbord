@@ -141,7 +141,7 @@ function AuditLogs() {
   const [selectedItem, setSelectedItem] = useState(""); // Customize
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
-  const [sortModel, setSortModel] = useState([{ field: "id", sort: "asc" }]);
+  const [sortModel, setSortModel] = useState([{ field: "id", sort: "desc" }]);
 
   const columns = [
     {
