@@ -326,7 +326,7 @@ function ViewVendor({ match }) {
                 Status
               </StyledTableCell>
               <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                {vendor.approved ? (
+                {vendor.vendorStatus === 'approved' ? (
                   <span
                     style={{
                       display: "flex",
@@ -340,7 +340,7 @@ function ViewVendor({ match }) {
                   >
                     Approved
                   </span>
-                ) : vendor.rejected ? (
+                ) : vendor.vendorStatus === 'incomplete' ? (
                   <span
                     style={{
                       display: "flex",
@@ -352,9 +352,9 @@ function ViewVendor({ match }) {
                       height: 30,
                     }}
                   >
-                    Invalid Info
+                    Incomplete
                   </span>
-                ) : vendor.declined ? (
+                ) : vendor.vendorStatus === 'invalid info' ? (
                   <span
                     style={{
                       display: "flex",
@@ -366,7 +366,7 @@ function ViewVendor({ match }) {
                       height: 30,
                     }}
                   >
-                    Rejected
+                    Invalid Info
                   </span>
                 ) : (
                   <span

@@ -236,7 +236,7 @@ function Products() {
   const [categories, setCategories] = useState([]);
   const [carMades, setCarMades] = useState([]);
   const [carYears, setCarYears] = useState([]);
-  const [stores, setStores] = useState([]);
+  const [stores, setStores] = useState(null);
   const [manufacturers, setManufacturers] = useState([]);
   const [originCountries, setOriginCountries] = useState([]);
   const [carTypes, setCarTypes] = useState([]);
@@ -571,7 +571,7 @@ function Products() {
     axios
       .get("/storeslist")
       .then((res) => {
-        const _stores = res.data.data.map(({ id, name }) => ({ id, name }));
+        const _stores = res.data.data.filter((store) => !store.head_center);
         setStores(_stores);
       })
       .catch(() => {
@@ -759,189 +759,210 @@ function Products() {
       </Typography>
       <Divider my={6} />
 
-      {viewMode === "data-grid" ? (
-        <Card mb={6}>
-          <Paper mb={2}>
-            <Toolbar className={classes.toolBar}>
-              <Grid
-                container
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "flex-end" }}>
-                  {userPermissions.includes("product_create") ? (
-                    <Button
-                      className={classes.button}
-                      variant="contained"
-                      onClick={() => {
-                        // setOpenPopupTitle("New Product");
-                        // setOpenPopup(true);
-                        setViewMode("add");
-                        setPageHeader("Add Product");
-                        setSelectedItem("");
-                      }}
-                      startIcon={<Add />}
-                    >
-                      Add Product
-                    </Button>
-                  ) : null}
-
-                  {userPermissions.includes("product_delete") ? (
-                    <Button
-                      startIcon={<Delete />}
-                      color="secondary"
-                      variant="contained"
-                      disabled={rowsToDelete.length < 2}
-                      onClick={() => {
-                        setOpenMassDeleteDialog(true);
-                      }}
-                      style={{ height: 40, borderRadius: 0 }}
-                    >
-                      Delete Selected
-                    </Button>
-                  ) : null}
-                </div>
-
-                <Grid item>
-                  <div style={{ display: "flex" }}>
-                    <Grid
-                      container
-                      spacing={1}
-                      alignItems="flex-end"
-                      style={{ marginRight: "5px" }}
-                    >
-                      <Grid item>
-                        <Search />
-                      </Grid>
-                      <Grid item>
-                        <TextField
-                          id="input-with-icon-grid"
-                          label="Search by column"
-                          onChange={handleSearchInput}
-                        />
-                      </Grid>
-                    </Grid>
-
-                    <Grid style={{ alignSelf: "flex-end" }}>
-                      <FormControl variant="outlined" size="small">
-                        <Select
-                          autoWidth
-                          value={columnToFilter}
-                          onChange={handleColumnToFilter}
-                          displayEmpty
-                          size="small"
-                          IconComponent={UnfoldLess}
-                          MenuProps={{
-                            anchorOrigin: {
-                              vertical: "bottom",
-                              horizontal: "center",
-                            },
-                            transformOrigin: {
-                              vertical: "top",
-                              horizontal: "center",
-                            },
-                            getContentAnchorEl: () => null,
+      {stores?.length ? (
+        <>
+          {viewMode === "data-grid" ? (
+            <Card mb={6}>
+              <Paper mb={2}>
+                <Toolbar className={classes.toolBar}>
+                  <Grid
+                    container
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "flex-end" }}>
+                      {userPermissions.includes("product_create") ? (
+                        <Button
+                          className={classes.button}
+                          variant="contained"
+                          onClick={() => {
+                            // setOpenPopupTitle("New Product");
+                            // setOpenPopup(true);
+                            setViewMode("add");
+                            setPageHeader("Add Product");
+                            setSelectedItem("");
                           }}
+                          startIcon={<Add />}
                         >
-                          {/* <MenuItem value="" disabled>
+                          Add Product
+                        </Button>
+                      ) : null}
+
+                      {userPermissions.includes("product_delete") ? (
+                        <Button
+                          startIcon={<Delete />}
+                          color="secondary"
+                          variant="contained"
+                          disabled={rowsToDelete.length < 2}
+                          onClick={() => {
+                            setOpenMassDeleteDialog(true);
+                          }}
+                          style={{ height: 40, borderRadius: 0 }}
+                        >
+                          Delete Selected
+                        </Button>
+                      ) : null}
+                    </div>
+
+                    <Grid item>
+                      <div style={{ display: "flex" }}>
+                        <Grid
+                          container
+                          spacing={1}
+                          alignItems="flex-end"
+                          style={{ marginRight: "5px" }}
+                        >
+                          <Grid item>
+                            <Search />
+                          </Grid>
+                          <Grid item>
+                            <TextField
+                              id="input-with-icon-grid"
+                              label="Search by column"
+                              onChange={handleSearchInput}
+                            />
+                          </Grid>
+                        </Grid>
+
+                        <Grid style={{ alignSelf: "flex-end" }}>
+                          <FormControl variant="outlined" size="small">
+                            <Select
+                              autoWidth
+                              value={columnToFilter}
+                              onChange={handleColumnToFilter}
+                              displayEmpty
+                              size="small"
+                              IconComponent={UnfoldLess}
+                              MenuProps={{
+                                anchorOrigin: {
+                                  vertical: "bottom",
+                                  horizontal: "center",
+                                },
+                                transformOrigin: {
+                                  vertical: "top",
+                                  horizontal: "center",
+                                },
+                                getContentAnchorEl: () => null,
+                              }}
+                            >
+                              {/* <MenuItem value="" disabled>
                           Select a column to filter by
                         </MenuItem> */}
-                          <MenuItem value={""}>Generic Search</MenuItem>
-                          <MenuItem value={"name"}>Product Name</MenuItem>
-                          <MenuItem value={"quantity"}>Quantity</MenuItem>
-                          <MenuItem value={"price"}>Price</MenuItem>
-                          <MenuItem value={"car_made"}>Car Made</MenuItem>
-                          <MenuItem value={"car_model"}>Car Model</MenuItem>
-                          <MenuItem value={"year"}>Car Year</MenuItem>
-                          <MenuItem value={"category_id"}>Category</MenuItem>
-                          <MenuItem value={"part_category"}>
-                            Part Category
-                          </MenuItem>
-                          {user?.roles[0].title === "Admin" ? (
-                            <MenuItem value={"vendor_id"}>Vendor Name</MenuItem>
-                          ) : null}
-                          <MenuItem value={"store_id"}>Store Name</MenuItem>
-                        </Select>
-                      </FormControl>
+                              <MenuItem value={""}>Generic Search</MenuItem>
+                              <MenuItem value={"name"}>Product Name</MenuItem>
+                              <MenuItem value={"quantity"}>Quantity</MenuItem>
+                              <MenuItem value={"price"}>Price</MenuItem>
+                              <MenuItem value={"car_made"}>Car Made</MenuItem>
+                              <MenuItem value={"car_model"}>Car Model</MenuItem>
+                              <MenuItem value={"year"}>Car Year</MenuItem>
+                              <MenuItem value={"category_id"}>
+                                Category
+                              </MenuItem>
+                              <MenuItem value={"part_category"}>
+                                Part Category
+                              </MenuItem>
+                              {user?.roles[0].title === "Admin" ? (
+                                <MenuItem value={"vendor_id"}>
+                                  Vendor Name
+                                </MenuItem>
+                              ) : null}
+                              <MenuItem value={"store_id"}>Store Name</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </div>
                     </Grid>
-                  </div>
-                </Grid>
-              </Grid>
-            </Toolbar>
-          </Paper>
-          <Paper>
-            <div style={{ width: "100%" }}>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                page={page}
-                pageSize={pageSize}
-                rowCount={rowsCount}
-                sortingOrder={["desc", "asc"]}
-                sortModel={sortModel}
-                columnBuffer={pageSize}
-                paginationMode="server"
-                sortingMode="server"
-                components={{
-                  Pagination: CustomPagination,
-                  LoadingOverlay: CustomLoadingOverlay,
+                  </Grid>
+                </Toolbar>
+              </Paper>
+              <Paper>
+                <div style={{ width: "100%" }}>
+                  <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    page={page}
+                    pageSize={pageSize}
+                    rowCount={rowsCount}
+                    sortingOrder={["desc", "asc"]}
+                    sortModel={sortModel}
+                    columnBuffer={pageSize}
+                    paginationMode="server"
+                    sortingMode="server"
+                    components={{
+                      Pagination: CustomPagination,
+                      LoadingOverlay: CustomLoadingOverlay,
+                    }}
+                    loading={loading}
+                    checkboxSelection
+                    disableColumnMenu
+                    autoHeight={true}
+                    onRowClick={
+                      userPermissions.includes("product_show")
+                        ? ({ row }) =>
+                            history.push(`/product/products/${row.id}`)
+                        : null
+                    }
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSize}
+                    onSortModelChange={handleSortModelChange}
+                    onSelectionChange={(newSelection) => {
+                      setRowsToDelete(newSelection.rowIds);
+                    }}
+                  />
+                </div>
+              </Paper>
+            </Card>
+          ) : (
+            <Card mb={6} style={{ padding: "50px 60px" }}>
+              <div
+                className={classes.backBtn}
+                onClick={() => {
+                  setViewMode("data-grid");
+                  setPageHeader("Products");
                 }}
-                loading={loading}
-                checkboxSelection
-                disableColumnMenu
-                autoHeight={true}
-                onRowClick={
-                  userPermissions.includes("product_show")
-                    ? ({ row }) => history.push(`/product/products/${row.id}`)
-                    : null
-                }
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSize}
-                onSortModelChange={handleSortModelChange}
-                onSelectionChange={(newSelection) => {
-                  setRowsToDelete(newSelection.rowIds);
-                }}
-              />
-            </div>
-          </Paper>
-        </Card>
-      ) : (
-        <Card mb={6} style={{ padding: "50px 60px" }}>
-          <div
-            className={classes.backBtn}
-            onClick={() => {
-              setViewMode("data-grid");
-              setPageHeader("Products");
-            }}
-          >
-            <ArrowBack className={classes.backIcon} />
-            <span>Back</span>
-          </div>
+              >
+                <ArrowBack className={classes.backIcon} />
+                <span>Back</span>
+              </div>
 
-          <Divider my={3} />
-          <ProductsForm
-            setPage={setPage}
-            setOpenPopup={setOpenPopup}
-            itemToEdit={selectedItem}
-            stores={stores}
-            mainCategories={mainCategories}
-            categories={categories}
-            carMades={carMades}
-            carYears={carYears}
-            manufacturers={manufacturers}
-            originCountries={originCountries}
-            carTypes={carTypes}
-            transmissionsList={transmissionsList}
-            productTags={productTags}
-            productTypes={productTypes}
-            setViewMode={setViewMode}
-            setPageHeader={setPageHeader}
-          />
-        </Card>
-      )}
+              <Divider my={3} />
+              <ProductsForm
+                setPage={setPage}
+                setOpenPopup={setOpenPopup}
+                itemToEdit={selectedItem}
+                stores={stores}
+                mainCategories={mainCategories}
+                categories={categories}
+                carMades={carMades}
+                carYears={carYears}
+                manufacturers={manufacturers}
+                originCountries={originCountries}
+                carTypes={carTypes}
+                transmissionsList={transmissionsList}
+                productTags={productTags}
+                productTypes={productTypes}
+                setViewMode={setViewMode}
+                setPageHeader={setPageHeader}
+              />
+            </Card>
+          )}
+        </>
+      ) : stores ? (
+        <div
+          style={{
+            height: "200px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: "1.4rem",
+          }}
+        >
+          يرجي إضافة فرع لتتمكن من إضافة منتجاتك
+        </div>
+      ) : null }
 
       <Popup
         title={openPopupTitle}

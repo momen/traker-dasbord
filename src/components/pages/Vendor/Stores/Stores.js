@@ -70,6 +70,16 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     height: 30,
   },
+  shippingAddress: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "5px",
+    color: "#717171",
+    border: "1px solid #717171",
+    width: "100%",
+    height: 30,
+  },
   footer: {
     width: "100%",
     display: "flex",
@@ -253,7 +263,7 @@ function Stores() {
         params.value ? (
           <div className={classes.billingAddress}>Billing</div>
         ) : (
-          <span>Shipping</span>
+          <span className={classes.shippingAddress}>Shipping</span>
         ),
     },
     { field: "address", headerName: "Address", width: 100 },

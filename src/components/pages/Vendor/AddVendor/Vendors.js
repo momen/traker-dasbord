@@ -208,11 +208,11 @@ function Vendors() {
       },
     },
     {
-      field: "approved",
+      field: "vendorStatus",
       headerName: "Status",
       width: 100,
       renderCell: (params) => {
-        return params.row.approved ? (
+        return params.value === "approved" ? (
           <span
             style={{
               display: "flex",
@@ -227,7 +227,7 @@ function Vendors() {
           >
             Approved
           </span>
-        ) : !params.row.complete ? (
+        ) : params.value === "incomplete" ? (
           <span
             style={{
               display: "flex",
@@ -240,9 +240,9 @@ function Vendors() {
               border: "1px solid #FFA920",
             }}
           >
-            In complete
+            Incomplete
           </span>
-        ) : params.row.rejected ? (
+        ) : params.value === "invalid info" ? (
           <div
             style={{
               display: "flex",
