@@ -360,8 +360,9 @@ const Sidebar = ({ classes, staticContext, location, ...rest }) => {
   };
 
   const toggleLanguage = () => {
-    axios.defaults.headers.common["Accept-Language"] =
-      lang === "ar" ? "en" : "ar";
+    // axios.defaults.headers.common["Accept-Language"] =
+    //   lang === "ar" ? "en" : "ar";
+    axios.defaults.headers.common["Accept-Language"] = "ar";
     dispatch(setLanguage(lang === "ar" ? "en" : "ar"));
   };
 
