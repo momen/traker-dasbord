@@ -3,12 +3,17 @@ import { useHistory } from "react-router-dom";
 import axios from "../../../../axios";
 import {
   Button,
+  Collapse,
+  Checkbox,
+  FormControlLabel,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   TextField,
+  Typography,
+  Grid,
 } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -109,7 +114,8 @@ const useStyles = makeStyles((theme) => ({
     marginRight: "15px",
   },
   rejectBtn: {
-    height: 30,
+    height: 40,
+    marginRight: "15px",
     fontFamily: `"Almarai", sans-serif`,
     color: "#F8CF00",
     background: "#ffffff",
@@ -122,6 +128,7 @@ const useStyles = makeStyles((theme) => ({
   },
   declineBtn: {
     height: 40,
+    marginRight: "15px",
     fontFamily: `"Almarai", sans-serif`,
     color: "#CA2828",
     background: "#ffffff",
@@ -132,7 +139,31 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
   },
+  submitBtn: {
+    width: 150,
+    height: 40,
+    marginTop: 20,
+    fontFamily: `"Almarai", sans-serif`,
+    color: "#EF9300",
+    background: "#ffffff",
+    border: "1px solid #EF9300",
+    borderRadius: 0,
+    "&:hover": {
+      background: "#EF9300",
+      color: "#ffffff",
+    },
+  },
 }));
+
+const CustomCheckbox = withStyles({
+  root: {
+    color: "#EF9300",
+    "&$checked": {
+      color: "#EF9300",
+    },
+  },
+  checked: {},
+})((props) => <Checkbox color="default" {...props} />);
 
 function ViewVendor({ match }) {
   const classes = useStyles();
@@ -143,11 +174,32 @@ function ViewVendor({ match }) {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [itemToReject, setItemToReject] = useState("");
+  const [itemsToReject, setItemsToReject] = useState([]);
+  const [isRejecting, setIsRejecting] = useState(false);
   const [reason, setReason] = useState("");
+
+  const rejectionList = [
+    { id: 9, fieldEn: "Wholesale Document", fieldAr: "تصريح تاجر الجملة" },
+    { id: 8, fieldEn: "Company Name", fieldAr: "إسم الشركة" },
+    { id: 1, fieldEn: "Commercial No.", fieldAr: "رقم السجل التجاري" },
+    { id: 2, fieldEn: "Commercial Document", fieldAr: "المستند التجاري" },
+    { id: 3, fieldEn: "Tax Card No.", fieldAr: "رقم البطاقة الضريبية" },
+    { id: 4, fieldEn: "Tax Document", fieldAr: "المستند الضريبي" },
+    { id: 5, fieldEn: "Bank Account", fieldAr: "رقم الحساب البنكي" },
+    { id: 6, fieldEn: "Bank Document", fieldAr: "المستند البنكي" },
+  ];
 
   const openRejectionConfirmation = (fieldId) => {
     setItemToReject(fieldId);
     setOpenDialog(true);
+  };
+
+  const selectRejection = (e) => {
+    if (e.target.checked) {
+      setItemsToReject([...itemsToReject, e.target.value]);
+    } else {
+      setItemsToReject(itemsToReject.filter((item) => item != e.target.value));
+    }
   };
 
   const approveVendor = () => {
@@ -180,11 +232,14 @@ function ViewVendor({ match }) {
       .post("admin/reject/vendor", {
         vendor_id: vendor.id,
         reason,
-        commented_field: itemToReject,
+        commented_field: JSON.stringify(itemsToReject),
       })
       .then(({ data }) => {
         setOpenDialog(false);
         alert(data.message);
+        setReason("");
+        setItemsToReject([]);
+        setIsRejecting(false);
       })
       .catch(({ response }) => alert(response.data.errors));
   };
@@ -204,6 +259,9 @@ function ViewVendor({ match }) {
       });
   }, []);
 
+  useEffect(() => {
+    console.log(itemsToReject);
+  }, [itemsToReject]);
   const uppercaseWords = (str) =>
     str?.replace(/^(.)|\s+(.)/g, (c) => c.toUpperCase());
 
@@ -326,7 +384,7 @@ function ViewVendor({ match }) {
                 Status
               </StyledTableCell>
               <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                {vendor.vendorStatus === 'approved' ? (
+                {vendor.vendorStatus === "approved" ? (
                   <span
                     style={{
                       display: "flex",
@@ -340,7 +398,7 @@ function ViewVendor({ match }) {
                   >
                     Approved
                   </span>
-                ) : vendor.vendorStatus === 'incomplete' ? (
+                ) : vendor.vendorStatus === "incomplete" ? (
                   <span
                     style={{
                       display: "flex",
@@ -354,7 +412,7 @@ function ViewVendor({ match }) {
                   >
                     Incomplete
                   </span>
-                ) : vendor.vendorStatus === 'invalid info' ? (
+                ) : vendor.vendorStatus === "invalid info" ? (
                   <span
                     style={{
                       display: "flex",
@@ -393,7 +451,7 @@ function ViewVendor({ match }) {
                 {vendor.commercial_no ? (
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     {vendor.commercial_no}
-                    {vendor.complete && !vendor.approved && !vendor.declined ? (
+                    {/* {vendor.complete && !vendor.approved && !vendor.declined ? (
                       <Button
                         style={{
                           width: "fit-content",
@@ -407,7 +465,7 @@ function ViewVendor({ match }) {
                       >
                         Reject
                       </Button>
-                    ) : null}
+                    ) : null} */}
                   </div>
                 ) : (
                   <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -440,7 +498,7 @@ function ViewVendor({ match }) {
                       >
                         View Document
                       </Button>
-                      {vendor.complete &&
+                      {/* {vendor.complete &&
                       !vendor.approved &&
                       !vendor.declined ? (
                         <Button
@@ -455,7 +513,7 @@ function ViewVendor({ match }) {
                         >
                           Reject
                         </Button>
-                      ) : null}
+                      ) : null} */}
                     </div>
                   ) : (
                     <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -474,7 +532,7 @@ function ViewVendor({ match }) {
                 {vendor.tax_card_no ? (
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     {vendor.tax_card_no}
-                    {vendor.complete && !vendor.approved && !vendor.declined ? (
+                    {/* {vendor.complete && !vendor.approved && !vendor.declined ? (
                       <Button
                         style={{
                           width: "fit-content",
@@ -487,7 +545,7 @@ function ViewVendor({ match }) {
                       >
                         Reject
                       </Button>
-                    ) : null}
+                    ) : null} */}
                   </div>
                 ) : (
                   <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -518,7 +576,7 @@ function ViewVendor({ match }) {
                       >
                         View Document
                       </Button>
-                      {vendor.complete &&
+                      {/* {vendor.complete &&
                       !vendor.approved &&
                       !vendor.declined ? (
                         <Button
@@ -533,7 +591,7 @@ function ViewVendor({ match }) {
                         >
                           Reject
                         </Button>
-                      ) : null}
+                      ) : null} */}
                     </div>
                   ) : (
                     <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -565,7 +623,7 @@ function ViewVendor({ match }) {
                       >
                         View Document
                       </Button>
-                      {vendor.complete &&
+                      {/* {vendor.complete &&
                       !vendor.approved &&
                       !vendor.declined ? (
                         <Button
@@ -580,7 +638,7 @@ function ViewVendor({ match }) {
                         >
                           Reject
                         </Button>
-                      ) : null}
+                      ) : null} */}
                     </div>
                   ) : (
                     <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -599,7 +657,7 @@ function ViewVendor({ match }) {
                 {vendor.bank_account ? (
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     {vendor.bank_account}
-                    {vendor.complete && !vendor.approved && !vendor.declined ? (
+                    {/* {vendor.complete && !vendor.approved && !vendor.declined ? (
                       <Button
                         style={{
                           width: "fit-content",
@@ -612,7 +670,7 @@ function ViewVendor({ match }) {
                       >
                         Reject
                       </Button>
-                    ) : null}
+                    ) : null} */}
                   </div>
                 ) : (
                   <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -643,7 +701,7 @@ function ViewVendor({ match }) {
                       >
                         View Document
                       </Button>
-                      {vendor.complete &&
+                      {/* {vendor.complete &&
                       !vendor.approved &&
                       !vendor.declined ? (
                         <Button
@@ -658,7 +716,7 @@ function ViewVendor({ match }) {
                         >
                           Reject
                         </Button>
-                      ) : null}
+                      ) : null} */}
                     </div>
                   ) : (
                     <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -687,28 +745,95 @@ function ViewVendor({ match }) {
                 Actions
               </StyledTableCell>
               <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                {vendor.complete ? (
-                  <>
-                    {!vendor.approved && vendor.complete ? (
+                <div style={{ textAlign: "center" }}>
+                  {vendor.vendorStatus !== "incomplete" &&
+                  vendor.vendorStatus !== "approved" ? (
+                    <>
                       <Button
                         variant="contained"
                         className={classes.approveBtn}
                         onClick={approveVendor}
+                        disabled={!vendor.vendorStatus === "pending"}
                       >
-                        Approve Vendor
+                        {lang === "en" ? "Approve Vendor" : "قبول الطلب"}
                       </Button>
-                    ) : null}
-                    {!vendor.approved ? (
+                      <Button
+                        variant="contained"
+                        className={classes.rejectBtn}
+                        onClick={() => setIsRejecting(!isRejecting)}
+                        disabled={!vendor.vendorStatus === "pending"}
+                      >
+                        {lang === "en" ? "Reject Info" : "طلب استيفاء بيانات"}
+                      </Button>
                       <Button
                         variant="contained"
                         className={classes.declineBtn}
                         onClick={declineVendor}
+                        disabled={!vendor.vendorStatus === "approved"}
                       >
-                        Decline Request
+                        {lang === "en" ? "Decline Request" : "رفض الطلب"}
                       </Button>
-                    ) : null}
-                  </>
-                ) : null}
+                    </>
+                  ) : null}
+                </div>
+
+                <Collapse timeout="auto" in={isRejecting}>
+                  <p>
+                    {lang === "en" ? "Rejection reasons" : "سبب الاستيفاء"}:
+                  </p>
+
+                  <Grid container>
+                    {rejectionList?.map((currentItem) => (
+                      <Grid item xs={12} md={6}>
+                        <FormControlLabel
+                          control={
+                            <CustomCheckbox
+                              // checked={
+                              //   itemsToReject.filter(
+                              //     (item) => item == currentItem.id
+                              //   ).length
+                              // }
+                              // name={category.name}
+                              value={currentItem.id}
+                              onChange={selectRejection}
+                            />
+                          }
+                          label={
+                            <Typography className={classes.checkboxLabel}>
+                              {lang === "en"
+                                ? currentItem.fieldEn
+                                : currentItem.fieldAr}
+                            </Typography>
+                          }
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+
+                  <p> {lang === "en" ? "Comments" : "رسالة/ملاحظات"}:</p>
+
+                  <TextField
+                    variant="outlined"
+                    multiline
+                    rows={4}
+                    fullWidth
+                    required
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    style={{
+                      backgroundColor: "#FFFFFF",
+                      borderColor: "#CCCCCC",
+                    }}
+                  />
+
+                  <Button
+                    className={classes.submitBtn}
+                    disabled={!itemsToReject.length || !reason}
+                    onClick={rejectInfo}
+                  >
+                    {lang === "en" ? "Submit" : "إرسال"}
+                  </Button>
+                </Collapse>
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>
