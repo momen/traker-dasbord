@@ -439,12 +439,10 @@ function ProductsForm({
       setIsSubmitting(false);
     } else {
       Object.entries(formData).forEach(([key, value]) => {
-        if (
-          key === "photo" ||
-          (key === "quantity" && formData.producttype_id == 2)
-        )
-          return;
-        if (key === "tags" || key === "models") {
+        if (key === "photo") return;
+        if (key === "quantity" && formData.producttype_id == 2) {
+          data.append(key, 1);
+        } else if (key === "tags" || key === "models") {
           data.append(key, JSON.stringify(value.map((val) => val.id)));
         } else if (
           (key === "discount" && !value) ||
