@@ -202,7 +202,7 @@ function CategoriesForm({
     const imgSize = e.target.files[0]?.size / 1000; //Convert Size from bytes to kilo bytes
 
     // Maximum Size for an Image is 2MB
-    if (imgSize > 2000) {
+    if (imgSize > 512) {
       setBigImgSize(true);
       return;
     }

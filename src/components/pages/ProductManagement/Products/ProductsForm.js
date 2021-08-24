@@ -141,7 +141,7 @@ function ProductsForm({
     holesale_price: itemToEdit ? parseFloat(itemToEdit.holesale_price) : "",
     no_of_orders: itemToEdit ? parseInt(itemToEdit.no_of_orders) : "",
 
-    part_category_id: itemToEdit ? itemToEdit.part_category_id.toString() : "",
+    part_category_id: itemToEdit.part_category_id?.toString() || "",
     manufacturer_id: itemToEdit ? itemToEdit.manufacturer?.id : "",
     prodcountry_id: itemToEdit ? itemToEdit.origin_country?.id : "",
     transmission_id: itemToEdit ? itemToEdit.transmission_id || "" : "",
@@ -311,7 +311,7 @@ function ProductsForm({
     itemToEdit.discount ? true : false
   );
 
-  const [imagesToDelete, setImagesToDelete] = useState("");
+  const [imagesToDelete, setImagesToDelete] = useState([]);
 
   const [productImages, setProductImages] = useState(() =>
     itemToEdit
@@ -434,7 +434,10 @@ function ProductsForm({
     setIsSubmitting(true); // Update on other components
     let data = new FormData();
 
-    if (formData.photo.length === 0 && !itemToEdit) {
+    if (
+      (formData.photo.length === 0 && !itemToEdit) ||
+      (productImages.length === imagesToDelete.length && !formData.photo.length)
+    ) {
       setOpenAlert(true);
       setIsSubmitting(false);
     } else {
@@ -472,7 +475,7 @@ function ProductsForm({
             },
           })
           .then((res) => {
-            if (imagesToDelete) {
+            if (imagesToDelete.length) {
               axios
                 .post(`/products/remove/checked/media`, {
                   product_id: itemToEdit.id,
@@ -563,7 +566,7 @@ function ProductsForm({
     // & append only the new images to avoid duplication.
     Object.entries(e.target.files).forEach(([key, file]) => {
       if (!formData.photo.find((img) => img.name === file.name)) {
-        if (file.size / 1000 > 2000) {
+        if (file.size / 1000 > 512) {
           setBigImgSize(true);
           return;
         }

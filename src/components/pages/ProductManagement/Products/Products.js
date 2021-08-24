@@ -759,7 +759,7 @@ function Products() {
       </Typography>
       <Divider my={6} />
 
-      {stores?.length ? (
+      {stores?.length || user.roles[0].id === 1 ? (
         <>
           {viewMode === "data-grid" ? (
             <Card mb={6}>
