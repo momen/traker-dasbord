@@ -180,18 +180,27 @@ function PendingOrders() {
       field: "order_number",
       headerName: "Order Number",
       width: 150,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "wholesale_total",
       headerName: "Order Total",
       width: 150,
-      renderCell: (params) =>
-        `${new Intl.NumberFormat().format(params.value)} SAR`,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <span style={{ textAlign: "center" }}>
+          {" "}
+          {`${new Intl.NumberFormat().format(params.value)} SAR`}
+        </span>
+      ),
     },
     {
       field: "status",
       headerName: "Status",
       width: 150,
+      headerAlign: "center",
+      align: "center",
       headerAlign: "center",
       align: "center",
     },

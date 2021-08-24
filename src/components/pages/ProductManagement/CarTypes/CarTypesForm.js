@@ -124,13 +124,12 @@ function CarTypesForm({
 
   const handleSubmit = () => {
     if (!formData.photo && !itemToEdit) {
+      alert("Fail");
       setOpenAlert(true);
     } else {
       let data = new FormData();
 
       data.append("type_name", formData.type_name);
-
-      data.append("photo", formData.photo, formData.photo.name);
 
       setIsSubmitting(true);
 
@@ -149,6 +148,7 @@ function CarTypesForm({
             setResponseErrors(response.data.errors);
           });
       } else {
+        data.append("photo", formData.photo, formData.photo.name);
         axios
           .post("/car-types", data, {
             headers: {

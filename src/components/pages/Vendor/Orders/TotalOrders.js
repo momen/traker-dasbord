@@ -176,10 +176,40 @@ function PendingOrders() {
       headerAlign: "center",
       align: "center",
     },
-    { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
-    { field: "order_total", headerName: "Order Total", width: 200 },
-    { field: "orderStatus", headerName: "Status", width: 150, sortable: false },
-    { field: "paid", headerName: "Paid", width: 80, sortable: false },
+    {
+      field: "order_number",
+      headerName: "Order Number",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "order_total",
+      headerName: "Order Total",
+      width: 120,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "orderStatus",
+      headerName: "Status",
+      width: 150,
+      sortable: false,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "paid",
+      headerName: "Paid",
+      width: 80,
+      sortable: false,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <div style={{ width: "100%", textAlign: "center" }}>
+          {params.value ? "Yes" : "No"}
+        </div>
+      ),
+    },
     {
       field: "created_at",
       headerName: "Created At",

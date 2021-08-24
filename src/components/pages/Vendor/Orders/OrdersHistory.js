@@ -122,7 +122,18 @@ function OrdersHistory() {
     { field: "order_number", headerName: "Order Number", width: 150, flex: 1 },
     { field: "order_total", headerName: "Order Total", width: 200 },
     { field: "orderStatus", headerName: "Status", width: 100, sortable: false },
-    { field: "paid", headerName: "Paid", width: 80, sortable: false },
+    {
+      field: "paid",
+      headerName: "Paid",
+      width: 80,
+      sortable: false,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <div style={{ width: "100%", textAlign: "center" }}>
+          {params.value ? "Yes" : "No"}
+        </div>
+      ),
+    },
     {
       field: "actions",
       headerName: "Actions",

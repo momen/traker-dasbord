@@ -198,11 +198,11 @@ function CarMade() {
     { field: "id", headerName: "ID", width: 70 },
     { field: "car_made", headerName: "Brand Name", width: 200, flex: 1 },
     {
-      field: "categoryid_id",
-      headerName: "Category",
+      field: "car_type",
+      headerName: "Vehicle Type",
       width: 200,
       flex: 1,
-      renderCell: (params) => params.row.catName,
+      renderCell: (params) => params.value?.type_name,
     },
     // {
     //   field: "categoryid",
