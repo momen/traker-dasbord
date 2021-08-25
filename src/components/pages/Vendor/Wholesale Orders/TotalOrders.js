@@ -386,10 +386,7 @@ function PendingOrders() {
     setLoading(true);
     if (!userIsSearching) {
       axios(
-        `/admin/show/wholesale/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-        {
-          fetch: statusToFilterBy,
-        }
+        `/admin/show/wholesale/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}&fetch=${statusToFilterBy}`
       )
         .then((res) => {
           setRowsCount(res.data.total);
