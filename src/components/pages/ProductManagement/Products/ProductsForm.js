@@ -27,6 +27,7 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import SuccessPopup from "../../../SuccessPopup";
 import { spacing } from "@material-ui/system";
+import { useSelector } from "react-redux";
 
 const Divider = styled(MuiDivider)(spacing);
 
@@ -118,10 +119,13 @@ function ProductsForm({
 }) {
   const classes = useStyles();
   const uploadRef = useRef();
+  const { userPermissions, user, lang } = useSelector((state) => state);
 
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
+    name_en: itemToEdit ? itemToEdit.name_en : "",
     description: itemToEdit ? itemToEdit.description || "" : "",
+    description_en: itemToEdit ? itemToEdit.description_en || "" : "",
     car_made_id: itemToEdit ? itemToEdit.car_made_id || "" : "",
     models: itemToEdit
       ? itemToEdit.car_model?.map(({ id, carmodel }) => ({
@@ -163,18 +167,59 @@ function ProductsForm({
   const [toYears, setToYears] = useState([]);
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .required("This field is Required")
-      .test(
-        "No floating points",
-        "Please remove any dots",
-        (val) => !val?.includes(".")
-      )
-      .test(
-        "Not empty",
-        "Please remove any spaces at the beginning",
-        (val) => !(val?.substring(0, 1) === " ")
-      ),
+    name:
+      lang === "ar"
+        ? Yup.string()
+            .required("This field is Required")
+            .test(
+              "No floating points",
+              "Please remove any dots",
+              (val) => !val?.includes(".")
+            )
+            .test(
+              "Not empty",
+              "Please remove any spaces at the beginning",
+              (val) => !(val?.substring(0, 1) === " ")
+            )
+        : Yup.string()
+            .notRequired()
+            .test(
+              "No floating points",
+              "Please remove any dots",
+              (val) => !val?.includes(".")
+            )
+            .test(
+              "Not empty",
+              "Please remove any spaces at the beginning",
+              (val) => !(val?.substring(0, 1) === " ")
+            ),
+
+    name_en:
+      lang === "en"
+        ? Yup.string()
+            .required("This field is Required")
+            .test(
+              "No floating points",
+              "Please remove any dots",
+              (val) => !val?.includes(".")
+            )
+            .test(
+              "Not empty",
+              "Please remove any spaces at the beginning",
+              (val) => !(val?.substring(0, 1) === " ")
+            )
+        : Yup.string()
+            .notRequired()
+            .test(
+              "No floating points",
+              "Please remove any dots",
+              (val) => !val?.includes(".")
+            )
+            .test(
+              "Not empty",
+              "Please remove any spaces at the beginning",
+              (val) => !(val?.substring(0, 1) === " ")
+            ),
     serial_number: Yup.string()
       .required("This field is Required")
       .test(
@@ -291,20 +336,67 @@ function ProductsForm({
             .min(5, "Minimum value should be 5")
         : Yup.number().nullable().notRequired(),
     qty_reminder: Yup.number().required("This field is Required"),
-    description: Yup.string()
-      .required("This field is Required")
-      .test(
-        "Minimum 5 chars without spaces",
-        "Please enter 5 characters excluding spaces",
-        (val) => val?.trim().length >= 5
-      )
-      .test(
-        "Not empty",
-        "Please remove any spaces at the beginning",
-        (val) => val?.trim() !== ""
-      )
-      .min(5, "Description must be at least 5 characters")
-      .max(255, "Description must not exceed 255 characters"),
+    description:
+      lang === "ar"
+        ? Yup.string()
+            .required("This field is Required")
+            .test(
+              "Minimum 5 chars without spaces",
+              "Please enter 5 characters excluding spaces",
+              (val) => val?.trim().length >= 5
+            )
+            .test(
+              "Not empty",
+              "Please remove any spaces at the beginning",
+              (val) => val?.trim() !== ""
+            )
+            .min(5, "Description must be at least 5 characters")
+            .max(255, "Description must not exceed 255 characters")
+        : Yup.string()
+            .notRequired()
+            .test(
+              "Minimum 5 chars without spaces",
+              "Please enter 5 characters excluding spaces",
+              (val) => val?.trim().length >= 5
+            )
+            .test(
+              "Not empty",
+              "Please remove any spaces at the beginning",
+              (val) => val?.trim() !== ""
+            )
+            .min(5, "Description must be at least 5 characters")
+            .max(255, "Description must not exceed 255 characters"),
+
+    description_en:
+      lang === "en"
+        ? Yup.string()
+            .required("This field is Required")
+            .test(
+              "Minimum 5 chars without spaces",
+              "Please enter 5 characters excluding spaces",
+              (val) => val?.trim().length >= 5
+            )
+            .test(
+              "Not empty",
+              "Please remove any spaces at the beginning",
+              (val) => val?.trim() !== ""
+            )
+            .min(5, "Description must be at least 5 characters")
+            .max(255, "Description must not exceed 255 characters")
+        : Yup.string()
+            .notRequired()
+            .test(
+              "Minimum 5 chars without spaces",
+              "Please enter 5 characters excluding spaces",
+              (val) => val?.trim().length >= 5
+            )
+            .test(
+              "Not empty",
+              "Please remove any spaces at the beginning",
+              (val) => val?.trim() !== ""
+            )
+            .min(5, "Description must be at least 5 characters")
+            .max(255, "Description must not exceed 255 characters"),
   });
 
   const [enableDiscount, setEnableDiscount] = useState(
@@ -320,7 +412,7 @@ function ProductsForm({
           file_name,
           image,
         }))
-      : null
+      : []
   );
 
   const [openAlert, setOpenAlert] = useState(false);
@@ -349,10 +441,13 @@ function ProductsForm({
         axios
           .get(`/car-modelslist/${itemToEdit.car_made_id}`)
           .then((res) => {
-            const _carModels = res.data.data.map(({ id, carmodel }) => ({
-              id,
-              carmodel,
-            })); // Customize
+            const _carModels = res.data.data.map(
+              ({ id, carmodel, name_en }) => ({
+                id,
+                carmodel,
+                name_en,
+              })
+            ); // Customize
             setCarModels(_carModels);
           })
           .catch(() => {
@@ -363,9 +458,10 @@ function ProductsForm({
       axios
         .get(`/categorieslist/${itemToEdit.category?.maincategory_id}`)
         .then((res) => {
-          const _categories = res.data.data.map(({ id, name }) => ({
+          const _categories = res.data.data.map(({ id, name, name_en }) => ({
             id,
             name,
+            name_en,
           })); // Customize
           setCategories(_categories);
         })
@@ -377,9 +473,10 @@ function ProductsForm({
         .get(`/part-categorieslist/${itemToEdit.category_id}`)
         .then((res) => {
           const _partCategories = res.data.data.map(
-            ({ id, category_name }) => ({
+            ({ id, category_name, name_en }) => ({
               id,
               category_name,
+              name_en,
             })
           ); // Customize
           setPartCategories(_partCategories);
@@ -431,12 +528,13 @@ function ProductsForm({
     setAutoSelectModelError(false);
     setAutoSelectTagError(false);
 
-    setIsSubmitting(true); // Update on other components
+    // setIsSubmitting(true);
     let data = new FormData();
 
     if (
       (formData.photo.length === 0 && !itemToEdit) ||
-      (productImages.length === imagesToDelete.length && !formData.photo.length)
+      (productImages?.length === imagesToDelete?.length &&
+        !formData.photo?.length)
     ) {
       setOpenAlert(true);
       setIsSubmitting(false);
@@ -679,9 +777,10 @@ function ProductsForm({
                           .get(`/categorieslist/${e.target.value}`)
                           .then((res) => {
                             const _categories = res.data.data.map(
-                              ({ id, name }) => ({
+                              ({ id, name, name_en }) => ({
                                 id,
                                 name,
+                                name_en,
                               })
                             ); // Customize
                             setCategories(_categories);
@@ -708,7 +807,9 @@ function ProductsForm({
                     <option aria-label="None" value="" />
                     {mainCategories?.map((category) => (
                       <option value={category.id}>
-                        {category.main_category_name}
+                        {lang === "ar"
+                          ? category.main_category_name || category.name_en
+                          : category.name_en || category.main_category_name}
                       </option>
                     ))}
                   </TextField>
@@ -741,9 +842,10 @@ function ProductsForm({
                           .get(`/part-categorieslist/${e.target.value}`)
                           .then((res) => {
                             const _partCategories = res.data.data.map(
-                              ({ id, category_name }) => ({
+                              ({ id, category_name, name_en }) => ({
                                 id,
                                 category_name,
+                                name_en,
                               })
                             ); // Customize
                             setPartCategories(_partCategories);
@@ -770,7 +872,11 @@ function ProductsForm({
                   >
                     <option aria-label="None" value="" />
                     {categories?.map((category) => (
-                      <option value={category.id}>{category.name}</option>
+                      <option value={category.id}>
+                        {lang === "ar"
+                          ? category.name || category.name_en
+                          : category.name_en || category.name}
+                      </option>
                     ))}
                   </TextField>
 
@@ -815,7 +921,9 @@ function ProductsForm({
                     <option aria-label="None" value="" />
                     {partCategories?.map((partCategory) => (
                       <option value={partCategory.id}>
-                        {partCategory.category_name}
+                        {lang === "ar"
+                          ? partCategory.category_name || partCategory.name_en
+                          : partCategory.name_en || partCategory.category_name}
                       </option>
                     ))}
                   </TextField>
@@ -836,10 +944,10 @@ function ProductsForm({
                 <div>
                   <TextField
                     name="name"
-                    required
+                    required={lang === "ar"}
                     fullWidth
                     id="name"
-                    label="Product Name"
+                    label="Product Name (Arabic)"
                     value={values.name}
                     // autoFocus
                     onChange={(e) => {
@@ -857,6 +965,87 @@ function ProductsForm({
                   {responseErrors ? (
                     <div className={classes.inputMessage}>
                       {responseErrors.name?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} sm={6}>
+                <div>
+                  <TextField
+                    name="name_en"
+                    required={lang === "en"}
+                    fullWidth
+                    id="name_en"
+                    label="Product Name (English)"
+                    value={values.name_en}
+                    // autoFocus
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.name_en ||
+                      Boolean(touched.name_en && errors.name_en)
+                    }
+                    helperText={touched.name_en && errors.name_en}
+                  />
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.name_en?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6} md={6}>
+                <div>
+                  <TextField
+                    select
+                    label="Manufacturer"
+                    value={formData.manufacturer_id}
+                    name="manufacturer_id"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.manufacturer_id ||
+                      Boolean(touched.manufacturer_id && errors.manufacturer_id)
+                    }
+                    helperText="Please select a Manufacturer"
+                    fullWidth
+                    required
+                  >
+                    <option aria-label="None" value="" />
+                    {manufacturers?.map((manufacturer) => (
+                      <option value={manufacturer.id}>
+                        {lang === "ar"
+                          ? manufacturer.manufacturer_name ||
+                            manufacturer.name_en
+                          : manufacturer.name_en ||
+                            manufacturer.manufacturer_name}
+                      </option>
+                    ))}
+                  </TextField>
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.manufacturer_id?.map((msg) => (
                         <span key={msg} className={classes.errorMsg}>
                           {msg}
                         </span>
@@ -903,49 +1092,6 @@ function ProductsForm({
                 <div>
                   <TextField
                     select
-                    label="Manufacturer"
-                    value={formData.manufacturer_id}
-                    name="manufacturer_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.manufacturer_id ||
-                      Boolean(touched.manufacturer_id && errors.manufacturer_id)
-                    }
-                    helperText="Please select a Manufacturer"
-                    fullWidth
-                    required
-                  >
-                    <option aria-label="None" value="" />
-                    {manufacturers?.map((manufacturer) => (
-                      <option value={manufacturer.id}>
-                        {manufacturer.manufacturer_name}
-                      </option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.manufacturer_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={6} md={6}>
-                <div>
-                  <TextField
-                    select
                     label="Country of Origin"
                     value={formData.prodcountry_id}
                     name="prodcountry_id"
@@ -967,7 +1113,11 @@ function ProductsForm({
                   >
                     <option aria-label="None" value="" />
                     {originCountries?.map((country) => (
-                      <option value={country.id}>{country.country_name}</option>
+                      <option value={country.id}>
+                        {lang === "ar"
+                          ? country.country_name || country.name_en
+                          : country.name_en || country.country_name}
+                      </option>
                     ))}
                   </TextField>
 
@@ -983,13 +1133,15 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid item xs={6} md={6}></Grid>
+
+              <Grid item xs={6}>
                 <div style={{ minWidth: "100%", maxWidth: "100%" }}>
                   <TextField
                     variant="outlined"
                     name="description"
-                    required
-                    label="Description"
+                    required={lang === "ar"}
+                    label="Description (Arabic)"
                     multiline
                     rows={5}
                     rowsMax={8}
@@ -1010,6 +1162,42 @@ function ProductsForm({
                   {responseErrors ? (
                     <div className={classes.inputMessage}>
                       {responseErrors.description?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={6}>
+                <div style={{ minWidth: "100%", maxWidth: "100%" }}>
+                  <TextField
+                    variant="outlined"
+                    name="description_en"
+                    required={lang === "en"}
+                    label="Description (English)"
+                    multiline
+                    rows={5}
+                    rowsMax={8}
+                    value={formData.description_en}
+                    fullWidth
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.description_en ||
+                      Boolean(touched.description_en && errors.description_en)
+                    }
+                    helperText={touched.description_en && errors.description_en}
+                  />
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.description_en?.map((msg) => (
                         <span key={msg} className={classes.errorMsg}>
                           {msg}
                         </span>
@@ -1561,9 +1749,10 @@ function ProductsForm({
                               .get(`/car-modelslist/${e.target.value}`)
                               .then((res) => {
                                 const _carModels = res.data.data.map(
-                                  ({ id, carmodel }) => ({
+                                  ({ id, carmodel, name_en }) => ({
                                     id,
                                     carmodel,
+                                    name_en,
                                   })
                                 ); // Customize
                                 setCarModels(_carModels);
@@ -1593,7 +1782,11 @@ function ProductsForm({
                       >
                         <option aria-label="None" value="" />
                         {carMades?.map((carMade) => (
-                          <option value={carMade.id}>{carMade.car_made}</option>
+                          <option value={carMade.id}>
+                            {lang === "ar"
+                              ? carMade.car_made || carMade.name_en
+                              : carMade.name_en || carMade.car_made}
+                          </option>
                         ))}
                       </TextField>
 
@@ -1621,7 +1814,11 @@ function ProductsForm({
                           option.id === value.id
                         }
                         disableCloseOnSelect
-                        getOptionLabel={(option) => option.carmodel}
+                        getOptionLabel={(option) =>
+                          lang === "ar"
+                            ? option.carmodel || option.name_en
+                            : option.name_en || option.carmodel
+                        }
                         renderOption={(option, { selected }) => (
                           <React.Fragment>
                             <Checkbox
@@ -1630,7 +1827,9 @@ function ProductsForm({
                               style={{ marginRight: 8 }}
                               checked={selected}
                             />
-                            {option.carmodel}
+                            {lang === "ar"
+                              ? option.carmodel || option.name_en
+                              : option.name_en || option.carmodel}
                           </React.Fragment>
                         )}
                         fullWidth
@@ -1810,7 +2009,11 @@ function ProductsForm({
                             value={transmission.id}
                             style={{ textTransform: "capitalize" }}
                           >
-                            {transmission.transmission_name}
+                            {lang === "ar"
+                              ? transmission.transmission_name ||
+                                transmission.name_en
+                              : transmission.name_en ||
+                                transmission.transmission_name}
                           </option>
                         ))}
                       </TextField>
@@ -1853,7 +2056,11 @@ function ProductsForm({
                   >
                     <option aria-label="None" value="" />
                     {carTypes?.map((carType) => (
-                      <option value={carType.id}>{carType.type_name}</option>
+                      <option value={carType.id}>
+                        {lang === "ar"
+                          ? carType.type_name || carType.name_en
+                          : carType.name_en || carType.type_name}
+                      </option>
                     ))}
                   </TextField>
 

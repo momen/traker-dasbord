@@ -30,7 +30,8 @@ const useStyles = makeStyles((theme) => ({
 export default function VendorCards({ cards }) {
   const classes = useStyles();
   return (
-    <Grid container spacing={2}>
+    // <Grid container spacing={2}>
+    <>
       <Grid item xs={12} md={6} lg={4}>
         <Card>
           <CardContent>
@@ -152,7 +153,6 @@ export default function VendorCards({ cards }) {
           </CardContent>
         </Card>
       </Grid>
-
       <Grid item xs={12} md={6} lg={4}>
         <Card>
           <CardContent>
@@ -176,6 +176,7 @@ export default function VendorCards({ cards }) {
           </CardContent>
         </Card>
       </Grid>
-    </Grid>
+    </>
+    // </Grid>
   );
 }

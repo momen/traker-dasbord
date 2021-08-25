@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardContent,
+  Divider,
   Grid,
   makeStyles,
   Typography,
@@ -35,6 +36,11 @@ const useStyles = makeStyles((theme) => ({
     },
     margin: theme.spacing(3, 2, 2),
   },
+  productImg: {
+    maxWidth: "95%",
+    minHight: 30,
+    maxHeight: 30,
+  },
 }));
 
 function Dashboard() {
@@ -43,6 +49,8 @@ function Dashboard() {
   const [barChartLabels, setBarChartLabels] = useState("");
   const [dashboardInfo, setDashboardInfo] = useState({});
   const [sales, setSales] = useState([]);
+
+  const [lowStockProducts, setLowStockProducts] = useState([]);
 
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
@@ -53,6 +61,14 @@ function Dashboard() {
     from: null,
     to: null,
   });
+
+  useEffect(() => {
+    if (user?.roles[0].title === "Vendor") {
+      axios("vendor/about/rare/products").then(({ data }) => {
+        setLowStockProducts(data.data);
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     axios
@@ -71,9 +87,9 @@ function Dashboard() {
 
   return (
     <>
-      <Grid container spacing={6}>
-        <Grid item xs={12} lg={12}>
-          {/* {Object.entries(dashboardInfo).map(([key, value]) => {
+      <Grid container spacing={5}>
+        {/* <Grid item xs={12} lg={12}> */}
+        {/* {Object.entries(dashboardInfo).map(([key, value]) => {
               if (key === "status_code" || key === "message") return;
               // This is done to reformat the key variable name in a better looking way to display as a title.
               // This should be done as we are using dynamic rendering.
@@ -92,31 +108,107 @@ function Dashboard() {
                 </Grid>
                 ) : null;
               })} */}
-          {user?.roles[0].title === "Admin" ? (
-            <AdminCards cards={dashboardInfo} />
-          ) : (
-            <VendorCards cards={dashboardInfo} />
-          )}
-        </Grid>
+        {user?.roles[0].title === "Admin" ? (
+          <AdminCards cards={dashboardInfo} />
+        ) : (
+          <VendorCards cards={dashboardInfo} />
+        )}
+        {/* </Grid> */}
 
-        <Grid item>
-          <Button
-            className={classes.submitButton}
-            variant="outlined"
-            onClick={() => setOpenPopup(true)}
-          >
-            Filter
-          </Button>
-        </Grid>
+        {/* <Grid item>
+        </Grid> */}
 
-        <Grid item xs={12} lg={12}>
-          <BarChart
-            barChartLabels={barChartLabels}
-            sales={sales}
-            fromDate={filterData.from}
-            toDate={filterData.to}
-          />
-        </Grid>
+        {user?.roles[0].title === "Admin" ? (
+          <Grid item xs={12} lg={12}>
+            <Button
+              className={classes.submitButton}
+              variant="outlined"
+              onClick={() => setOpenPopup(true)}
+            >
+              Filter
+            </Button>
+            <BarChart
+              barChartLabels={barChartLabels}
+              sales={sales}
+              fromDate={filterData.from}
+              toDate={filterData.to}
+            />
+          </Grid>
+        ) : (
+          <>
+            <Grid item xs={12} lg={6}>
+              <Button
+                className={classes.submitButton}
+                variant="outlined"
+                onClick={() => setOpenPopup(true)}
+              >
+                Filter
+              </Button>
+              <BarChart
+                barChartLabels={barChartLabels}
+                sales={sales}
+                fromDate={filterData.from}
+                toDate={filterData.to}
+              />
+            </Grid>
+            <Grid item xs={12} lg={6} style={{ backgroundColor: "#ffffff" }}>
+              <Grid container style={{ minHeight: "30px" }} spacing={1}>
+                <Grid item xs={2}>
+                  <div style={{ height: "30px", textAlign: "center" }}>
+                    <img src="ic-shopping-box.svg" alt="" />
+                  </div>
+                </Grid>
+                <Grid item xs={8}>
+                  <span>
+                    {lang === "ar"
+                      ? "مخزون على وشك النفاذ"
+                      : "Almost\nout of stock"}
+                  </span>
+                </Grid>
+                <Grid item xs={2}>
+                  <span>{lang === "ar" ? "متبقي" : "Quantity left"}</span>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  style={{ marginTop: "10px", marginBottom: "10px" }}
+                >
+                  <Divider />
+                </Grid>
+              </Grid>
+              {lowStockProducts?.map((product, index) => (
+                <>
+                  <Grid container spacing={1}>
+                    <Grid item xs={2}>
+                      <div style={{ height: "30px", textAlign: "center" }}>
+                        <img
+                          className={classes.productImg}
+                          src={product.photo[0]?.image}
+                          alt={`img-${index + 1}`}
+                        />
+                      </div>
+                    </Grid>
+                    <Grid item xs={8}>
+                      {product.name}
+                    </Grid>
+                    <Grid item xs={2}>
+                      <div style={{ color: "#E10000", textAlign: "center" }}>
+                        {product.quantity}
+                      </div>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={12}
+                      style={{ marginTop: "10px", marginBottom: "10px" }}
+                    >
+                      <Divider />
+                    </Grid>
+                  </Grid>
+                </>
+              ))}
+            </Grid>
+          </>
+        )}
       </Grid>
 
       <Popup

@@ -151,14 +151,14 @@ function ViewOrder({ match }) {
                   order.shipping?.last_name}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`paid`}>
+            {/* <StyledTableRow key={`paid`}>
               <StyledTableCell component="th" scope="row">
                 Paid
               </StyledTableCell>
               <StyledTableCell align="left">
                 {!order ? null : order.paid ? order.paid : "No"}
               </StyledTableCell>
-            </StyledTableRow>
+            </StyledTableRow> */}
             <StyledTableRow key={`created_at`}>
               <StyledTableCell component="th" scope="row">
                 Created At

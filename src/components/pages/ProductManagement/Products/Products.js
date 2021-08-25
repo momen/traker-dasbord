@@ -596,7 +596,11 @@ function Products() {
     axios
       .get("/categorieslist")
       .then((res) => {
-        const _categories = res.data.data.map(({ id, name }) => ({ id, name }));
+        const _categories = res.data.data.map(({ id, name, name_en }) => ({
+          id,
+          name,
+          name_en,
+        }));
         setCategories(_categories);
       })
       .catch(() => {
@@ -606,9 +610,10 @@ function Products() {
     axios
       .get("/car-madeslist")
       .then((res) => {
-        const _carMades = res.data.data.map(({ id, car_made }) => ({
+        const _carMades = res.data.data.map(({ id, car_made, name_en }) => ({
           id,
           car_made,
+          name_en,
         })); // Customize
         setCarMades(_carMades);
       })
@@ -633,9 +638,10 @@ function Products() {
       .get("/manufacturer/list")
       .then((res) => {
         const _manufacturers = res.data.data.map(
-          ({ id, manufacturer_name }) => ({
+          ({ id, manufacturer_name, name_en }) => ({
             id,
             manufacturer_name,
+            name_en,
           })
         ); // Customize
         setManufacturers(_manufacturers);
@@ -647,10 +653,13 @@ function Products() {
     axios
       .get("/prodcountries/list")
       .then((res) => {
-        const _countries = res.data.data.map(({ id, country_name }) => ({
-          id,
-          country_name,
-        })); // Customize
+        const _countries = res.data.data.map(
+          ({ id, country_name, name_en }) => ({
+            id,
+            country_name,
+            name_en,
+          })
+        ); // Customize
         setOriginCountries(_countries);
       })
       .catch(() => {
@@ -660,9 +669,10 @@ function Products() {
     axios
       .get("/cartypes/list")
       .then((res) => {
-        const _carTypes = res.data.data.map(({ id, type_name }) => ({
+        const _carTypes = res.data.data.map(({ id, type_name, name_en }) => ({
           id,
           type_name,
+          name_en,
         })); // Customize
         setCarTypes(_carTypes);
       })
@@ -674,9 +684,10 @@ function Products() {
       .get("/transmissions-list")
       .then((res) => {
         const _transmissionsList = res.data.data.map(
-          ({ id, transmission_name }) => ({
+          ({ id, transmission_name, name_en }) => ({
             id,
             transmission_name,
+            name_en,
           })
         ); // Customize
         setTransmissionsList(_transmissionsList);
@@ -688,9 +699,10 @@ function Products() {
     axios
       .get("/product-tagslist")
       .then((res) => {
-        const _tags = res.data.data.map(({ id, name }) => ({
+        const _tags = res.data.data.map(({ id, name, name_en }) => ({
           id,
           name,
+          name_en,
         })); // Customize
         setProductTags(_tags);
       })
@@ -701,10 +713,13 @@ function Products() {
     axios
       .get("product/types/list")
       .then((res) => {
-        const _productTypes = res.data.data.map(({ id, producttype }) => ({
-          id,
-          producttype,
-        })); // Customize
+        const _productTypes = res.data.data.map(
+          ({ id, producttype, name_en }) => ({
+            id,
+            producttype,
+            name_en,
+          })
+        ); // Customize
         setProductTypes(_productTypes);
       })
       .catch(() => {
@@ -962,7 +977,7 @@ function Products() {
         >
           يرجي إضافة فرع لتتمكن من إضافة منتجاتك
         </div>
-      ) : null }
+      ) : null}
 
       <Popup
         title={openPopupTitle}

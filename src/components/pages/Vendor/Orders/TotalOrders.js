@@ -198,18 +198,18 @@ function PendingOrders() {
       headerAlign: "center",
       align: "center",
     },
-    {
-      field: "paid",
-      headerName: "Paid",
-      width: 80,
-      sortable: false,
-      headerAlign: "center",
-      renderCell: (params) => (
-        <div style={{ width: "100%", textAlign: "center" }}>
-          {params.value ? "Yes" : "No"}
-        </div>
-      ),
-    },
+    // {
+    //   field: "paid",
+    //   headerName: "Paid",
+    //   width: 80,
+    //   sortable: false,
+    //   headerAlign: "center",
+    //   renderCell: (params) => (
+    //     <div style={{ width: "100%", textAlign: "center" }}>
+    //       {params.value ? "Yes" : "No"}
+    //     </div>
+    //   ),
+    // },
     {
       field: "created_at",
       headerName: "Created At",
