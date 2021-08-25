@@ -44,6 +44,7 @@ import ProductsForm from "./ProductsForm";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
 import { useSelector } from "react-redux";
+import SuccessPopup from "../../../SuccessPopup";
 
 const Card = styled(MuiCard)(spacing);
 const Divider = styled(MuiDivider)(spacing);
@@ -249,6 +250,13 @@ function Products() {
   const [openRejectDialog, setOpenRejectDialog] = useState(false);
   const [productToApproveOrRejct, setProductToApproveOrRejct] = useState();
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState("Product approved successfully");
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+  };
+
   const [pageHeader, setPageHeader] = useState("Products");
   const [viewMode, setViewMode] = useState("data-grid");
 
@@ -450,6 +458,7 @@ function Products() {
         product_id: productToApproveOrRejct,
       })
       .then(() => {
+        setDialogOpen(true);
         setOpenApproveDialog(false);
         setLoading(true);
         axios
@@ -1124,6 +1133,12 @@ function Products() {
           </Button>
         </DialogActions>
       </Dialog>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </React.Fragment>
   );
 }

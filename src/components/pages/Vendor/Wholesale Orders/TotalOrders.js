@@ -34,6 +34,7 @@ import axios from "../../../../axios";
 import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
 import { useSelector } from "react-redux";
+import SuccessPopup from "../../../SuccessPopup";
 
 const Card = styled(MuiCard)(spacing);
 const Divider = styled(MuiDivider)(spacing);
@@ -167,6 +168,13 @@ function PendingOrders() {
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const [orderToApproveOrCancel, setOrderToApproveOrCancel] = useState();
   const [statusToFilterBy, setStatusToFilterBy] = useState("");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState("Order approved successfully");
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+  };
 
   const columns = [
     {
@@ -322,6 +330,7 @@ function PendingOrders() {
         status: 1,
       })
       .then(() => {
+        setDialogOpen(true);
         setOpenApproveDialog(false);
         setLoading(true);
         axios(
@@ -336,7 +345,7 @@ function PendingOrders() {
             setLoading(false);
           })
           .catch(({ response }) => {
-            alert(response.data?.errors);
+            alert(response.data?.message);
           });
       })
       .catch(({ response }) => {
@@ -578,6 +587,12 @@ function PendingOrders() {
           </Button>
         </DialogActions>
       </Dialog>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </React.Fragment>
   );
 }

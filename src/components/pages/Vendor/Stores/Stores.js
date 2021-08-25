@@ -198,7 +198,7 @@ function CustomLoadingOverlay() {
 function Stores() {
   const classes = useStyles();
   const history = useHistory();
-  const { userPermissions, lang } = useSelector((state) => state);
+  const { user, userPermissions, lang } = useSelector((state) => state);
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState("New Branch");
@@ -222,7 +222,7 @@ function Stores() {
 
   const location = useLocation();
 
-  const columns = [
+  const columnsAdmin = [
     {
       field: "company",
       headerName: "Company",
@@ -254,6 +254,110 @@ function Stores() {
           : params.row.vendor?.type == "2"
           ? "Wholesaler"
           : "Retailer/Wholesaler",
+    },
+    {
+      field: "head_center",
+      headerName: "Address Type",
+      width: 100,
+      renderCell: (params) =>
+        params.value ? (
+          <div className={classes.billingAddress}>Billing</div>
+        ) : (
+          <span className={classes.shippingAddress}>Shipping</span>
+        ),
+    },
+    { field: "address", headerName: "Address", width: 100 },
+
+    {
+      field: "members",
+      headerName: "Members",
+      width: 150,
+      renderCell: (params) => (
+        <div>
+          {params.value?.map((member) => (
+            <span key={member.id} className={classes.memberBadge}>
+              {member.name}
+            </span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 220,
+      sortable: false,
+      disableClickEventBubbling: true,
+      renderCell: (params) => {
+        // let carMade = params.getValue("id");
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-start",
+              width: "100%",
+              // padding: "5px"
+            }}
+          >
+            {/* {userPermissions.includes("stores_show") ? (
+              <Button
+                style={{ marginRight: "5px" }}
+                variant="contained"
+                size="small"
+                onClick={() => {
+                  history.push(`${location.pathname}/${params.row.id}`);
+                  console.log(location);
+                }}
+              >
+                View
+              </Button>
+            ) : null} */}
+            {userPermissions.includes("stores_edit") ? (
+              <Button
+                style={{ marginRight: "5px" }}
+                className={classes.actionBtn}
+                startIcon={<Edit />}
+                // color="primary"
+                variant="contained"
+                // size="small"
+                onClick={() => {
+                  setSelectedItem(params.row);
+                  setViewMode("edit");
+                  setPageHeader("Update Branch Details");
+                }}
+              >
+                Edit
+              </Button>
+            ) : null}
+
+            {userPermissions.includes("stores_delete") ? (
+              <Button
+                className={classes.actionBtn}
+                startIcon={<Delete />}
+                // color="secondary"
+                variant="contained"
+                // size="small"
+                onClick={() => openDeleteConfirmation(params.row.id)}
+              >
+                Delete
+              </Button>
+            ) : null}
+          </div>
+        );
+      },
+    },
+  ];
+
+  const columnsVendor = [
+    {
+      field: "name",
+      headerName: "Branch",
+      width: 100,
+    },
+    {
+      field: "serial_id",
+      headerName: "Serial",
+      width: 80,
     },
     {
       field: "head_center",
@@ -560,7 +664,7 @@ function Stores() {
             <div style={{ width: "100%" }}>
               <DataGrid
                 rows={rows}
-                columns={columns}
+                columns={user.roles[0].id === 1 ? columnsAdmin : columnsVendor}
                 page={page}
                 pageSize={pageSize}
                 rowCount={rowsCount}

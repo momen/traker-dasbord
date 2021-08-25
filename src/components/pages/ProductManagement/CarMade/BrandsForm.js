@@ -11,6 +11,7 @@ import { Formik } from "formik";
 import axios from "../../../../axios";
 import { RotateLeft } from "@material-ui/icons";
 import SuccessPopup from "../../../SuccessPopup";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -91,6 +92,8 @@ function CreateCarMade({
   const classes = useStyles();
 
   const formRef = useRef();
+  const { lang } = useSelector((state) => state);
+
   const [formData, updateFormData] = useState({
     car_made: itemToEdit ? itemToEdit.car_made : "",
     cartype_id: itemToEdit ? itemToEdit.cartype_id : "",
@@ -204,15 +207,14 @@ function CreateCarMade({
 
               <Grid item xs={4}>
                 <TextField
-                  id="standard-select-currency-native"
                   select
-                  label="Product Type"
+                  label="Vehicle Type"
                   value={formData.cartype_id}
                   name="cartype_id"
                   SelectProps={{
                     native: true,
                   }}
-                  helperText="Please select a Product Type"
+                  helperText="Please select a Vehicle Type"
                   fullWidth
                   required
                   onChange={(e) => {
@@ -226,8 +228,12 @@ function CreateCarMade({
                   }
                 >
                   <option aria-label="None" value="" />
-                  {carTypes?.map((type) => (
-                    <option value={type.id}>{type.type_name}</option>
+                  {carTypes?.map((carType) => (
+                    <option value={carType.id}>
+                      {lang === "ar"
+                        ? carType.type_name || carType.name_en
+                        : carType.name_en || carType.type_name}
+                    </option>
                   ))}
                 </TextField>
               </Grid>

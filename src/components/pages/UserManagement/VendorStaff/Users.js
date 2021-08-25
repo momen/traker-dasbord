@@ -455,7 +455,7 @@ function Users() {
     axios
       .get("/storeslist")
       .then((res) => {
-        const _stores = res.data.data.map(({ id, name }) => ({ id, name }));
+        const _stores = res.data.data.filter((store) => !store.head_center);
         setStores(_stores);
       })
       .catch(() => {

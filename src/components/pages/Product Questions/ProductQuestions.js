@@ -151,6 +151,16 @@ function ProductQuestions() {
     { field: "body_question", headerName: "Question", width: 100, flex: 1 },
     { field: "user_name", headerName: "User", width: 120 },
     {
+      field: "created_at",
+      headerName: "Date",
+      headerAlign: "center",
+      align: "center",
+      width: 120,
+      renderCell: (params) => (
+        <div style={{ textAlign: "center" }}>{params.value?.slice(0, 10)}</div>
+      ),
+    },
+    {
       field: "answer",
       headerName: "Status",
       width: 120,

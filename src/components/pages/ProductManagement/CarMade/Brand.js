@@ -370,9 +370,10 @@ function CarMade() {
     axios
       .get("/cartypes/list")
       .then((res) => {
-        const _carTypes = res.data.data.map(({ id, type_name }) => ({
+        const _carTypes = res.data.data.map(({ id, type_name, name_en }) => ({
           id,
           type_name,
+          name_en,
         })); // Customize
         setCarTypes(_carTypes);
       })
