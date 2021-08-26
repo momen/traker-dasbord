@@ -353,20 +353,20 @@ function ProductsForm({
             .min(5, "Description must be at least 5 characters")
             .max(255, "Description must not exceed 255 characters")
         : Yup.string()
+            .nullable()
             .notRequired()
             .test(
               "Minimum 5 chars without spaces",
               "Please enter 5 characters excluding spaces",
-              (val) => val?.trim().length >= 5
+              (val) => (val ? val?.trim().length >= 5 : true)
             )
             .test(
               "Not empty",
               "Please remove any spaces at the beginning",
-              (val) => val?.trim() !== ""
+              (val) => (val ? val?.trim() !== "" : true)
             )
             .min(5, "Description must be at least 5 characters")
             .max(255, "Description must not exceed 255 characters"),
-
     description_en:
       lang === "en"
         ? Yup.string()
@@ -384,19 +384,20 @@ function ProductsForm({
             .min(5, "Description must be at least 5 characters")
             .max(255, "Description must not exceed 255 characters")
         : Yup.string()
-            .notRequired()
             .test(
               "Minimum 5 chars without spaces",
               "Please enter 5 characters excluding spaces",
-              (val) => val?.trim().length >= 5
+              (val) => (val ? val?.trim().length >= 5 : true)
             )
             .test(
               "Not empty",
               "Please remove any spaces at the beginning",
-              (val) => val?.trim() !== ""
+              (val) => (val ? val?.trim() !== "" : true)
             )
             .min(5, "Description must be at least 5 characters")
-            .max(255, "Description must not exceed 255 characters"),
+            .max(255, "Description must not exceed 255 characters")
+            .notRequired()
+            .nullable(),
   });
 
   const [enableDiscount, setEnableDiscount] = useState(

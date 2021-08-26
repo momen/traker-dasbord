@@ -166,7 +166,9 @@ function Dashboard() {
                   </span>
                 </Grid>
                 <Grid item xs={2}>
-                  <span>{lang === "ar" ? "متبقي" : "Quantity left"}</span>
+                  <div style={{ textAlign: "center" }}>
+                    {lang === "ar" ? "متبقي" : "Quantity left"}
+                  </div>
                 </Grid>
                 <Grid
                   item

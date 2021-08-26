@@ -330,7 +330,8 @@ function Stores() {
               </Button>
             ) : null}
 
-            {userPermissions.includes("stores_delete") ? (
+            {userPermissions.includes("stores_delete") &&
+            !params.row.head_center ? (
               <Button
                 className={classes.actionBtn}
                 startIcon={<Delete />}
@@ -434,7 +435,8 @@ function Stores() {
               </Button>
             ) : null}
 
-            {userPermissions.includes("stores_delete") ? (
+            {userPermissions.includes("stores_delete") &&
+            !params.row.head_center ? (
               <Button
                 className={classes.actionBtn}
                 startIcon={<Delete />}
