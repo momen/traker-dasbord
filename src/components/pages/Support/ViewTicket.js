@@ -178,43 +178,71 @@ function ViewTicket({ match }) {
               <StyledTableCell component="th" scope="row">
                 <span className={classes.rowContent}>Message</span>
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.message}
+              <StyledTableCell align="left">{ticket.message}</StyledTableCell>
+            </StyledTableRow>
 
-                {(user?.roles[0].title === "Admin" &&
-                  ticket.case === "to admin") ||
-                (user?.roles[0].title === "Vendor" &&
-                  ticket.case !== "solved" &&
-                  ticket.case !== "to admin") ? (
-                  <>
-                    <p
+            <StyledTableRow key={`replies-${ticket.id}`}>
+              <StyledTableCell component="th" scope="row">
+                <span className={classes.rowContent}>Replies</span>
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.comments?.map((comment) => (
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span
                       style={{
                         fontWeight: "bold",
                         textDecoration: "underline",
                       }}
                     >
-                      Add Reply:
-                    </p>
-                    <TextField
-                      multiline
-                      rows={5}
-                      variant="outlined"
-                      fullWidth
-                      value={answer}
-                      onChange={(e) => updateAnswer(e.target.value)}
-                    />
+                      Role: {comment.user_role}
+                    </span>
 
-                    <Button
-                      className={classes.submitButton}
-                      onClick={addReply}
-                      disabled={!answer}
+                    <span
+                      style={{
+                        fontWeight: "bold",
+                      }}
                     >
-                      Submit
-                    </Button>
-                  </>
+                      {comment.comment}
+                    </span>
+                  </div>
+                ))}
+                {(user?.roles[0].title === "Vendor" &&
+                      ticket.comments?.length < 1 &&
+                      ticket.case !== "solved" &&
+                      ticket.case !== "to admin") ||
+                    (user?.roles[0].title === "Admin" &&
+                      ticket.case === "to admin") ? (
+                      <>
+                        <p
+                          style={{
+                            fontWeight: "bold",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          Add Reply:
+                        </p>
+                        <TextField
+                          style={{ backgroundColor: "#ffffff" }}
+                          multiline
+                          rows={5}
+                          variant="outlined"
+                          fullWidth
+                          value={answer}
+                          onChange={(e) => updateAnswer(e.target.value)}
+                        />
+
+                        <Button
+                          className={classes.submitButton}
+                          onClick={addReply}
+                          disabled={!answer}
+                        >
+                          Submit
+                        </Button>
+                      </>
                 ) : null}
               </StyledTableCell>
             </StyledTableRow>
+
             <StyledTableRow key={`status${ticket.id}`}>
               <StyledTableCell component="th" scope="row">
                 Status
