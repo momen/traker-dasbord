@@ -5,6 +5,7 @@ import { Formik } from "formik";
 import axios from "../../../../axios";
 import NumberFormat from "react-number-format";
 import { RotateLeft } from "@material-ui/icons";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -70,14 +71,28 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
+  name_en: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    )
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
+    ),
 });
 
 function MainCategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
+  const { lang } = useSelector((state) => state);
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
     main_category_name: itemToEdit ? itemToEdit.main_category_name : "",
+    name_en: itemToEdit ? itemToEdit.name_en : "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
@@ -144,10 +159,11 @@ function MainCategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
+                  autoFocus
                   name="main_category_name"
                   required
                   fullWidth
-                  label="Main Category Name"
+                  label="Main Category Name (Arabic)"
                   // prefix="%"
                   value={formData.main_category_name}
                   onChange={(e) => {
@@ -169,6 +185,36 @@ function MainCategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.main_category_name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12}>
+                <TextField
+                  name="name_en"
+                  required
+                  fullWidth
+                  label="Main Category Name (English)"
+                  // prefix="%"
+                  value={formData.name_en}
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.name_en ||
+                    Boolean(touched.name_en && errors.name_en)
+                  }
+                  helperText={touched.name_en && errors.name_en}
+                />
+              </Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.name_en?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>

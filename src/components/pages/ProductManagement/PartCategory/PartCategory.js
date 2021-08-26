@@ -386,7 +386,11 @@ function PartCategory() {
     axios
       .get("/categorieslist")
       .then((res) => {
-        let _categories = res.data.data.map(({ id, name }) => ({ id, name }));
+        let _categories = res.data.data.map(({ id, name, name_en }) => ({
+          id,
+          name,
+          name_en,
+        }));
         setCategories(_categories);
       })
       .catch(() => {

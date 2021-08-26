@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import { RotateLeft } from "@material-ui/icons";
 import SuccessPopup from "../../../SuccessPopup";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -76,6 +77,18 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
+  name_en: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    )
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
+    ),
   carmade_id: Yup.string().required(),
 });
 
@@ -88,6 +101,7 @@ function CarModelForm({
   setPageHeader,
 }) {
   const classes = useStyles();
+  const { lang } = useSelector((state) => state);
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
@@ -177,7 +191,7 @@ function CarModelForm({
                   required
                   fullWidth
                   id="carmodel"
-                  label="Car Model Name"
+                  label="Model Name (Arabic)"
                   value={formData.carmodel}
                   autoFocus
                   onChange={(e) => {
@@ -192,7 +206,6 @@ function CarModelForm({
                   helperText={touched.carmodel && errors.carmodel}
                 />
               </Grid>
-              <Grid item xs={8}></Grid>
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.carmodel?.map((msg) => (
@@ -205,15 +218,47 @@ function CarModelForm({
 
               <Grid item xs={4}>
                 <TextField
+                  name="name_en"
+                  required
+                  fullWidth
+                  id="name_en"
+                  label="Model Name (English)"
+                  value={formData.name_en}
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.name_en ||
+                    Boolean(touched.name_en && errors.name_en)
+                  }
+                  helperText={touched.name_en && errors.name_en}
+                />
+              </Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.name_en?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={4}></Grid>
+
+              <Grid item xs={4}>
+                <TextField
                   id="standard-select-currency-native"
                   select
-                  label="Select Car Made"
+                  label="Select Brand"
                   value={formData.carmade_id}
                   name="carmade_id"
                   SelectProps={{
                     native: true,
                   }}
-                  helperText="Please select a Car Made"
+                  helperText="Please select a Brand"
                   fullWidth
                   required
                   onChange={(e) => {
@@ -228,7 +273,11 @@ function CarModelForm({
                 >
                   <option aria-label="None" value="" />
                   {carMades?.map((carMade) => (
-                    <option value={carMade.id}>{carMade.car_made}</option>
+                    <option value={carMade.id}>
+                      {lang === "ar"
+                        ? carMade.car_made || carMade.name_en
+                        : carMade.name_en || carMade.car_made}
+                    </option>
                   ))}
                 </TextField>
               </Grid>

@@ -381,9 +381,10 @@ function Categories() {
       .get("/main/categories/list/all")
       .then((res) => {
         const _mainCategories = res.data.data.map(
-          ({ id, main_category_name }) => ({
+          ({ id, main_category_name, name_en }) => ({
             id,
             main_category_name,
+            name_en,
           })
         );
         setMainCategories(_mainCategories);

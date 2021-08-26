@@ -202,7 +202,7 @@ function Users() {
   const [memberToApprove, setMemberToApprove] = useState();
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
-  const [rolesList, setRolesList] = useState("");
+  const [rolesList, setRolesList] = useState([]);
   const [stores, setStores] = useState([]);
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "desc" }]);
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);

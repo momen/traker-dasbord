@@ -16,6 +16,7 @@ import { Alert } from "@material-ui/lab";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import SuccessPopup from "../../../SuccessPopup";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -92,6 +93,18 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
+  name_en: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    )
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
+    ),
   category_id: Yup.string().required(),
 });
 
@@ -104,12 +117,14 @@ function PartCategoryForm({
   setPageHeader,
 }) {
   const classes = useStyles();
+  const { lang } = useSelector((state) => state);
 
   const formRef = useRef();
   const uploadRef = useRef();
 
   const [formData, updateFormData] = useState({
     category_name: itemToEdit ? itemToEdit.category_name : "",
+    name_en: itemToEdit ? itemToEdit.name_en : "",
     category_id: itemToEdit ? itemToEdit.category_id : "",
   });
   const [imgName, setImgName] = useState("");
@@ -137,6 +152,7 @@ function PartCategoryForm({
       setOpenAlert(true);
     } else {
       data.append("category_name", formData.category_name);
+      data.append("name_en", formData.name_en);
       data.append("category_id", formData.category_id);
       if (formData.photo) {
         data.append("photo", formData.photo, formData.photo.name);
@@ -245,14 +261,14 @@ function PartCategoryForm({
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
             <Grid container spacing={8}>
-              <Grid item xs={4}>
+              <Grid item xs={5}>
                 <div>
                   <TextField
                     name="category_name"
                     required
                     fullWidth
                     id="category_name"
-                    label="Part Category Name"
+                    label="Part Category Name (Arabic)"
                     value={formData.category_name}
                     autoFocus
                     onChange={(e) => {
@@ -278,9 +294,39 @@ function PartCategoryForm({
                 </div>
               </Grid>
 
-              <Grid item xs={8}></Grid>
+              <Grid item xs={5}>
+                <TextField
+                  name="name_en"
+                  required
+                  fullWidth
+                  label="Part Category Name (English)"
+                  // prefix="%"
+                  value={formData.name_en}
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.name_en ||
+                    Boolean(touched.name_en && errors.name_en)
+                  }
+                  helperText={touched.name_en && errors.name_en}
+                />
+              </Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.name_en?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
 
-              <Grid item xs={4}>
+              <Grid item xs={2}></Grid>
+
+              <Grid item xs={5}>
                 <div>
                   <TextField
                     select
@@ -305,7 +351,11 @@ function PartCategoryForm({
                   >
                     <option aria-label="None" value="" />
                     {categories?.map((category) => (
-                      <option value={category.id}>{category.name}</option>
+                      <option value={category.id}>
+                        {lang === "ar"
+                          ? category.name || category.name_en
+                          : category.name_en || category.name}
+                      </option>
                     ))}
                   </TextField>
                   {responseErrors ? (
@@ -320,7 +370,7 @@ function PartCategoryForm({
                 </div>
               </Grid>
 
-              <Grid item xs={8}></Grid>
+              <Grid item xs={7}></Grid>
 
               <Grid item xs={12} md={3}>
                 <input

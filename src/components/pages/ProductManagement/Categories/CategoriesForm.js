@@ -16,6 +16,7 @@ import { Alert } from "@material-ui/lab";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import SuccessPopup from "../../../SuccessPopup";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -91,8 +92,34 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
+  name_en: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    )
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
+    ),
   maincategory_id: Yup.string().required(),
   description: Yup.string()
+    .notRequired()
+    .test(
+      "Minimum 5 chars without spaces",
+      "Please enter 5 characters excluding spaces",
+      (val) => val?.trim().length >= 5
+    )
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => val?.trim() !== ""
+    )
+    .min(5, "Description must be at least 5 characters")
+    .max(255, "Description must not exceed 255 characters"),
+  description_en: Yup.string()
     .notRequired()
     .test(
       "Minimum 5 chars without spaces",
@@ -117,14 +144,17 @@ function CategoriesForm({
   setPageHeader,
 }) {
   const classes = useStyles();
+  const { lang } = useSelector((state) => state);
 
   const formRef = useRef();
   const uploadRef = useRef();
 
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
+    name_en: itemToEdit ? itemToEdit.name_en : "",
     maincategory_id: itemToEdit ? itemToEdit.maincategory_id : "",
     description: itemToEdit ? itemToEdit.description : "",
+    description_en: itemToEdit ? itemToEdit.description_en : "",
     photo: "",
   });
   const [imgName, setImgName] = useState("");
@@ -152,10 +182,14 @@ function CategoriesForm({
     } else {
       let data = new FormData();
       data.append("name", formData.name);
+      data.append("name_en", formData.name_en);
       data.append("maincategory_id", formData.maincategory_id);
 
       if (formData.description) {
         data.append("description", formData.description);
+      }
+      if (formData.description_en) {
+        data.append("description", formData.description_en);
       }
       if (formData.photo) {
         data.append("photo", formData.photo, formData.photo.name);
@@ -270,7 +304,7 @@ function CategoriesForm({
                   required
                   fullWidth
                   id="name"
-                  label="Category Name"
+                  label="Category Name (Arabic)"
                   value={formData.name}
                   autoFocus
                   onChange={(e) => {
@@ -284,7 +318,7 @@ function CategoriesForm({
                   helperText={touched.name && errors.name}
                 />
               </Grid>
-              <Grid item xs={8}></Grid>
+
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.name?.map((msg) => (
@@ -294,6 +328,38 @@ function CategoriesForm({
                   ))}
                 </Grid>
               ) : null}
+
+              <Grid item xs={4}>
+                <TextField
+                  name="name_en"
+                  required
+                  fullWidth
+                  label="Category Name (English)"
+                  // prefix="%"
+                  value={formData.name_en}
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.name_en ||
+                    Boolean(touched.name_en && errors.name_en)
+                  }
+                  helperText={touched.name_en && errors.name_en}
+                />
+              </Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.name_en?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={4}></Grid>
 
               <Grid item xs={4}>
                 <div>
@@ -321,12 +387,12 @@ function CategoriesForm({
                     <option aria-label="None" value="" />
                     {mainCategories?.map((category) => (
                       <option value={category.id}>
-                        {category.main_category_name}
+                        {lang === "ar"
+                          ? category.main_category_name || category.name_en
+                          : category.name_en || category.main_category_name}
                       </option>
                     ))}
                   </TextField>
-
-                  <Grid item xs={8}></Grid>
 
                   {responseErrors ? (
                     <div className={classes.inputMessage}>
@@ -340,12 +406,17 @@ function CategoriesForm({
                 </div>
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid item xs={8}></Grid>
+
+              <Grid item xs={6}>
                 <TextField
+                  required
+                  variant="outlined"
                   id="description"
                   name="description"
-                  label="Description"
+                  label="Description (Arabic)"
                   multiline
+                  rows={4}
                   rowsMax={8}
                   value={formData.description}
                   fullWidth
@@ -365,6 +436,41 @@ function CategoriesForm({
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.description?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={6}>
+                <TextField
+                  required
+                  variant="outlined"
+                  id="description_en"
+                  name="description_en"
+                  label="Description (English)"
+                  multiline
+                  rows={4}
+                  rowsMax={8}
+                  value={formData.description_en}
+                  fullWidth
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.description_en ||
+                    Boolean(touched.description_en && errors.description_en)
+                  }
+                  helperText={touched.description_en && errors.description_en}
+                />
+              </Grid>
+
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.description_en?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>

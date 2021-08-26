@@ -879,13 +879,13 @@ function Products() {
                               <MenuItem value={"name"}>Product Name</MenuItem>
                               <MenuItem value={"quantity"}>Quantity</MenuItem>
                               <MenuItem value={"price"}>Price</MenuItem>
-                              <MenuItem value={"car_made"}>Car Made</MenuItem>
-                              <MenuItem value={"car_model"}>Car Model</MenuItem>
+                              <MenuItem value={"car_made_id"}>Car Made</MenuItem>
+                              <MenuItem value={"car_model_id"}>Car Model</MenuItem>
                               <MenuItem value={"year"}>Car Year</MenuItem>
                               <MenuItem value={"category_id"}>
                                 Category
                               </MenuItem>
-                              <MenuItem value={"part_category"}>
+                              <MenuItem value={"part_category_id"}>
                                 Part Category
                               </MenuItem>
                               {user?.roles[0].title === "Admin" ? (

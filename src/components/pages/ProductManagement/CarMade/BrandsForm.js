@@ -78,6 +78,19 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
+  name_en: Yup.string()
+    .required("This field is Required")
+    .test(
+      "No floating points",
+      "Please remove any dots",
+      (val) => !val?.includes(".")
+    )
+    .matches(/^([^0-9]*)$/, "Number are not allowed, only letters.")
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
+    ),
   cartype_id: Yup.string().required(),
 });
 
@@ -179,7 +192,7 @@ function CreateCarMade({
                   required
                   fullWidth
                   id="car_made"
-                  label="Brand"
+                  label="Brand (Arabic)"
                   value={formData.car_made}
                   autoFocus
                   onChange={(e) => {
@@ -194,7 +207,6 @@ function CreateCarMade({
                   helperText={touched.car_made && errors.car_made}
                 />
               </Grid>
-              <Grid xs={8}></Grid>
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.car_made?.map((msg) => (
@@ -204,6 +216,38 @@ function CreateCarMade({
                   ))}
                 </Grid>
               ) : null}
+
+              <Grid item xs={4}>
+                <TextField
+                  name="name_en"
+                  required
+                  fullWidth
+                  id="name_en"
+                  label="Brand (English)"
+                  value={formData.name_en}
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.name_en ||
+                    Boolean(touched.name_en && errors.name_en)
+                  }
+                  helperText={touched.name_en && errors.name_en}
+                />
+              </Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.name_en?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid xs={4}></Grid>
 
               <Grid item xs={4}>
                 <TextField
@@ -231,8 +275,8 @@ function CreateCarMade({
                   {carTypes?.map((carType) => (
                     <option value={carType.id}>
                       {lang === "ar"
-                        ? carType.type_name || carType.name_en
-                        : carType.name_en || carType.type_name}
+                        ? carType.car_made || carType.name_en
+                        : carType.name_en || carType.car_made}
                     </option>
                   ))}
                 </TextField>

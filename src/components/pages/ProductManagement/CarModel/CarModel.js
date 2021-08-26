@@ -363,9 +363,10 @@ function CarModel() {
     axios
       .get("/car-madeslist")
       .then((res) => {
-        let _carMades = res.data.data.map(({ id, car_made }) => ({
+        let _carMades = res.data.data.map(({ id, car_made, name_en }) => ({
           id,
           car_made,
+          name_en,
         })); // Customize
         setCarMades(_carMades);
       })

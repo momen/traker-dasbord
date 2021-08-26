@@ -119,7 +119,7 @@ function ProductsForm({
 }) {
   const classes = useStyles();
   const uploadRef = useRef();
-  const { userPermissions, user, lang } = useSelector((state) => state);
+  const { lang } = useSelector((state) => state);
 
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
@@ -234,15 +234,15 @@ function ProductsForm({
       ),
     producttype_id: Yup.string().required(),
     holesale_price:
-      formData.producttype_id.toString() == "2" ||
-      formData.producttype_id.toString() == "3"
+      formData.producttype_id?.toString() == "2" ||
+      formData.producttype_id?.toString() == "3"
         ? Yup.number()
             .min(1, "Enter a value greater than 0")
             .required("This field is Required")
         : Yup.string().nullable().notRequired(),
     no_of_orders:
-      formData.producttype_id.toString() == "2" ||
-      formData.producttype_id.toString() == "3"
+      formData.producttype_id?.toString() == "2" ||
+      formData.producttype_id?.toString() == "3"
         ? Yup.number()
             .min(1, "Minimum value should be 1")
             .required("This field is Required")
@@ -290,8 +290,8 @@ function ProductsForm({
       .min(1, "Minimum value for discount is 0%")
       .max(formData.price * 0.8, "Maximum value for discount is 80%"),
     price:
-      formData.producttype_id.toString() == "1" ||
-      formData.producttype_id.toString() == "3"
+      formData.producttype_id?.toString() == "1" ||
+      formData.producttype_id?.toString() == "3"
         ? Yup.number()
             .required("This field is Required")
             .min(1, "Enter a value greater than 0")
@@ -329,7 +329,7 @@ function ProductsForm({
         : Yup.string().nullable().notRequired(),
     store_id: Yup.string().required(),
     quantity:
-      formData.producttype_id.toString() != "2"
+      formData.producttype_id?.toString() != "2"
         ? Yup.number()
             .required("This field is Required")
             .nullable()
@@ -1306,8 +1306,8 @@ function ProductsForm({
                 </FormControl>
               </Grid>
 
-              {formData.producttype_id.toString() === "2" ||
-              formData.producttype_id.toString() === "3" ? (
+              {formData.producttype_id?.toString() === "2" ||
+              formData.producttype_id?.toString() === "3" ? (
                 <>
                   <Grid item xs={6} md={3}>
                     <div>
@@ -1402,13 +1402,13 @@ function ProductsForm({
                 </>
               ) : null}
 
-              {formData.producttype_id.toString() === "2" ||
-              formData.producttype_id.toString() === "3" ? (
+              {formData.producttype_id?.toString() === "2" ||
+              formData.producttype_id?.toString() === "3" ? (
                 <Grid item xs={7}></Grid>
               ) : null}
 
-              {formData.producttype_id.toString() === "1" ||
-              formData.producttype_id.toString() === "3" ? (
+              {formData.producttype_id?.toString() === "1" ||
+              formData.producttype_id?.toString() === "3" ? (
                 <>
                   <Grid item xs={6} md={4}>
                     <div>
@@ -1588,7 +1588,7 @@ function ProductsForm({
                 <Grid item xs={3}></Grid>
               ) : null} */}
 
-              {formData.producttype_id.toString() !== "2" ? (
+              {formData.producttype_id?.toString() !== "2" ? (
                 <Grid item xs={4} md={3}>
                   <div>
                     <NumberFormat
@@ -1713,7 +1713,7 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              {formData.producttype_id.toString() === "2" ? (
+              {formData.producttype_id?.toString() === "2" ? (
                 <Grid item xs={6}></Grid>
               ) : null}
 
