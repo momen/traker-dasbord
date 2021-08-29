@@ -256,9 +256,8 @@ function PendingOrders() {
               </Button>
             ) : null} */}
             {userPermissions.includes("approve_orders") &&
-            params.row.need_approval &&
-            !params.row.expired &&
-            params.row.status !== "cancelled" ? (
+            params.row.status === "pending" &&
+            !params.row.expired ? (
               <Button
                 style={{ marginRight: "7px" }}
                 className={classes.approveButton}
@@ -275,7 +274,7 @@ function PendingOrders() {
 
             {userPermissions.includes("cancel_orders") &&
             params.row.status === "pending" &&
-            params.row.need_approval ? (
+            !params.row.expired ? (
               <Button
                 style={{ marginRight: "5px" }}
                 className={classes.cancelButton}
