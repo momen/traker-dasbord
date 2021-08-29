@@ -11,6 +11,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
 import CurrencyFormat from "react-currency-format";
+import { useSelector } from "react-redux";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -65,12 +66,13 @@ const useStyles = makeStyles({
     userSelect: "none",
   },
   tagsBadge: {
+    width: "fit-content",
     background: "#e5c08b",
     color: "#000000",
     fontSize: "12px",
     fontWeight: "bold",
     borderRadius: "6px",
-    padding: "5px",
+    padding: "10px",
     marginRight: "5px",
     userSelect: "none",
   },
@@ -89,6 +91,7 @@ const useStyles = makeStyles({
 function ViewProduct({ match }) {
   const classes = useStyles();
   const history = useHistory();
+  const { lang } = useSelector((state) => state);
   const [product, setProduct] = useState(""); //Customize
 
   //Customize
@@ -151,7 +154,9 @@ function ViewProduct({ match }) {
                 Product Name
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.name}</span>
+                <span className={classes.rowContent}>
+                  {lang === "ar" ? product.name : product.name_en}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`vendor-${product.vendor?.id}`}>
@@ -179,7 +184,11 @@ function ViewProduct({ match }) {
                 Description
               </StyledTableCell>
               <StyledTableCell align="left">
-                <p className={classes.rowContent}>{product.description}</p>
+                <p className={classes.rowContent}>
+                  {lang === "ar"
+                    ? product.description || product.description_en
+                    : product.description_en || product.description}
+                </p>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={product.description}>
@@ -376,6 +385,28 @@ function ViewProduct({ match }) {
                       {model.carmodel}
                     </span>
                   ))}
+                </span>
+              </StyledTableCell>
+            </StyledTableRow>
+
+            <StyledTableRow key={`year-from-${product.year_from?.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Year From
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>
+                  {product.year_from?.year}
+                </span>
+              </StyledTableCell>
+            </StyledTableRow>
+
+            <StyledTableRow key={`year-to-${product.year_to?.id}`}>
+              <StyledTableCell component="th" scope="row">
+                Year To
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>
+                  {product.year_to?.year}
                 </span>
               </StyledTableCell>
             </StyledTableRow>

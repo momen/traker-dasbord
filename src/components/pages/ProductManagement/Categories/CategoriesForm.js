@@ -240,13 +240,13 @@ function CategoriesForm({
   const handleUpload = (e) => {
     const imgSize = e.target.files[0]?.size / 1000; //Convert Size from bytes to kilo bytes
 
+    setBigImgSize(false);
+
     // Maximum Size for an Image is 2MB
     if (imgSize > 512) {
       setBigImgSize(true);
       return;
     }
-
-    setBigImgSize(false);
 
     setImgName(e.target.files[0].name);
     updateFormData({
@@ -514,7 +514,7 @@ function CategoriesForm({
               {bigImgSize ? (
                 <Grid item xs={12}>
                   <p className={classes.errorMsg}>
-                    The uploaded image size shouldn't exceed 2MB.
+                    The uploaded image size shouldn't exceed 512 KB.
                   </p>
                 </Grid>
               ) : null}

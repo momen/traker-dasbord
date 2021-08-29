@@ -87,6 +87,11 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(0.5),
     maxWidth: "100%",
   },
+  productImages: {
+    width: "100px",
+    maxHeight: "100px",
+    marginRight: "10px",
+  },
   errorsContainer: {
     marginBottom: theme.spacing(1),
   },
@@ -155,7 +160,7 @@ function ProductsForm({
       : [],
     store_id: itemToEdit ? itemToEdit.store_id : "",
     quantity: itemToEdit ? parseInt(itemToEdit.quantity) : "",
-    qty_reminder: itemToEdit ? parseInt(itemToEdit.qty_reminder) : "",
+    qty_reminder: itemToEdit ? parseInt(itemToEdit.qty_reminder) || 1 : 1,
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
     producttype_id: itemToEdit ? itemToEdit.product_type?.id : "",
     photo: [],
@@ -335,7 +340,10 @@ function ProductsForm({
             .nullable()
             .min(5, "Minimum value should be 5")
         : Yup.number().nullable().notRequired(),
-    qty_reminder: Yup.number().required("This field is Required"),
+    qty_reminder:
+      !formData.producttype_id?.toString() === "2"
+        ? Yup.number().required("This field is Required")
+        : Yup.number().notRequired().nullable(),
     description:
       lang === "ar"
         ? Yup.string()
@@ -661,6 +669,7 @@ function ProductsForm({
   const handleUpload = (e) => {
     let filesList = []; //The arrary of new file to be added to the state
 
+    setBigImgSize(false);
     //Loop on all files saved in the File Input, find if the image was already added to the state
     // & append only the new images to avoid duplication.
     Object.entries(e.target.files).forEach(([key, file]) => {
@@ -672,8 +681,6 @@ function ProductsForm({
         filesList.push(file);
       }
     });
-
-    setBigImgSize(false);
 
     updateFormData({
       ...formData,
@@ -1402,9 +1409,8 @@ function ProductsForm({
                 </>
               ) : null}
 
-              {formData.producttype_id?.toString() === "2" ||
-              formData.producttype_id?.toString() === "3" ? (
-                <Grid item xs={7}></Grid>
+              {formData.producttype_id?.toString() === "3" ? (
+                <Grid item xs={6}></Grid>
               ) : null}
 
               {formData.producttype_id?.toString() === "1" ||
@@ -1630,48 +1636,50 @@ function ProductsForm({
                   </div>
                 </Grid>
               ) : null}
-              <Grid item xs={4} md={3}>
-                <div>
-                  <NumberFormat
-                    allowNegative={false}
-                    customInput={TextField}
-                    thousandSeparator={true}
-                    name="qty_reminder"
-                    required
-                    fullWidth
-                    label="Reminder Quantity"
-                    value={formData.qty_reminder}
-                    onValueChange={({ floatValue }) => {
-                      updateFormData({
-                        ...formData,
-                        qty_reminder: Math.round(floatValue),
-                      });
-                      values.qty_reminder = Math.round(floatValue);
-                      // if (!floatValue) {
-                      //   errors.qty_reminder = "This field is Required";
-                      // } else if (floatValue < 5) {
-                      //   errors.qty_reminder = "Minimum value should be 5";
-                      // }
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.qty_reminder ||
-                      Boolean(touched.qty_reminder && errors.qty_reminder)
-                    }
-                    helperText={touched.qty_reminder && errors.qty_reminder}
-                  />
+              {formData.producttype_id?.toString() !== "2" ? (
+                <Grid item xs={4} md={3}>
+                  <div>
+                    <NumberFormat
+                      allowNegative={false}
+                      customInput={TextField}
+                      thousandSeparator={true}
+                      name="qty_reminder"
+                      required={!formData.producttype_id?.toString() === "2"}
+                      fullWidth
+                      label="Reminder Quantity"
+                      value={formData.qty_reminder}
+                      onValueChange={({ floatValue }) => {
+                        updateFormData({
+                          ...formData,
+                          qty_reminder: Math.round(floatValue),
+                        });
+                        values.qty_reminder = Math.round(floatValue);
+                        // if (!floatValue) {
+                        //   errors.qty_reminder = "This field is Required";
+                        // } else if (floatValue < 5) {
+                        //   errors.qty_reminder = "Minimum value should be 5";
+                        // }
+                      }}
+                      onBlur={handleBlur}
+                      error={
+                        responseErrors?.qty_reminder ||
+                        Boolean(touched.qty_reminder && errors.qty_reminder)
+                      }
+                      helperText={touched.qty_reminder && errors.qty_reminder}
+                    />
 
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.qty_reminder?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
+                    {responseErrors ? (
+                      <div className={classes.inputMessage}>
+                        {responseErrors.qty_reminder?.map((msg) => (
+                          <span key={msg} className={classes.errorMsg}>
+                            {msg}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </Grid>
+              ) : null}
 
               <Grid item xs={6} md={3}>
                 <div>
@@ -2163,37 +2171,43 @@ function ProductsForm({
                 </label>
               </Grid>
 
-              <Grid item xs>
-                {productImages?.map((img, index) => {
-                  // console.log(imagesToDelete);
-                  return (
+              {productImages?.length || formData.photo?.length ? (
+                <Grid item xs>
+                  {productImages?.map((img, index) => {
+                    // console.log(imagesToDelete);
+                    return (
+                      // <Chip
+                      //   className={classes.chip}
+                      //   // icon={<FaceIcon/>}
+                      //   label={img.file_name}
+                      //   onDelete={() => ToggleExistingImage(img)}
+                      //   variant="outlined"
+                      //   color={img.deleted ? "secondary" : "primary"}
+                      // />
+                      <img
+                        src={img.image}
+                        alt={`img-${index}`}
+                        className={classes.productImages}
+                      />
+                    );
+                  })}
+                  {formData.photo?.map((img, index) => (
                     <Chip
                       className={classes.chip}
                       // icon={<FaceIcon/>}
-                      label={img.file_name}
-                      onDelete={() => ToggleExistingImage(img)}
+                      label={img.name}
+                      onDelete={() => handleDeleteImage(img.name)}
                       variant="outlined"
-                      color={img.deleted ? "secondary" : "primary"}
                     />
                     // <img src={img.image} alt={`img-${index}`} />
-                  );
-                })}
-                {formData.photo?.map((img, index) => (
-                  <Chip
-                    className={classes.chip}
-                    // icon={<FaceIcon/>}
-                    label={img.name}
-                    onDelete={() => handleDeleteImage(img.name)}
-                    variant="outlined"
-                  />
-                  // <img src={img.image} alt={`img-${index}`} />
-                ))}
-              </Grid>
+                  ))}
+                </Grid>
+              ) : null}
 
               {bigImgSize ? (
                 <Grid item xs={12}>
                   <p className={classes.errorMsg}>
-                    Size has exceeded 2MB for one Image or more & have been
+                    Size has exceeded 512 KB for one Image or more & have been
                     excluded.
                   </p>
                 </Grid>
