@@ -79,6 +79,8 @@ function ViewTicket({ match }) {
   const { user } = useSelector((state) => state);
   const [ticket, setTicket] = useState("");
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [answer, updateAnswer] = useState("");
 
   useEffect(() => {
@@ -93,6 +95,7 @@ function ViewTicket({ match }) {
   }, []);
 
   const addReply = () => {
+    setIsSubmitting(true);
     if (user.roles[0].title === "Vendor") {
       axios
         .post("vendor/answer/ticket", {
@@ -100,6 +103,14 @@ function ViewTicket({ match }) {
           answer: answer,
         })
         .then(() => {
+          axios
+            .get(`/show/ticket/${match.params.id}`)
+            .then((res) => {
+              setTicket(res.data.data);
+            })
+            .catch(() => {
+              alert("Failed to Fetch data");
+            });
           alert("Reply added successfully");
         });
     } else {
@@ -109,6 +120,14 @@ function ViewTicket({ match }) {
           answer: answer,
         })
         .then(() => {
+          axios
+            .get(`/show/ticket/${match.params.id}`)
+            .then((res) => {
+              setTicket(res.data.data);
+            })
+            .catch(() => {
+              alert("Failed to Fetch data");
+            });
           alert("Reply added successfully");
         });
     }
@@ -207,38 +226,38 @@ function ViewTicket({ match }) {
                   </div>
                 ))}
                 {(user?.roles[0].title === "Vendor" &&
-                      ticket.comments?.length < 1 &&
-                      ticket.case !== "solved" &&
-                      ticket.case !== "to admin") ||
-                    (user?.roles[0].title === "Admin" &&
-                      ticket.case === "to admin") ? (
-                      <>
-                        <p
-                          style={{
-                            fontWeight: "bold",
-                            textDecoration: "underline",
-                          }}
-                        >
-                          Add Reply:
-                        </p>
-                        <TextField
-                          style={{ backgroundColor: "#ffffff" }}
-                          multiline
-                          rows={5}
-                          variant="outlined"
-                          fullWidth
-                          value={answer}
-                          onChange={(e) => updateAnswer(e.target.value)}
-                        />
+                  ticket.comments?.length < 1 &&
+                  ticket.case !== "solved" &&
+                  ticket.case !== "to admin") ||
+                (user?.roles[0].title === "Admin" &&
+                  ticket.case === "to admin") ? (
+                  <>
+                    <p
+                      style={{
+                        fontWeight: "bold",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      Add Reply:
+                    </p>
+                    <TextField
+                      style={{ backgroundColor: "#ffffff" }}
+                      multiline
+                      rows={5}
+                      variant="outlined"
+                      fullWidth
+                      value={answer}
+                      onChange={(e) => updateAnswer(e.target.value)}
+                    />
 
-                        <Button
-                          className={classes.submitButton}
-                          onClick={addReply}
-                          disabled={!answer}
-                        >
-                          Submit
-                        </Button>
-                      </>
+                    <Button
+                      className={classes.submitButton}
+                      onClick={addReply}
+                      disabled={!answer || isSubmitting}
+                    >
+                      Submit
+                    </Button>
+                  </>
                 ) : null}
               </StyledTableCell>
             </StyledTableRow>

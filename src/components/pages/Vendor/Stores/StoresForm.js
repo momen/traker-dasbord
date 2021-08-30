@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import { RotateLeft } from "@material-ui/icons";
 import SuccessPopup from "../../../SuccessPopup";
+import { useEffect } from "react";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -148,6 +149,36 @@ function StoresForm({
     setPageHeader("Branches");
   };
 
+  useEffect(() => {
+    if (itemToEdit) {
+      axios
+        .get(`areas/list/all/${itemToEdit.country_id}`)
+        .then(({ data }) => {
+          const _areas = data.data.map(({ id, area_name }) => ({
+            id,
+            area_name,
+          })); // Customize
+          setAreas(_areas);
+        })
+        .catch(() => {
+          alert("Failed to Fetch Areas List");
+        });
+
+      axios
+        .get(`cities/list/all/${itemToEdit.area_id}`)
+        .then(({ data }) => {
+          const _cities = data.data.map(({ id, city_name }) => ({
+            id,
+            city_name,
+          })); // Customize
+          setCities(_cities);
+        })
+        .catch(() => {
+          alert("Failed to Fetch Cities List");
+        });
+    }
+  }, []);
+
   const handleSubmit = async () => {
     if (!formData.lat || !formData.long) {
       setLocationNotSelected(true);
@@ -274,98 +305,27 @@ function StoresForm({
               <Grid item xs={8}></Grid>
 
               <Grid item xs={4}>
-                <div>
-                  <NumberFormat
-                    name="moderator_phone"
-                    required
-                    fullWidth
-                    format={
-                      itemToEdit ? "+### ## ### ####" : "+966 ## ### ####"
-                    }
-                    mask="_ "
-                    allowEmptyFormatting
-                    customInput={TextField}
-                    id="moderator_phone"
-                    label="Moderator Phone"
-                    value={formData.moderator_phone}
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.moderator_phone ||
-                      Boolean(touched.moderator_phone && errors.moderator_phone)
-                    }
-                    helperText={
-                      touched.moderator_phone && errors.moderator_phone
-                    }
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.moderator_phone?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={4}>
-                <div>
-                  <NumberFormat
-                    name="moderator_alt_phone"
-                    fullWidth
-                    format="+966 ## ### ####"
-                    mask="_ "
-                    customInput={TextField}
-                    id="moderator_alt_phone"
-                    label="Moderator Alternative Phone"
-                    value={formData.moderator_alt_phone}
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.moderator_alt_phone ||
-                      Boolean(
-                        touched.moderator_alt_phone &&
-                          errors.moderator_alt_phone
-                      )
-                    }
-                    helperText={
-                      touched.moderator_alt_phone && errors.moderator_alt_phone
-                    }
-                  />
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.moderator_alt_phone?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
-              <Grid item xs={4}></Grid>
-
-              <Grid item xs={4}>
                 <TextField
                   select
                   label="country"
                   name="country_id"
                   value={formData.country_id}
                   onChange={(e) => {
+                    handleChange(e);
                     if (e.target.value) {
-                      handleChange(e);
-                      handleStateChange(e);
+                      updateFormData({
+                        ...formData,
+                        country_id: e.target.value,
+                        area_id: "",
+                        city_id: "",
+                        moderator_phone: "",
+                        moderator_alt_phone: "",
+                      });
+                      values.area_id = "";
+                      values.city_id = "";
+                      values.moderator_phone = "";
+                      values.moderator_alt_phone = "";
+                      // handleStateChange(e);
                       axios
                         .get(`areas/list/all/${e.target.value}`)
                         .then(({ data }) => {
@@ -380,11 +340,17 @@ function StoresForm({
                         });
                     } else {
                       setAreas([]);
+                      values.area_id = "";
+                      values.city_id = "";
+                      values.moderator_phone = "";
+                      values.moderator_alt_phone = "";
                       updateFormData({
                         ...formData,
                         country_id: "",
                         area_id: "",
                         city_id: "",
+                        moderator_phone: "",
+                        moderator_alt_phone: "",
                       });
                     }
                   }}
@@ -412,6 +378,7 @@ function StoresForm({
                     native: true,
                   }}
                 >
+                  <option value=""></option>
                   {countries?.map((country) => (
                     <option
                       key={`country-${country.id}`}
@@ -432,9 +399,12 @@ function StoresForm({
                   name="area_id"
                   value={formData.area_id}
                   onChange={(e) => {
+                    handleChange(e);
                     if (e.target.value) {
-                      handleChange(e);
-                      handleStateChange(e);
+                      updateFormData({
+                        ...formData,
+                        city_id: "",
+                      });
                       axios
                         .get(`cities/list/all/${e.target.value}`)
                         .then(({ data }) => {
@@ -459,6 +429,7 @@ function StoresForm({
                     }
                   }}
                   fullWidth
+                  InputLabelProps={{ shrink: !!formData.area_id }}
                   error={
                     Boolean(touched.area_id && errors.area_id) ||
                     responseErrors.area_id
@@ -516,6 +487,7 @@ function StoresForm({
                     handleChange(e);
                     handleStateChange(e);
                   }}
+                  InputLabelProps={{ shrink: !!formData.city_id }}
                   InputProps={{
                     classes: {
                       input: classes.input,
@@ -543,7 +515,102 @@ function StoresForm({
                 </TextField>
               </Grid>
 
-              <Grid item xs={12} style={{ marginTop: -32 }}>
+              {formData.country_id ? (
+                <>
+                  <Grid item xs={4}>
+                    <div>
+                      <NumberFormat
+                        dir="ltr"
+                        name="moderator_phone"
+                        required
+                        fullWidth
+                        prefix={`+${
+                          countries.find(
+                            (country) => country.id == formData.country_id
+                          )?.phonecode || ""
+                        } `}
+                        allowEmptyFormatting
+                        customInput={TextField}
+                        label="Moderator Phone"
+                        value={formData.moderator_phone}
+                        onChange={(e) => {
+                          handleChange(e);
+                          handleStateChange(e);
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.moderator_phone ||
+                          Boolean(
+                            touched.moderator_phone && errors.moderator_phone
+                          )
+                        }
+                        helperText={
+                          touched.moderator_phone && errors.moderator_phone
+                        }
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.moderator_phone?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+
+                  <Grid item xs={4}>
+                    <div>
+                      <NumberFormat
+                        dir="ltr"
+                        name="moderator_alt_phone"
+                        fullWidth
+                        prefix={`+${
+                          countries.find(
+                            (country) => country.id == formData.country_id
+                          )?.phonecode || ""
+                        } `}
+                        customInput={TextField}
+                        id="moderator_alt_phone"
+                        label="Moderator Alternative Phone"
+                        value={formData.moderator_alt_phone}
+                        onChange={(e) => {
+                          handleChange(e);
+                          handleStateChange(e);
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.moderator_alt_phone ||
+                          Boolean(
+                            touched.moderator_alt_phone &&
+                              errors.moderator_alt_phone
+                          )
+                        }
+                        helperText={
+                          touched.moderator_alt_phone &&
+                          errors.moderator_alt_phone
+                        }
+                      />
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.moderator_alt_phone?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
+
+              <Grid item xs={4}></Grid>
+
+              <Grid item xs={12}>
                 <div>
                   <TextField
                     name="address"

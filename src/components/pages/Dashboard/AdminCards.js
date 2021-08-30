@@ -11,9 +11,11 @@ import {
   GroupWork,
   LocalShipping,
   Money,
+  NotificationImportant,
   Warning,
 } from "@material-ui/icons";
 import { ShoppingBag } from "react-feather";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   multiInfoCard: {
@@ -31,26 +33,40 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AdminCards({ cards }) {
   const classes = useStyles();
+  const history = useHistory();
 
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} md={6} lg={4}>
         <Card>
           <CardContent>
-            <Typography
-              variant="h6"
-              mb={6}
+            <div
               style={{
                 display: "flex",
-                alignItems: "center",
+                justifyContent: "space-between",
                 color: "#F67830",
               }}
             >
-              <div style={{ width: 30 }}>
-                <GroupWork />
-              </div>
-              Vendors
-            </Typography>
+              <Typography
+                variant="h6"
+                mb={6}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <div style={{ width: 30 }}>
+                  <GroupWork />
+                </div>
+                Vendors
+              </Typography>
+              {parseInt(cards.pending_vendors) > 0 ? (
+                <NotificationImportant
+                  style={{ cursor: "pointer" }}
+                  onClick={() => history.push(`/vendor/vendors`)}
+                />
+              ) : null}
+            </div>
             <div className={classes.multiInfoCard}>
               <span style={{ color: "#7B7B7B" }}>
                 <span style={{ color: "#F67830" }}>Total&emsp;</span>

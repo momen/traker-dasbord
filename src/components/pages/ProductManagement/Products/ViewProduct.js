@@ -155,7 +155,9 @@ function ViewProduct({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>
-                  {lang === "ar" ? product.name : product.name_en}
+                  {lang === "ar"
+                    ? product.name || product.name_en
+                    : product.name_en || product.name}
                 </span>
               </StyledTableCell>
             </StyledTableRow>
