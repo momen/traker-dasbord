@@ -18,6 +18,7 @@ import {
   Warning,
 } from "@material-ui/icons";
 import { ShoppingBag } from "react-feather";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   cardInfo: {
@@ -29,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function VendorCards({ cards }) {
   const classes = useStyles();
+  const { t } = useTranslation();
   return (
     // <Grid container spacing={2}>
     <>
@@ -47,7 +49,7 @@ export default function VendorCards({ cards }) {
               <div style={{ width: 30 }}>
                 <HourglassEmpty />
               </div>
-              Pending Orders
+              {t(`components.dashboard.vendor.pendingOrders`)}
             </Typography>
             <div className={classes.cardInfo}>
               <div style={{ color: "#7B7B7B" }}>{cards.pending_orders}</div>
@@ -71,7 +73,7 @@ export default function VendorCards({ cards }) {
               <div style={{ width: 30 }}>
                 <ShoppingBasket />
               </div>
-              Approved Orders
+              {t(`components.dashboard.vendor.approvedOrders`)}
             </Typography>
             <div className={classes.cardInfo}>
               <div style={{ color: "#7B7B7B" }}>{cards.total_orders}</div>
@@ -95,11 +97,11 @@ export default function VendorCards({ cards }) {
               <div style={{ width: 30 }}>
                 <Money />
               </div>
-              Sales
+              {t(`components.dashboard.vendor.sales`)}
             </Typography>
             <div className={classes.cardInfo}>
               <div style={{ color: "#7B7B7B" }}>
-                {new Intl.NumberFormat().format(cards.total_sale)} SAR
+                {new Intl.NumberFormat().format(cards.total_sale)}
               </div>
             </div>
           </CardContent>
@@ -121,7 +123,7 @@ export default function VendorCards({ cards }) {
               <div style={{ width: 30 }}>
                 <ShoppingBag />
               </div>
-              Total Products
+              {t(`components.dashboard.vendor.products`)}
             </Typography>
             <div className={classes.cardInfo}>
               <div style={{ color: "#7B7B7B" }}>{cards.total_products}</div>
@@ -145,7 +147,7 @@ export default function VendorCards({ cards }) {
               <div style={{ width: 30 }}>
                 <HelpOutline />
               </div>
-              Product Questions
+              {t(`components.dashboard.vendor.questions`)}
             </Typography>
             <div className={classes.cardInfo}>
               <div style={{ color: "#7B7B7B" }}>{cards.prod_questions}</div>
@@ -168,7 +170,7 @@ export default function VendorCards({ cards }) {
               <div style={{ width: 30 }}>
                 <Warning />
               </div>
-              Tickets
+              {t(`components.dashboard.vendor.tickets`)}
             </Typography>
             <div className={classes.cardInfo}>
               <div style={{ color: "#7B7B7B" }}>{cards.tickets}</div>

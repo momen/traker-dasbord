@@ -39,6 +39,27 @@
     "logout": "تسجيل الخروج"
   },
   "components": {
+    "dashboard": {
+      "admin": {
+        "vendors": "البائعين",
+        "clients": "العملاء",
+        "products": "المنتجات",
+        "sales": "المبيعات (ريال سعودي)",
+        "wholesaleSales": "جملة",
+        "wholesaleOrders": "طلبت الجملة",
+        "tickets": "الشكاوي",
+        "pending": "بإنتظار الموافقة",
+        "total": "المجموع"
+      },
+      "vendor": {
+        "pendingOrders": "طلبات بإنتظار الموافقة",
+        "approvedOrders": "طلبات تم الموافقة عليها",
+        "sales": "المبيعات (ريال سعودي)",
+        "products": "المنتجات",
+        "questions": "أسئلة علي المنتجات",
+        "tickets": "الشكاوي"
+      }
+    },
     "ads": {
       "mainHeader": "الإعلانات",
       "top": {

@@ -125,7 +125,7 @@ function Dashboard() {
               variant="outlined"
               onClick={() => setOpenPopup(true)}
             >
-              Filter
+              {lang === "ar" ? "تحديد مدة" : "Filter by period"}
             </Button>
             <BarChart
               barChartLabels={barChartLabels}
@@ -142,7 +142,7 @@ function Dashboard() {
                 variant="outlined"
                 onClick={() => setOpenPopup(true)}
               >
-                Filter
+                {lang === "ar" ? "تحديد مدة" : "Filter by period"}
               </Button>
               <BarChart
                 barChartLabels={barChartLabels}
@@ -191,7 +191,9 @@ function Dashboard() {
                       </div>
                     </Grid>
                     <Grid item xs={8}>
-                      {product.name}
+                      {lang === "ar"
+                        ? product.name || product.name_en
+                        : product.name_en || product.name}
                     </Grid>
                     <Grid item xs={2}>
                       <div style={{ color: "#E10000", textAlign: "center" }}>

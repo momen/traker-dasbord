@@ -274,10 +274,7 @@ function ProductQuestions() {
         });
     } else {
       axios(
-        `/search/prod/questions?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-        {
-          search_index: searchValue,
-        }
+        `/search/prod/questions?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}&search_index=${searchValue}`
       )
         .then((res) => {
           setRowsCount(res.data.total);

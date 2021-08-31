@@ -39,6 +39,27 @@
     "logout": "Logout"
   },
   "components": {
+    "dashboard": {
+      "admin": {
+        "vendors": "Vendors",
+        "clients": "Clients",
+        "products": "Products",
+        "sales": "Sales (SAR)",
+        "wholesaleSales": "Wholesale",
+        "wholesaleOrders": "Wholsale",
+        "tickets": "Tickets",
+        "pending": "Pending",
+        "total": "Total"
+      },
+      "vendor": {
+        "pendingOrders": "Pending Orders",
+        "approvedOrders": "Approved Orders",
+        "sales": "Sales (SAR)",
+        "products": "Products",
+        "questions": "Product Questions",
+        "tickets": "Tickets"
+      }
+    },
     "ads": {
       "mainHeader": "Advertisments",
       "top": {

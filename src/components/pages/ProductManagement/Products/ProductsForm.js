@@ -127,8 +127,8 @@ function ProductsForm({
   const { lang } = useSelector((state) => state);
 
   const [formData, updateFormData] = useState({
-    name: itemToEdit ? itemToEdit.name : "",
-    name_en: itemToEdit ? itemToEdit.name_en : "",
+    name: itemToEdit ? itemToEdit.name || "" : "",
+    name_en: itemToEdit ? itemToEdit.name_en || "" : "",
     description: itemToEdit ? itemToEdit.description || "" : "",
     description_en: itemToEdit ? itemToEdit.description_en || "" : "",
     car_made_id: itemToEdit ? itemToEdit.car_made_id || "" : "",
@@ -2197,19 +2197,21 @@ function ProductsForm({
                   {productImages?.map((img, index) => {
                     // console.log(imagesToDelete);
                     return (
-                      // <Chip
-                      //   className={classes.chip}
-                      //   // icon={<FaceIcon/>}
-                      //   label={img.file_name}
-                      //   onDelete={() => ToggleExistingImage(img)}
-                      //   variant="outlined"
-                      //   color={img.deleted ? "secondary" : "primary"}
-                      // />
-                      <img
-                        src={img.image}
-                        alt={`img-${index}`}
-                        className={classes.productImages}
-                      />
+                      <div>
+                        <Chip
+                          className={classes.chip}
+                          // icon={<FaceIcon/>}
+                          label={img.file_name}
+                          onDelete={() => ToggleExistingImage(img)}
+                          variant="outlined"
+                          color={img.deleted ? "secondary" : "primary"}
+                        />
+                        <img
+                          src={img.image}
+                          alt={`img-${index}`}
+                          className={classes.productImages}
+                        />
+                      </div>
                     );
                   })}
                   {formData.photo?.map((img, index) => (

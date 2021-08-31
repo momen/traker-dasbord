@@ -14,6 +14,7 @@ import "./roundedBarCharts";
 import { Bar, defaults } from "react-chartjs-2";
 
 import { MoreVertical } from "react-feather";
+import { useSelector } from "react-redux";
 
 const Card = styled(MuiCard)(spacing);
 
@@ -29,6 +30,7 @@ const ChartWrapper = styled.div`
 `;
 
 const BarChart = ({ theme, barChartLabels, sales, fromDate, toDate }) => {
+  const { lang } = useSelector((state) => state);
   const firstDatasetColor = "#90CA28";
   const secondDatasetColor =
     theme.palette?.type === "dark"
@@ -102,7 +104,7 @@ const BarChart = ({ theme, barChartLabels, sales, fromDate, toDate }) => {
         //     <MoreVertical />
         //   </IconButton>
         // }
-        title="Sales"
+        title={lang === "ar" ? "المبيعات" : "Sales"}
       />
       <CardHeader
         // action={

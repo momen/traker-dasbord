@@ -16,6 +16,7 @@ import {
 } from "@material-ui/icons";
 import { ShoppingBag } from "react-feather";
 import { useHistory } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   multiInfoCard: {
@@ -34,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 export default function AdminCards({ cards }) {
   const classes = useStyles();
   const history = useHistory();
+  const { t } = useTranslation();
 
   return (
     <Grid container spacing={2}>
@@ -58,7 +60,7 @@ export default function AdminCards({ cards }) {
                 <div style={{ width: 30 }}>
                   <GroupWork />
                 </div>
-                Vendors
+                {t(`components.dashboard.admin.vendors`)}
               </Typography>
               {parseInt(cards.pending_vendors) > 0 ? (
                 <NotificationImportant
@@ -69,12 +71,16 @@ export default function AdminCards({ cards }) {
             </div>
             <div className={classes.multiInfoCard}>
               <span style={{ color: "#7B7B7B" }}>
-                <span style={{ color: "#F67830" }}>Total&emsp;</span>
+                <span style={{ color: "#F67830" }}>
+                  {t(`components.dashboard.admin.total`)}&emsp;
+                </span>
                 {cards.actual_vendors}
               </span>
 
               <span style={{ color: "#7B7B7B" }}>
-                <span style={{ color: "#F67830" }}>Pending&emsp;</span>
+                <span style={{ color: "#F67830" }}>
+                  {t(`components.dashboard.admin.pending`)}&emsp;
+                </span>
                 {cards.pending_vendors}
               </span>
             </div>
@@ -97,7 +103,7 @@ export default function AdminCards({ cards }) {
               <div style={{ width: 30 }}>
                 <Group />
               </div>
-              Clients
+              {t(`components.dashboard.admin.clients`)}
             </Typography>
             <div className={classes.singleInfoCard}>
               <div style={{ color: "#7B7B7B" }}>{cards.total_customers}</div>
@@ -121,7 +127,7 @@ export default function AdminCards({ cards }) {
               <div style={{ width: 30 }}>
                 <ShoppingBag />
               </div>
-              Total Products
+              {t(`components.dashboard.admin.products`)}
             </Typography>
             <div className={classes.singleInfoCard}>
               <div style={{ color: "#7B7B7B" }}>{cards.total_products}</div>
@@ -145,16 +151,20 @@ export default function AdminCards({ cards }) {
               <div style={{ width: 30 }}>
                 <Money />
               </div>
-              Sales (SAR)
+              {t(`components.dashboard.admin.sales`)}
             </Typography>
             <div className={classes.multiInfoCard}>
               <span style={{ color: "#7B7B7B" }}>
-                <b style={{ color: "#90CA28" }}>Total&nbsp;&nbsp;</b>
+                <b style={{ color: "#90CA28" }}>
+                  {t(`components.dashboard.admin.total`)}&nbsp;&nbsp;
+                </b>
                 {new Intl.NumberFormat().format(cards.total_sale)}
               </span>
 
               <span style={{ color: "#7B7B7B" }}>
-                <b style={{ color: "#90CA28" }}>Wholesale&nbsp;&nbsp;</b>
+                <b style={{ color: "#90CA28" }}>
+                  {t(`components.dashboard.admin.wholesaleSales`)}&nbsp;&nbsp;
+                </b>
                 {new Intl.NumberFormat().format(cards.wholesale_total_sale)}
               </span>
             </div>
@@ -178,16 +188,20 @@ export default function AdminCards({ cards }) {
                 <LocalShipping />
                 {/* <img src={deliveryIcon} alt="" /> */}
               </div>
-              Wholesale Orders
+              {t(`components.dashboard.admin.wholesaleOrders`)}
             </Typography>
             <div className={classes.multiInfoCard}>
               <span style={{ color: "#7B7B7B" }}>
-                <span style={{ color: "#C5B152" }}>Total&emsp;</span>
+                <span style={{ color: "#C5B152" }}>
+                  {t(`components.dashboard.admin.total`)}&emsp;
+                </span>
                 {cards.wholesale_orders}
               </span>
 
               <span style={{ color: "#7B7B7B" }}>
-                <span style={{ color: "#C5B152" }}>Pending&emsp;</span>
+                <span style={{ color: "#C5B152" }}>
+                  {t(`components.dashboard.admin.pending`)}&emsp;
+                </span>
                 {cards.pending_wholesale_orders}
               </span>
             </div>
@@ -210,7 +224,7 @@ export default function AdminCards({ cards }) {
               <div style={{ width: 30 }}>
                 <Warning />
               </div>
-              Tickets
+              {t(`components.dashboard.admin.tickets`)}
             </Typography>
             <div className={classes.singleInfoCard}>
               <div style={{ color: "#7B7B7B" }}>{cards.tickets}</div>
