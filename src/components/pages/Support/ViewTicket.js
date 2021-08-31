@@ -225,7 +225,7 @@ function ViewTicket({ match }) {
                     </span>
                   </div>
                 ))}
-                {(user?.roles[0].title === "Vendor" &&
+                {(user?.roles[0].title !== "Admin" &&
                   ticket.comments?.length < 1 &&
                   ticket.case !== "solved" &&
                   ticket.case !== "to admin") ||
