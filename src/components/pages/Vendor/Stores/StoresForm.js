@@ -271,6 +271,7 @@ function StoresForm({
               <Grid item xs={4}>
                 <div>
                   <TextField
+                    variant="outlined"
                     name="name"
                     required
                     fullWidth
@@ -306,6 +307,7 @@ function StoresForm({
 
               <Grid item xs={4}>
                 <TextField
+                  variant="outlined"
                   select
                   label="country"
                   name="country_id"
@@ -393,6 +395,7 @@ function StoresForm({
 
               <Grid item xs={4}>
                 <TextField
+                  variant="outlined"
                   disabled={!formData.country_id}
                   select
                   label="Area"
@@ -468,6 +471,7 @@ function StoresForm({
 
               <Grid item xs={4}>
                 <TextField
+                  variant="outlined"
                   disabled={!formData.area_id}
                   select
                   label="City"
@@ -520,6 +524,7 @@ function StoresForm({
                   <Grid item xs={4}>
                     <div>
                       <NumberFormat
+                        variant="outlined"
                         dir="ltr"
                         name="moderator_phone"
                         required
@@ -564,6 +569,7 @@ function StoresForm({
                   <Grid item xs={4}>
                     <div>
                       <NumberFormat
+                        variant="outlined"
                         dir="ltr"
                         name="moderator_alt_phone"
                         fullWidth
@@ -613,6 +619,7 @@ function StoresForm({
               <Grid item xs={12}>
                 <div>
                   <TextField
+                    variant="outlined"
                     name="address"
                     required
                     fullWidth

@@ -342,7 +342,7 @@ function ProductsForm({
         : Yup.number().nullable().notRequired(),
     qty_reminder:
       !formData.producttype_id?.toString() === "2"
-        ? Yup.number().required("This field is Required")
+        ? Yup.number().nullable().required("This field is Required")
         : Yup.number().notRequired().nullable(),
     description:
       lang === "ar"
@@ -773,6 +773,7 @@ function ProductsForm({
               <Grid item xs={6} md={4}>
                 <div>
                   <TextField
+                    variant="outlined"
                     select
                     label="Main Category"
                     value={formData.maincategory_id}
@@ -837,6 +838,7 @@ function ProductsForm({
               <Grid item xs={6} md={4}>
                 <div>
                   <TextField
+                    variant="outlined"
                     disabled={!formData.maincategory_id}
                     select
                     label="Category"
@@ -903,6 +905,7 @@ function ProductsForm({
               <Grid item xs={6} md={4}>
                 <div>
                   <TextField
+                    variant="outlined"
                     disabled={!partCategories}
                     select
                     label="Part Category"
@@ -951,6 +954,7 @@ function ProductsForm({
               <Grid item xs={6} sm={6}>
                 <div>
                   <TextField
+                    variant="outlined"
                     name="name"
                     required={lang === "ar"}
                     fullWidth
@@ -985,6 +989,7 @@ function ProductsForm({
               <Grid item xs={6} sm={6}>
                 <div>
                   <TextField
+                    variant="outlined"
                     name="name_en"
                     required={lang === "en"}
                     fullWidth
@@ -1019,6 +1024,7 @@ function ProductsForm({
               <Grid item xs={6} md={6}>
                 <div>
                   <TextField
+                    variant="outlined"
                     select
                     label="Manufacturer"
                     value={formData.manufacturer_id}
@@ -1066,6 +1072,7 @@ function ProductsForm({
               <Grid item xs={6} sm={6}>
                 <div>
                   <TextField
+                    variant="outlined"
                     name="serial_number"
                     required
                     fullWidth
@@ -1099,6 +1106,7 @@ function ProductsForm({
               <Grid item xs={6} md={6}>
                 <div>
                   <TextField
+                    variant="outlined"
                     select
                     label="Country of Origin"
                     value={formData.prodcountry_id}
@@ -1319,6 +1327,7 @@ function ProductsForm({
                   <Grid item xs={6} md={3}>
                     <div>
                       <NumberFormat
+                        variant="outlined"
                         allowNegative={false}
                         customInput={TextField}
                         thousandSeparator={true}
@@ -1367,6 +1376,7 @@ function ProductsForm({
                   <Grid item xs={6} md={3} lg={2}>
                     <div>
                       <NumberFormat
+                        variant="outlined"
                         allowNegative={false}
                         customInput={TextField}
                         thousandSeparator={true}
@@ -1419,6 +1429,7 @@ function ProductsForm({
                   <Grid item xs={6} md={4}>
                     <div>
                       <NumberFormat
+                        variant="outlined"
                         allowNegative={false}
                         customInput={TextField}
                         thousandSeparator={true}
@@ -1487,6 +1498,7 @@ function ProductsForm({
                   <Grid item xs={4} md={2}>
                     <div>
                       <NumberFormat
+                        variant="outlined"
                         disabled={
                           !formData.price ||
                           (!enableDiscount && !itemToEdit?.discount)
@@ -1534,6 +1546,7 @@ function ProductsForm({
                   <Grid item xs={4} md={2}>
                     <div>
                       <NumberFormat
+                        variant="outlined"
                         disabled={
                           !formData.price ||
                           (!enableDiscount && !itemToEdit?.discount)
@@ -1598,6 +1611,7 @@ function ProductsForm({
                 <Grid item xs={4} md={3}>
                   <div>
                     <NumberFormat
+                      variant="outlined"
                       allowNegative={false}
                       customInput={TextField}
                       thousandSeparator={true}
@@ -1640,6 +1654,7 @@ function ProductsForm({
                 <Grid item xs={4} md={3}>
                   <div>
                     <NumberFormat
+                      variant="outlined"
                       allowNegative={false}
                       customInput={TextField}
                       thousandSeparator={true}
@@ -1684,6 +1699,7 @@ function ProductsForm({
               <Grid item xs={6} md={3}>
                 <div>
                   <TextField
+                    variant="outlined"
                     select
                     label="Store"
                     value={formData.store_id}
@@ -1742,6 +1758,7 @@ function ProductsForm({
                   <Grid item xs={6} md={3}>
                     <div>
                       <TextField
+                        variant="outlined"
                         select
                         label="Brand"
                         value={formData.car_made_id}
@@ -1886,6 +1903,7 @@ function ProductsForm({
                   <Grid item xs={6} md={3}>
                     <div>
                       <TextField
+                        variant="outlined"
                         select
                         label="From Year"
                         value={formData.year_from}
@@ -1935,6 +1953,7 @@ function ProductsForm({
                   <Grid item xs={6} md={3}>
                     <div>
                       <TextField
+                        variant="outlined"
                         disabled={!formData.year_from}
                         select
                         label="To Year"
@@ -1990,6 +2009,7 @@ function ProductsForm({
                   <Grid item xs={6} md={3}>
                     <div>
                       <TextField
+                        variant="outlined"
                         select
                         label="Transmission"
                         value={formData.transmission_id}
@@ -2044,6 +2064,7 @@ function ProductsForm({
               <Grid item xs={6} md={3}>
                 <div>
                   <TextField
+                    variant="outlined"
                     select
                     label="Car Types"
                     value={formData.cartype_id}

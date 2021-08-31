@@ -264,6 +264,7 @@ function PartCategoryForm({
               <Grid item xs={5}>
                 <div>
                   <TextField
+                    variant="outlined"
                     name="category_name"
                     required
                     fullWidth
@@ -296,6 +297,7 @@ function PartCategoryForm({
 
               <Grid item xs={5}>
                 <TextField
+                  variant="outlined"
                   name="name_en"
                   required
                   fullWidth
@@ -329,6 +331,7 @@ function PartCategoryForm({
               <Grid item xs={5}>
                 <div>
                   <TextField
+                    variant="outlined"
                     select
                     label="Related Category"
                     value={formData.category_id}

@@ -101,11 +101,24 @@ function ProductsForm({
 
   const [formData, updateFormData] = useState({
     city_name: itemToEdit ? itemToEdit.city_name : "",
+    name_en: itemToEdit ? itemToEdit.name_en : "",
     area_id: itemToEdit ? itemToEdit.area_id : "",
   });
 
   const validationSchema = Yup.object().shape({
     city_name: Yup.string()
+      .required("This field is Required")
+      .test(
+        "No floating points",
+        "Please remove any dots",
+        (val) => !val?.includes(".")
+      )
+      .test(
+        "Not empty",
+        "Please remove any spaces at the beginning",
+        (val) => !(val?.substring(0, 1) === " ")
+      ),
+    name_en: Yup.string()
       .required("This field is Required")
       .test(
         "No floating points",
@@ -195,7 +208,7 @@ function ProductsForm({
                     required
                     fullWidth
                     id="city_name"
-                    label="City Name"
+                    label="City Name (Ar)"
                     value={values.city_name}
                     autoFocus
                     onChange={(e) => {
@@ -221,9 +234,42 @@ function ProductsForm({
                   ) : null}
                 </div>
               </Grid>
+
+              <Grid item xs={4}>
+                <div>
+                  <TextField
+                    name="name_en"
+                    required
+                    fullWidth
+                    id="name_en"
+                    label="City Name (En)"
+                    value={values.name_en}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.name_en ||
+                      Boolean(touched.name_en && errors.name_en)
+                    }
+                    helperText={touched.name_en && errors.name_en}
+                  />
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.name_en?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
               {/****************************** ******************************/}
 
-              <Grid item xs={8}></Grid>
+              <Grid item xs={4}></Grid>
 
               <Grid item xs={4}>
                 <div>

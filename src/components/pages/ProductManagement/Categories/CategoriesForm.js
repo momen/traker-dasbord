@@ -300,6 +300,7 @@ function CategoriesForm({
             <Grid container spacing={8}>
               <Grid item xs={4}>
                 <TextField
+                  variant="outlined"
                   name="name"
                   required
                   fullWidth
@@ -331,6 +332,7 @@ function CategoriesForm({
 
               <Grid item xs={4}>
                 <TextField
+                  variant="outlined"
                   name="name_en"
                   required
                   fullWidth
@@ -364,6 +366,7 @@ function CategoriesForm({
               <Grid item xs={4}>
                 <div>
                   <TextField
+                    variant="outlined"
                     select
                     label="Main Category"
                     value={formData.maincategory_id}
@@ -410,6 +413,7 @@ function CategoriesForm({
 
               <Grid item xs={6}>
                 <TextField
+                  variant="outlined"
                   required
                   variant="outlined"
                   id="description"
@@ -445,6 +449,7 @@ function CategoriesForm({
 
               <Grid item xs={6}>
                 <TextField
+                  variant="outlined"
                   required
                   variant="outlined"
                   id="description_en"

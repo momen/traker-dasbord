@@ -159,6 +159,7 @@ function MainCategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
+                  variant="outlined"
                   autoFocus
                   name="main_category_name"
                   required
@@ -194,6 +195,7 @@ function MainCategoriesForm({ setPage, setOpenPopup, itemToEdit }) {
 
               <Grid item xs={12}>
                 <TextField
+                  variant="outlined"
                   name="name_en"
                   required
                   fullWidth

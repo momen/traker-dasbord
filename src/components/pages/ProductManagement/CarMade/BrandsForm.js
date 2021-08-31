@@ -109,6 +109,7 @@ function CreateCarMade({
 
   const [formData, updateFormData] = useState({
     car_made: itemToEdit ? itemToEdit.car_made : "",
+    name_en: itemToEdit ? itemToEdit.name_en : "",
     cartype_id: itemToEdit ? itemToEdit.cartype_id : "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -188,6 +189,7 @@ function CreateCarMade({
             <Grid container spacing={8}>
               <Grid item xs={4}>
                 <TextField
+                  variant="outlined"
                   name="car_made"
                   required
                   fullWidth
@@ -219,6 +221,7 @@ function CreateCarMade({
 
               <Grid item xs={4}>
                 <TextField
+                variant="outlined"
                   name="name_en"
                   required
                   fullWidth
@@ -251,6 +254,7 @@ function CreateCarMade({
 
               <Grid item xs={4}>
                 <TextField
+                variant="outlined"
                   select
                   label="Vehicle Type"
                   value={formData.cartype_id}

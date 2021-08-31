@@ -55,12 +55,25 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit }) {
 
   const [formData, updateFormData] = useState({
     country_name: itemToEdit ? itemToEdit.country_name : "",
+    name_en: itemToEdit ? itemToEdit.name_en : "",
     country_code: itemToEdit ? itemToEdit.country_code : "",
     phonecode: itemToEdit ? itemToEdit.phonecode : "",
   });
 
   const validationSchema = Yup.object().shape({
     country_name: Yup.string()
+      .required("This field is Required")
+      .test(
+        "No floating points",
+        "Please remove any dots",
+        (val) => !val?.includes(".")
+      )
+      .test(
+        "Not empty",
+        "Please remove any spaces at the beginning",
+        (val) => !(val?.substring(0, 1) === " ")
+      ),
+    name_en: Yup.string()
       .required("This field is Required")
       .test(
         "No floating points",
@@ -151,7 +164,7 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit }) {
                     required
                     fullWidth
                     id="country_name"
-                    label="Country Name"
+                    label="Country Name (Ar)"
                     value={values.country_name}
                     autoFocus
                     onChange={(e) => {
@@ -169,6 +182,39 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit }) {
                   {responseErrors ? (
                     <div className={classes.inputMessage}>
                       {responseErrors.country_name?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <div>
+                  <TextField
+                    name="name_en"
+                    required
+                    fullWidth
+                    id="name_en"
+                    label="Country Name (En)"
+                    value={values.name_en}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.name_en ||
+                      Boolean(touched.name_en && errors.name_en)
+                    }
+                    helperText={touched.name_en && errors.name_en}
+                  />
+
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.name_en?.map((msg) => (
                         <span key={msg} className={classes.errorMsg}>
                           {msg}
                         </span>

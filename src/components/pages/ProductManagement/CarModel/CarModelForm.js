@@ -106,6 +106,7 @@ function CarModelForm({
   const formRef = useRef();
   const [formData, updateFormData] = useState({
     carmodel: itemToEdit ? itemToEdit.carmodel : "",
+    name_en: itemToEdit ? itemToEdit.name_en : "",
     carmade_id: itemToEdit ? itemToEdit.carmade_id : "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -187,6 +188,7 @@ function CarModelForm({
             <Grid container spacing={8}>
               <Grid item xs={4}>
                 <TextField
+                  variant="outlined"
                   name="carmodel"
                   required
                   fullWidth
@@ -218,6 +220,7 @@ function CarModelForm({
 
               <Grid item xs={4}>
                 <TextField
+                  variant="outlined"
                   name="name_en"
                   required
                   fullWidth
@@ -250,6 +253,7 @@ function CarModelForm({
 
               <Grid item xs={4}>
                 <TextField
+                  variant="outlined"
                   id="standard-select-currency-native"
                   select
                   label="Select Brand"
