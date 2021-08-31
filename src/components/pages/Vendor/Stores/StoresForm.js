@@ -406,6 +406,7 @@ function StoresForm({
                     if (e.target.value) {
                       updateFormData({
                         ...formData,
+                        area_id: e.target.value,
                         city_id: "",
                       });
                       axios
