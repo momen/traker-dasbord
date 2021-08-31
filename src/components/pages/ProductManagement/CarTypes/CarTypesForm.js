@@ -85,6 +85,13 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
+  name_en: Yup.string()
+    .required("This field is Required")
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
+    ),
 });
 
 function CarTypesForm({
@@ -101,6 +108,7 @@ function CarTypesForm({
 
   const [formData, updateFormData] = useState({
     type_name: itemToEdit ? itemToEdit.type_name : "",
+    name_en: itemToEdit ? itemToEdit.name_en : "",
     photo: "",
   });
   const [imgName, setImgName] = useState("");
@@ -235,10 +243,11 @@ function CarTypesForm({
             <Grid container spacing={8}>
               <Grid item xs={4}>
                 <TextField
+                  autoFocus
                   name="type_name"
                   required
                   fullWidth
-                  label="Type Name"
+                  label="Type Name (Ar)"
                   // prefix="%"
                   value={formData.type_name}
                   onChange={(e) => {
@@ -253,7 +262,6 @@ function CarTypesForm({
                   helperText={touched.type_name && errors.type_name}
                 />
               </Grid>
-              <Grid item xs={8}></Grid>
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.type_name?.map((msg) => (
@@ -263,6 +271,39 @@ function CarTypesForm({
                   ))}
                 </Grid>
               ) : null}
+
+              <Grid item xs={4}>
+                <TextField
+                  name="name_en"
+                  required
+                  fullWidth
+                  label="Type Name (En)"
+                  // prefix="%"
+                  value={formData.name_en}
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.name_en ||
+                    Boolean(touched.name_en && errors.name_en)
+                  }
+                  helperText={touched.name_en && errors.name_en}
+                />
+              </Grid>
+              <Grid item xs={8}></Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.name_en?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={4}></Grid>
 
               <Grid item xs={12} md={3}>
                 <input

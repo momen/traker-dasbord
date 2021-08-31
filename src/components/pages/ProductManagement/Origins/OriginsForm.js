@@ -64,6 +64,13 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
+  name_en: Yup.string()
+    .required("This field is Required")
+    .test(
+      "Not empty",
+      "Please remove any spaces at the beginning",
+      (val) => !(val?.substring(0, 1) === " ")
+    ),
 });
 
 function OriginsForm({ setPage, setOpenPopup, itemToEdit }) {
@@ -72,6 +79,7 @@ function OriginsForm({ setPage, setOpenPopup, itemToEdit }) {
   const formRef = useRef();
   const [formData, updateFormData] = useState({
     country_name: itemToEdit ? itemToEdit.country_name : "",
+    name_en: itemToEdit ? itemToEdit.name_en : "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
@@ -136,10 +144,11 @@ function OriginsForm({ setPage, setOpenPopup, itemToEdit }) {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
+                  autoFocus
                   name="country_name"
                   required
                   fullWidth
-                  label="Origin Country Name"
+                  label="Origin Country Name (Ar)"
                   // prefix="%"
                   value={formData.country_name}
                   onChange={(e) => {
@@ -157,6 +166,36 @@ function OriginsForm({ setPage, setOpenPopup, itemToEdit }) {
               {responseErrors ? (
                 <Grid item xs={12}>
                   {responseErrors.country_name?.map((msg) => (
+                    <span key={msg} className={classes.errorMsg}>
+                      {msg}
+                    </span>
+                  ))}
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12}>
+                <TextField
+                  name="name_en"
+                  required
+                  fullWidth
+                  label="Origin Country Name (En)"
+                  // prefix="%"
+                  value={formData.name_en}
+                  onChange={(e) => {
+                    handleChange(e);
+                    handleStateChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  error={
+                    responseErrors?.name_en ||
+                    Boolean(touched.name_en && errors.name_en)
+                  }
+                  helperText={touched.name_en && errors.name_en}
+                />
+              </Grid>
+              {responseErrors ? (
+                <Grid item xs={12}>
+                  {responseErrors.name_en?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
                       {msg}
                     </span>
