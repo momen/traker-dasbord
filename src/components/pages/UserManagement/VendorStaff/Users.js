@@ -203,7 +203,7 @@ function Users() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const [rolesList, setRolesList] = useState([]);
-  const [stores, setStores] = useState([]);
+  const [stores, setStores] = useState(null);
   const [sortModel, setSortModel] = useState([{ field: "id", sort: "desc" }]);
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [rowsToDelete, setRowsToDelete] = useState([]);
@@ -506,120 +506,137 @@ function Users() {
         {pageHeader}
       </Typography>
       <Divider my={6} />
-      {viewMode === "data-grid" ? (
-        <Card mb={6}>
-          <Paper mb={2}>
-            <Toolbar className={classes.toolBar}>
-              <div style={{ display: "flex", alignItems: "flex-end" }}>
-                {userPermissions.includes("vendor_add_staff") ? (
-                  <Button
-                    data-test="users-create-btn"
-                    className={classes.button}
-                    variant="contained"
-                    onClick={() => {
-                      setSelectedItem("");
-                      setViewMode("add");
-                      setPageHeader("New User");
-                    }}
-                  >
-                    Add User
-                  </Button>
-                ) : null}
+      {stores?.length ? (
+        <>
+          {viewMode === "data-grid" ? (
+            <Card mb={6}>
+              <Paper mb={2}>
+                <Toolbar className={classes.toolBar}>
+                  <div style={{ display: "flex", alignItems: "flex-end" }}>
+                    {userPermissions.includes("vendor_add_staff") ? (
+                      <Button
+                        data-test="users-create-btn"
+                        className={classes.button}
+                        variant="contained"
+                        onClick={() => {
+                          setSelectedItem("");
+                          setViewMode("add");
+                          setPageHeader("New User");
+                        }}
+                      >
+                        Add User
+                      </Button>
+                    ) : null}
 
-                {userPermissions.includes("user_delete_by_vendor") ? (
-                  <Button
-                    startIcon={<Delete />}
-                    color="secondary"
-                    variant="contained"
-                    disabled={rowsToDelete.length < 2}
-                    onClick={() => {
-                      setOpenMassDeleteDialog(true);
+                    {userPermissions.includes("user_delete_by_vendor") ? (
+                      <Button
+                        startIcon={<Delete />}
+                        color="secondary"
+                        variant="contained"
+                        disabled={rowsToDelete.length < 2}
+                        onClick={() => {
+                          setOpenMassDeleteDialog(true);
+                        }}
+                        style={{ height: 40, borderRadius: 0 }}
+                      >
+                        Delete Selected
+                      </Button>
+                    ) : null}
+                  </div>
+
+                  <div>
+                    <Grid container spacing={1} alignItems="flex-end">
+                      <Grid item>
+                        <Search />
+                      </Grid>
+                      <Grid item>
+                        <TextField
+                          id="input-with-icon-grid"
+                          label="Search"
+                          onChange={handleSearchInput}
+                        />
+                      </Grid>
+                    </Grid>
+                  </div>
+                </Toolbar>
+              </Paper>
+              <Paper>
+                <div style={{ width: "100%" }}>
+                  <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    page={page}
+                    pageSize={pageSize}
+                    rowCount={rowsCount}
+                    sortingOrder={["desc", "asc"]}
+                    sortModel={sortModel}
+                    columnBuffer={pageSize}
+                    paginationMode="server"
+                    sortingMode="server"
+                    components={{
+                      Pagination: CustomPagination,
+                      LoadingOverlay: CustomLoadingOverlay,
                     }}
-                    style={{ height: 40, borderRadius: 0 }}
-                  >
-                    Delete Selected
-                  </Button>
-                ) : null}
+                    loading={loading}
+                    checkboxSelection
+                    disableColumnMenu
+                    autoHeight={true}
+                    onRowClick={
+                      userPermissions.includes("user_show_by_vendor")
+                        ? ({ row }) =>
+                            history.push(`/user-mgt/vendor-users/${row.id}`)
+                        : null
+                    }
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSize}
+                    onSortModelChange={handleSortModelChange}
+                    onSelectionChange={(newSelection) => {
+                      setRowsToDelete(newSelection.rowIds);
+                    }}
+                  />
+                </div>
+              </Paper>
+            </Card>
+          ) : (
+            <Card mb={6} style={{ padding: "50px 60px" }}>
+              <div
+                className={classes.backBtn}
+                onClick={() => {
+                  setViewMode("data-grid");
+                  setPageHeader("Staff");
+                }}
+              >
+                <ArrowBack className={classes.backIcon} />
+                <span>Back</span>
               </div>
 
-              <div>
-                <Grid container spacing={1} alignItems="flex-end">
-                  <Grid item>
-                    <Search />
-                  </Grid>
-                  <Grid item>
-                    <TextField
-                      id="input-with-icon-grid"
-                      label="Search"
-                      onChange={handleSearchInput}
-                    />
-                  </Grid>
-                </Grid>
-              </div>
-            </Toolbar>
-          </Paper>
-          <Paper>
-            <div style={{ width: "100%" }}>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                page={page}
-                pageSize={pageSize}
-                rowCount={rowsCount}
-                sortingOrder={["desc", "asc"]}
-                sortModel={sortModel}
-                columnBuffer={pageSize}
-                paginationMode="server"
-                sortingMode="server"
-                components={{
-                  Pagination: CustomPagination,
-                  LoadingOverlay: CustomLoadingOverlay,
-                }}
-                loading={loading}
-                checkboxSelection
-                disableColumnMenu
-                autoHeight={true}
-                onRowClick={
-                  userPermissions.includes("user_show_by_vendor")
-                    ? ({ row }) =>
-                        history.push(`/user-mgt/vendor-users/${row.id}`)
-                    : null
-                }
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSize}
-                onSortModelChange={handleSortModelChange}
-                onSelectionChange={(newSelection) => {
-                  setRowsToDelete(newSelection.rowIds);
-                }}
+              <Divider my={3} />
+              <UsersForm
+                setPage={setPage}
+                setOpenPopup={setOpenPopup}
+                rolesList={rolesList}
+                stores={stores}
+                setViewMode={setViewMode}
+                setPageHeader={setPageHeader}
+                itemToEdit={selectedItem}
               />
-            </div>
-          </Paper>
-        </Card>
-      ) : (
-        <Card mb={6} style={{ padding: "50px 60px" }}>
-          <div
-            className={classes.backBtn}
-            onClick={() => {
-              setViewMode("data-grid");
-              setPageHeader("Staff");
-            }}
-          >
-            <ArrowBack className={classes.backIcon} />
-            <span>Back</span>
-          </div>
+            </Card>
+          )}
+        </>
+      ) : stores ? (
+        <div
+          style={{
+            height: "200px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: "1.4rem",
+          }}
+        >
+          يرجي إضافة فرع لتتمكن من إضافة موظفين
+        </div>
+      ) : null}
 
-          <Divider my={3} />
-          <UsersForm
-            setPage={setPage}
-            setOpenPopup={setOpenPopup}
-            rolesList={rolesList}
-            stores={stores}
-            setViewMode={setViewMode}
-            setPageHeader={setPageHeader}
-            itemToEdit={selectedItem}
-          />
-        </Card>
-      )}
       <Popup
         title={openPopupTitle}
         openPopup={openPopup}
