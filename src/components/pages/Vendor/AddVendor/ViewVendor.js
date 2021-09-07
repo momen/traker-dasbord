@@ -301,14 +301,14 @@ function ViewVendor({ match }) {
                 {vendor.serial}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={vendor.vendor_name}>
+            {/* <StyledTableRow key={vendor.vendor_name}>
               <StyledTableCell component="th" scope="row">
                 Vendor
               </StyledTableCell>
               <StyledTableCell align={lang === "en" ? "left" : "right"}>
                 <span className={classes.rowContent}>{vendor.vendor_name}</span>
               </StyledTableCell>
-            </StyledTableRow>
+            </StyledTableRow> */}
             <StyledTableRow key={vendor.company_name}>
               <StyledTableCell component="th" scope="row">
                 Company Name
