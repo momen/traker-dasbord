@@ -96,7 +96,7 @@ function ViewTicket({ match }) {
 
   const addReply = () => {
     setIsSubmitting(true);
-    if (user.roles[0].title !== "Admin") {
+    if (user.roles[0].title === "Vendor" || user.roles[0].title === "Manager") {
       axios
         .post("vendor/answer/ticket", {
           ticket_id: ticket.id,
@@ -113,7 +113,7 @@ function ViewTicket({ match }) {
             });
           alert("Reply added successfully");
         });
-    } else {
+    } else if (user.roles[0].title === "Admin") {
       axios
         .post("admin/answer/ticket", {
           ticket_id: ticket.id,
