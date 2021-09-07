@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../axios";
-import { Button, TextField } from "@material-ui/core";
+import { Button, TextField, Chip, Grid } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -71,6 +71,19 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
   },
+  productsBadge: {
+    minWidth: "fit-content",
+    maxWidth: "fit-content",
+    background: "#C0D9D9",
+    color: "#000000",
+    fontSize: "12px",
+    fontWeight: "bold",
+    borderRadius: "6px",
+    padding: "5px",
+    marginRight: "5px",
+    userSelect: "none",
+    marginBottom: "5px",
+  },
 }));
 
 function ViewTicket({ match }) {
@@ -139,7 +152,7 @@ function ViewTicket({ match }) {
         id: ticket.id,
       })
       .then(() => {
-        alert("Ticket Solved");
+        alert("Ticket closed successfully");
         axios
           .get(`/show/ticket/${match.params.id}`)
           .then((res) => {
@@ -198,6 +211,26 @@ function ViewTicket({ match }) {
                 <span className={classes.rowContent}>Message</span>
               </StyledTableCell>
               <StyledTableCell align="left">{ticket.message}</StyledTableCell>
+            </StyledTableRow>
+
+            <StyledTableRow key={`attachment${ticket.id}`}>
+              <StyledTableCell component="th" scope="row">
+                <span className={classes.rowContent}>Attachment</span>
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.attachment ? (
+                  <Chip
+                    className={classes.chip}
+                    // icon={<FaceIcon/>}
+                    label={ticket.attachment.file_name}
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => window.open(ticket.attachment.image)}
+                  />
+                ) : (
+                  <b>لم يتم ارفاق صورة</b>
+                )}
+              </StyledTableCell>
             </StyledTableRow>
 
             <StyledTableRow key={`replies-${ticket.id}`}>
@@ -297,8 +330,20 @@ function ViewTicket({ match }) {
               <StyledTableCell component="th" scope="row">
                 Products
               </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.orderDetails?.map((order) => order.product_name + ", ")}
+              <StyledTableCell
+                align="left"
+                style={{ display: "flex", overflowWrap: "break-word" }}
+              >
+                <Grid container spacing={1}>
+                  {ticket.orderDetails?.map((order) => (
+                    <div
+                      key={`product-${order.id}`}
+                      className={classes.productsBadge}
+                    >
+                      {order.product_name}
+                    </div>
+                  ))}
+                </Grid>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`order-payment-${ticket.order_number}`}>
@@ -349,22 +394,24 @@ function ViewTicket({ match }) {
                 {ticket.vendor_email}
               </StyledTableCell>
             </StyledTableRow>
-            {/* <StyledTableRow key={`actions`}>
-              <StyledTableCell component="th" scope="row">
-                Actions
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.case !== "solved" ? (
-                  <Button
-                    variant="contained"
-                    className={classes.solveBtn}
-                    onClick={solveTicket}
-                  >
-                    Mark as Solved
-                  </Button>
-                ) : null}
-              </StyledTableCell>
-            </StyledTableRow> */}
+            {user.roles[0].title === "Admin" ? (
+              <StyledTableRow key={`actions`}>
+                <StyledTableCell component="th" scope="row">
+                  Actions
+                </StyledTableCell>
+                <StyledTableCell align="left">
+                  {ticket.case !== "solved" ? (
+                    <Button
+                      variant="contained"
+                      className={classes.solveBtn}
+                      onClick={solveTicket}
+                    >
+                      Mark as Solved
+                    </Button>
+                  ) : null}
+                </StyledTableCell>
+              </StyledTableRow>
+            ) : null}
           </TableBody>
         </Table>
       </TableContainer>
