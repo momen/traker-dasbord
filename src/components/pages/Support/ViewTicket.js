@@ -96,7 +96,7 @@ function ViewTicket({ match }) {
 
   const addReply = () => {
     setIsSubmitting(true);
-    if (user.roles[0].title === "Vendor") {
+    if (user.roles[0].title !== "Admin") {
       axios
         .post("vendor/answer/ticket", {
           ticket_id: ticket.id,
