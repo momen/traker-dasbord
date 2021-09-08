@@ -307,7 +307,7 @@ function Products() {
               key={img.uuid}
               src={img.image}
               alt="ph"
-              style={{ objectFit: "contain", width: 50 }}
+              style={{ objectFit: "contain", maxHeight: 40 }}
             />
           ))}
         </Fragment>
@@ -879,8 +879,12 @@ function Products() {
                               <MenuItem value={"name"}>Product Name</MenuItem>
                               <MenuItem value={"quantity"}>Quantity</MenuItem>
                               <MenuItem value={"price"}>Price</MenuItem>
-                              <MenuItem value={"car_made_id"}>Car Made</MenuItem>
-                              <MenuItem value={"car_model_id"}>Car Model</MenuItem>
+                              <MenuItem value={"car_made_id"}>
+                                Car Made
+                              </MenuItem>
+                              <MenuItem value={"car_model_id"}>
+                                Car Model
+                              </MenuItem>
                               <MenuItem value={"year"}>Car Year</MenuItem>
                               <MenuItem value={"category_id"}>
                                 Category

@@ -4,6 +4,11 @@ import {
   Checkbox,
   Chip,
   Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider as MuiDivider,
   FormControl,
   FormControlLabel,
@@ -74,7 +79,13 @@ const useStyles = makeStyles((theme) => ({
     width: "15%",
   },
   uploadButton: {
-    margin: theme.spacing(3, 2, 2),
+    // margin: theme.spacing(3, 2, 2),
+    width: "150px",
+    height: 40,
+  },
+  uploadIcon: {
+    marginRight: "10px",
+    marginLeft: "10px",
   },
   uploadInput: {
     display: "none",
@@ -88,9 +99,8 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: "100%",
   },
   productImages: {
-    width: "100px",
-    maxHeight: "100px",
-    marginRight: "10px",
+    height: "60px",
+    marginRight: "20px",
   },
   errorsContainer: {
     marginBottom: theme.spacing(1),
@@ -111,7 +121,7 @@ function ProductsForm({
   stores,
   mainCategories,
   // categories,
-  carMades,
+  // carMades,
   carYears,
   productTags,
   manufacturers,
@@ -166,6 +176,7 @@ function ProductsForm({
     photo: [],
   });
 
+  const [brands, setBrands] = useState(null);
   const [carModels, setCarModels] = useState(null);
   const [categories, setCategories] = useState(null);
   const [partCategories, setPartCategories] = useState(null);
@@ -412,6 +423,11 @@ function ProductsForm({
     itemToEdit.discount ? true : false
   );
 
+  // This is the for an image if you are editing a product, if you try to delete it there is a confirmation Dialog
+  // appearing before the action is done, so the image info is needed if the user confirms to delete.
+  const [imageToDelete, setImageToDelete] = useState({});
+
+  // List of images Ids to be deleted on submit (applies for previously saved images on editing a product, not new uploaded images)
   const [imagesToDelete, setImagesToDelete] = useState([]);
 
   const [productImages, setProductImages] = useState(() =>
@@ -431,6 +447,8 @@ function ProductsForm({
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
 
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogText, setDialogText] = useState(
     itemToEdit
@@ -447,6 +465,19 @@ function ProductsForm({
   useEffect(() => {
     if (itemToEdit) {
       if (itemToEdit.car_made_id) {
+        axios
+          .get(`/cartype/madeslist/${itemToEdit.cartype_id}`)
+          .then((res) => {
+            const _brands = res.data.data.map(({ id, car_made, name_en }) => ({
+              id,
+              car_made,
+              name_en,
+            })); // Customize
+            setBrands(_brands);
+          })
+          .catch(() => {
+            alert("Failed to Fetch Models List");
+          });
         axios
           .get(`/car-modelslist/${itemToEdit.car_made_id}`)
           .then((res) => {
@@ -542,8 +573,7 @@ function ProductsForm({
 
     if (
       (formData.photo.length === 0 && !itemToEdit) ||
-      (productImages?.length === imagesToDelete?.length &&
-        !formData.photo?.length)
+      (productImages?.length === 0 && !formData.photo?.length)
     ) {
       setOpenAlert(true);
       setIsSubmitting(false);
@@ -669,6 +699,8 @@ function ProductsForm({
   const handleUpload = (e) => {
     let filesList = []; //The arrary of new file to be added to the state
 
+    console.log(e.target.files);
+
     setBigImgSize(false);
     //Loop on all files saved in the File Input, find if the image was already added to the state
     // & append only the new images to avoid duplication.
@@ -702,18 +734,25 @@ function ProductsForm({
     // as we can't manipulate the FileList directly.
   };
 
-  const ToggleExistingImage = ({ id, file_name, deleted }) => {
-    if (deleted) {
-      setImagesToDelete(imagesToDelete.filter((img_id) => img_id !== id));
-    } else {
-      setImagesToDelete([...imagesToDelete, id]);
-    }
-    setProductImages(
-      productImages.map((img) =>
-        img.file_name === file_name ? { ...img, deleted: !img.deleted } : img
-      )
-    );
+  // const ToggleExistingImage = ({ id, file_name, deleted }) => {
+  //   if (deleted) {
+  //     setImagesToDelete(imagesToDelete.filter((img_id) => img_id !== id));
+  //   } else {
+  //     setImagesToDelete([...imagesToDelete, id]);
+  //   }
+  //   setProductImages(
+  //     productImages.map((img) =>
+  //       img.file_name === file_name ? { ...img, deleted: !img.deleted } : img
+  //     )
+  //   );
+  //   setBigImgSize(false);
+  // };
+
+  const addToDeleteImages = ({ id, file_name, deleted }) => {
+    setImagesToDelete([...imagesToDelete, id]);
+    setProductImages(productImages.filter((img) => img.id !== id));
     setBigImgSize(false);
+    setOpenDeleteDialog(false);
   };
 
   const handleReset = () => {
@@ -1760,6 +1799,84 @@ function ProductsForm({
                       <TextField
                         variant="outlined"
                         select
+                        label="Car Type"
+                        value={formData.cartype_id}
+                        name="cartype_id"
+                        onChange={(e) => {
+                          handleChange(e);
+                          updateFormData({
+                            ...formData,
+                            cartype_id: e.target.value,
+                            car_made_id: "",
+                            models: [],
+                          });
+                          values.car_made_id = "";
+                          values.models = [];
+                          if (e.target.value) {
+                            axios
+                              .get(`/cartype/madeslist/${e.target.value}`)
+                              .then((res) => {
+                                const _brands = res.data.data.map(
+                                  ({ id, car_made, name_en }) => ({
+                                    id,
+                                    car_made,
+                                    name_en,
+                                  })
+                                ); // Customize
+                                setBrands(_brands);
+                              })
+                              .catch(() => {
+                                alert("Failed to Fetch Brands List");
+                              });
+                          } else {
+                            setBrands(null);
+                            setCarModels(null);
+                            updateFormData({
+                              ...formData,
+                              cartype_id: "",
+                              car_made_id: "",
+                              models: [],
+                            });
+                          }
+                        }}
+                        SelectProps={{
+                          native: true,
+                        }}
+                        onBlur={handleBlur}
+                        error={
+                          responseErrors?.cartype_id ||
+                          Boolean(touched.cartype_id && errors.cartype_id)
+                        }
+                        helperText="Please select a Car Type"
+                        fullWidth
+                      >
+                        <option aria-label="None" value="" />
+                        {carTypes?.map((carType) => (
+                          <option value={carType.id}>
+                            {lang === "ar"
+                              ? carType.type_name || carType.name_en
+                              : carType.name_en || carType.type_name}
+                          </option>
+                        ))}
+                      </TextField>
+
+                      {responseErrors ? (
+                        <div className={classes.inputMessage}>
+                          {responseErrors.cartype_id?.map((msg) => (
+                            <span key={msg} className={classes.errorMsg}>
+                              {msg}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                    <div>
+                      <TextField
+                        disabled={!brands?.length > 0}
+                        variant="outlined"
+                        select
                         label="Brand"
                         value={formData.car_made_id}
                         name="car_made_id"
@@ -1784,7 +1901,7 @@ function ProductsForm({
                                 setCarModels(_carModels);
                               })
                               .catch(() => {
-                                alert("Failed to Fetch Brands List");
+                                alert("Failed to Fetch Models List");
                               });
                           } else {
                             setCarModels(null);
@@ -1807,7 +1924,7 @@ function ProductsForm({
                         fullWidth
                       >
                         <option aria-label="None" value="" />
-                        {carMades?.map((carMade) => (
+                        {brands?.map((carMade) => (
                           <option value={carMade.id}>
                             {lang === "ar"
                               ? carMade.car_made || carMade.name_en
@@ -1827,8 +1944,7 @@ function ProductsForm({
                       ) : null}
                     </div>
                   </Grid>
-
-                  <Grid item xs={9} md={9}>
+                  <Grid item xs={12} md={6}>
                     <div>
                       <Autocomplete
                         disabled={!formData.car_made_id}
@@ -1899,7 +2015,6 @@ function ProductsForm({
                       ) : null}
                     </div>
                   </Grid>
-
                   <Grid item xs={6} md={3}>
                     <div>
                       <TextField
@@ -1949,7 +2064,6 @@ function ProductsForm({
                       ) : null}
                     </div>
                   </Grid>
-
                   <Grid item xs={6} md={3}>
                     <div>
                       <TextField
@@ -2061,51 +2175,6 @@ function ProductsForm({
                 </>
               ) : null}
 
-              <Grid item xs={6} md={3}>
-                <div>
-                  <TextField
-                    variant="outlined"
-                    select
-                    label="Car Types"
-                    value={formData.cartype_id}
-                    name="cartype_id"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleStateChange(e);
-                    }}
-                    SelectProps={{
-                      native: true,
-                    }}
-                    onBlur={handleBlur}
-                    error={
-                      responseErrors?.cartype_id ||
-                      Boolean(touched.cartype_id && errors.cartype_id)
-                    }
-                    helperText="Please select a Car Type"
-                    fullWidth
-                  >
-                    <option aria-label="None" value="" />
-                    {carTypes?.map((carType) => (
-                      <option value={carType.id}>
-                        {lang === "ar"
-                          ? carType.type_name || carType.name_en
-                          : carType.name_en || carType.type_name}
-                      </option>
-                    ))}
-                  </TextField>
-
-                  {responseErrors ? (
-                    <div className={classes.inputMessage}>
-                      {responseErrors.cartype_id?.map((msg) => (
-                        <span key={msg} className={classes.errorMsg}>
-                          {msg}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </Grid>
-
               <Grid item xs={12}>
                 <div>
                   <Autocomplete
@@ -2169,7 +2238,7 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={12} lg={2}>
+              <Grid item xs={12} lg={12}>
                 <input
                   ref={uploadRef}
                   accept="image/*"
@@ -2184,7 +2253,7 @@ function ProductsForm({
                     variant="contained"
                     color="default"
                     className={classes.uploadButton}
-                    startIcon={<PhotoCamera />}
+                    startIcon={<PhotoCamera className={classes.uploadIcon} />}
                     component="span"
                   >
                     Upload
@@ -2197,12 +2266,15 @@ function ProductsForm({
                   {productImages?.map((img, index) => {
                     // console.log(imagesToDelete);
                     return (
-                      <div>
+                      <div style={{ display: "flex", alignItems: "center" }}>
                         <Chip
                           className={classes.chip}
                           // icon={<FaceIcon/>}
                           label={img.file_name}
-                          onDelete={() => ToggleExistingImage(img)}
+                          onDelete={() => {
+                            setImageToDelete(img);
+                            setOpenDeleteDialog(true);
+                          }}
                           variant="outlined"
                           color={img.deleted ? "secondary" : "primary"}
                         />
@@ -2309,6 +2381,41 @@ function ProductsForm({
           </form>
         )}
       </Formik>
+      <Dialog
+        open={openDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Delete Image"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            id="alert-dialog-description"
+            style={{ maxWidth: "20vw" }}
+          >
+            Are you sure you want to delete this image?
+            <br />
+            If you proceed the image will be removed from the view, however it
+            won't be actually deleted until you submit the form.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              addToDeleteImages(imageToDelete);
+            }}
+            color="primary"
+          >
+            Yes
+          </Button>
+          <Button
+            onClick={() => setOpenDeleteDialog(false)}
+            color="secondary"
+            autoFocus
+          >
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
       <SuccessPopup
         open={dialogOpen}
         setOpen={setDialogOpen}
