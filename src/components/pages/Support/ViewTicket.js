@@ -394,7 +394,7 @@ function ViewTicket({ match }) {
                 {ticket.vendor_email}
               </StyledTableCell>
             </StyledTableRow>
-            {user.roles[0].title === "Admin" ? (
+            {user?.roles[0].title === "Admin" ? (
               <StyledTableRow key={`actions`}>
                 <StyledTableCell component="th" scope="row">
                   Actions
