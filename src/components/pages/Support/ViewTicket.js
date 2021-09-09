@@ -152,7 +152,7 @@ function ViewTicket({ match }) {
         id: ticket.id,
       })
       .then(() => {
-        alert("Ticket closed successfully");
+        alert("Ticket solved successfully");
         axios
           .get(`/show/ticket/${match.params.id}`)
           .then((res) => {
@@ -162,7 +162,7 @@ function ViewTicket({ match }) {
             alert("Failed to Fetch data");
           });
       })
-      .catch(({ response }) => alert(response.data.errors));
+      .catch(({ response }) => alert(response.data.message));
   };
 
   return (

@@ -9,6 +9,7 @@ import {
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import { RotateLeft } from "@material-ui/icons";
+import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -95,9 +96,11 @@ function FAQ_Form({
     setIsSubmitting(true);
     setFromDate(newFromDate);
     setToDate(newToDate);
+    console.log(moment(newFromDate).format().slice(0, 16));
+    console.log(moment(newToDate).format().slice(0, 16));
     updateFilterData({
-      from: newFromDate.toISOString().slice(0, 10),
-      to: newToDate.toISOString().slice(0, 10),
+      from: moment(newFromDate).format().slice(0, 10),
+      to: moment(newToDate).format().slice(0, 10),
     });
     setOpenPopup(false);
   };

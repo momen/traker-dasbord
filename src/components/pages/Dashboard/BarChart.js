@@ -15,6 +15,7 @@ import { Bar, defaults } from "react-chartjs-2";
 
 import { MoreVertical } from "react-feather";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const Card = styled(MuiCard)(spacing);
 
@@ -31,6 +32,7 @@ const ChartWrapper = styled.div`
 
 const BarChart = ({ theme, barChartLabels, sales, fromDate, toDate }) => {
   const { lang } = useSelector((state) => state);
+  const { t } = useTranslation();
   const firstDatasetColor = "#90CA28";
   const secondDatasetColor =
     theme.palette?.type === "dark"

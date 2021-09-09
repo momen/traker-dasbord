@@ -20,6 +20,7 @@ import { Group, GroupWork, LocalShipping, Warning } from "@material-ui/icons";
 import deliveryIcon from "../../imgs/ic-ecommerce-delivery.svg";
 import AdminCards from "./AdminCards";
 import VendorCards from "./VendorCards";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   submitButton: {
@@ -45,6 +46,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Dashboard() {
   const classes = useStyles();
+  const { t } = useTranslation();
   const { user, lang } = useSelector((state) => state);
   const [barChartLabels, setBarChartLabels] = useState("");
   const [dashboardInfo, setDashboardInfo] = useState({});
@@ -216,7 +218,7 @@ function Dashboard() {
       </Grid>
 
       <Popup
-        title="Filter Sales by period"
+        title={t('components.dashboard.filterForm.title')}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
