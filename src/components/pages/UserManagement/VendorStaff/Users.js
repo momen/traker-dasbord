@@ -63,6 +63,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.direction === "rtl" ? 40 : 25,
   },
   button: {
+    width: "fit-content",
     height: 40,
     fontFamily: `"Almarai", sans-serif`,
     color: "#EF9300",
@@ -214,7 +215,7 @@ function Users() {
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
     { field: "name", headerName: "Name", width: 100 },
-    { field: "email", headerName: "Email", width: 160 },
+    { field: "email", headerName: "Email", width: 140 },
     {
       field: "roles",
       headerName: "Role",
@@ -225,7 +226,7 @@ function Users() {
     {
       field: "stores",
       headerName: "Branches",
-      width: 200,
+      width: 150,
       sortable: false,
       renderCell: (params) => (
         <div>
@@ -240,14 +241,15 @@ function Users() {
     {
       field: "approved",
       headerName: "Status",
-      width: 120,
+      width: 90,
       renderCell: (params) =>
         params.row.approved === 0 ? "Pending Approval" : "Approved",
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      // width: 250,
+      flex: 1,
       sortable: false,
       disableClickEventBubbling: true,
       renderCell: (params) => {
@@ -256,13 +258,12 @@ function Users() {
             style={{
               display: "flex",
               justifyContent: "flex-start",
-              width: "100%",
+              width: "250px",
               // padding: "5px"
             }}
           >
             {params.row.approved === 0 ? (
               <Button
-                style={{ marginRight: "5px" }}
                 className={classes.button}
                 variant="contained"
                 size="small"
@@ -291,7 +292,6 @@ function Users() {
               <Button
                 className={classes.actionBtn}
                 startIcon={<Edit />}
-                style={{ marginRight: "5px" }}
                 color="primary"
                 variant="contained"
                 // size="small"

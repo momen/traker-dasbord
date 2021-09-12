@@ -270,24 +270,33 @@ function ViewProduct({ match }) {
                 ))}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`quantity-${product.quantity}`}>
-              <StyledTableCell component="th" scope="row">
-                Available Quantity
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.quantity}</span>
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`reminderQuantity-${product.qty_reminder}`}>
-              <StyledTableCell component="th" scope="row">
-                Reminder Quantity
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>
-                  {product.qty_reminder}
-                </span>
-              </StyledTableCell>
-            </StyledTableRow>
+            {product.producttype_id?.producttype === "normal" ? (
+              <>
+                <StyledTableRow key={`quantity-${product.quantity}`}>
+                  <StyledTableCell component="th" scope="row">
+                    Available Quantity
+                  </StyledTableCell>
+                  <StyledTableCell align="left">
+                    <span className={classes.rowContent}>
+                      {product.quantity}
+                    </span>
+                  </StyledTableCell>
+                </StyledTableRow>
+                <StyledTableRow
+                  key={`reminderQuantity-${product.qty_reminder}`}
+                >
+                  <StyledTableCell component="th" scope="row">
+                    Reminder Quantity
+                  </StyledTableCell>
+                  <StyledTableCell align="left">
+                    <span className={classes.rowContent}>
+                      {product.qty_reminder}
+                    </span>
+                  </StyledTableCell>
+                </StyledTableRow>
+              </>
+            ) : null}
+
             <StyledTableRow key={`discount-${product.discount}`}>
               <StyledTableCell component="th" scope="row">
                 Discount
