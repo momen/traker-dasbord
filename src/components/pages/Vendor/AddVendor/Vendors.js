@@ -82,6 +82,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.direction === "rtl" ? 5 : 0,
   },
   actionBtn: {
+    marginRight: 5,
     padding: 5,
     color: "#CCCCCC",
     backgroundColor: "transparent",
@@ -276,23 +277,6 @@ function Vendors() {
       },
     },
     {
-      field: "images",
-      headerName: "Logo",
-      width: 70,
-      sortable: false,
-      renderCell: (params) => {
-        if (params.value) {
-          return (
-            <img
-              src={params.value.image}
-              alt="logo"
-              style={{ objectFit: "contain", width: 50, borderRadius: "999px" }}
-            />
-          );
-        }
-      },
-    },
-    {
       field: "actions",
       headerName: "Actions",
       width: 550,
@@ -321,9 +305,6 @@ function Vendors() {
             ) : null} */}
             {userPermissions.includes("add_vendor_edit") ? (
               <Button
-                style={{
-                  marginRight: "5px",
-                }}
                 className={classes.actionBtn}
                 startIcon={<Edit />}
                 color="primary"
@@ -342,9 +323,6 @@ function Vendors() {
             ) : null}
             {userPermissions.includes("add_vendor_delete") ? (
               <Button
-                style={{
-                  marginRight: "5px",
-                }}
                 className={classes.actionBtn}
                 startIcon={<Delete />}
                 color="secondary"
@@ -357,7 +335,7 @@ function Vendors() {
             ) : null}
             {userPermissions.includes("admin_access_vendor_orders") ? (
               <Button
-                style={{ marginRight: "5px", marginLeft: "15px" }}
+                className={classes.actionBtn}
                 // color="secondary"
                 variant="contained"
                 size="small"
@@ -370,6 +348,7 @@ function Vendors() {
             ) : null}
             {userPermissions.includes("admin_access_vendor_invoices") ? (
               <Button
+                className={classes.actionBtn}
                 // color="secondary"
                 variant="contained"
                 size="small"
@@ -537,8 +516,8 @@ function Vendors() {
           setRows(res.data.data);
           setLoading(false);
         })
-        .catch(() => {
-          alert("Failed to Fetch data");
+        .catch(({ response }) => {
+          alert(response.errors || response.error || response.message);
         });
     } else {
       axios
@@ -553,8 +532,8 @@ function Vendors() {
           setRows(res.data.data);
           setLoading(false);
         })
-        .catch(() => {
-          alert("Failed to Fetch data");
+        .catch(({ response }) => {
+          alert(response.errors || response.error || response.message);
         });
     }
   }, [page, searchValue, openPopup, sortModel, pageSize, lang]);

@@ -48,6 +48,9 @@ const useStyles = makeStyles((theme) => ({
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
+  radioLabel: {
+    textTransform: "capitalize",
+  },
   submitButton: {
     height: 40,
     fontFamily: `"Almarai", sans-serif`,
@@ -785,11 +788,11 @@ function ProductsForm({
     setBigImgSize(false);
   };
 
-  const vendorTypes = [
-    { id: 2, title: "Wholesale" },
-    { id: 1, title: "Retail" },
-    { id: 3, title: "Both" },
-  ];
+  // const vendorTypes = [
+  //   { id: 2, title: "Wholesale" },
+  //   { id: 1, title: "Retail" },
+  //   { id: 3, title: "Both" },
+  // ];
   return (
     <div className={classes.paper}>
       <Formik
@@ -1326,7 +1329,7 @@ function ProductsForm({
                     }}
                   >
                     <div style={{ display: "flex" }}>
-                      {vendorTypes?.map((type) => (
+                      {productTypes?.map((type) => (
                         <FormControlLabel
                           key={`vendor-type-${type.id}`}
                           // style={{ marginLeft: "30px" }}
@@ -1343,7 +1346,9 @@ function ProductsForm({
                           //   style={{ padding: 0 }}
                           label={
                             <span className={classes.radioLabel}>
-                              {type.title}
+                              {lang === "ar"
+                                ? type.producttype || type.name_en
+                                : type.name_en || type.producttype}
                             </span>
                           }
                         />
