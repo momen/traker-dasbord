@@ -244,6 +244,7 @@ function Origins() {
 
   const handlePageSize = ({ pageSize }) => {
     setPageSize(pageSize);
+    setPage(1);
   };
 
   const handlePageChange = ({ page }) => {
