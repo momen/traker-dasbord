@@ -336,11 +336,19 @@ function PendingOrders() {
             setLoading(false);
           })
           .catch(({ response }) => {
-            alert(response.data?.errors);
+            alert(
+              response.data?.errors ||
+                response.data?.error ||
+                response.data?.message
+            );
           });
       })
       .catch(({ response }) => {
-        alert(response.data?.message);
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
   };
 
@@ -365,11 +373,19 @@ function PendingOrders() {
             setLoading(false);
           })
           .catch(({ response }) => {
-            alert(response.data?.errors);
+            alert(
+              response.data?.errors ||
+                response.data?.error ||
+                response.data?.message
+            );
           });
       })
       .catch(({ response }) => {
-        alert(response.data?.errors);
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
   };
 
@@ -389,8 +405,12 @@ function PendingOrders() {
           setRows(res.data.data);
           setLoading(false);
         })
-        .catch(() => {
-          alert("Failed to Fetch data");
+        .catch(({ response }) => {
+          alert(
+            response.data?.errors ||
+              response.data?.error ||
+              response.data?.message
+          );
         });
     } else {
       axios
@@ -405,8 +425,12 @@ function PendingOrders() {
           setRows(res.data.data);
           setLoading(false);
         })
-        .catch(() => {
-          alert("Failed to Fetch data");
+        .catch(({ response }) => {
+          alert(
+            response.data?.errors ||
+              response.data?.error ||
+              response.data?.message
+          );
         });
     }
   }, [page, searchValue, sortModel, pageSize, statusToFilterBy, lang]);
