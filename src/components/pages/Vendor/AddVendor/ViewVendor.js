@@ -228,6 +228,7 @@ function ViewVendor({ match }) {
 
   const rejectInfo = (e) => {
     e.preventDefault();
+    console.log(itemsToReject);
     axios
       .post("admin/reject/vendor", {
         vendor_id: vendor.id,

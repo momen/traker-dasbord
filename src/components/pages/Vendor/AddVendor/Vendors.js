@@ -212,6 +212,7 @@ function Vendors() {
       field: "vendorStatus",
       headerName: "Status",
       width: 100,
+      sortable: false,
       renderCell: (params) => {
         return params.value === "approved" ? (
           <span

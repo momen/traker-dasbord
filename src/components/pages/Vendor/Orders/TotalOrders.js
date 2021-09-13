@@ -248,9 +248,7 @@ function PendingOrders() {
             ) : null} */}
             {userPermissions.includes("approve_orders") &&
             user.roles[0].id != 1 &&
-            params.row.need_approval &&
-            params.row.orderStatus !== "cancelled" &&
-            params.row.orderStatus !== "cancelled due to expiration" ? (
+            params.row.need_approval ? (
               <Button
                 style={{ marginRight: "5px" }}
                 className={classes.approveButton}
@@ -267,9 +265,7 @@ function PendingOrders() {
 
             {userPermissions.includes("cancel_orders") &&
             user.roles[0].id !== 1 &&
-            params.row.need_approval &&
-            params.row.orderStatus !== "cancelled" &&
-            params.row.orderStatus !== "cancelled due to expiration" ? (
+            params.row.need_approval ? (
               <Button
                 style={{ marginRight: "5px" }}
                 className={classes.cancelButton}
