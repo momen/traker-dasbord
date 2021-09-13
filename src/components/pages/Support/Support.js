@@ -175,9 +175,41 @@ function Support() {
     {
       field: "case",
       headerName: "Status",
-      width: 80,
+      width: 90,
       headerAlign: "center",
       align: "center",
+      renderCell: (params) =>
+        params.value === "solved" ? (
+          <span
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              height: 30,
+              padding: "5px",
+              color: "#90CA28",
+              border: "1px solid #90CA28",
+            }}
+          >
+            Solved
+          </span>
+        ) : (
+          <span
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              height: 30,
+              padding: "5px",
+              color: "#98A9FF",
+              border: "1px solid #98A9FF",
+            }}
+          >
+            Open
+          </span>
+        ),
     },
     {
       field: "category_name",
