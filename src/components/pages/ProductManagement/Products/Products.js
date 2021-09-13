@@ -262,7 +262,15 @@ function Products() {
 
   const columns = [
     { field: "id", headerName: "ID", width: 45 },
-    { field: "name", headerName: "Name", width: 80 },
+    {
+      field: "name",
+      headerName: "Name",
+      width: 80,
+      renderCell: (params) =>
+        lang === "ar"
+          ? params.row.name || params.row.name_en
+          : params.row.name_en || params.row.name,
+    },
     { field: "serial_coding", headerName: "Serial", width: 100 },
     {
       field: "store_name",

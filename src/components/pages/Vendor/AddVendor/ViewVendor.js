@@ -240,6 +240,9 @@ function ViewVendor({ match }) {
         setReason("");
         setItemsToReject([]);
         setIsRejecting(false);
+        axios.get(`/add-vendors/${match.params.id}`).then((res) => {
+          setVendor(res.data.data);
+        });
       })
       .catch(({ response }) => alert(response.data.errors));
   };
@@ -740,14 +743,15 @@ function ViewVendor({ match }) {
               </StyledTableCell>
             </StyledTableRow>
 
-            <StyledTableRow key={`vendor-actions`}>
-              <StyledTableCell component="th" scope="row">
-                Actions
-              </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                <div style={{ textAlign: "center" }}>
-                  {vendor.vendorStatus !== "incomplete" &&
-                  vendor.vendorStatus !== "approved" ? (
+            {vendor.vendorStatus !== "incomplete" &&
+            vendor.vendorStatus !== "invalid info" &&
+            vendor.vendorStatus !== "approved" ? (
+              <StyledTableRow key={`vendor-actions`}>
+                <StyledTableCell component="th" scope="row">
+                  Actions
+                </StyledTableCell>
+                <StyledTableCell align={lang === "en" ? "left" : "right"}>
+                  <div style={{ textAlign: "center" }}>
                     <>
                       <Button
                         variant="contained"
@@ -774,68 +778,68 @@ function ViewVendor({ match }) {
                         {lang === "en" ? "Decline Request" : "رفض الطلب"}
                       </Button>
                     </>
-                  ) : null}
-                </div>
+                  </div>
 
-                <Collapse timeout="auto" in={isRejecting}>
-                  <p>
-                    {lang === "en" ? "Rejection reasons" : "سبب الاستيفاء"}:
-                  </p>
+                  <Collapse timeout="auto" in={isRejecting}>
+                    <p>
+                      {lang === "en" ? "Rejection reasons" : "سبب الاستيفاء"}:
+                    </p>
 
-                  <Grid container>
-                    {rejectionList?.map((currentItem) => (
-                      <Grid item xs={12} md={6}>
-                        <FormControlLabel
-                          control={
-                            <CustomCheckbox
-                              // checked={
-                              //   itemsToReject.filter(
-                              //     (item) => item == currentItem.id
-                              //   ).length
-                              // }
-                              // name={category.name}
-                              value={currentItem.id}
-                              onChange={selectRejection}
-                            />
-                          }
-                          label={
-                            <Typography className={classes.checkboxLabel}>
-                              {lang === "en"
-                                ? currentItem.fieldEn
-                                : currentItem.fieldAr}
-                            </Typography>
-                          }
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
+                    <Grid container>
+                      {rejectionList?.map((currentItem) => (
+                        <Grid item xs={12} md={6}>
+                          <FormControlLabel
+                            control={
+                              <CustomCheckbox
+                                // checked={
+                                //   itemsToReject.filter(
+                                //     (item) => item == currentItem.id
+                                //   ).length
+                                // }
+                                // name={category.name}
+                                value={currentItem.id}
+                                onChange={selectRejection}
+                              />
+                            }
+                            label={
+                              <Typography className={classes.checkboxLabel}>
+                                {lang === "en"
+                                  ? currentItem.fieldEn
+                                  : currentItem.fieldAr}
+                              </Typography>
+                            }
+                          />
+                        </Grid>
+                      ))}
+                    </Grid>
 
-                  <p> {lang === "en" ? "Comments" : "رسالة/ملاحظات"}:</p>
+                    <p> {lang === "en" ? "Comments" : "رسالة/ملاحظات"}:</p>
 
-                  <TextField
-                    variant="outlined"
-                    multiline
-                    rows={4}
-                    fullWidth
-                    required
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    style={{
-                      backgroundColor: "#FFFFFF",
-                      borderColor: "#CCCCCC",
-                    }}
-                  />
+                    <TextField
+                      variant="outlined"
+                      multiline
+                      rows={4}
+                      fullWidth
+                      required
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                      style={{
+                        backgroundColor: "#FFFFFF",
+                        borderColor: "#CCCCCC",
+                      }}
+                    />
 
-                  <Button
-                    className={classes.submitBtn}
-                    disabled={!itemsToReject.length || !reason}
-                    onClick={rejectInfo}
-                  >
-                    {lang === "en" ? "Submit" : "إرسال"}
-                  </Button>
-                </Collapse>
-              </StyledTableCell>
-            </StyledTableRow>
+                    <Button
+                      className={classes.submitBtn}
+                      disabled={!itemsToReject.length || !reason}
+                      onClick={rejectInfo}
+                    >
+                      {lang === "en" ? "Submit" : "إرسال"}
+                    </Button>
+                  </Collapse>
+                </StyledTableCell>
+              </StyledTableRow>
+            ) : null}
           </TableBody>
         </Table>
       </TableContainer>

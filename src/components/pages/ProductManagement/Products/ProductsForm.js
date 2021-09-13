@@ -1765,7 +1765,7 @@ function ProductsForm({
                   >
                     <option aria-label="None" value="" />
                     {stores?.map((store) => (
-                      <option value={store.id}>{store.name}</option>
+                      <option value={parseInt(store.id)}>{store.name}</option>
                     ))}
                   </TextField>
 
