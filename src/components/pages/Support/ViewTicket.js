@@ -264,7 +264,10 @@ function ViewTicket({ match }) {
                   ticket.case !== "solved" &&
                   ticket.case !== "to admin") ||
                 (user?.roles[0].title === "Admin" &&
-                  ticket.case === "to admin") ? (
+                  ticket.case === "to admin" &&
+                  !ticket.comments?.filter(
+                    (comment) => comment.user_role === "Admin"
+                  ).length) ? (
                   <>
                     <p
                       style={{
