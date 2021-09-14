@@ -604,28 +604,31 @@ function ViewVendor({ match }) {
               </StyledTableCell>
             </StyledTableRow>
 
-            <StyledTableRow>
-              <StyledTableCell component="th" scope="row">
-                Wholesale Document
-              </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <span> {vendor.wholesaleDocs?.file_name}</span>
-                  {vendor.wholesaleDocs?.image ? (
-                    <div style={{ display: "flex" }}>
-                      <Button
-                        style={{
-                          width: "fit-content",
-                          margin: "5px 15px",
-                          marginLeft: 0,
-                        }}
-                        className={classes.viewDocumentButton}
-                        variant="contained"
-                        onClick={() => window.open(vendor.wholesaleDocs?.image)}
-                      >
-                        View Document
-                      </Button>
-                      {/* {vendor.complete &&
+            {vendor.type != 1 ? (
+              <StyledTableRow>
+                <StyledTableCell component="th" scope="row">
+                  Wholesale Document
+                </StyledTableCell>
+                <StyledTableCell align={lang === "en" ? "left" : "right"}>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span> {vendor.wholesaleDocs?.file_name}</span>
+                    {vendor.wholesaleDocs?.image ? (
+                      <div style={{ display: "flex" }}>
+                        <Button
+                          style={{
+                            width: "fit-content",
+                            margin: "5px 15px",
+                            marginLeft: 0,
+                          }}
+                          className={classes.viewDocumentButton}
+                          variant="contained"
+                          onClick={() =>
+                            window.open(vendor.wholesaleDocs?.image)
+                          }
+                        >
+                          View Document
+                        </Button>
+                        {/* {vendor.complete &&
                       !vendor.approved &&
                       !vendor.declined ? (
                         <Button
@@ -641,15 +644,16 @@ function ViewVendor({ match }) {
                           Reject
                         </Button>
                       ) : null} */}
-                    </div>
-                  ) : (
-                    <span style={{ color: "#ff6700", fontWeight: "bold" }}>
-                      Not provided yet
-                    </span>
-                  )}
-                </div>
-              </StyledTableCell>
-            </StyledTableRow>
+                      </div>
+                    ) : (
+                      <span style={{ color: "#ff6700", fontWeight: "bold" }}>
+                        Not provided yet
+                      </span>
+                    )}
+                  </div>
+                </StyledTableCell>
+              </StyledTableRow>
+            ) : null}
 
             <StyledTableRow key={vendor.bank_account}>
               <StyledTableCell component="th" scope="row">
@@ -729,7 +733,7 @@ function ViewVendor({ match }) {
               </StyledTableCell>
             </StyledTableRow>
 
-            <StyledTableRow key={`vendor-logo`}>
+            {/* <StyledTableRow key={`vendor-logo`}>
               <StyledTableCell component="th" scope="row">
                 Logo
               </StyledTableCell>
@@ -740,7 +744,7 @@ function ViewVendor({ match }) {
                   className={classes.media}
                 />
               </StyledTableCell>
-            </StyledTableRow>
+            </StyledTableRow> */}
 
             {vendor.vendorStatus !== "incomplete" &&
             vendor.vendorStatus !== "invalid info" &&
@@ -786,7 +790,7 @@ function ViewVendor({ match }) {
 
                     <Grid container>
                       {rejectionList?.map((currentItem, index) =>
-                        vendor.type == 2 && index === 0 ? null : (
+                        vendor.type == 1 && index === 0 ? null : (
                           <Grid item xs={12} md={6}>
                             <FormControlLabel
                               control={
