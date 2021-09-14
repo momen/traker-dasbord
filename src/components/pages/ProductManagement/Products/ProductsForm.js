@@ -33,6 +33,7 @@ import { Formik } from "formik";
 import SuccessPopup from "../../../SuccessPopup";
 import { spacing } from "@material-ui/system";
 import { useSelector } from "react-redux";
+import clsx from "clsx";
 
 const Divider = styled(MuiDivider)(spacing);
 
@@ -100,6 +101,14 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     margin: theme.spacing(0.5),
     maxWidth: "100%",
+  },
+  chipError: {
+    color: "red",
+    borderColor: "red",
+  },
+  imageErrorMsg: {
+    marginLeft: 10,
+    color: "red",
   },
   productImages: {
     height: "60px",
@@ -2246,7 +2255,8 @@ function ProductsForm({
               <Grid item xs={12} lg={12}>
                 <input
                   ref={uploadRef}
-                  accept="image/*"
+                  // accept="image/*"
+                  accept=".jpg, .jpeg, .png, .gif"
                   className={classes.uploadInput}
                   id="icon-button-file"
                   type="file"
@@ -2292,14 +2302,21 @@ function ProductsForm({
                     );
                   })}
                   {formData.photo?.map((img, index) => (
-                    <Chip
-                      className={classes.chip}
-                      // icon={<FaceIcon/>}
-                      label={img.name}
-                      onDelete={() => handleDeleteImage(img.name)}
-                      variant="outlined"
-                    />
-                    // <img src={img.image} alt={`img-${index}`} />
+                    <>
+                      <Chip
+                        className={clsx(
+                          classes.chip,
+                          responseErrors[`photo.${index}`] && classes.chipError
+                        )}
+                        // icon={<FaceIcon/>}
+                        label={img.name}
+                        onDelete={() => handleDeleteImage(img.name)}
+                        variant="outlined"
+                      />
+                      <p className={classes.imageErrorMsg}>
+                        {responseErrors[`photo.${index}`]}
+                      </p>
+                    </>
                   ))}
                 </Grid>
               ) : null}
