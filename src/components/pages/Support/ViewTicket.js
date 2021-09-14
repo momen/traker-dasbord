@@ -89,7 +89,7 @@ const useStyles = makeStyles((theme) => ({
 function ViewTicket({ match }) {
   const classes = useStyles();
   const history = useHistory();
-  const { user } = useSelector((state) => state);
+  const { user, lang } = useSelector((state) => state);
   const [ticket, setTicket] = useState("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -328,21 +328,21 @@ function ViewTicket({ match }) {
             </StyledTableRow>
             <StyledTableRow key={`order-products-${ticket.order_number}`}>
               <StyledTableCell component="th" scope="row">
-                Products
+                Product
               </StyledTableCell>
               <StyledTableCell
                 align="left"
                 style={{ display: "flex", overflowWrap: "break-word" }}
               >
                 <Grid container spacing={1}>
-                  {ticket.orderDetails?.map((order) => (
-                    <div
-                      key={`product-${order.id}`}
-                      className={classes.productsBadge}
-                    >
-                      {order.product_name}
-                    </div>
-                  ))}
+                  <div
+                    key={`ticket-${ticket.id}-product`}
+                    className={classes.productsBadge}
+                  >
+                    {lang === "ar"
+                      ? ticket.product_name || ticket.name_en
+                      : ticket.name_en || ticket.product_name}
+                  </div>
                 </Grid>
               </StyledTableCell>
             </StyledTableRow>
