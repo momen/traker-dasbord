@@ -785,31 +785,33 @@ function ViewVendor({ match }) {
                     </p>
 
                     <Grid container>
-                      {rejectionList?.map((currentItem) => (
-                        <Grid item xs={12} md={6}>
-                          <FormControlLabel
-                            control={
-                              <CustomCheckbox
-                                // checked={
-                                //   itemsToReject.filter(
-                                //     (item) => item == currentItem.id
-                                //   ).length
-                                // }
-                                // name={category.name}
-                                value={currentItem.id}
-                                onChange={selectRejection}
-                              />
-                            }
-                            label={
-                              <Typography className={classes.checkboxLabel}>
-                                {lang === "en"
-                                  ? currentItem.fieldEn
-                                  : currentItem.fieldAr}
-                              </Typography>
-                            }
-                          />
-                        </Grid>
-                      ))}
+                      {rejectionList?.map((currentItem, index) =>
+                        vendor.type == 2 && index === 0 ? null : (
+                          <Grid item xs={12} md={6}>
+                            <FormControlLabel
+                              control={
+                                <CustomCheckbox
+                                  // checked={
+                                  //   itemsToReject.filter(
+                                  //     (item) => item == currentItem.id
+                                  //   ).length
+                                  // }
+                                  // name={category.name}
+                                  value={currentItem.id}
+                                  onChange={selectRejection}
+                                />
+                              }
+                              label={
+                                <Typography className={classes.checkboxLabel}>
+                                  {lang === "en"
+                                    ? currentItem.fieldEn
+                                    : currentItem.fieldAr}
+                                </Typography>
+                              }
+                            />
+                          </Grid>
+                        )
+                      )}
                     </Grid>
 
                     <p> {lang === "en" ? "Comments" : "رسالة/ملاحظات"}:</p>
