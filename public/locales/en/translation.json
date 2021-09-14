@@ -25,6 +25,7 @@
     "products": "Products",
     "vendorMgt": "Vendor Management",
     "vendors": "Vendors",
+    "pendingVendors": "Pending Vendors",
     "branches": "Branches",
     "totalOrders": "Total Orders",
     "wholesaleOrders": "Wholesale Orders",
@@ -46,7 +47,6 @@
     "dashboard": {
       "admin": {
         "vendors": "Vendors",
-        "pendingVendors": "Pending Vendors",
         "clients": "Clients",
         "products": "Products",
         "sales": "Sales (SAR)",
