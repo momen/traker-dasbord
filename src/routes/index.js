@@ -128,6 +128,9 @@ const Products = async(() =>
 const Vendors = async(() =>
   import("../components/pages/Vendor/AddVendor/Vendors")
 );
+const PendingVendors = async(() =>
+  import("../components/pages/Vendor/AddVendor/PendingVendors")
+);
 const VendorOrders = async(() =>
   import("../components/pages/Vendor/AddVendor/VendorOrders")
 );
@@ -539,6 +542,14 @@ const vendorRoutes = {
       name: "vendors",
       component: Vendors,
       icon: <RecentActors />,
+      guard: PermissionGuard,
+      permission: "add_vendor_access",
+    },
+    {
+      path: "/vendor/pending-vendors",
+      name: "pendingVendors",
+      component: PendingVendors,
+      icon: <HourglassEmpty />,
       guard: PermissionGuard,
       permission: "add_vendor_access",
     },

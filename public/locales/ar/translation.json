@@ -46,6 +46,7 @@
     "dashboard": {
       "admin": {
         "vendors": "البائعين",
+        "pendingVendors": "البائعين بإنتظار الموافقة",
         "clients": "العملاء",
         "products": "المنتجات",
         "sales": "المبيعات (ريال سعودي)",

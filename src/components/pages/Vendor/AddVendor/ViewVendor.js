@@ -220,8 +220,9 @@ function ViewVendor({ match }) {
       .post("admin/decline/vendor", {
         vendor_id: vendor.id,
       })
-      .then(() => {
-        history.push("/vendor/vendors");
+      .then(({ data }) => {
+        alert(data?.message || "Vendor declined successfully");
+        history.goBack();
       })
       .catch(({ response }) => alert(response.data.errors));
   };
@@ -275,10 +276,7 @@ function ViewVendor({ match }) {
         Back to list
       </Button> */}
 
-      <div
-        className={classes.backBtn}
-        onClick={() => history.push("/vendor/vendors")}
-      >
+      <div className={classes.backBtn} onClick={() => history.goBack()}>
         <ArrowBack className={classes.backIcon} />
         <span>Back</span>
       </div>

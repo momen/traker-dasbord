@@ -46,6 +46,7 @@
     "dashboard": {
       "admin": {
         "vendors": "Vendors",
+        "pendingVendors": "Pending Vendors",
         "clients": "Clients",
         "products": "Products",
         "sales": "Sales (SAR)",

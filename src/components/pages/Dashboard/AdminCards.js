@@ -65,7 +65,7 @@ export default function AdminCards({ cards }) {
               {parseInt(cards.pending_vendors) > 0 ? (
                 <NotificationImportant
                   style={{ cursor: "pointer" }}
-                  onClick={() => history.push(`/vendor/vendors`)}
+                  onClick={() => history.push(`/vendor/pending-vendors`)}
                 />
               ) : null}
             </div>
