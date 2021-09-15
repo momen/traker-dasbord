@@ -45,6 +45,7 @@
   },
   "components": {
     "dashboard": {
+      "title": "الرئيسية",
       "admin": {
         "vendors": "البائعين",
         "clients": "العملاء",

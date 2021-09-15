@@ -3,11 +3,12 @@ import {
   Button,
   Card,
   CardContent,
-  Divider,
+  Divider as MuiDivider,
   Grid,
   makeStyles,
   Typography,
 } from "@material-ui/core";
+import styled from "styled-components/macro";
 import React, { useEffect, useState } from "react";
 import axios from "../../../axios";
 import { useSelector } from "react-redux";
@@ -21,6 +22,9 @@ import deliveryIcon from "../../imgs/ic-ecommerce-delivery.svg";
 import AdminCards from "./AdminCards";
 import VendorCards from "./VendorCards";
 import { useTranslation } from "react-i18next";
+import { spacing } from "@material-ui/system";
+
+const Divider = styled(MuiDivider)(spacing);
 
 const useStyles = makeStyles((theme) => ({
   submitButton: {
@@ -89,6 +93,10 @@ function Dashboard() {
 
   return (
     <>
+      <Typography variant="h3" gutterBottom display="inline">
+        {t("components.dashboard.title")}
+      </Typography>
+      <Divider my={6} />
       <Grid container spacing={5}>
         {/* <Grid item xs={12} lg={12}> */}
         {/* {Object.entries(dashboardInfo).map(([key, value]) => {
@@ -138,22 +146,29 @@ function Dashboard() {
           </Grid>
         ) : (
           <>
-            <Grid item xs={12} lg={6}>
-              <Button
-                className={classes.submitButton}
-                variant="outlined"
-                onClick={() => setOpenPopup(true)}
-              >
-                {lang === "ar" ? "تحديد مدة" : "Filter by period"}
-              </Button>
-              <BarChart
-                barChartLabels={barChartLabels}
-                sales={sales}
-                fromDate={filterData.from}
-                toDate={filterData.to}
-              />
-            </Grid>
-            <Grid item xs={12} lg={6} style={{ backgroundColor: "#ffffff" }}>
+            {user?.roles[0].title !== "Staff" ? (
+              <Grid item xs={12} lg={6}>
+                <Button
+                  className={classes.submitButton}
+                  variant="outlined"
+                  onClick={() => setOpenPopup(true)}
+                >
+                  {lang === "ar" ? "تحديد مدة" : "Filter by period"}
+                </Button>
+                <BarChart
+                  barChartLabels={barChartLabels}
+                  sales={sales}
+                  fromDate={filterData.from}
+                  toDate={filterData.to}
+                />
+              </Grid>
+            ) : null}
+            <Grid
+              item
+              xs={12}
+              lg={user?.roles[0].title !== "Staff" ? 6 : 12}
+              style={{ backgroundColor: "#ffffff" }}
+            >
               <Grid container style={{ minHeight: "30px" }} spacing={1}>
                 <Grid item xs={2}>
                   <div style={{ height: "30px", textAlign: "center" }}>
@@ -218,7 +233,7 @@ function Dashboard() {
       </Grid>
 
       <Popup
-        title={t('components.dashboard.filterForm.title')}
+        title={t("components.dashboard.filterForm.title")}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >

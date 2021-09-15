@@ -616,6 +616,8 @@ function ProductsForm({
       // formData.tags = formData.tags.map(tag => tag.id)
       // formData.photo= formData.photo.map(async (img) => await toBase64(img));
 
+      console.log(formData.models);
+
       if (itemToEdit) {
         await axios
           .post(`/products/${itemToEdit.id}`, data, {

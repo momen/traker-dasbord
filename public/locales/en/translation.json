@@ -45,6 +45,7 @@
   },
   "components": {
     "dashboard": {
+      "title": "Dashboard",
       "admin": {
         "vendors": "Vendors",
         "clients": "Clients",
