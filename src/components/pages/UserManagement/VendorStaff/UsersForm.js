@@ -144,6 +144,7 @@ function UsersForm({
     if (itemToEdit) {
       data.name = formData.name;
       data.roles = parseInt(formData.roles);
+      data.stores = JSON.stringify(formData.stores.map((val) => val.id));
       axios
         .put(`/users/${itemToEdit.id}`, data)
         .then((res) => {
@@ -155,7 +156,6 @@ function UsersForm({
         });
     } else {
       data.role = parseInt(formData.role);
-      data.stores = JSON.stringify(formData.stores.map((val) => val.id));
       axios
         .post("/vendor/add/staff", data)
         .then((res) => {
@@ -330,70 +330,68 @@ function UsersForm({
               )}
               {/* <Grid item xs={7}></Grid> */}
 
-              {!itemToEdit ? (
-                <Grid item xs={12}>
-                  <div>
-                    <Autocomplete
-                      multiple
-                      // filterSelectedOptions
-                      options={stores ? stores : []}
-                      value={formData.stores}
-                      getOptionSelected={(option, value) =>
-                        option.id === value.id
-                      }
-                      disableCloseOnSelect
-                      getOptionLabel={(option) => option.name}
-                      renderOption={(option, { selected }) => (
-                        <React.Fragment>
-                          <Checkbox
-                            icon={icon}
-                            checkedIcon={checkedIcon}
-                            style={{ marginRight: 8 }}
-                            checked={selected}
-                          />
-                          {option.name}
-                        </React.Fragment>
-                      )}
-                      fullWidth
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          name="stores"
-                          variant="outlined"
-                          label="Stores *"
-                          placeholder="Assign stores for this user"
-                          fullWidth
-                          error={responseErrors?.stores || autoSelectStoreError}
-                          helperText="At least one Store must be selected."
+              <Grid item xs={12}>
+                <div>
+                  <Autocomplete
+                    multiple
+                    // filterSelectedOptions
+                    options={stores ? stores : []}
+                    value={formData.stores}
+                    getOptionSelected={(option, value) =>
+                      option.id === value.id
+                    }
+                    disableCloseOnSelect
+                    getOptionLabel={(option) => option.name}
+                    renderOption={(option, { selected }) => (
+                      <React.Fragment>
+                        <Checkbox
+                          icon={icon}
+                          checkedIcon={checkedIcon}
+                          style={{ marginRight: 8 }}
+                          checked={selected}
                         />
-                      )}
-                      onBlur={() => {
-                        if (formData.stores.length === 0) {
-                          setAutoSelectStoreError(true);
-                        }
-                      }}
-                      onChange={(e, val) => {
-                        updateAutoCompleteStores(e, val);
-                        if (val.length === 0) {
-                          setAutoSelectStoreError(true);
-                        } else {
-                          setAutoSelectStoreError(false);
-                        }
-                      }}
-                    />
+                        {option.name}
+                      </React.Fragment>
+                    )}
+                    fullWidth
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="stores"
+                        variant="outlined"
+                        label="Stores *"
+                        placeholder="Assign stores for this user"
+                        fullWidth
+                        error={responseErrors?.stores || autoSelectStoreError}
+                        helperText="At least one Store must be selected."
+                      />
+                    )}
+                    onBlur={() => {
+                      if (formData.stores.length === 0) {
+                        setAutoSelectStoreError(true);
+                      }
+                    }}
+                    onChange={(e, val) => {
+                      updateAutoCompleteStores(e, val);
+                      if (val.length === 0) {
+                        setAutoSelectStoreError(true);
+                      } else {
+                        setAutoSelectStoreError(false);
+                      }
+                    }}
+                  />
 
-                    {responseErrors ? (
-                      <div className={classes.inputMessage}>
-                        {responseErrors.stores?.map((msg) => (
-                          <span key={msg} className={classes.errorMsg}>
-                            {msg}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                </Grid>
-              ) : null}
+                  {responseErrors ? (
+                    <div className={classes.inputMessage}>
+                      {responseErrors.stores?.map((msg) => (
+                        <span key={msg} className={classes.errorMsg}>
+                          {msg}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Grid>
 
               {typeof responseErrors === "string" ? (
                 <Grid item xs={12}>
