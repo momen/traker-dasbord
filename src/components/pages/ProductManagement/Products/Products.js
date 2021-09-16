@@ -260,24 +260,43 @@ function Products() {
   const [viewMode, setViewMode] = useState("data-grid");
 
   const columns = [
-    { field: "id", headerName: "ID", width: 45 },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 45,
+      headerAlign: "center",
+      align: "center",
+    },
     {
       field: "name",
       headerName: "Name",
       width: 80,
+      flex: 1,
       renderCell: (params) =>
         lang === "ar"
           ? params.row.name || params.row.name_en
           : params.row.name_en || params.row.name,
     },
-    { field: "serial_coding", headerName: "Serial", width: 100 },
+    {
+      field: "serial_coding",
+      headerName: "Serial",
+      width: 100,
+      headerAlign: "center",
+      align: "center",
+    },
     {
       field: "store_name",
       headerName: "Store",
-      width: 100,
+      width: 120,
       renderCell: (params) => params.row.store?.name,
     },
-    { field: "quantity", headerName: "Quantity", width: 70 },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      width: 70,
+      headerAlign: "center",
+      align: "center",
+    },
     {
       field: "product_type",
       headerName: "Type",
@@ -290,36 +309,48 @@ function Products() {
         </span>
       ),
     },
-    { field: "price", headerName: "Price", width: 80 },
     {
-      field: "discount",
-      headerName: "Discount",
-      width: 60,
-      renderCell: (params) =>
-        params.value ? `%${parseFloat(params.value).toFixed(2)}` : "%0",
-      align: "center",
-    },
-    { field: "holesale_price", headerName: "Wholesale Price", width: 80 },
-    // { field: "no_of_orders", headerName: "No of orders", width: 60 },
-
-    {
-      field: "photo",
-      headerName: "Photos",
-      width: 80,
+      field: "vehicle_type",
+      headerName: "Vehicle",
+      width: 90,
       sortable: false,
       renderCell: (params) => (
-        <Fragment>
-          {params.value?.map((img, index) => (
-            <img
-              key={img.uuid}
-              src={img.image}
-              alt="ph"
-              style={{ objectFit: "contain", maxHeight: 40 }}
-            />
-          ))}
-        </Fragment>
+        <span style={{ textTransform: "capitalize" }}>
+          {" "}
+          {params.row.car_type?.type_name}
+        </span>
       ),
     },
+    // { field: "price", headerName: "Price", width: 80 },
+    // {
+    //   field: "discount",
+    //   headerName: "Discount",
+    //   width: 60,
+    //   renderCell: (params) =>
+    //     params.value ? `%${parseFloat(params.value).toFixed(2)}` : "%0",
+    //   align: "center",
+    // },
+    // { field: "holesale_price", headerName: "Wholesale Price", width: 80 },
+    // // { field: "no_of_orders", headerName: "No of orders", width: 60 },
+
+    // {
+    //   field: "photo",
+    //   headerName: "Photos",
+    //   width: 80,
+    //   sortable: false,
+    //   renderCell: (params) => (
+    //     <Fragment>
+    //       {params.value?.map((img, index) => (
+    //         <img
+    //           key={img.uuid}
+    //           src={img.image}
+    //           alt="ph"
+    //           style={{ objectFit: "contain", maxHeight: 40 }}
+    //         />
+    //       ))}
+    //     </Fragment>
+    //   ),
+    // },
     {
       field: "actions",
       headerName: "Actions",

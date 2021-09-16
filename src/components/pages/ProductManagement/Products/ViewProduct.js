@@ -193,7 +193,7 @@ function ViewProduct({ match }) {
                 </p>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={product.description}>
+            <StyledTableRow key={`product-type-${product.producttype_id?.id}`}>
               <StyledTableCell component="th" scope="row">
                 Product Type
               </StyledTableCell>
@@ -206,6 +206,21 @@ function ViewProduct({ match }) {
                 </p>
               </StyledTableCell>
             </StyledTableRow>
+            {product.car_type ? (
+              <StyledTableRow key={`vehicle-type-${product.car_type?.id}`}>
+                <StyledTableCell component="th" scope="row">
+                  Vehicle Type
+                </StyledTableCell>
+                <StyledTableCell align="left">
+                  <p
+                    className={classes.rowContent}
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    {product.car_type?.type_name}
+                  </p>
+                </StyledTableCell>
+              </StyledTableRow>
+            ) : null}
             {product?.price ? (
               <StyledTableRow key={`price-${product.price}`}>
                 <StyledTableCell component="th" scope="row">
@@ -224,7 +239,6 @@ function ViewProduct({ match }) {
                 </StyledTableCell>
               </StyledTableRow>
             ) : null}
-
             {product?.holesale_price ? (
               <StyledTableRow key={`wholesale-price-${product.holesale_price}`}>
                 <StyledTableCell component="th" scope="row">
@@ -243,7 +257,6 @@ function ViewProduct({ match }) {
                 </StyledTableCell>
               </StyledTableRow>
             ) : null}
-
             {product?.no_of_orders ? (
               <StyledTableRow key={`wholesale-orders-${product.no_of_orders}`}>
                 <StyledTableCell component="th" scope="row">
@@ -296,7 +309,6 @@ function ViewProduct({ match }) {
                 </StyledTableRow>
               </>
             ) : null}
-
             <StyledTableRow key={`discount-${product.discount}`}>
               <StyledTableCell component="th" scope="row">
                 Discount
@@ -333,7 +345,6 @@ function ViewProduct({ match }) {
                 ))}
               </StyledTableCell>
             </StyledTableRow>
-
             <StyledTableRow key={`manufacturer-${product.manufacturer?.id}`}>
               <StyledTableCell component="th" scope="row">
                 Manufacturer
@@ -344,7 +355,6 @@ function ViewProduct({ match }) {
                 </span>
               </StyledTableCell>
             </StyledTableRow>
-
             <StyledTableRow key={`origin-${product.origin_country?.id}`}>
               <StyledTableCell component="th" scope="row">
                 Origin Country
@@ -355,7 +365,6 @@ function ViewProduct({ match }) {
                 </span>
               </StyledTableCell>
             </StyledTableRow>
-
             {/* <StyledTableRow key={`model-${product.car_model_id}`}>
               <StyledTableCell component="th" scope="row">
                 Car Model
@@ -374,53 +383,54 @@ function ViewProduct({ match }) {
                 <span className={classes.rowContent}>{product.year?.year}</span>
               </StyledTableCell>
             </StyledTableRow> */}
-            <StyledTableRow key={`made-${product.car_made_id}`}>
-              <StyledTableCell component="th" scope="row">
-                Brand
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>
-                  {product.car_made?.car_made}
-                </span>
-              </StyledTableCell>
-            </StyledTableRow>
-
-            <StyledTableRow key={`models-${product.id}`}>
-              <StyledTableCell component="th" scope="row">
-                Models
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>
-                  {product.car_model?.map((model) => (
-                    <span key={model.id} className={classes.modelsBadge}>
-                      {model.carmodel}
+            {product.car_made_id ? (
+              <>
+                <StyledTableRow key={`made-${product.car_made_id}`}>
+                  <StyledTableCell component="th" scope="row">
+                    Brand
+                  </StyledTableCell>
+                  <StyledTableCell align="left">
+                    <span className={classes.rowContent}>
+                      {product.car_made?.car_made}
                     </span>
-                  ))}
-                </span>
-              </StyledTableCell>
-            </StyledTableRow>
-
-            <StyledTableRow key={`year-from-${product.year_from?.id}`}>
-              <StyledTableCell component="th" scope="row">
-                Year From
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>
-                  {product.year_from?.year}
-                </span>
-              </StyledTableCell>
-            </StyledTableRow>
-
-            <StyledTableRow key={`year-to-${product.year_to?.id}`}>
-              <StyledTableCell component="th" scope="row">
-                Year To
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>
-                  {product.year_to?.year}
-                </span>
-              </StyledTableCell>
-            </StyledTableRow>
+                  </StyledTableCell>
+                </StyledTableRow>
+                <StyledTableRow key={`models-${product.id}`}>
+                  <StyledTableCell component="th" scope="row">
+                    Models
+                  </StyledTableCell>
+                  <StyledTableCell align="left">
+                    <span className={classes.rowContent}>
+                      {product.car_model?.map((model) => (
+                        <span key={model.id} className={classes.modelsBadge}>
+                          {model.carmodel}
+                        </span>
+                      ))}
+                    </span>
+                  </StyledTableCell>
+                </StyledTableRow>
+                <StyledTableRow key={`year-from-${product.year_from?.id}`}>
+                  <StyledTableCell component="th" scope="row">
+                    Year From
+                  </StyledTableCell>
+                  <StyledTableCell align="left">
+                    <span className={classes.rowContent}>
+                      {product.year_from?.year}
+                    </span>
+                  </StyledTableCell>
+                </StyledTableRow>
+                <StyledTableRow key={`year-to-${product.year_to?.id}`}>
+                  <StyledTableCell component="th" scope="row">
+                    Year To
+                  </StyledTableCell>
+                  <StyledTableCell align="left">
+                    <span className={classes.rowContent}>
+                      {product.year_to?.year}
+                    </span>
+                  </StyledTableCell>
+                </StyledTableRow>
+              </>
+            ) : null}
             <StyledTableRow key={`product-category-${product.category_id}`}>
               <StyledTableCell component="th" scope="row">
                 Category
