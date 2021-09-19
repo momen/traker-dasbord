@@ -117,6 +117,9 @@ function StoresForm({
   const classes = useStyles();
 
   const formRef = useRef();
+  const mainPhoneRef = useRef();
+  const altPhoneRef = useRef();
+
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
     address: itemToEdit ? itemToEdit.address : "",
@@ -177,10 +180,18 @@ function StoresForm({
           alert("Failed to Fetch Cities List");
         });
 
-      console.log(
-        countries.find((country) => country.id == formData.country_id)
-          ?.phonecode
-      );
+      const codeLength = countries
+        .find((country) => country.id == formData.country_id)
+        ?.phonecode.toString().length;
+      updateFormData({
+        ...formData,
+        moderator_phone: itemToEdit.moderator_phone
+          .slice(codeLength + 1)
+          .trim(),
+        moderator_alt_phone: itemToEdit?.moderator_alt_phone
+          ? itemToEdit.moderator_alt_phone.slice(codeLength + 1).trim()
+          : "",
+      });
     }
   }, []);
 
@@ -189,13 +200,16 @@ function StoresForm({
       setLocationNotSelected(true);
       return;
     }
-    console.log(formData.moderator_phone);
-    console.log(formData.moderator_alt_phone);
+    // console.log(
+    //   mainPhoneRef.current.props.prefix + mainPhoneRef.current.props.value
+    // );
     let data = {
       name: formData.name,
       address: formData.address,
-      moderator_phone: formData.moderator_phone,
-      moderator_alt_phone: formData.moderator_alt_phone,
+      moderator_phone: `${mainPhoneRef.current.props.prefix}${mainPhoneRef.current.props.value}`,
+      moderator_alt_phone: formData.moderator_alt_phone
+        ? `${altPhoneRef.current.props.prefix}${altPhoneRef.current.props.value}`
+        : "",
       lat: formData.lat,
       long: formData.long,
       country_id: formData.country_id,
@@ -529,6 +543,7 @@ function StoresForm({
                   <Grid item xs={4}>
                     <div>
                       <NumberFormat
+                        ref={mainPhoneRef}
                         variant="outlined"
                         dir="ltr"
                         name="moderator_phone"
@@ -574,6 +589,7 @@ function StoresForm({
                   <Grid item xs={4}>
                     <div>
                       <NumberFormat
+                        ref={altPhoneRef}
                         variant="outlined"
                         dir="ltr"
                         name="moderator_alt_phone"
