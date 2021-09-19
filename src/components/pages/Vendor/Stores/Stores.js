@@ -359,6 +359,7 @@ function Stores() {
       field: "serial_id",
       headerName: "Serial",
       width: 80,
+      flex: 1,
     },
     {
       field: "head_center",
@@ -371,7 +372,7 @@ function Stores() {
           <span className={classes.shippingAddress}>Shipping</span>
         ),
     },
-    { field: "address", headerName: "Address", width: 100 },
+    { field: "address", headerName: "Address", width: 120, flex: 1 },
 
     {
       field: "members",
@@ -548,10 +549,13 @@ function Stores() {
     axios
       .get("/countries/list/all")
       .then((res) => {
-        const _countries = res.data.data.map(({ id, country_name }) => ({
-          id,
-          country_name,
-        }));
+        const _countries = res.data.data.map(
+          ({ id, country_name, phonecode }) => ({
+            id,
+            country_name,
+            phonecode,
+          })
+        );
         setCountries(_countries);
       })
       .catch(() => {

@@ -176,6 +176,11 @@ function StoresForm({
         .catch(() => {
           alert("Failed to Fetch Cities List");
         });
+
+      console.log(
+        countries.find((country) => country.id == formData.country_id)
+          ?.phonecode
+      );
     }
   }, []);
 
@@ -184,15 +189,13 @@ function StoresForm({
       setLocationNotSelected(true);
       return;
     }
-
-    let mod_phone = formData.moderator_phone.replace(/[^A-Z0-9]/gi, "");
-    let mod_alt_phone = formData.moderator_alt_phone.replace(/[^A-Z0-9]/gi, "");
-
+    console.log(formData.moderator_phone);
+    console.log(formData.moderator_alt_phone);
     let data = {
       name: formData.name,
       address: formData.address,
-      moderator_phone: mod_phone,
-      moderator_alt_phone: mod_alt_phone,
+      moderator_phone: formData.moderator_phone,
+      moderator_alt_phone: formData.moderator_alt_phone,
       lat: formData.lat,
       long: formData.long,
       country_id: formData.country_id,
@@ -307,6 +310,7 @@ function StoresForm({
 
               <Grid item xs={4}>
                 <TextField
+                  disabled={itemToEdit}
                   variant="outlined"
                   select
                   label="country"
@@ -359,11 +363,11 @@ function StoresForm({
                   fullWidth
                   error={
                     Boolean(touched.country_id && errors.country_id) ||
-                    responseErrors.country_id
+                    responseErrors?.country_id
                   }
                   helperText={
                     (touched.country_id && errors.country_id) ||
-                    responseErrors.country_id
+                    responseErrors?.country_id
                   }
                   onBlur={handleBlur}
                   InputProps={{
@@ -396,7 +400,7 @@ function StoresForm({
               <Grid item xs={4}>
                 <TextField
                   variant="outlined"
-                  disabled={!formData.country_id}
+                  disabled={!formData.country_id || itemToEdit}
                   select
                   label="Area"
                   name="area_id"
@@ -436,11 +440,11 @@ function StoresForm({
                   InputLabelProps={{ shrink: !!formData.area_id }}
                   error={
                     Boolean(touched.area_id && errors.area_id) ||
-                    responseErrors.area_id
+                    responseErrors?.area_id
                   }
                   helperText={
                     (touched.area_id && errors.area_id) ||
-                    responseErrors.area_id
+                    responseErrors?.area_id
                   }
                   onBlur={handleBlur}
                   InputProps={{
@@ -473,7 +477,7 @@ function StoresForm({
               <Grid item xs={4}>
                 <TextField
                   variant="outlined"
-                  disabled={!formData.area_id}
+                  disabled={!formData.area_id || itemToEdit}
                   select
                   label="City"
                   name="city_id"
@@ -481,11 +485,11 @@ function StoresForm({
                   value={formData.city_id}
                   error={
                     Boolean(touched.city_id && errors.city_id) ||
-                    responseErrors.city_id
+                    responseErrors?.city_id
                   }
                   helperText={
                     (touched.city_id && errors.city_id) ||
-                    responseErrors.city_id
+                    responseErrors?.city_id
                   }
                   onBlur={handleBlur}
                   onChange={(e) => {
@@ -620,6 +624,7 @@ function StoresForm({
               <Grid item xs={12}>
                 <div>
                   <TextField
+                    disabled={itemToEdit}
                     variant="outlined"
                     name="address"
                     required
@@ -653,56 +658,64 @@ function StoresForm({
 
               {/* <Grid item></Grid> */}
 
-              <Grid
-                item
-                xs={12}
-                style={{
-                  height: "60vh",
-                  position: "relative",
-                  marginBottom: "10px",
-                }}
-              >
-                <label
-                  htmlFor="stores-map"
-                  style={{ marginTop: "10px", fontWeight: "bold" }}
-                >
-                  Select your store location
-                </label>
-                <div
-                  style={{
-                    height: "50vh",
-                    marginTop: "10px",
-                    position: "relative",
-                  }}
-                >
-                  <Map
-                    id="stores-map"
-                    lattitude={formData.lat ? parseFloat(formData.lat) : null}
-                    longitude={formData.long ? parseFloat(formData.long) : null}
-                    formData={formData}
-                    updateFormData={updateFormData}
-                    setLocationNotSelected={setLocationNotSelected}
-                    showSearch={true}
-                  />
-                </div>
-              </Grid>
-              {locationNotSelected ? (
-                <Grid item xs={12}>
-                  <span key={`no-location`} className={classes.errorMsg}>
-                    Please Select a location on the map.
-                  </span>
-                </Grid>
+              {!itemToEdit ? (
+                <>
+                  <Grid
+                    item
+                    xs={12}
+                    style={{
+                      height: "60vh",
+                      position: "relative",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <label
+                      htmlFor="stores-map"
+                      style={{ marginTop: "10px", fontWeight: "bold" }}
+                    >
+                      Select your store location
+                    </label>
+                    <div
+                      style={{
+                        height: "50vh",
+                        marginTop: "10px",
+                        position: "relative",
+                      }}
+                    >
+                      <Map
+                        id="stores-map"
+                        lattitude={
+                          formData.lat ? parseFloat(formData.lat) : null
+                        }
+                        longitude={
+                          formData.long ? parseFloat(formData.long) : null
+                        }
+                        formData={formData}
+                        updateFormData={updateFormData}
+                        setLocationNotSelected={setLocationNotSelected}
+                        showSearch={true}
+                      />
+                    </div>
+                  </Grid>
+                  {locationNotSelected ? (
+                    <Grid item xs={12}>
+                      <span key={`no-location`} className={classes.errorMsg}>
+                        Please Select a location on the map.
+                      </span>
+                    </Grid>
+                  ) : null}
+                </>
               ) : null}
             </Grid>
 
             {typeof responseErrors === "string" ? (
               <Grid item xs={12}>
-                <span key={`faluire-msg`} className={classes.errorMsg}>
+                <p key={`faluire-msg`} className={classes.errorMsg}>
                   {responseErrors}
-                </span>
+                </p>
               </Grid>
             ) : null}
-            <Grid container justify="center">
+            <Grid container justify="center" style={{ marginTop: 25 }}>
               <Button
                 className={classes.submitButton}
                 type="submit"
