@@ -133,6 +133,7 @@ function FAQ_Form({
                 <Grid item xs={12} sm={6}>
                   <div style={{ width: "100%" }}>
                     <KeyboardDatePicker
+                      dir="ltr"
                       name="from"
                       fullWidth
                       disableToolbar
@@ -178,6 +179,7 @@ function FAQ_Form({
                 <Grid item xs={12} sm={6}>
                   <div style={{ width: "100%" }}>
                     <KeyboardDatePicker
+                      dir="ltr"
                       name="to"
                       fullWidth
                       disableToolbar
@@ -404,7 +406,7 @@ function FAQ_Form({
                       fullWidth
                     >
                       <option aria-label="None" value="" />
-                      <option aria-label="Vendor" label="Vendor" value="1" />
+                      <option aria-label="Retailer" label="Retail" value="1" />
                       <option
                         aria-label="ًWholesale"
                         label="Wholesale"

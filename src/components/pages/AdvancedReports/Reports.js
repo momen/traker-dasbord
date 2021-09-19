@@ -336,7 +336,9 @@ function Reports() {
         searchData.order_total ||
         searchData.order_total.toString().trim() !== ""
           ? ordersAfterSearch.filter(
-              (order) => order.order_total <= parseFloat(searchData.order_total)
+              (order) =>
+                parseFloat(order.order_total) <=
+                parseFloat(searchData.order_total)
             )
           : ordersAfterSearch;
 

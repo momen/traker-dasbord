@@ -137,6 +137,7 @@ function UsersForm({
     let data = {};
     // if (!itemToEdit) {
     data.email = formData.email;
+    data.stores = JSON.stringify(formData.stores.map((val) => val.id));
     // }
 
     setIsSubmitting(true);
@@ -144,7 +145,6 @@ function UsersForm({
     if (itemToEdit) {
       data.name = formData.name;
       data.roles = parseInt(formData.roles);
-      data.stores = JSON.stringify(formData.stores.map((val) => val.id));
       axios
         .put(`/users/${itemToEdit.id}`, data)
         .then((res) => {
@@ -158,9 +158,10 @@ function UsersForm({
       data.role = parseInt(formData.role);
       axios
         .post("/vendor/add/staff", data)
-        .then((res) => {
+        .then(({ data }) => {
           setPage(1);
           setOpenPopup(false);
+          setDialogText(data.message);
           setDialogOpen(true);
         })
         .catch(({ response }) => {
