@@ -200,15 +200,18 @@ function StoresForm({
       setLocationNotSelected(true);
       return;
     }
-    // console.log(
-    //   mainPhoneRef.current.props.prefix + mainPhoneRef.current.props.value
-    // );
+    console.log(mainPhoneRef.current.props);
     let data = {
       name: formData.name,
       address: formData.address,
-      moderator_phone: `${mainPhoneRef.current.props.prefix}${mainPhoneRef.current.props.value}`,
+      moderator_phone:
+        formData.moderator_phone[0] === "+"
+          ? mainPhoneRef.current.props.value
+          : `${mainPhoneRef.current.props.prefix}${mainPhoneRef.current.props.value}`,
       moderator_alt_phone: formData.moderator_alt_phone
-        ? `${altPhoneRef.current.props.prefix}${altPhoneRef.current.props.value}`
+        ? formData.moderator_alt_phone[0] === "+"
+          ? altPhoneRef.current.props.value
+          : `${altPhoneRef.current.props.prefix}${altPhoneRef.current.props.value}`
         : "",
       lat: formData.lat,
       long: formData.long,
