@@ -54,6 +54,7 @@ const Button = styled(MuiButton)(spacing);
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+    width: "fit-content",
   },
   footer: {
     width: "100%",
@@ -75,6 +76,17 @@ const useStyles = makeStyles((theme) => ({
       color: "#ffffff",
     },
     marginRight: "5px",
+  },
+  approveBtn: {
+    background: "#ffffff",
+    color: "#90CA28",
+    border: "1px solid #90CA28",
+    borderRadius: 0,
+    height: 30,
+    "&:hover": {
+      background: "#90CA28",
+      color: "#ffffff",
+    },
   },
   backBtn: {
     width: "fit-content",
@@ -213,20 +225,19 @@ function Users() {
   const [viewMode, setViewMode] = useState("data-grid");
 
   const columns = [
-    { field: "id", headerName: "ID", width: 55 },
-    { field: "name", headerName: "Name", width: 100 },
+    { field: "id", headerName: "ID", width: 55},
+    { field: "name", headerName: "Name", width: 100  },
     { field: "email", headerName: "Email", width: 140 },
     {
       field: "roles",
       headerName: "Role",
-      width: 100,
+      width: 80,
       renderCell: (params) => params.value?.title,
     },
-    { field: "serial_id", headerName: "Serial", width: 160 },
+    { field: "serial_id", headerName: "Serial", width: 100 },
     {
       field: "stores",
       headerName: "Branches",
-      width: 150,
       sortable: false,
       renderCell: (params) => (
         <div>
@@ -241,14 +252,13 @@ function Users() {
     {
       field: "approved",
       headerName: "Status",
-      width: 90,
+      width: 100,
       renderCell: (params) =>
-        params.row.approved === 0 ? "Pending Approval" : "Approved",
+        params.row.approved === 0 ? "Pending" : "Approved",
     },
     {
       field: "actions",
       headerName: "Actions",
-      // width: 250,
       flex: 1,
       sortable: false,
       disableClickEventBubbling: true,
@@ -257,14 +267,12 @@ function Users() {
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-start",
-              width: "250px",
               // padding: "5px"
             }}
           >
             {params.row.approved === 0 ? (
               <Button
-                className={classes.button}
+                className={classes.approveBtn}
                 variant="contained"
                 size="small"
                 onClick={() => {
@@ -561,42 +569,40 @@ function Users() {
                   </div>
                 </Toolbar>
               </Paper>
-              <Paper>
-                <div style={{ width: "100%" }}>
-                  <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    page={page}
-                    pageSize={pageSize}
-                    rowCount={rowsCount}
-                    sortingOrder={["desc", "asc"]}
-                    sortModel={sortModel}
-                    columnBuffer={pageSize}
-                    paginationMode="server"
-                    sortingMode="server"
-                    components={{
-                      Pagination: CustomPagination,
-                      LoadingOverlay: CustomLoadingOverlay,
-                    }}
-                    loading={loading}
-                    checkboxSelection
-                    disableColumnMenu
-                    autoHeight={true}
-                    onRowClick={
-                      userPermissions.includes("user_show_by_vendor")
-                        ? ({ row }) =>
-                            history.push(`/user-mgt/vendor-users/${row.id}`)
-                        : null
-                    }
-                    onPageChange={handlePageChange}
-                    onPageSizeChange={handlePageSize}
-                    onSortModelChange={handleSortModelChange}
-                    onSelectionChange={(newSelection) => {
-                      setRowsToDelete(newSelection.rowIds);
-                    }}
-                  />
-                </div>
-              </Paper>
+              <div style={{ width: "100%" }}>
+                <DataGrid
+                  rows={rows}
+                  columns={columns}
+                  page={page}
+                  pageSize={pageSize}
+                  rowCount={rowsCount}
+                  sortingOrder={["desc", "asc"]}
+                  sortModel={sortModel}
+                  columnBuffer={pageSize}
+                  paginationMode="server"
+                  sortingMode="server"
+                  components={{
+                    Pagination: CustomPagination,
+                    LoadingOverlay: CustomLoadingOverlay,
+                  }}
+                  loading={loading}
+                  checkboxSelection
+                  disableColumnMenu
+                  autoHeight={true}
+                  onRowClick={
+                    userPermissions.includes("user_show_by_vendor")
+                      ? ({ row }) =>
+                          history.push(`/user-mgt/vendor-users/${row.id}`)
+                      : null
+                  }
+                  onPageChange={handlePageChange}
+                  onPageSizeChange={handlePageSize}
+                  onSortModelChange={handleSortModelChange}
+                  onSelectionChange={(newSelection) => {
+                    setRowsToDelete(newSelection.rowIds);
+                  }}
+                />
+              </div>
             </Card>
           ) : (
             <Card mb={6} style={{ padding: "50px 60px" }}>
