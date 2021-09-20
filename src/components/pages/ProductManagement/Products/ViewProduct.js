@@ -325,12 +325,11 @@ function ViewProduct({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>
-                  {product.discount ? `% ${product.discount}` : "Not applied"}
+                  {product.discount
+                    ? `% ${(product.discount / 100) * product.price} ريال`
+                    : "Not applied"}
                 </span>
                 &emsp;
-                <span className={classes.rowContent}>
-                  {(product.discount / 100) * product.price} ريال
-                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`serial-${product.serial_number}`}>
