@@ -83,13 +83,8 @@ const useStyles = makeStyles((theme) => ({
     width: "15%",
   },
   uploadButton: {
-    // margin: theme.spacing(3, 2, 2),
-    width: "150px",
+    width: 150,
     height: 40,
-  },
-  uploadIcon: {
-    marginRight: "10px",
-    marginLeft: "10px",
   },
   uploadInput: {
     display: "none",
@@ -2267,6 +2262,7 @@ function ProductsForm({
                 />
                 <label htmlFor="icon-button-file">
                   <Button
+                    dir="ltr"
                     variant="contained"
                     color="default"
                     className={classes.uploadButton}
