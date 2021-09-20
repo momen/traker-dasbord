@@ -587,7 +587,7 @@ function StoresForm({
                   </Grid>
 
                   <Grid item xs={4}>
-                    <div>
+                    {/* <div>
                       <NumberFormat
                         ref={altPhoneRef}
                         variant="outlined"
@@ -630,7 +630,7 @@ function StoresForm({
                           ))}
                         </div>
                       ) : null}
-                    </div>
+                    </div> */}
                   </Grid>
                 </>
               ) : null}
