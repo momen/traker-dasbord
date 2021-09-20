@@ -228,7 +228,7 @@ function CarTypes() {
               </Button>
             ) : null} */}
 
-            {userPermissions.includes("car_type_update") ? (
+            {/* {userPermissions.includes("car_type_update") ? (
               <Button
                 className={classes.actionBtn}
                 startIcon={<Edit />}
@@ -246,9 +246,9 @@ function CarTypes() {
               >
                 Edit
               </Button>
-            ) : null}
+            ) : null} */}
 
-            {userPermissions.includes("car_type_delete") ? (
+            {/* {userPermissions.includes("car_type_delete") ? (
               <Button
                 className={classes.actionBtn}
                 startIcon={<Delete />}
@@ -259,7 +259,7 @@ function CarTypes() {
               >
                 Delete
               </Button>
-            ) : null}
+            ) : null} */}
           </div>
         );
       },
@@ -413,7 +413,7 @@ function CarTypes() {
               }}
             >
               <div style={{ display: "flex", alignItems: "flex-end" }}>
-                {userPermissions.includes("car_type_add") ? (
+                {/* {userPermissions.includes("car_type_add") ? (
                   <Button
                     className={classes.button}
                     variant="contained"
@@ -426,9 +426,9 @@ function CarTypes() {
                   >
                     New Car Type
                   </Button>
-                ) : null}
+                ) : null} */}
 
-                {userPermissions.includes("car_type_delete") ? (
+                {/* {userPermissions.includes("car_type_delete") ? (
                   <Button
                     startIcon={<Delete />}
                     color="secondary"
@@ -441,7 +441,7 @@ function CarTypes() {
                   >
                     Delete Selected
                   </Button>
-                ) : null}
+                ) : null} */}
               </div>
 
               <div>
