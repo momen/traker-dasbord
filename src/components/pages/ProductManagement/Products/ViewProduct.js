@@ -149,6 +149,14 @@ function ViewProduct({ match }) {
                 </span>
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={product.serial_id}>
+              <StyledTableCell component="th" scope="row">
+                Detailed Serial
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                <span className={classes.rowContent}>{product.serial_id}</span>
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={product.name}>
               <StyledTableCell component="th" scope="row">
                 Product Name
