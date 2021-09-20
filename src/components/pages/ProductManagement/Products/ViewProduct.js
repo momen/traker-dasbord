@@ -151,10 +151,12 @@ function ViewProduct({ match }) {
             </StyledTableRow>
             <StyledTableRow key={product.serial_id}>
               <StyledTableCell component="th" scope="row">
-                Detailed Serial
+                Serial Coding
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>{product.serial_id}</span>
+                <span className={classes.rowContent} dir="ltr">
+                  {product.serial_id}
+                </span>
               </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={product.name}>
