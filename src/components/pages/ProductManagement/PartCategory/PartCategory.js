@@ -204,7 +204,13 @@ function PartCategory() {
     { field: "id", headerName: "ID", width: 60 },
     {
       field: "category_name",
-      headerName: "Part Category Name",
+      headerName: "Part Category Name (Ar)",
+      width: 250,
+      flex: 1,
+    },
+    {
+      field: "name_en",
+      headerName: "Part Category Name (En)",
       width: 250,
       flex: 1,
     },

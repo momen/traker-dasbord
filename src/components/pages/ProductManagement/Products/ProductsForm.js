@@ -108,6 +108,7 @@ const useStyles = makeStyles((theme) => ({
   productImages: {
     height: "60px",
     marginRight: "20px",
+    marginLeft: "20px",
   },
   errorsContainer: {
     marginBottom: theme.spacing(1),
@@ -188,6 +189,10 @@ function ProductsForm({
   const [categories, setCategories] = useState(null);
   const [partCategories, setPartCategories] = useState(null);
   const [toYears, setToYears] = useState([]);
+
+  const [enableDiscount, setEnableDiscount] = useState(
+    itemToEdit.discount ? true : false
+  );
 
   const validationSchema = Yup.object().shape({
     name:
@@ -306,11 +311,14 @@ function ProductsForm({
       formData.maincategory_id != "5"
         ? Yup.string().required()
         : Yup.string().nullable().notRequired(),
-    discount: Yup.number()
-      .min(1, "Minimum value for discount is 0%")
-      .max(80, "Maximum value for discount is 80%"),
+    discount: enableDiscount
+      ? Yup.number()
+          .required()
+          .min(1, "Minimum value for discount is 1%")
+          .max(80, "Maximum value for discount is 80%")
+      : Yup.number().nullable().notRequired(),
     discount_value: Yup.number()
-      .min(1, "Minimum value for discount is 0%")
+      .min(1, "Minimum value for discount is 1%")
       .max(formData.price * 0.8, "Maximum value for discount is 80%"),
     price:
       formData.producttype_id?.toString() == "1" ||
@@ -425,11 +433,6 @@ function ProductsForm({
             .notRequired()
             .nullable(),
   });
-
-  const [enableDiscount, setEnableDiscount] = useState(
-    itemToEdit.discount ? true : false
-  );
-
   // This is the for an image if you are editing a product, if you try to delete it there is a confirmation Dialog
   // appearing before the action is done, so the image info is needed if the user confirms to delete.
   const [imageToDelete, setImageToDelete] = useState({});
@@ -1548,6 +1551,7 @@ function ProductsForm({
                   <Grid item xs={4} md={2}>
                     <div>
                       <NumberFormat
+                        required={enableDiscount}
                         variant="outlined"
                         disabled={
                           !formData.price ||
@@ -1559,13 +1563,11 @@ function ProductsForm({
                         fullWidth
                         label="Percentage %"
                         // prefix="%"
-                        value={formData.discount}
+                        value={formData.discount || 0}
                         onChange={(e) => {
                           updateFormData({
                             ...formData,
-                            discount: e.target.value
-                              ? parseFloat(e.target.value)
-                              : "",
+                            discount: parseFloat(e.target.value),
                           });
                           handleChange(e);
                         }}
@@ -1607,17 +1609,26 @@ function ProductsForm({
                         fullWidth
                         label="Value"
                         // prefix="%"
-                        value={(formData.discount / 100) * formData.price}
+                        value={
+                          formData.discount
+                            ? (
+                                (formData.discount / 100) *
+                                parseFloat(formData.price)
+                              ).toFixed(2)
+                            : 0
+                        }
                         onChange={(e) => {
                           updateFormData({
                             ...formData,
                             discount: e.target.value
                               ? parseFloat(
-                                  (e.target.value / formData.price) * 100
-                                )
-                              : "",
+                                  (e.target.value /
+                                    parseFloat(formData.price)) *
+                                    100
+                                ).toFixed(2)
+                              : null,
                           });
-                          setFieldValue("discount", e.target.value);
+                          values.discount = e.target.value;
                           if (!touched.discount) {
                             touched.discount = true;
                           }
