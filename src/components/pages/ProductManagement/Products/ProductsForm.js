@@ -720,7 +720,7 @@ function ProductsForm({
     // & append only the new images to avoid duplication.
     Object.entries(e.target.files).forEach(([key, file]) => {
       if (!formData.photo.find((img) => img.name === file.name)) {
-        if (file.size / 1000 > 512) {
+        if (file.size / 1000 > 1048) {
           setBigImgSize(true);
           return;
         }
@@ -2326,7 +2326,7 @@ function ProductsForm({
               {bigImgSize ? (
                 <Grid item xs={12}>
                   <p className={classes.errorMsg}>
-                    Size has exceeded 512 KB for one Image or more & have been
+                    Size has exceeded 1MB for one Image or more & have been
                     excluded.
                   </p>
                 </Grid>
