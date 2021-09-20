@@ -67,6 +67,10 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 2, 2),
     maxWidth: "100%",
   },
+  productImages: {
+    height: "60px",
+    marginRight: "20px",
+  },
   uploadInput: {
     display: "none",
   },
@@ -110,12 +114,10 @@ const validationSchema = Yup.object().shape({
     .test(
       "Minimum 5 chars without spaces",
       "Please enter 5 characters excluding spaces",
-      (val) => val?.trim().length >= 5
+      (val) => (val ? val?.trim().length >= 5 : true)
     )
-    .test(
-      "Not empty",
-      "Please remove any spaces at the beginning",
-      (val) => val?.trim() !== ""
+    .test("Not empty", "Please remove any spaces at the beginning", (val) =>
+      val ? val?.trim() !== "" : true
     )
     .min(5, "Description must be at least 5 characters")
     .max(255, "Description must not exceed 255 characters"),
@@ -124,12 +126,10 @@ const validationSchema = Yup.object().shape({
     .test(
       "Minimum 5 chars without spaces",
       "Please enter 5 characters excluding spaces",
-      (val) => val?.trim().length >= 5
+      (val) => (val ? val?.trim().length >= 5 : true)
     )
-    .test(
-      "Not empty",
-      "Please remove any spaces at the beginning",
-      (val) => val?.trim() !== ""
+    .test("Not empty", "Please remove any spaces at the beginning", (val) =>
+      val ? val?.trim() !== "" : true
     )
     .min(5, "Description must be at least 5 characters")
     .max(255, "Description must not exceed 255 characters"),
@@ -153,8 +153,8 @@ function CategoriesForm({
     name: itemToEdit ? itemToEdit.name : "",
     name_en: itemToEdit ? itemToEdit.name_en : "",
     maincategory_id: itemToEdit ? itemToEdit.maincategory_id : "",
-    description: itemToEdit ? itemToEdit.description : "",
-    description_en: itemToEdit ? itemToEdit.description_en : "",
+    // description: itemToEdit ? itemToEdit.description : "",
+    // description_en: itemToEdit ? itemToEdit.description_en : "",
     photo: "",
   });
   const [imgName, setImgName] = useState("");
@@ -162,6 +162,8 @@ function CategoriesForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
+
+  const [imageDeletedOnEdit, setImageDeletedOnEdit] = useState(false);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogText, setDialogText] = useState(
@@ -177,57 +179,59 @@ function CategoriesForm({
   };
 
   const handleSubmit = async () => {
-    if (!formData.photo && !itemToEdit) {
-      setOpenAlert(true);
-    } else {
-      let data = new FormData();
-      data.append("name", formData.name);
-      data.append("name_en", formData.name_en);
-      data.append("maincategory_id", formData.maincategory_id);
+    // if (!formData.photo && !itemToEdit) {
+    //   setOpenAlert(true);
+    // } else {
+    let data = new FormData();
+    data.append("name", formData.name);
+    data.append("name_en", formData.name_en);
+    data.append("maincategory_id", formData.maincategory_id);
 
-      if (formData.description) {
-        data.append("description", formData.description);
-      }
-      if (formData.description_en) {
-        data.append("description", formData.description_en);
-      }
-      if (formData.photo) {
-        data.append("photo", formData.photo, formData.photo.name);
-      }
-
-      setIsSubmitting(true);
-
-      if (itemToEdit) {
-        await axios
-          .post(`/product-categories/${itemToEdit.id}`, data, {
-            headers: {
-              "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
-            },
-          })
-          .then((res) => {
-            setDialogOpen(true);
-          })
-          .catch((res) => {
-            setIsSubmitting(false);
-            setResponseErrors(res.response.data.errors);
-          });
-      } else {
-        await axios
-          .post("/product-categories", data, {
-            headers: {
-              "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
-            },
-          })
-          .then((res) => {
-            setPage(1);
-            setDialogOpen(true);
-          })
-          .catch((res) => {
-            setIsSubmitting(false);
-            setResponseErrors(res.response.data.errors);
-          });
-      }
+    if (formData.description) {
+      data.append("description", formData.description);
     }
+    if (formData.description_en) {
+      data.append("description", formData.description_en);
+    }
+    if (formData.photo && !imageDeletedOnEdit) {
+      data.append("photo", formData.photo, formData.photo.name);
+    } else {
+      data.append("photo", "");
+    }
+
+    setIsSubmitting(true);
+
+    if (itemToEdit) {
+      await axios
+        .post(`/product-categories/${itemToEdit.id}`, data, {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
+          },
+        })
+        .then((res) => {
+          setDialogOpen(true);
+        })
+        .catch((res) => {
+          setIsSubmitting(false);
+          setResponseErrors(res.response.data.errors);
+        });
+    } else {
+      await axios
+        .post("/product-categories", data, {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
+          },
+        })
+        .then((res) => {
+          setPage(1);
+          setDialogOpen(true);
+        })
+        .catch((res) => {
+          setIsSubmitting(false);
+          setResponseErrors(res.response.data.errors);
+        });
+    }
+    // }
   };
 
   const handleStateChange = (e) => {
@@ -411,10 +415,9 @@ function CategoriesForm({
 
               <Grid item xs={8}></Grid>
 
-              <Grid item xs={6}>
+              {/* <Grid item xs={6}>
                 <TextField
                   variant="outlined"
-                  required
                   variant="outlined"
                   id="description"
                   name="description"
@@ -450,7 +453,6 @@ function CategoriesForm({
               <Grid item xs={6}>
                 <TextField
                   variant="outlined"
-                  required
                   variant="outlined"
                   id="description_en"
                   name="description_en"
@@ -481,7 +483,7 @@ function CategoriesForm({
                     </span>
                   ))}
                 </Grid>
-              ) : null}
+              ) : null} */}
 
               <Grid item xs={12} md={3}>
                 <input
@@ -504,17 +506,32 @@ function CategoriesForm({
                 </label>
               </Grid>
 
-              {imgName ? (
-                <Grid item xs md={9}>
+              <Grid item xs md={9}>
+                {itemToEdit && !imageDeletedOnEdit && !imgName ? (
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Chip
+                      className={classes.chip}
+                      label={itemToEdit.photo.file_name}
+                      onDelete={() => setImageDeletedOnEdit(true)}
+                      variant="outlined"
+                      color="primary"
+                    />
+                    <img
+                      src={itemToEdit.photo.image}
+                      alt={`cat-img`}
+                      className={classes.productImages}
+                    />
+                  </div>
+                ) : imgName ? (
                   <Chip
                     className={classes.chip}
-                    // icon={<FaceIcon/>}
                     label={imgName}
                     onDelete={handleDeleteImage}
                     variant="outlined"
+                    color="primary"
                   />
-                </Grid>
-              ) : null}
+                ) : null}
+              </Grid>
 
               {bigImgSize ? (
                 <Grid item xs={12}>

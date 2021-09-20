@@ -68,6 +68,10 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 2, 2),
     maxWidth: "100%",
   },
+  productImages: {
+    height: "60px",
+    marginRight: "20px",
+  },
   uploadInput: {
     display: "none",
   },
@@ -133,6 +137,8 @@ function PartCategoryForm({
   const [responseErrors, setResponseErrors] = useState("");
   const [bigImgSize, setBigImgSize] = useState(false);
 
+  const [imageDeletedOnEdit, setImageDeletedOnEdit] = useState(false);
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogText, setDialogText] = useState(
     itemToEdit
@@ -154,8 +160,10 @@ function PartCategoryForm({
       data.append("category_name", formData.category_name);
       data.append("name_en", formData.name_en);
       data.append("category_id", formData.category_id);
-      if (formData.photo) {
+      if (formData.photo && !imageDeletedOnEdit) {
         data.append("photo", formData.photo, formData.photo.name);
+      } else {
+        data.append("photo", "");
       }
 
       setIsSubmitting(true);
@@ -397,17 +405,32 @@ function PartCategoryForm({
                 </label>
               </Grid>
 
-              {imgName ? (
-                <Grid item xs md={9}>
+              <Grid item xs md={9}>
+                {itemToEdit && !imageDeletedOnEdit && !imgName ? (
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Chip
+                      className={classes.chip}
+                      label={itemToEdit.photo.file_name}
+                      onDelete={() => setImageDeletedOnEdit(true)}
+                      variant="outlined"
+                      color="primary"
+                    />
+                    <img
+                      src={itemToEdit.photo.image}
+                      alt={`cat-img`}
+                      className={classes.productImages}
+                    />
+                  </div>
+                ) : imgName ? (
                   <Chip
                     className={classes.chip}
-                    // icon={<FaceIcon/>}
                     label={imgName}
                     onDelete={handleDeleteImage}
                     variant="outlined"
+                    color="primary"
                   />
-                </Grid>
-              ) : null}
+                ) : null}
+              </Grid>
 
               {bigImgSize ? (
                 <Grid item xs={12}>

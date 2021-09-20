@@ -243,7 +243,7 @@ function Products() {
   const [transmissionsList, setTransmissionsList] = useState([]);
   const [productTypes, setProductTypes] = useState([]);
   const [productTags, setProductTags] = useState([]);
-  const [sortModel, setSortModel] = useState([{ field: "", sort: "asc" }]);
+  const [sortModel, setSortModel] = useState([{ field: "", sort: "" }]);
   const [rowsToDelete, setRowsToDelete] = useState([]);
   const [openApproveDialog, setOpenApproveDialog] = useState(false);
   const [openRejectDialog, setOpenRejectDialog] = useState(false);
