@@ -2311,21 +2311,31 @@ function ProductsForm({
                     );
                   })}
                   {formData.photo?.map((img, index) => (
-                    <>
-                      <Chip
-                        className={clsx(
-                          classes.chip,
-                          responseErrors[`photo.${index}`] && classes.chipError
-                        )}
-                        // icon={<FaceIcon/>}
-                        label={img.name}
-                        onDelete={() => handleDeleteImage(img.name)}
-                        variant="outlined"
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <div>
+                        <Chip
+                          className={clsx(
+                            classes.chip,
+                            responseErrors[`photo.${index}`] &&
+                              classes.chipError
+                          )}
+                          // icon={<FaceIcon/>}
+                          label={img.name}
+                          onDelete={() => handleDeleteImage(img.name)}
+                          variant="outlined"
+                        />
+                        <p className={classes.imageErrorMsg}>
+                          {responseErrors[`photo.${index}`]}
+                        </p>
+                      </div>
+
+                      <img
+                        src={URL.createObjectURL(img)}
+                        alt=""
+                        alt={`img-${index}`}
+                        className={classes.productImages}
                       />
-                      <p className={classes.imageErrorMsg}>
-                        {responseErrors[`photo.${index}`]}
-                      </p>
-                    </>
+                    </div>
                   ))}
                 </Grid>
               ) : null}

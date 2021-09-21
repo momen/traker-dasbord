@@ -424,13 +424,20 @@ function PartCategoryForm({
                     />
                   </div>
                 ) : imgName ? (
-                  <Chip
-                    className={classes.chip}
-                    label={imgName}
-                    onDelete={handleDeleteImage}
-                    variant="outlined"
-                    color="primary"
-                  />
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Chip
+                      className={classes.chip}
+                      label={imgName}
+                      onDelete={handleDeleteImage}
+                      variant="outlined"
+                      color="primary"
+                    />
+                    <img
+                      src={URL.createObjectURL(formData.photo)}
+                      alt={`cat-img`}
+                      className={classes.productImages}
+                    />
+                  </div>
                 ) : null}
               </Grid>
 
