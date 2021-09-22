@@ -360,14 +360,14 @@ function ProductsForm({
         : Yup.string().nullable().notRequired(),
     store_id: Yup.string().required(),
     quantity:
-      formData.producttype_id?.toString() != "2"
+      formData.producttype_id?.toString() !== "2"
         ? Yup.number()
             .required("This field is Required")
             .nullable()
             .min(5, "Minimum value should be 5")
-        : Yup.number().nullable().notRequired(),
+        : Yup.string().nullable().notRequired(),
     qty_reminder:
-      !formData.producttype_id?.toString() === "2"
+      formData.producttype_id?.toString() !== "2"
         ? Yup.number().nullable().required("This field is Required")
         : Yup.number().notRequired().nullable(),
     description:
@@ -546,6 +546,11 @@ function ProductsForm({
         );
       }
     }
+    if (productTypes.length === 1 && productTypes.includes("wholesale")) {
+      updateFormData({ ...formData, producttype_id: "2" });
+    } else if (!itemToEdit) {
+      updateFormData({ ...formData, producttype_id: "1" });
+    }
   }, []);
 
   const toggleDiscount = () => {
@@ -553,25 +558,25 @@ function ProductsForm({
   };
 
   const handleSubmit = async () => {
-    if (
-      formData.models.length === 0 &&
-      formData.category_id &&
-      formData.category_id != "43" &&
-      formData.category_id != "81" &&
-      formData.category_id != "82" &&
-      formData.category_id != "83" &&
-      formData.category_id != "84" &&
-      formData.category_id != "85" &&
-      formData.maincategory_id &&
-      formData.maincategory_id != "5"
-    ) {
-      setAutoSelectModelError(true);
-      return;
-    }
-    if (formData.tags.length === 0) {
-      setAutoSelectTagError(true);
-      return;
-    }
+    // if (
+    //   formData.models.length === 0 &&
+    //   formData.category_id &&
+    //   formData.category_id != "43" &&
+    //   formData.category_id != "81" &&
+    //   formData.category_id != "82" &&
+    //   formData.category_id != "83" &&
+    //   formData.category_id != "84" &&
+    //   formData.category_id != "85" &&
+    //   formData.maincategory_id &&
+    //   formData.maincategory_id != "5"
+    // ) {
+    //   setAutoSelectModelError(true);
+    //   return;
+    // }
+    // if (formData.tags.length === 0) {
+    //   setAutoSelectTagError(true);
+    //   return;
+    // }
 
     //   ? Yup.string().required()
     //   : Yup.string().nullable().notRequired(),
@@ -862,7 +867,6 @@ function ProductsForm({
                     }
                     helperText="Please select a Main Category"
                     fullWidth
-                    required
                   >
                     <option aria-label="None" value="" />
                     {mainCategories?.map((category) => (
@@ -929,7 +933,6 @@ function ProductsForm({
                     }
                     helperText="Please select a Category"
                     fullWidth
-                    required
                   >
                     <option aria-label="None" value="" />
                     {categories?.map((category) => (
@@ -1016,6 +1019,7 @@ function ProductsForm({
                     onChange={(e) => {
                       handleChange(e);
                       handleStateChange(e);
+                      console.log(errors);
                     }}
                     onBlur={handleBlur}
                     error={
@@ -1094,7 +1098,6 @@ function ProductsForm({
                     }
                     helperText="Please select a Manufacturer"
                     fullWidth
-                    required
                   >
                     <option aria-label="None" value="" />
                     {manufacturers?.map((manufacturer) => (
@@ -1125,7 +1128,6 @@ function ProductsForm({
                   <TextField
                     variant="outlined"
                     name="serial_number"
-                    required
                     fullWidth
                     id="serial_number"
                     label="Serial Number"
@@ -1176,7 +1178,6 @@ function ProductsForm({
                     }
                     helperText="Please select a Country"
                     fullWidth
-                    required
                   >
                     <option aria-label="None" value="" />
                     {originCountries?.map((country) => (
@@ -1384,7 +1385,6 @@ function ProductsForm({
                         allowNegative={false}
                         customInput={TextField}
                         thousandSeparator={true}
-                        required
                         fullWidth
                         name="holesale_price"
                         label="Wholesale Price"
@@ -1426,7 +1426,7 @@ function ProductsForm({
                     </div>
                   </Grid>
 
-                  <Grid item xs={6} md={3} lg={2}>
+                  <Grid item xs={6} md={3} lg={3}>
                     <div>
                       <NumberFormat
                         variant="outlined"
@@ -1434,7 +1434,6 @@ function ProductsForm({
                         customInput={TextField}
                         thousandSeparator={true}
                         name="no_of_orders"
-                        required
                         fullWidth
                         label="Number of orders"
                         value={formData.no_of_orders}
@@ -1486,7 +1485,6 @@ function ProductsForm({
                         allowNegative={false}
                         customInput={TextField}
                         thousandSeparator={true}
-                        required
                         fullWidth
                         name="price"
                         label="Price"
@@ -1677,7 +1675,6 @@ function ProductsForm({
                       customInput={TextField}
                       thousandSeparator={true}
                       name="quantity"
-                      required
                       fullWidth
                       label="Qunatity"
                       value={formData.quantity}
@@ -2011,18 +2008,18 @@ function ProductsForm({
                             helperText="At least one model must be selected."
                           />
                         )}
-                        onBlur={() => {
-                          if (formData.models.length === 0) {
-                            setAutoSelectModelError(true);
-                          }
-                        }}
+                        // onBlur={() => {
+                        //   if (formData.models.length === 0) {
+                        //     setAutoSelectModelError(true);
+                        //   }
+                        // }}
                         onChange={(e, val) => {
                           updateAutoCompleteModels(e, val);
-                          if (val.length === 0) {
-                            setAutoSelectModelError(true);
-                          } else {
-                            setAutoSelectModelError(false);
-                          }
+                          // if (val.length === 0) {
+                          //   setAutoSelectModelError(true);
+                          // } else {
+                          //   setAutoSelectModelError(false);
+                          // }
                         }}
                       />
 
@@ -2166,7 +2163,6 @@ function ProductsForm({
                         }
                         helperText="Please select a Transmission"
                         fullWidth
-                        required
                       >
                         <option aria-label="None" value="" />
                         {transmissionsList?.map((transmission) => (
@@ -2233,18 +2229,18 @@ function ProductsForm({
                         helperText="At least one tag must be selected."
                       />
                     )}
-                    onBlur={() => {
-                      if (formData.tags.length === 0) {
-                        setAutoSelectTagError(true);
-                      }
-                    }}
+                    // onBlur={() => {
+                    //   if (formData.tags.length === 0) {
+                    //     setAutoSelectTagError(true);
+                    //   }
+                    // }}
                     onChange={(e, val) => {
                       updateAutoCompleteTags(e, val);
-                      if (val.length === 0) {
-                        setAutoSelectTagError(true);
-                      } else {
-                        setAutoSelectTagError(false);
-                      }
+                      // if (val.length === 0) {
+                      //   setAutoSelectTagError(true);
+                      // } else {
+                      //   setAutoSelectTagError(false);
+                      // }
                     }}
                   />
 
