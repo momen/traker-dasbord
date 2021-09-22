@@ -242,29 +242,31 @@ function UsersForm({
                   />
                 </Grid>
               ) : null}
-              <Grid item xs={6}>
-                <TextField
-                  name="email" //Customize
-                  required
-                  fullWidth
-                  id="email" //Customize
-                  label="Email" //Customize
-                  value={formData.email} //Customize
-                  autoFocus
-                  onChange={(e) => {
-                    handleChange(e);
-                    handleStateChange(e);
-                  }}
-                  onBlur={handleBlur}
-                  error={
-                    responseErrors?.email ||
-                    Boolean(touched.email && errors.email)
-                  }
-                  helperText={
-                    (touched.email && errors.email) || responseErrors?.email
-                  }
-                />
-              </Grid>
+              {!itemToEdit ? (
+                <Grid item xs={6}>
+                  <TextField
+                    name="email" //Customize
+                    required
+                    fullWidth
+                    id="email" //Customize
+                    label="Email" //Customize
+                    value={formData.email} //Customize
+                    autoFocus
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleStateChange(e);
+                    }}
+                    onBlur={handleBlur}
+                    error={
+                      responseErrors?.email ||
+                      Boolean(touched.email && errors.email)
+                    }
+                    helperText={
+                      (touched.email && errors.email) || responseErrors?.email
+                    }
+                  />
+                </Grid>
+              ) : null}
               {/* <Grid item xs={7}></Grid>{" "} */}
               {itemToEdit ? (
                 <Grid item xs={6}>

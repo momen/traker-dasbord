@@ -198,8 +198,8 @@ function Vendors() {
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
     { field: "serial", headerName: "Serial", width: 70 },
-    { field: "vendor_name", headerName: "Vendor Name", width: 80 },
-    { field: "email", headerName: "Email", width: 120 },
+    { field: "vendor_name", headerName: "Vendor Name", width: 120 },
+    { field: "email", headerName: "Email", width: 200 },
     {
       field: "userid_id",
       headerName: "Username",

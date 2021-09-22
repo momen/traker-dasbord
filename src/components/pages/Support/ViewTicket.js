@@ -380,11 +380,27 @@ function ViewTicket({ match }) {
                 {ticket.vendor_name}
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={`vendor-email-${ticket.vendor_email}`}>
+              <StyledTableCell component="th" scope="row">
+                Vendor Email
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.vendor_email}
+              </StyledTableCell>
+            </StyledTableRow>
             <StyledTableRow key={`user-${ticket.user_id}`}>
               <StyledTableCell component="th" scope="row">
                 Username
               </StyledTableCell>
               <StyledTableCell align="left">{ticket.user_name}</StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={`userEmail-${ticket.user_id}`}>
+              <StyledTableCell component="th" scope="row">
+                User Email
+              </StyledTableCell>
+              <StyledTableCell align="left">
+                {ticket.user_email}
+              </StyledTableCell>
             </StyledTableRow>
             <StyledTableRow key={`userphone-${ticket.user_phone}`}>
               <StyledTableCell component="th" scope="row">
@@ -394,14 +410,7 @@ function ViewTicket({ match }) {
                 {ticket.user_phone}
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`vendor-email-${ticket.vendor_email}`}>
-              <StyledTableCell component="th" scope="row">
-                Vendor Email
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {ticket.vendor_email}
-              </StyledTableCell>
-            </StyledTableRow>
+
             {/* {user?.roles[0].title === "Admin" ? (
               <StyledTableRow key={`actions`}>
                 <StyledTableCell component="th" scope="row">
