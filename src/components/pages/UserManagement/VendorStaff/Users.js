@@ -225,8 +225,8 @@ function Users() {
   const [viewMode, setViewMode] = useState("data-grid");
 
   const columns = [
-    { field: "id", headerName: "ID", width: 55},
-    { field: "name", headerName: "Name", width: 100  },
+    { field: "id", headerName: "ID", width: 55 },
+    { field: "name", headerName: "Name", width: 100 },
     { field: "email", headerName: "Email", width: 140 },
     {
       field: "roles",
@@ -522,7 +522,7 @@ function Users() {
               <Paper mb={2}>
                 <Toolbar className={classes.toolBar}>
                   <div style={{ display: "flex", alignItems: "flex-end" }}>
-                    {userPermissions.includes("vendor_add_staff") ? (
+                    {userPermissions.includes("user_create_by_vendor") ? (
                       <Button
                         data-test="users-create-btn"
                         className={classes.button}

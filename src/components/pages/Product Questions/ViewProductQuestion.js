@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import axios from "../../../axios";
 import { Button, TextField } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
+import { Edit } from "@material-ui/icons";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -45,6 +46,17 @@ const useStyles = makeStyles((theme) => ({
     wordWrap: "break-word",
     wordBreak: "break-word",
   },
+  editBtn: {
+    padding: 5,
+    color: "#CCCCCC",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    "&:hover": {
+      color: "#7B7B7B",
+      backgroundColor: "transparent",
+      borderBottom: "1px solid #7B7B7B",
+    },
+  },
   submitButton: {
     width: 150,
     height: 40,
@@ -57,7 +69,17 @@ const useStyles = makeStyles((theme) => ({
       background: "#EF9300",
       color: "#ffffff",
     },
-    marginTop: 15,
+  },
+  resetButton: {
+    width: 150,
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    marginRight: 10,
   },
 }));
 
@@ -66,6 +88,8 @@ function ViewProductQuestion({ match }) {
   const history = useHistory();
   const { user } = useSelector((state) => state);
   const [question, setQuestion] = useState("");
+
+  const [enableEditing, setEnableEditing] = useState(false);
 
   const [answer, updateAnswer] = useState("");
 
@@ -88,6 +112,15 @@ function ViewProductQuestion({ match }) {
       })
       .then(() => {
         alert("Reply added successfully");
+        setEnableEditing(false);
+        axios
+          .post(`/vendor/fetch/specific/question/${match.params.id}`)
+          .then((res) => {
+            setQuestion(res.data.data);
+          })
+          .catch(() => {
+            alert("Failed to Fetch data");
+          });
       });
   };
 
@@ -135,8 +168,25 @@ function ViewProductQuestion({ match }) {
                 <span className={classes.rowContent}>Answer</span>
               </StyledTableCell>
               <StyledTableCell align="left">
-                {question.answer ? (
-                  <b>{question.answer}</b>
+                {question.answer && !enableEditing ? (
+                  <div>
+                    <b>{question.answer}</b>
+                    <Button
+                      style={{
+                        marginRight: "5px",
+                      }}
+                      className={classes.editBtn}
+                      startIcon={<Edit />}
+                      color="primary"
+                      variant="contained"
+                      onClick={() => {
+                        updateAnswer(question.answer);
+                        setEnableEditing(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  </div>
                 ) : (
                   <>
                     <p
@@ -155,14 +205,23 @@ function ViewProductQuestion({ match }) {
                       value={answer}
                       onChange={(e) => updateAnswer(e.target.value)}
                     />
-
-                    <Button
-                      className={classes.submitButton}
-                      onClick={addReply}
-                      disabled={!answer}
-                    >
-                      Submit
-                    </Button>
+                    <div className={classes.actionsContainer}>
+                      <Button
+                        className={classes.submitButton}
+                        onClick={addReply}
+                        disabled={!answer}
+                      >
+                        Submit
+                      </Button>
+                      {enableEditing ? (
+                        <Button
+                          className={classes.resetButton}
+                          onClick={() => setEnableEditing(false)}
+                        >
+                          Cancel
+                        </Button>
+                      ) : null}
+                    </div>
                   </>
                 )}
               </StyledTableCell>

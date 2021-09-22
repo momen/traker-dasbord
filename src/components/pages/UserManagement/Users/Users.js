@@ -238,7 +238,8 @@ function Users() {
                 View
               </Button>
             ) : null} */}
-            {userPermissions.includes("user_edit") ? (
+            {userPermissions.includes("user_edit") ||
+            userPermissions.includes("user_edit_by_vendor") ? (
               <Button
                 className={classes.actionBtn}
                 startIcon={<Edit />}
@@ -256,7 +257,8 @@ function Users() {
               </Button>
             ) : null}
 
-            {userPermissions.includes("user_delete") ? (
+            {userPermissions.includes("user_delete_by_vendor") ||
+            userPermissions.includes("user_delete") ? (
               <Button
                 className={classes.actionBtn}
                 startIcon={<Delete />}
@@ -425,7 +427,7 @@ function Users() {
         <Paper mb={2}>
           <Toolbar className={classes.toolBar}>
             <div style={{ display: "flex", alignItems: "flex-end" }}>
-              {/* {userPermissions.includes("user_create") ? (
+              {userPermissions.includes("user_create_by_vendor") ? (
                 <Button
                   data-test="users-create-btn"
                   className={classes.button}
@@ -439,9 +441,10 @@ function Users() {
                 >
                   Add User
                 </Button>
-              ) : null} */}
+              ) : null}
 
-              {userPermissions.includes("user_delete") ? (
+              {userPermissions.includes("user_delete") ||
+              userPermissions.includes("user_delete_by_vendor") ? (
                 <Button
                   startIcon={<Delete />}
                   color="secondary"
