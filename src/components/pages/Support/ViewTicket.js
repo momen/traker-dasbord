@@ -109,7 +109,11 @@ function ViewTicket({ match }) {
 
   const addReply = () => {
     setIsSubmitting(true);
-    if (user.roles[0].title === "Vendor" || user.roles[0].title === "Manager") {
+    if (
+      user.roles[0].title === "Vendor" ||
+      user.roles[0].title === "Manager" ||
+      user.roles[0].title === "Staff"
+    ) {
       axios
         .post("vendor/answer/ticket", {
           ticket_id: ticket.id,
@@ -259,7 +263,8 @@ function ViewTicket({ match }) {
                   </div>
                 ))}
                 {((user?.roles[0].title === "Vendor" ||
-                  user?.roles[0].title === "Manager") &&
+                  user?.roles[0].title === "Manager" ||
+                  user?.roles[0].title === "Staff") &&
                   ticket.comments?.length < 1 &&
                   ticket.case !== "solved" &&
                   ticket.case !== "to admin") ||
