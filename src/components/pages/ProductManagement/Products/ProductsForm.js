@@ -473,6 +473,10 @@ function ProductsForm({
   };
 
   useEffect(() => {
+    if (!itemToEdit) {
+      updateFormData({ ...formData, producttype_id: productTypes[0].id });
+    }
+
     if (itemToEdit) {
       if (itemToEdit.car_made_id) {
         axios
@@ -545,11 +549,6 @@ function ProductsForm({
           )
         );
       }
-    }
-    if (productTypes.length === 1 && productTypes.includes("wholesale")) {
-      updateFormData({ ...formData, producttype_id: "2" });
-    } else if (!itemToEdit) {
-      updateFormData({ ...formData, producttype_id: "1" });
     }
   }, []);
 
