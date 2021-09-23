@@ -544,8 +544,8 @@ function ProductsForm({
           (carYear) => carYear.id == itemToEdit.year_from?.id
         );
         setToYears(
-          carYears.filter(
-            (year) => parseInt(year.year) >= parseInt(fromYear.year)
+          carYears?.filter(
+            (year) => parseInt(year.year) >= parseInt(fromYear?.year)
           )
         );
       }
@@ -2048,9 +2048,9 @@ function ProductsForm({
                             (carYear) => carYear.id == e.target.value
                           );
                           setToYears(
-                            carYears.filter(
+                            carYears?.filter(
                               (year) =>
-                                parseInt(year.year) >= parseInt(fromYear.year)
+                                parseInt(year?.year) >= parseInt(fromYear?.year)
                             )
                           );
                         }}
