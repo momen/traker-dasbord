@@ -2071,7 +2071,7 @@ function ProductsForm({
 
                       {responseErrors ? (
                         <div className={classes.inputMessage}>
-                          {responseErrors.year_from?.map((msg) => (
+                          {responseErrors?.year_from?.map((msg) => (
                             <span key={msg} className={classes.errorMsg}>
                               {msg}
                             </span>
