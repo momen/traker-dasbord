@@ -180,7 +180,9 @@ function ProductsForm({
     quantity: itemToEdit ? parseInt(itemToEdit.quantity) : "",
     qty_reminder: itemToEdit ? parseInt(itemToEdit.qty_reminder) || 1 : 1,
     serial_number: itemToEdit ? itemToEdit.serial_number : "",
-    producttype_id: itemToEdit ? itemToEdit.product_type?.id : "",
+    producttype_id: itemToEdit
+      ? itemToEdit.product_type?.id
+      : productTypes[0].id,
     photo: [],
   });
 
@@ -473,10 +475,6 @@ function ProductsForm({
   };
 
   useEffect(() => {
-    if (!itemToEdit) {
-      updateFormData({ ...formData, producttype_id: productTypes[0].id });
-    }
-
     if (itemToEdit) {
       if (itemToEdit.car_made_id) {
         axios
