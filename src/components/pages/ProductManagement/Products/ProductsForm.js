@@ -2087,7 +2087,7 @@ function ProductsForm({
                         disabled={!formData.year_from}
                         select
                         label="To Year"
-                        value={formData.year_to}
+                        value={formData?.year_to}
                         name="year_to"
                         onChange={(e) => {
                           handleChange(e);
