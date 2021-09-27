@@ -386,11 +386,19 @@ function Users() {
             setLoading(false);
           })
           .catch(({ response }) => {
-            alert(response.data?.errors);
+            alert(
+              response.data?.errors ||
+                response.data?.error ||
+                response.data?.message
+            );
           });
       })
       .catch(({ response }) => {
-        alert(response.data?.errors);
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
   };
 
@@ -413,11 +421,19 @@ function Users() {
             setLoading(false);
           })
           .catch(({ response }) => {
-            alert(response.data?.errors);
+            alert(
+              response.data?.errors ||
+                response.data?.error ||
+                response.data?.message
+            );
           });
       })
       .catch(({ response }) => {
-        alert(response.data?.errors);
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
   };
 
@@ -443,11 +459,19 @@ function Users() {
             setLoading(false);
           })
           .catch(({ response }) => {
-            alert(response.data?.errors);
+            alert(
+              response.data?.errors ||
+                response.data?.error ||
+                response.data?.message
+            );
           });
       })
       .catch(({ response }) => {
-        alert(response.data?.errors);
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
   };
 
@@ -459,7 +483,11 @@ function Users() {
         setRolesList(res.data.data);
       })
       .catch(({ response }) => {
-        // alert(response.data?.errors);
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
     axios
       .get("/storeslist")
@@ -467,8 +495,12 @@ function Users() {
         const _stores = res.data.data.filter((store) => !store.head_center);
         setStores(_stores);
       })
-      .catch(() => {
-        alert("Failed to Fetch Stores List");
+      .catch(({ response }) => {
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
   }, [lang]);
 
@@ -486,8 +518,12 @@ function Users() {
           setRows(res.data.data);
           setLoading(false);
         })
-        .catch(() => {
-          alert("Failed to Fetch data");
+        .catch(({ response }) => {
+          alert(
+            response.data?.errors ||
+              response.data?.error ||
+              response.data?.message
+          );
         });
     } else {
       axios
@@ -502,8 +538,12 @@ function Users() {
           setRows(res.data.data);
           setLoading(false);
         })
-        .catch(() => {
-          alert("Failed to Fetch data");
+        .catch(({ response }) => {
+          alert(
+            response.data?.errors ||
+              response.data?.error ||
+              response.data?.message
+          );
         });
     }
   }, [page, searchValue, openPopup, sortModel, pageSize, viewMode, lang]);

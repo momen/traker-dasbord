@@ -118,11 +118,12 @@ function SignIn() {
                   JSON.stringify(res.data.data.token)
                 );
               })
-              .catch((res) => {
-                console.log(`Error: ${res}`);
-                const message = res.response?.data.errors
-                  ? "Please check your Email or Password"
-                  : "Something went wrong";
+              .catch(({ response }) => {
+                const message =
+                  response.data?.errors ||
+                  response.data?.error ||
+                  response.data?.message ||
+                  "Something went wrong";
 
                 setStatus({ success: false });
                 setErrors({ submit: message });
