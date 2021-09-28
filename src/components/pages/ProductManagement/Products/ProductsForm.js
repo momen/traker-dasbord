@@ -267,8 +267,9 @@ function ProductsForm({
       formData.producttype_id?.toString() == "2" ||
       formData.producttype_id?.toString() == "3"
         ? Yup.number()
-            .min(1, "Enter a value greater than 0")
             .required("This field is Required")
+            .typeError("This field is Required")
+            .min(1, "Enter a value greater than 0")
         : Yup.string().nullable().notRequired(),
     no_of_orders:
       formData.producttype_id?.toString() == "2" ||
@@ -276,6 +277,7 @@ function ProductsForm({
         ? Yup.number()
             .min(1, "Minimum value should be 1")
             .required("This field is Required")
+            .typeError("This field is Required")
         : Yup.string().nullable().notRequired(),
     car_made_id:
       formData.category_id &&
@@ -316,6 +318,7 @@ function ProductsForm({
     discount: enableDiscount
       ? Yup.number()
           .required()
+          .typeError("This field is Required")
           .min(1, "Minimum value for discount is 1%")
           .max(80, "Maximum value for discount is 80%")
       : Yup.number().nullable().notRequired(),
@@ -327,6 +330,7 @@ function ProductsForm({
       formData.producttype_id?.toString() == "3"
         ? Yup.number()
             .required("This field is Required")
+            .typeError("This field is Required")
             .min(1, "Enter a value greater than 0")
         : Yup.string().nullable().notRequired(),
     maincategory_id: Yup.string().required(),
@@ -365,12 +369,17 @@ function ProductsForm({
       formData.producttype_id?.toString() !== "2"
         ? Yup.number()
             .required("This field is Required")
+            .typeError("This field is Required")
             .nullable()
             .min(5, "Minimum value should be 5")
         : Yup.string().nullable().notRequired(),
     qty_reminder:
       formData.producttype_id?.toString() !== "2"
-        ? Yup.number().nullable().required("This field is Required")
+        ? Yup.number()
+            .nullable()
+            .required("This field is Required")
+            .typeError("This field is Required")
+            .min(0, "Minimum value should be 0")
         : Yup.number().notRequired().nullable(),
     description:
       lang === "ar"
@@ -1434,18 +1443,12 @@ function ProductsForm({
                         name="holesale_price"
                         label="Wholesale Price"
                         value={formData.holesale_price}
+                        onChange={handleChange}
                         onValueChange={({ floatValue }) => {
                           updateFormData({
                             ...formData,
                             holesale_price: Math.round(floatValue),
                           });
-                          values.holesale_price = Math.round(floatValue);
-                          if (!floatValue) {
-                            errors.holesale_price = "This field is Required";
-                          } else if (floatValue === 0) {
-                            errors.holesale_price =
-                              "Enter a value greater than 0";
-                          }
                         }}
                         onBlur={handleBlur}
                         error={
@@ -1482,17 +1485,12 @@ function ProductsForm({
                         fullWidth
                         label="Number of orders"
                         value={formData.no_of_orders}
+                        onChange={handleChange}
                         onValueChange={({ floatValue }) => {
                           updateFormData({
                             ...formData,
                             no_of_orders: Math.round(floatValue),
                           });
-                          values.no_of_orders = floatValue;
-                          if (!floatValue) {
-                            errors.no_of_orders = "This field is Required";
-                          } else if (floatValue < 1) {
-                            errors.no_of_orders = "Minimum value should be 1";
-                          }
                         }}
                         onBlur={handleBlur}
                         error={
@@ -1534,14 +1532,9 @@ function ProductsForm({
                         name="price"
                         label="Price"
                         value={formData.price}
+                        onChange={handleChange}
                         onValueChange={({ floatValue }) => {
                           updateFormData({ ...formData, price: floatValue });
-                          values.price = floatValue;
-                          if (!floatValue) {
-                            errors.price = "This field is Required";
-                          } else if (floatValue < 1) {
-                            errors.price = "Enter a value greater than 0";
-                          }
                         }}
                         onBlur={handleBlur}
                         error={
