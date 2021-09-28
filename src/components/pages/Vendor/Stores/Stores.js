@@ -438,8 +438,7 @@ function Stores() {
             ) : null}
 
             {userPermissions.includes("stores_delete") &&
-            !params.row.head_center &&
-            !params.row.members?.length ? (
+            !params.row.head_center ? (
               <Button
                 className={classes.actionBtn}
                 startIcon={<Delete />}
@@ -509,11 +508,19 @@ function Stores() {
             setLoading(false);
           })
           .catch(({ response }) => {
-            alert(response.data?.errors);
+            alert(
+              response.data?.errors ||
+                response.data?.error ||
+                response.data?.message
+            );
           });
       })
       .catch(({ response }) => {
-        alert(response.data?.errors);
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
   };
 
@@ -539,11 +546,19 @@ function Stores() {
             setLoading(false);
           })
           .catch(({ response }) => {
-            alert(response.data?.errors);
+            alert(
+              response.data?.errors ||
+                response.data?.error ||
+                response.data?.message
+            );
           });
       })
       .catch(({ response }) => {
-        alert(response.data?.errors);
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
   };
 
@@ -560,8 +575,12 @@ function Stores() {
         );
         setCountries(_countries);
       })
-      .catch(() => {
-        alert("Failed to Fetch Countries List");
+      .catch(({ response }) => {
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
   }, [lang]);
 
@@ -579,8 +598,13 @@ function Stores() {
           setRows(res.data.data);
           setLoading(false);
         })
-        .catch(() => {
-          alert("Failed to Fetch data");
+        .catch(({ response }) => {
+          alert(
+            response.data?.errors ||
+              response.data?.error ||
+              response.data?.message ||
+              response.data
+          );
         });
     } else {
       axios
@@ -595,8 +619,13 @@ function Stores() {
           setRows(res.data.data);
           setLoading(false);
         })
-        .catch(() => {
-          alert("Failed to Fetch data");
+        .catch(({ response }) => {
+          alert(
+            response.data?.errors ||
+              response.data?.error ||
+              response.data?.message ||
+              response.data
+          );
         });
     }
   }, [page, searchValue, openPopup, sortModel, pageSize, viewMode, lang]);

@@ -740,8 +740,12 @@ function Products() {
         ); // Customize
         setTransmissionsList(_transmissionsList);
       })
-      .catch(() => {
-        alert("Failed to Fetch Transmissions List");
+      .catch(({ response }) => {
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
 
     axios
@@ -754,8 +758,12 @@ function Products() {
         })); // Customize
         setProductTags(_tags);
       })
-      .catch(() => {
-        alert("Failed to Fetch Product Tags List");
+      .catch(({ response }) => {
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
 
     axios
@@ -770,8 +778,12 @@ function Products() {
         ); // Customize
         setProductTypes(_productTypes);
       })
-      .catch(() => {
-        alert("Failed to Fetch Product Types List");
+      .catch(({ response }) => {
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
   }, [lang]);
 

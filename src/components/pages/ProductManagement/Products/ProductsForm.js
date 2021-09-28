@@ -476,7 +476,7 @@ function ProductsForm({
 
   useEffect(() => {
     if (itemToEdit) {
-      if (itemToEdit.car_made_id) {
+      if (itemToEdit.cartype_id) {
         axios
           .get(`/cartype/madeslist/${itemToEdit.cartype_id}`)
           .then((res) => {
@@ -615,8 +615,6 @@ function ProductsForm({
       // formData.categories = formData.categories.map(category => category.id)
       // formData.tags = formData.tags.map(tag => tag.id)
       // formData.photo= formData.photo.map(async (img) => await toBase64(img));
-
-      console.log(formData.models);
 
       if (itemToEdit) {
         await axios
@@ -780,7 +778,7 @@ function ProductsForm({
       discount: "",
       price: "",
       maincategory_id: "",
-      category_id: [],
+      category_id: "",
       part_category_id: "",
       manufacturer_id: "",
       prodcountry_id: "",
@@ -810,6 +808,7 @@ function ProductsForm({
         initialValues={formData}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
+        enableReinitialize
       >
         {({
           errors,
@@ -832,8 +831,30 @@ function ProductsForm({
                     value={formData.maincategory_id}
                     name="maincategory_id"
                     onChange={(e) => {
+                      console.log(values);
                       handleChange(e);
-                      handleStateChange(e);
+                      if (e.target.value == 5) {
+                        updateFormData({
+                          ...formData,
+                          maincategory_id: e.target.value,
+                          category_id: "",
+                          part_category_id: "",
+                          cartype_id: "",
+                          car_made_id: "",
+                          models: [],
+                          year_from: "",
+                          year_to: "",
+                          transmission_id: "",
+                        });
+                      } else {
+                        updateFormData({
+                          ...formData,
+                          maincategory_id: e.target.value,
+                          category_id: "",
+                          part_category_id: "",
+                        });
+                      }
+
                       if (e.target.value) {
                         axios
                           .get(`/categorieslist/${e.target.value}`)
@@ -897,8 +918,35 @@ function ProductsForm({
                     value={formData.category_id}
                     name="category_id"
                     onChange={(e) => {
+                      console.log(values);
                       handleChange(e);
-                      handleStateChange(e);
+                      console.log(e.target.value);
+                      if (
+                        e.target.value == 43 ||
+                        e.target.value == 81 ||
+                        e.target.value == 82 ||
+                        e.target.value == 83 ||
+                        e.target.value == 84 ||
+                        e.target.value == 85
+                      ) {
+                        updateFormData({
+                          ...formData,
+                          category_id: e.target.value,
+                          part_category_id: "",
+                          cartype_id: "",
+                          car_made_id: "",
+                          models: [],
+                          year_from: "",
+                          year_to: "",
+                          transmission_id: "",
+                        });
+                      } else {
+                        updateFormData({
+                          ...formData,
+                          category_id: e.target.value,
+                          part_category_id: "",
+                        });
+                      }
                       if (e.target.value) {
                         axios
                           .get(`/part-categorieslist/${e.target.value}`)
@@ -1845,6 +1893,8 @@ function ProductsForm({
                                 alert("Failed to Fetch Brands List");
                               });
                           } else {
+                            values.car_made_id = "";
+                            values.models = [];
                             setBrands(null);
                             setCarModels(null);
                             updateFormData({
@@ -2040,8 +2090,6 @@ function ProductsForm({
                         value={formData.year_from}
                         name="year_from"
                         onChange={(e) => {
-                          handleChange(e);
-                          handleStateChange(e);
                           const fromYear = carYears.find(
                             (carYear) => carYear.id == e.target.value
                           );
@@ -2051,6 +2099,25 @@ function ProductsForm({
                                 parseInt(year?.year) >= parseInt(fromYear?.year)
                             )
                           );
+                          if (
+                            parseInt(fromYear.year) >
+                            parseInt(
+                              carYears.find(
+                                (year) => year.id == formData.year_to
+                              )?.year
+                            )
+                          ) {
+                            updateFormData({
+                              ...formData,
+                              year_from: e.target.value,
+                              year_to: "",
+                            });
+                            values.year_from = e.target.value;
+                            values.year_to = "";
+                          } else {
+                            handleChange(e);
+                            handleStateChange(e);
+                          }
                         }}
                         SelectProps={{
                           native: true,
