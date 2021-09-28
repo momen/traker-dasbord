@@ -50,7 +50,11 @@ function App({ userToken, theme, lang }) {
         return res;
       },
       async (err) => {
-        if (err.response?.data.message === "Unauthenticated.") {
+        if (
+          err.response?.data.errors === "login and try again later" ||
+          err.response?.data.error === "login and try again later" ||
+          err.response?.data.message === "login and try again later"
+        ) {
           dispatch(Logout()); //Logout Action Creator
           delete axios.defaults.headers.common["Authorization"];
           localStorage.removeItem("trkar-token");
