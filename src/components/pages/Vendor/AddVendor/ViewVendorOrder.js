@@ -56,7 +56,6 @@ function ViewVendorOrder({ match }) {
   const [order, setOrder] = useState([]);
 
   useEffect(() => {
-    console.log(match.params);
     axios
       .get(
         `/admin/show/vendor/orders/${match.params.id}/${match.params.orderId}`

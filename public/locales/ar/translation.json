@@ -1,7 +1,15 @@
 {
   "global": {
-    "submiBtn": "حفظ",
-    "resetBtn": "إلغاء"
+    "submitBtn": "حفظ",
+    "resetBtn": "إلغاء",
+    "uploadBtn": "أضف صورة",
+    "editBtn": "تعديل",
+    "deleteBtn": "حذف",
+    "deleteSelectedBtn": "حذف المختار",
+    "search": "بحث",
+    "perPage_10": "عرض 10/صفحة",
+    "perPage_25": "عرض 25/صفحة",
+    "perPage_100": "عرض 100/صفحة"
   },
   "sidenav": {
     "main": "الرئيسية",
@@ -12,6 +20,7 @@
     "staff": "الموظفين",
     "logs": "السجل",
     "productMgt": "إدارة المنتجات",
+    "allCategories": "فئات",
     "mainCatgory": "فئات رئيسية",
     "category": "فئات فرعية",
     "partCategory": "فئات فرعية ثانية",
@@ -69,6 +78,18 @@
         "title": "أظهار المبيعات خلال مدة محددة",
         "from": "من",
         "to": "إلي"
+      }
+    },
+    "categories": {
+      "title": "فئات",
+      "mainBreadcrumb": "أنواع المركبات",
+      "addNew": "أضف فئة جديدة",
+      "newCategory": "إضافة فئة",
+      "editCategory": "تعديل فئة",
+      "gridColumns": {
+        "id": "ID رقم",
+        "mainCategory": "الفئة الرئيسية",
+        "category": "الفئة"
       }
     },
     "ads": {

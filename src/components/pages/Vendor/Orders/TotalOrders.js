@@ -394,6 +394,7 @@ function PendingOrders() {
   useEffect(() => {
     setLoading(true);
     if (!userIsSearching) {
+      console.log(statusToFilterBy);
       axios
         .post(
           `/show/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
@@ -488,10 +489,10 @@ function PendingOrders() {
                   <MenuItem value="">
                     <em>None</em>
                   </MenuItem>
-                  <MenuItem value="pending">Pending</MenuItem>
-                  <MenuItem value="in progress">In Progress</MenuItem>
-                  <MenuItem value="delivered">Delivered</MenuItem>
-                  <MenuItem value="cancelled">Cancelled</MenuItem>
+                  <MenuItem value={0}>Pending</MenuItem>
+                  <MenuItem value={1}>In Progress</MenuItem>
+                  <MenuItem value={2}>Cancelled</MenuItem>
+                  <MenuItem value={3}>Expired</MenuItem>
                 </Select>
               </FormControl>
 

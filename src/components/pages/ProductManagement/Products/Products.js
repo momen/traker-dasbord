@@ -232,6 +232,7 @@ function Products() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openMassDeleteDialog, setOpenMassDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
+  const [allCategories, setAllCategories] = useState([]);
   const [mainCategories, setMainCategories] = useState([]);
   const [categories, setCategories] = useState([]);
   const [carMades, setCarMades] = useState([]);
@@ -626,6 +627,19 @@ function Products() {
         alert("Failed to Fetch Stores List");
       });
 
+    axios("allcategories")
+      .then((res) => {
+        const _categories = res.data.data.map(({ id, name, name_en }) => ({
+          id,
+          name,
+          name_en,
+        }));
+        setAllCategories(_categories);
+      })
+      .catch(() => {
+        alert("Failed to Fetch All Categories List");
+      });
+
     axios
       .get("/main/categories/list/all")
       .then((res) => {
@@ -1013,6 +1027,7 @@ function Products() {
                 setOpenPopup={setOpenPopup}
                 itemToEdit={selectedItem}
                 stores={stores}
+                allCategories={allCategories}
                 mainCategories={mainCategories}
                 categories={categories}
                 carMades={carMades}
@@ -1053,6 +1068,7 @@ function Products() {
           setOpenPopup={setOpenPopup}
           itemToEdit={selectedItem}
           stores={stores}
+          allCategories={allCategories}
           mainCategories={mainCategories}
           categories={categories}
           carMades={carMades}

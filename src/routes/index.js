@@ -95,6 +95,9 @@ const AuditLogs = async(() =>
 const MainCategories = async(() =>
   import("../components/pages/ProductManagement/Main Categories/MainCategories")
 );
+const AllCategories = async(() =>
+  import("../components/pages/ProductManagement/AllCategories/Categories")
+);
 const Categories = async(() =>
   import("../components/pages/ProductManagement/Categories/Categories")
 );
@@ -377,6 +380,14 @@ const productManagementRoutes = {
   icon: <ShoppingCart />,
   component: null,
   children: [
+    {
+      path: "/product/all-categories",
+      name: "allCategories",
+      component: AllCategories,
+      icon: <Class />,
+      guard: PermissionGuard,
+      permission: "product_category_access",
+    },
     {
       path: "/product/main-categories",
       name: "mainCatgory",

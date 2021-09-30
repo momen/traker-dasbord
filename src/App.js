@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { Helmet } from "react-helmet";
 import DateFnsUtils from "@date-io/date-fns";
@@ -20,12 +20,17 @@ import { Redirect } from "react-router-dom";
 import { connect, useDispatch } from "react-redux";
 import { Logout } from "./actions";
 import { THEMES } from "./constants";
-import jssRTL from "jss-rtl";
+import rtl from "jss-rtl";
 import { useTranslation } from "react-i18next";
 
-const jss = create({
+const jssEnglish = create({
   // plugins: [...jssPreset().plugins, jssRTL()],
-  ...jssPreset(),
+  plugins: [...jssPreset().plugins],
+  insertionPoint: document.getElementById("jss-insertion-point"),
+});
+const jssArabic = create({
+  // plugins: [...jssPreset().plugins, jssRTL()],
+  plugins: [...jssPreset().plugins, rtl()],
   insertionPoint: document.getElementById("jss-insertion-point"),
 });
 
@@ -34,6 +39,7 @@ function App({ userToken, theme, lang }) {
   // const [{ userToken, theme }, dispatch] = useStateValue();
   const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
+  const [jss, setJss] = useState(jssArabic);
 
   // Inject the token in the headers to be available on each request from the beginning, & this is
   // done only on the initial render.
@@ -73,6 +79,7 @@ function App({ userToken, theme, lang }) {
     document
       .getElementById("body")
       .setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+    setJss(lang === "ar" ? jssArabic : jssEnglish);
   }, [lang]);
 
   return (

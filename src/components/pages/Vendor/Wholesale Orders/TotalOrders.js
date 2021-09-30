@@ -483,10 +483,10 @@ function PendingOrders() {
                   <MenuItem value="">
                     <em>None</em>
                   </MenuItem>
-                  <MenuItem value="pending">Pending</MenuItem>
-                  <MenuItem value="in progress">In Progress</MenuItem>
-                  <MenuItem value="delivered">Delivered</MenuItem>
-                  <MenuItem value="cancelled">Cancelled</MenuItem>
+                  <MenuItem value={0}>Pending</MenuItem>
+                  <MenuItem value={1}>In Progress</MenuItem>
+                  <MenuItem value={2}>Cancelled</MenuItem>
+                  <MenuItem value={3}>Expired</MenuItem>
                 </Select>
               </FormControl>
 

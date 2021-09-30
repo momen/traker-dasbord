@@ -1,7 +1,17 @@
 {
   "global": {
     "submiBtn": "Submit",
-    "resetBtn": "Reset"
+    "resetBtn": "Reset",
+    "editBtn": "Edit",
+    "deleteBtn": "Delete",
+    "deleteSelectedBtn": "Delete Selected",
+    "search": "Search",
+    "perPage_10": "10 records/page",
+    "perPage_25": "25 records/page",
+    "perPage_100": "100 records/page",
+    "forms": {
+      "uploadBtn": "Upload"
+    }
   },
   "sidenav": {
     "main": "Dashboard",
@@ -12,6 +22,7 @@
     "staff": "Staff",
     "logs": "Audit Logs",
     "productMgt": "Product Management",
+    "allCategories": "Categories",
     "mainCatgory": "Main Categories",
     "category": "Categories",
     "partCategory": "Part Categories",
@@ -69,6 +80,18 @@
         "title": "Filter Sales by period",
         "from": "From",
         "to": "To"
+      }
+    },
+    "categories": {
+      "title": "Categories",
+      "mainBreadcrumb": "Vehicle Types",
+      "addNew": "Add Category",
+      "newCategory": "New Category",
+      "editCategory": "Edit Category",
+      "gridColumns": {
+        "id": "ID",
+        "mainCategory": "Main Category",
+        "category": "Category"
       }
     },
     "ads": {

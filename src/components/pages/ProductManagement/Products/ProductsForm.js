@@ -34,6 +34,7 @@ import SuccessPopup from "../../../SuccessPopup";
 import { spacing } from "@material-ui/system";
 import { useSelector } from "react-redux";
 import clsx from "clsx";
+import { isGenericCategory } from "./helpers";
 
 const Divider = styled(MuiDivider)(spacing);
 
@@ -127,7 +128,7 @@ function ProductsForm({
   setOpenPopup,
   itemToEdit,
   stores,
-  mainCategories,
+  allCategories,
   // categories,
   // carMades,
   carYears,
@@ -145,6 +146,8 @@ function ProductsForm({
   const { lang } = useSelector((state) => state);
 
   const [formData, updateFormData] = useState({
+    cartype_id: itemToEdit ? itemToEdit.cartype_id : "",
+    maincategory_id: itemToEdit ? itemToEdit.category?.maincategory_id : "",
     name: itemToEdit ? itemToEdit.name || "" : "",
     name_en: itemToEdit ? itemToEdit.name_en || "" : "",
     description: itemToEdit ? itemToEdit.description || "" : "",
@@ -162,17 +165,15 @@ function ProductsForm({
       itemToEdit?.discount && itemToEdit?.discount > 0
         ? itemToEdit.discount
         : "",
-    maincategory_id: itemToEdit ? itemToEdit.category?.maincategory_id : "",
-    category_id: itemToEdit ? itemToEdit.category?.id : "",
+    // category_id: itemToEdit ? itemToEdit.category?.id : "",
     price: itemToEdit ? parseFloat(itemToEdit.price) : "",
     holesale_price: itemToEdit ? parseFloat(itemToEdit.holesale_price) : "",
     no_of_orders: itemToEdit ? parseInt(itemToEdit.no_of_orders) : "",
 
-    part_category_id: itemToEdit.part_category_id?.toString() || "",
+    // part_category_id: itemToEdit.part_category_id?.toString() || "",
     manufacturer_id: itemToEdit ? itemToEdit.manufacturer?.id : "",
     prodcountry_id: itemToEdit ? itemToEdit.origin_country?.id : "",
     transmission_id: itemToEdit ? itemToEdit.transmission_id || "" : "",
-    cartype_id: itemToEdit ? itemToEdit.cartype_id : "",
     tags: itemToEdit
       ? itemToEdit.tags.map(({ id, name }) => ({ id, name }))
       : [],
@@ -188,7 +189,8 @@ function ProductsForm({
 
   const [brands, setBrands] = useState(null);
   const [carModels, setCarModels] = useState(null);
-  const [categories, setCategories] = useState(null);
+  const [mainCategories, setMainCategories] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [partCategories, setPartCategories] = useState(null);
   const [toYears, setToYears] = useState([]);
 
@@ -279,42 +281,15 @@ function ProductsForm({
             .required("This field is Required")
             .typeError("This field is Required")
         : Yup.string().nullable().notRequired(),
-    car_made_id:
-      formData.category_id &&
-      formData.category_id != "43" &&
-      formData.category_id != "81" &&
-      formData.category_id != "82" &&
-      formData.category_id != "83" &&
-      formData.category_id != "84" &&
-      formData.category_id != "85" &&
-      formData.maincategory_id &&
-      formData.maincategory_id != "5"
-        ? Yup.string().required()
-        : Yup.string().nullable().notRequired(),
-    year_from:
-      formData.category_id &&
-      formData.category_id != "43" &&
-      formData.category_id != "81" &&
-      formData.category_id != "82" &&
-      formData.category_id != "83" &&
-      formData.category_id != "84" &&
-      formData.category_id != "85" &&
-      formData.maincategory_id &&
-      formData.maincategory_id != "5"
-        ? Yup.string().required()
-        : Yup.string().nullable().notRequired(),
-    year_to:
-      formData.category_id &&
-      formData.category_id != "43" &&
-      formData.category_id != "81" &&
-      formData.category_id != "82" &&
-      formData.category_id != "83" &&
-      formData.category_id != "84" &&
-      formData.category_id != "85" &&
-      formData.maincategory_id &&
-      formData.maincategory_id != "5"
-        ? Yup.string().required()
-        : Yup.string().nullable().notRequired(),
+    car_made_id: !isGenericCategory(formData.allcategory_id)
+      ? Yup.string().required()
+      : Yup.string().nullable().notRequired(),
+    year_from: !isGenericCategory(formData.allcategory_id)
+      ? Yup.string().required()
+      : Yup.string().nullable().notRequired(),
+    year_to: !isGenericCategory(formData.allcategory_id)
+      ? Yup.string().required()
+      : Yup.string().nullable().notRequired(),
     discount: enableDiscount
       ? Yup.number()
           .required()
@@ -334,36 +309,18 @@ function ProductsForm({
             .min(1, "Enter a value greater than 0")
         : Yup.string().nullable().notRequired(),
     maincategory_id: Yup.string().required(),
-    category_id: Yup.string().required(),
-    part_category_id: partCategories?.length
-      ? Yup.string().required()
-      : Yup.string().nullable().notRequired(),
+    // category_id: Yup.string().required(),
+    // part_category_id: partCategories?.length
+    //   ? Yup.string().required()
+    //   : Yup.string().nullable().notRequired(),
     manufacturer_id: Yup.string().required(),
     prodcountry_id: Yup.string().required(),
-    transmission_id:
-      formData.category_id &&
-      formData.category_id != "43" &&
-      formData.category_id != "81" &&
-      formData.category_id != "82" &&
-      formData.category_id != "83" &&
-      formData.category_id != "84" &&
-      formData.category_id != "85" &&
-      formData.maincategory_id &&
-      formData.maincategory_id != "5"
-        ? Yup.string().required()
-        : Yup.string().nullable().notRequired(),
-    cartype_id:
-      formData.category_id &&
-      formData.category_id != "43" &&
-      formData.category_id != "81" &&
-      formData.category_id != "82" &&
-      formData.category_id != "83" &&
-      formData.category_id != "84" &&
-      formData.category_id != "85" &&
-      formData.maincategory_id &&
-      formData.maincategory_id != "5"
-        ? Yup.string().required()
-        : Yup.string().nullable().notRequired(),
+    transmission_id: !isGenericCategory(formData.allcategory_id)
+      ? Yup.string().required()
+      : Yup.string().nullable().notRequired(),
+    cartype_id: !isGenericCategory(formData.allcategory_id)
+      ? Yup.string().required()
+      : Yup.string().nullable().notRequired(),
     store_id: Yup.string().required(),
     quantity:
       formData.producttype_id?.toString() !== "2"
@@ -589,6 +546,7 @@ function ProductsForm({
     setAutoSelectModelError(false);
     setAutoSelectTagError(false);
 
+    console.log(formData.allcategory_id);
     // setIsSubmitting(true);
     let data = new FormData();
 
@@ -600,11 +558,18 @@ function ProductsForm({
       setIsSubmitting(false);
     } else {
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === "photo") return;
+        if (
+          key === "photo" ||
+          key === "cartype_id" ||
+          key === "maincategory_id"
+        )
+          return;
         if (key === "quantity" && formData.producttype_id == 2) {
           data.append(key, 1);
         } else if (key === "tags" || key === "models") {
           data.append(key, JSON.stringify(value.map((val) => val.id)));
+        } else if (key === "allcategory_id") {
+          data.append(key, JSON.stringify(value));
         } else if (
           (key === "discount" && !value) ||
           (key === "discount" && !enableDiscount)
@@ -806,11 +771,6 @@ function ProductsForm({
     setBigImgSize(false);
   };
 
-  // const vendorTypes = [
-  //   { id: 2, title: "Wholesale" },
-  //   { id: 1, title: "Retail" },
-  //   { id: 3, title: "Both" },
-  // ];
   return (
     <div className={classes.paper}>
       <Formik
@@ -831,57 +791,63 @@ function ProductsForm({
         }) => (
           <form onSubmit={handleSubmit}>
             <Grid container spacing={8}>
-              <Grid item xs={6} md={4}>
+              <Grid item xs={12} md={6}>
                 <div>
                   <TextField
                     variant="outlined"
                     select
-                    label="Main Category"
-                    value={formData.maincategory_id}
-                    name="maincategory_id"
+                    label="Vehicle Type"
+                    value={formData.cartype_id}
+                    name="cartype_id"
                     onChange={(e) => {
-                      console.log(values);
                       handleChange(e);
-                      if (e.target.value == 5) {
-                        updateFormData({
-                          ...formData,
-                          maincategory_id: e.target.value,
-                          category_id: "",
-                          part_category_id: "",
-                          cartype_id: "",
-                          car_made_id: "",
-                          models: [],
-                          year_from: "",
-                          year_to: "",
-                          transmission_id: "",
-                        });
-                      } else {
-                        updateFormData({
-                          ...formData,
-                          maincategory_id: e.target.value,
-                          category_id: "",
-                          part_category_id: "",
-                        });
-                      }
-
+                      updateFormData({
+                        ...formData,
+                        cartype_id: e.target.value, // Helps in validation & not sent with the request, just checking the user selected a vehicle type
+                        allcategory_id: [e.target.value],
+                        maincategory_id: "", // Same as cartype this is to help in validations & not sent with the request
+                        car_made_id: "",
+                        models: [],
+                        year_from: "",
+                        year_to: "",
+                        transmission_id: "",
+                      });
+                      setCategories([]);
                       if (e.target.value) {
                         axios
-                          .get(`/categorieslist/${e.target.value}`)
+                          .get(`/cartype/madeslist/${e.target.value}`)
                           .then((res) => {
-                            const _categories = res.data.data.map(
+                            const _brands = res.data.data.map(
+                              ({ id, car_made, name_en }) => ({
+                                id,
+                                car_made,
+                                name_en,
+                              })
+                            ); // Customize
+                            setBrands(_brands);
+                          })
+                          .catch(() => {
+                            alert("Failed to Fetch Brands List");
+                          });
+                        axios
+                          .get(`allcategories/details/${e.target.value}`)
+                          .then((res) => {
+                            const _maincategories = res.data.data.map(
                               ({ id, name, name_en }) => ({
                                 id,
                                 name,
                                 name_en,
                               })
                             ); // Customize
-                            setCategories(_categories);
+                            setMainCategories(_maincategories);
                           })
                           .catch(() => {
-                            alert("Failed to Fetch Categories List");
+                            alert("Failed to Fetch Main Categories List");
                           });
                       } else {
-                        setCategories(null);
+                        setMainCategories([]);
+                        setBrands([]);
+                        setCarModels([]);
                       }
                     }}
                     SelectProps={{
@@ -889,18 +855,18 @@ function ProductsForm({
                     }}
                     onBlur={handleBlur}
                     error={
-                      responseErrors?.maincategory_id ||
-                      Boolean(touched.maincategory_id && errors.maincategory_id)
+                      responseErrors?.cartype_id ||
+                      Boolean(touched.cartype_id && errors.cartype_id)
                     }
-                    helperText="Please select a Main Category"
+                    // helperText="Please select a Vehicle Type"
                     fullWidth
                   >
                     <option aria-label="None" value="" />
-                    {mainCategories?.map((category) => (
+                    {allCategories?.map((category) => (
                       <option value={category.id}>
                         {lang === "ar"
-                          ? category.main_category_name || category.name_en
-                          : category.name_en || category.main_category_name}
+                          ? category.name || category.name_en
+                          : category.name_en || category.name}
                       </option>
                     ))}
                   </TextField>
@@ -917,32 +883,25 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={6} md={4}>
+              <Grid item xs={12} md={6}>
                 <div>
                   <TextField
                     variant="outlined"
-                    disabled={!formData.maincategory_id}
+                    disabled={!formData.cartype_id}
                     select
-                    label="Category"
-                    value={formData.category_id}
-                    name="category_id"
+                    label="Main Category"
+                    value={formData.maincategory_id}
+                    name="maincategory_id"
                     onChange={(e) => {
-                      console.log(values);
                       handleChange(e);
-                      console.log(e.target.value);
-                      if (
-                        e.target.value == 43 ||
-                        e.target.value == 81 ||
-                        e.target.value == 82 ||
-                        e.target.value == 83 ||
-                        e.target.value == 84 ||
-                        e.target.value == 85
-                      ) {
+                      if (e.target.value) {
                         updateFormData({
                           ...formData,
-                          category_id: e.target.value,
-                          part_category_id: "",
-                          cartype_id: "",
+                          allcategory_id: [
+                            formData.allcategory_id[0],
+                            e.target.value,
+                          ],
+                          maincategory_id: e.target.value,
                           car_made_id: "",
                           models: [],
                           year_from: "",
@@ -952,44 +911,45 @@ function ProductsForm({
                       } else {
                         updateFormData({
                           ...formData,
-                          category_id: e.target.value,
-                          part_category_id: "",
+                          allcategory_id: [formData.allcategory_id[0]],
+                          maincategory_id: e.target.value,
                         });
                       }
                       if (e.target.value) {
                         axios
-                          .get(`/part-categorieslist/${e.target.value}`)
+                          .get(`/allcategories/details/${e.target.value}`)
                           .then((res) => {
-                            const _partCategories = res.data.data.map(
-                              ({ id, category_name, name_en }) => ({
+                            const _subCategories = res.data.data.map(
+                              ({ id, name, name_en }) => ({
                                 id,
-                                category_name,
+                                name,
                                 name_en,
                               })
                             ); // Customize
-                            setPartCategories(_partCategories);
+                            setCategories([_subCategories]);
                           })
                           .catch(() => {
-                            alert("Failed to Fetch Part Categories List");
+                            alert("Failed to Fetch 1st Sub Categories List");
                           });
                       } else {
-                        setPartCategories(null);
+                        setCategories([]);
                       }
                     }}
                     SelectProps={{
                       native: true,
                     }}
-                    InputLabelProps={{ shrink: !!formData.category_id }}
+                    InputLabelProps={{ shrink: !!formData.maincategory_id }}
                     onBlur={handleBlur}
+                    // Check later
                     error={
                       responseErrors?.category_id ||
-                      Boolean(touched.category_id && errors.category_id)
+                      Boolean(touched.maincategory_id && errors.maincategory_id)
                     }
-                    helperText="Please select a Category"
+                    // helperText="Please select a Main Category"
                     fullWidth
                   >
                     <option aria-label="None" value="" />
-                    {categories?.map((category) => (
+                    {mainCategories?.map((category) => (
                       <option value={category.id}>
                         {lang === "ar"
                           ? category.name || category.name_en
@@ -1010,7 +970,106 @@ function ProductsForm({
                 </div>
               </Grid>
 
-              <Grid item xs={6} md={4}>
+              {categories?.map((categoryLevel, index) => (
+                <>
+                  <Grid
+                    item
+                    xs={0}
+                    md={6}
+                    style={{
+                      minHeight: "fit-content",
+                      maxHeight: "fit-content",
+                    }}
+                  ></Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      variant="outlined"
+                      select
+                      label="Sub Category"
+                      value={formData.allcategory_id[index + 2]}
+                      name={`subCategory${index}`}
+                      onChange={(e) => {
+                        handleChange(e);
+                        // if (e.target.value) {
+                        if (e.target.value) {
+                          updateFormData({
+                            ...formData,
+                            allcategory_id: [
+                              ...formData.allcategory_id.slice(0, index + 2),
+                              e.target.value,
+                            ],
+                          });
+                          axios
+                            .get(`/allcategories/details/${e.target.value}`)
+                            .then((res) => {
+                              const _subCategories = res.data.data?.map(
+                                ({ id, name, name_en }) => ({
+                                  id,
+                                  name,
+                                  name_en,
+                                })
+                              ); // Customize
+
+                              if (_subCategories?.length) {
+                                setCategories([
+                                  ...categories.slice(0, index + 1),
+                                  _subCategories,
+                                ]);
+                              } else {
+                                setCategories([
+                                  ...categories.slice(0, index + 1),
+                                ]);
+                              }
+                            })
+                            .catch(() => {
+                              alert(
+                                `Failed to Fetch Sub Categories ${
+                                  index + 2
+                                } List`
+                              );
+                            });
+                        } else {
+                          setCategories([...categories.slice(0, index + 1)]);
+                          updateFormData({
+                            ...formData,
+                            allcategory_id: formData.allcategory_id.slice(
+                              0,
+                              index + 2
+                            ),
+                          });
+                        }
+                        // } else {
+                        //   setCategories([categories.slice(0, index + 1)]);
+                        // }
+                      }}
+                      SelectProps={{
+                        native: true,
+                      }}
+                      InputLabelProps={{ shrink: !!formData.maincategory_id }}
+                      onBlur={handleBlur}
+                      // Check later
+                      error={responseErrors[`allcategory_id.${index + 2}`]}
+                      // helperText="Please select a Main Category"
+                      fullWidth
+                    >
+                      <option
+                        key={`subCategory${index}-emptyOption`}
+                        aria-label="None"
+                        value=""
+                      />
+                      {categoryLevel?.map((category) => (
+                        <option value={category.id}>
+                          {lang === "ar"
+                            ? category.name || category.name_en
+                            : category.name_en || category.name}
+                        </option>
+                      ))}
+                    </TextField>
+                  </Grid>
+                </>
+              ))}
+
+              {/* <Grid item xs={6} md={4}>
                 <div>
                   <TextField
                     variant="outlined"
@@ -1057,7 +1116,7 @@ function ProductsForm({
                     </div>
                   ) : null}
                 </div>
-              </Grid>
+              </Grid> */}
 
               <Grid item xs={6} sm={6}>
                 <div>
@@ -1073,6 +1132,7 @@ function ProductsForm({
                     onChange={(e) => {
                       handleChange(e);
                       handleStateChange(e);
+                      console.log(formData);
                       console.log(errors);
                     }}
                     onBlur={handleBlur}
@@ -1841,17 +1901,9 @@ function ProductsForm({
                 <Divider my={1} />
               </Grid>
 
-              {formData.category_id &&
-              formData.category_id != "43" &&
-              formData.category_id != "81" &&
-              formData.category_id != "82" &&
-              formData.category_id != "83" &&
-              formData.category_id != "84" &&
-              formData.category_id != "85" &&
-              formData.maincategory_id &&
-              formData.maincategory_id != "5" ? (
+              {!isGenericCategory(formData.allcategory_id) ? (
                 <>
-                  <Grid item xs={6} md={3}>
+                  {/* <Grid item xs={6} md={3}>
                     <div>
                       <TextField
                         variant="outlined"
@@ -1929,7 +1981,7 @@ function ProductsForm({
                         </div>
                       ) : null}
                     </div>
-                  </Grid>
+                  </Grid> */}
                   <Grid item xs={6} md={3}>
                     <div>
                       <TextField
@@ -2003,7 +2055,7 @@ function ProductsForm({
                       ) : null}
                     </div>
                   </Grid>
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={12} md={9}>
                     <div>
                       <Autocomplete
                         disabled={!formData.car_made_id}
@@ -2181,21 +2233,6 @@ function ProductsForm({
                       ) : null}
                     </div>
                   </Grid>
-                </>
-              ) : null}
-
-              {/****************************** ******************************/}
-
-              {formData.category_id &&
-              formData.category_id != "43" &&
-              formData.category_id != "81" &&
-              formData.category_id != "82" &&
-              formData.category_id != "83" &&
-              formData.category_id != "84" &&
-              formData.category_id != "85" &&
-              formData.maincategory_id &&
-              formData.maincategory_id != "5" ? (
-                <>
                   <Grid item xs={6} md={3}>
                     <div>
                       <TextField
@@ -2249,6 +2286,8 @@ function ProductsForm({
                   </Grid>
                 </>
               ) : null}
+
+              {/****************************** ******************************/}
 
               <Grid item xs={12}>
                 <div>
@@ -2326,7 +2365,6 @@ function ProductsForm({
                 />
                 <label htmlFor="icon-button-file">
                   <Button
-                    dir="ltr"
                     variant="contained"
                     color="default"
                     className={classes.uploadButton}
@@ -2341,7 +2379,6 @@ function ProductsForm({
               {productImages?.length || formData.photo?.length ? (
                 <Grid item xs>
                   {productImages?.map((img, index) => {
-                    // console.log(imagesToDelete);
                     return (
                       <div style={{ display: "flex", alignItems: "center" }}>
                         <Chip
