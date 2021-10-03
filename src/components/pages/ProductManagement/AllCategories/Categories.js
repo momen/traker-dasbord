@@ -368,7 +368,7 @@ function Categories() {
 
   const DeleteCategory = async () => {
     await axios
-      .delete(`/product-categories/${itemToDelete}`)
+      .delete(`/allcategories/${itemToDelete}`)
       .then((res) => {
         setOpenDeleteDialog(false);
       })
@@ -380,9 +380,13 @@ function Categories() {
         );
       });
 
+    const URI =
+      currentLevel === 0
+        ? `allcategories`
+        : `allcategories/details/${selectedCategory}`;
     await axios
       .get(
-        `/product-categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+        `/${URI}?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
       )
       .then((res) => {
         if (Math.ceil(res.data.total / pageSize) < page) {
@@ -410,9 +414,13 @@ function Categories() {
         setOpenMassDeleteDialog(false);
         setRowsToDelete([]);
         setLoading(true);
+        const URI =
+          currentLevel === 0
+            ? `allcategories`
+            : `allcategories/details/${selectedCategory}`;
         axios
           .get(
-            `/product-categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+            `/${URI}?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
           )
           .then((res) => {
             if (Math.ceil(res.data.total / pageSize) < page) {
@@ -487,10 +495,9 @@ function Categories() {
           );
         });
     } else {
-      axios
-        .post(
-          `/allcategories/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}&search_index=${searchValue}`
-        )
+      axios(
+        `/allcategories/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}&search_index=${searchValue}`
+      )
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);

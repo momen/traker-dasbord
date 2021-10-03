@@ -124,8 +124,6 @@ function CategoriesForm({
   setOpenPopup,
   itemToEdit,
   selectedCategory,
-  setViewMode,
-  setPageHeader,
 }) {
   const classes = useStyles();
   const { t } = useTranslation();
@@ -137,7 +135,7 @@ function CategoriesForm({
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
     name_en: itemToEdit ? itemToEdit.name_en : "",
-    allcategory_id: selectedCategory,
+    allcategory_id: itemToEdit ? itemToEdit.allcategory_id : selectedCategory,
     photo: "",
   });
   const [imgName, setImgName] = useState("");
