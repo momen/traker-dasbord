@@ -25,7 +25,13 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "40vw",
+    width: "35vw",
+    [theme.breakpoints.down("sm")]: {
+      width: "50vw",
+    },
+    [theme.breakpoints.down("xs")]: {
+      width: "80vw",
+    },
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -110,38 +116,14 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
-  maincategory_id: Yup.string().required(),
-  description: Yup.string()
-    .notRequired()
-    .test(
-      "Minimum 5 chars without spaces",
-      "Please enter 5 characters excluding spaces",
-      (val) => (val ? val?.trim().length >= 5 : true)
-    )
-    .test("Not empty", "Please remove any spaces at the beginning", (val) =>
-      val ? val?.trim() !== "" : true
-    )
-    .min(5, "Description must be at least 5 characters")
-    .max(255, "Description must not exceed 255 characters"),
-  description_en: Yup.string()
-    .notRequired()
-    .test(
-      "Minimum 5 chars without spaces",
-      "Please enter 5 characters excluding spaces",
-      (val) => (val ? val?.trim().length >= 5 : true)
-    )
-    .test("Not empty", "Please remove any spaces at the beginning", (val) =>
-      val ? val?.trim() !== "" : true
-    )
-    .min(5, "Description must be at least 5 characters")
-    .max(255, "Description must not exceed 255 characters"),
+  allcategory_id: Yup.string().required(),
 });
 
 function CategoriesForm({
   setPage,
   setOpenPopup,
   itemToEdit,
-  mainCategories,
+  selectedCategory,
   setViewMode,
   setPageHeader,
 }) {
@@ -155,9 +137,7 @@ function CategoriesForm({
   const [formData, updateFormData] = useState({
     name: itemToEdit ? itemToEdit.name : "",
     name_en: itemToEdit ? itemToEdit.name_en : "",
-    maincategory_id: itemToEdit ? itemToEdit.maincategory_id : "",
-    // description: itemToEdit ? itemToEdit.description : "",
-    // description_en: itemToEdit ? itemToEdit.description_en : "",
+    allcategory_id: selectedCategory,
     photo: "",
   });
   const [imgName, setImgName] = useState("");
@@ -176,9 +156,8 @@ function CategoriesForm({
   );
 
   const closeDialog = () => {
+    setOpenPopup(false);
     setDialogOpen(false);
-    setViewMode("data-grid");
-    setPageHeader("Categories");
   };
 
   const handleSubmit = async () => {
@@ -188,14 +167,8 @@ function CategoriesForm({
     let data = new FormData();
     data.append("name", formData.name);
     data.append("name_en", formData.name_en);
-    data.append("maincategory_id", formData.maincategory_id);
+    data.append("allcategory_id", formData.allcategory_id);
 
-    if (formData.description) {
-      data.append("description", formData.description);
-    }
-    if (formData.description_en) {
-      data.append("description", formData.description_en);
-    }
     if (formData.photo && !imageDeletedOnEdit) {
       data.append("photo", formData.photo, formData.photo.name);
     } else {
@@ -206,7 +179,7 @@ function CategoriesForm({
 
     if (itemToEdit) {
       await axios
-        .post(`/product-categories/${itemToEdit.id}`, data, {
+        .post(`/allcategories/${itemToEdit.id}`, data, {
           headers: {
             "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
           },
@@ -220,7 +193,7 @@ function CategoriesForm({
         });
     } else {
       await axios
-        .post("/product-categories", data, {
+        .post("/allcategories", data, {
           headers: {
             "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
           },
@@ -305,7 +278,7 @@ function CategoriesForm({
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              <Grid item xs={4}>
+              <Grid item xs={12}>
                 <TextField
                   variant="outlined"
                   name="name"
@@ -337,7 +310,7 @@ function CategoriesForm({
                 </Grid>
               ) : null}
 
-              <Grid item xs={4}>
+              <Grid item xs={12}>
                 <TextField
                   variant="outlined"
                   name="name_en"
@@ -368,9 +341,7 @@ function CategoriesForm({
                 </Grid>
               ) : null}
 
-              <Grid item xs={4}></Grid>
-
-              <Grid item xs={4}>
+              {/* <Grid item xs={4}>
                 <div>
                   <TextField
                     variant="outlined"
@@ -414,9 +385,9 @@ function CategoriesForm({
                     </div>
                   ) : null}
                 </div>
-              </Grid>
+              </Grid> */}
 
-              <Grid item xs={8}></Grid>
+              {/* <Grid item xs={8}></Grid> */}
 
               {/* <Grid item xs={6}>
                 <TextField
@@ -488,7 +459,7 @@ function CategoriesForm({
                 </Grid>
               ) : null} */}
 
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12}>
                 <input
                   ref={uploadRef}
                   accept="image/*"

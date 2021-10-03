@@ -25,6 +25,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Breadcrumbs,
 } from "@material-ui/core";
 import { DataGrid, GridOverlay } from "@material-ui/data-grid";
 
@@ -35,6 +36,8 @@ import {
   Delete,
   Edit,
   ExpandMore,
+  NavigateBefore,
+  NavigateNext,
   UnfoldLess,
 } from "@material-ui/icons";
 import Popup from "../../../Popup";
@@ -53,6 +56,15 @@ const Button = styled(MuiButton)(spacing);
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+  },
+  breadcrumbs: {
+    fontSize: "25px",
+    marginTop: "25px",
+    marginLeft: "25px",
+    textTransform: "capitalize",
+  },
+  breadcrumbsTab: {
+    cursor: "pointer",
   },
   footer: {
     width: "100%",
@@ -86,14 +98,13 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   backIcon: {
-    marginRight: theme.direction === "rtl" ? 0 : 5,
-    marginLeft: theme.direction === "rtl" ? 5 : 0,
+    marginLeft: 5,
   },
   toolBar: {
     display: "flex",
     justifyContent: "space-between",
-    width: "100%",
     borderRadius: "6px",
+    marginLeft: 15,
   },
   actionBtn: {
     marginLeft: 5,
@@ -183,6 +194,8 @@ function Categories() {
   const { userPermissions, lang } = useSelector((state) => state);
   const history = useHistory();
   const [currentLevel, setCurrentLevel] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [breadcrumbs, setBreadcrumbs] = useState([]);
   const [rows, setRows] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupTitle, setOpenPopupTitle] = useState(
@@ -236,7 +249,7 @@ function Categories() {
       },
     },
     {
-      field: "description",
+      field: lang === "ar" ? "name" : "name_en",
       headerName:
         currentLevel < 2
           ? t("components.categories.gridColumns.mainCategory")
@@ -309,6 +322,16 @@ function Categories() {
       },
     },
   ];
+
+  const handleBreadcrumbsNavigation = (
+    categoryId,
+    levelToSet,
+    breadcrumbIndex
+  ) => {
+    setSelectedCategory(categoryId);
+    setCurrentLevel(levelToSet);
+    setBreadcrumbs([...breadcrumbs.slice(0, breadcrumbIndex + 1)]);
+  };
 
   const handlePageSize = ({ pageSize }) => {
     setPageSize(pageSize);
@@ -441,11 +464,15 @@ function Categories() {
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
     if (openPopup) return;
+    const URI =
+      currentLevel === 0
+        ? `allcategories`
+        : `allcategories/details/${selectedCategory}`;
     setLoading(true);
     if (!userIsSearching) {
       axios
         .get(
-          `/product-categories?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
+          `/${URI}?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -462,10 +489,7 @@ function Categories() {
     } else {
       axios
         .post(
-          `/categories/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            search_index: searchValue,
-          }
+          `/allcategories/search/name?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}&search_index=${searchValue}`
         )
         .then((res) => {
           setRowsCount(res.data.total);
@@ -480,7 +504,16 @@ function Categories() {
           );
         });
     }
-  }, [page, searchValue, openPopup, sortModel, pageSize, viewMode, lang]);
+  }, [
+    page,
+    searchValue,
+    currentLevel,
+    openPopup,
+    sortModel,
+    pageSize,
+    viewMode,
+    lang,
+  ]);
 
   return (
     <React.Fragment>
@@ -494,38 +527,74 @@ function Categories() {
       {/* {viewMode === "data-grid" ? ( */}
       <Card mb={6}>
         <Paper mb={2}>
+          <Breadcrumbs
+            className={classes.breadcrumbs}
+            separator={
+              lang === "ar" ? (
+                <NavigateBefore fontSize="small" />
+              ) : (
+                <NavigateNext fontSize="small" />
+              )
+            }
+            aria-label="breadcrumb"
+          >
+            <span
+              className={classes.breadcrumbsTab}
+              onClick={() => handleBreadcrumbsNavigation(null, 0, -1)}
+            >
+              {t("components.categories.mainBreadcrumb")}
+            </span>
+            {breadcrumbs?.map((categoryLevel, index) => (
+              <span
+                className={classes.breadcrumbsTab}
+                onClick={() =>
+                  handleBreadcrumbsNavigation(
+                    categoryLevel.id,
+                    index + 1,
+                    index
+                  )
+                }
+              >
+                {lang === "ar" ? categoryLevel.name : categoryLevel.name_en}
+              </span>
+            ))}
+          </Breadcrumbs>
           <Toolbar className={classes.toolBar}>
-            <div style={{ display: "flex", alignItems: "flex-end" }}>
-              {userPermissions.includes("product_category_create") ? (
-                <Button
-                  className={classes.button}
-                  variant="contained"
-                  onClick={() => {
-                    setOpenPopupTitle(t("components.categories.newCategory"));
-                    setOpenPopup(true);
-                    setSelectedItem("");
-                  }}
-                  startIcon={<Add />}
-                >
-                  {t("components.categories.addNew")}
-                </Button>
-              ) : null}
+            {currentLevel !== 0 ? (
+              <div style={{ display: "flex", alignItems: "flex-end" }}>
+                {userPermissions.includes("product_category_create") ? (
+                  <Button
+                    className={classes.button}
+                    variant="contained"
+                    onClick={() => {
+                      setOpenPopupTitle(t("components.categories.newCategory"));
+                      setOpenPopup(true);
+                      setSelectedItem("");
+                    }}
+                    startIcon={<Add />}
+                  >
+                    {t("components.categories.addNew")}
+                  </Button>
+                ) : null}
 
-              {userPermissions.includes("product_category_delete") ? (
-                <Button
-                  startIcon={<Delete />}
-                  color="secondary"
-                  variant="contained"
-                  disabled={rowsToDelete.length < 2}
-                  onClick={() => {
-                    setOpenMassDeleteDialog(true);
-                  }}
-                  style={{ height: 40, borderRadius: 0 }}
-                >
-                  {t("global.deleteSelectedBtn")}
-                </Button>
-              ) : null}
-            </div>
+                {userPermissions.includes("product_category_delete") ? (
+                  <Button
+                    startIcon={<Delete />}
+                    color="secondary"
+                    variant="contained"
+                    disabled={rowsToDelete.length < 2}
+                    onClick={() => {
+                      setOpenMassDeleteDialog(true);
+                    }}
+                    style={{ height: 40, borderRadius: 0 }}
+                  >
+                    {t("global.deleteSelectedBtn")}
+                  </Button>
+                ) : null}
+              </div>
+            ) : (
+              <div></div>
+            )}
 
             <div>
               <Grid container spacing={1} alignItems="flex-end">
@@ -566,9 +635,16 @@ function Categories() {
               disableColumnMenu
               autoHeight={true}
               onRowClick={
-                userPermissions.includes("product_category_show")
-                  ? ({ row }) => history.push(`/product/categories/${row.id}`)
-                  : null
+                ({ row }) => {
+                  if (row.id) {
+                    setSelectedCategory(row.id);
+                    setCurrentLevel(currentLevel + 1);
+                    setBreadcrumbs([...breadcrumbs, row]);
+                  }
+                }
+                // userPermissions.includes("product_category_show")
+                //   ? ({ row }) => history.push(`/product/categories/${row.id}`)
+                //   : null
               }
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSize}
@@ -614,6 +690,7 @@ function Categories() {
           setOpenPopup={setOpenPopup}
           itemToEdit={selectedItem}
           mainCategories={mainCategories}
+          selectedCategory={selectedCategory}
         />
       </Popup>
 

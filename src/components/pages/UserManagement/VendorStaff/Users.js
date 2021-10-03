@@ -44,6 +44,7 @@ import axios from "../../../../axios";
 import UsersForm from "./UsersForm";
 import { Pagination } from "@material-ui/lab";
 import { useSelector } from "react-redux";
+import Loader from "../../../Loader";
 
 const Card = styled(MuiCard)(spacing);
 const CardContent = styled(MuiCardContent)(spacing);
@@ -682,7 +683,11 @@ function Users() {
         >
           يرجي إضافة فرع لتتمكن من إضافة موظفين
         </div>
-      ) : null}
+      ) : (
+        <div style={{ height: "100%" }}>
+          <Loader />
+        </div>
+      )}
 
       <Popup
         title={openPopupTitle}
