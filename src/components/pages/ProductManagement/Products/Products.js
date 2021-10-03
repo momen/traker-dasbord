@@ -44,6 +44,7 @@ import { Pagination } from "@material-ui/lab";
 import { Search } from "react-feather";
 import { useSelector } from "react-redux";
 import SuccessPopup from "../../../SuccessPopup";
+import Loader from "../../../Loader";
 
 const Card = styled(MuiCard)(spacing);
 const Divider = styled(MuiDivider)(spacing);
@@ -1056,7 +1057,11 @@ function Products() {
         >
           يرجي إضافة فرع لتتمكن من إضافة منتجاتك
         </div>
-      ) : null}
+      ) : (
+        <div style={{ height: "100%" }}>
+          <Loader />
+        </div>
+      )}
 
       <Popup
         title={openPopupTitle}

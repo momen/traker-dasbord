@@ -35,6 +35,7 @@ import { spacing } from "@material-ui/system";
 import { useSelector } from "react-redux";
 import clsx from "clsx";
 import { isGenericCategory } from "./helpers";
+import Loader from "../../../Loader";
 
 const Divider = styled(MuiDivider)(spacing);
 
@@ -146,8 +147,13 @@ function ProductsForm({
   const { lang } = useSelector((state) => state);
 
   const [formData, updateFormData] = useState({
-    cartype_id: itemToEdit ? itemToEdit.cartype_id : "",
-    maincategory_id: itemToEdit ? itemToEdit.category?.maincategory_id : "",
+    cartype_id: itemToEdit?.allcategory ? itemToEdit.allcategory[0]?.id : "",
+    maincategory_id: itemToEdit?.allcategory
+      ? itemToEdit.allcategory[1]?.id
+      : "",
+    allcategory: itemToEdit
+      ? itemToEdit.allcategory.map((category) => category.id)
+      : [],
     name: itemToEdit ? itemToEdit.name || "" : "",
     name_en: itemToEdit ? itemToEdit.name_en || "" : "",
     description: itemToEdit ? itemToEdit.description || "" : "",
@@ -281,13 +287,13 @@ function ProductsForm({
             .required("This field is Required")
             .typeError("This field is Required")
         : Yup.string().nullable().notRequired(),
-    car_made_id: !isGenericCategory(formData.allcategory_id)
+    car_made_id: !isGenericCategory(formData.allcategory)
       ? Yup.string().required()
       : Yup.string().nullable().notRequired(),
-    year_from: !isGenericCategory(formData.allcategory_id)
+    year_from: !isGenericCategory(formData.allcategory)
       ? Yup.string().required()
       : Yup.string().nullable().notRequired(),
-    year_to: !isGenericCategory(formData.allcategory_id)
+    year_to: !isGenericCategory(formData.allcategory)
       ? Yup.string().required()
       : Yup.string().nullable().notRequired(),
     discount: enableDiscount
@@ -315,10 +321,10 @@ function ProductsForm({
     //   : Yup.string().nullable().notRequired(),
     manufacturer_id: Yup.string().required(),
     prodcountry_id: Yup.string().required(),
-    transmission_id: !isGenericCategory(formData.allcategory_id)
+    transmission_id: !isGenericCategory(formData.allcategory)
       ? Yup.string().required()
       : Yup.string().nullable().notRequired(),
-    cartype_id: !isGenericCategory(formData.allcategory_id)
+    cartype_id: !isGenericCategory(formData.allcategory)
       ? Yup.string().required()
       : Yup.string().nullable().notRequired(),
     store_id: Yup.string().required(),
@@ -442,20 +448,30 @@ function ProductsForm({
 
   useEffect(() => {
     if (itemToEdit) {
-      if (itemToEdit.cartype_id) {
-        axios
-          .get(`/cartype/madeslist/${itemToEdit.cartype_id}`)
-          .then((res) => {
-            const _brands = res.data.data.map(({ id, car_made, name_en }) => ({
-              id,
-              car_made,
-              name_en,
-            })); // Customize
-            setBrands(_brands);
-          })
-          .catch(() => {
-            alert("Failed to Fetch Models List");
-          });
+      if (
+        !isGenericCategory(
+          itemToEdit.allcategory.map((category) => category.id)
+        )
+      ) {
+        // Temporary Guard to be removed until testing is done & there are no previously added products
+        // in the old way causing conflicts.
+        if (formData.allcategory.length) {
+          axios
+            .get(`/cartype/madeslist/${formData.allcategory[0]}`)
+            .then((res) => {
+              const _brands = res.data.data.map(
+                ({ id, car_made, name_en }) => ({
+                  id,
+                  car_made,
+                  name_en,
+                })
+              ); // Customize
+              setBrands(_brands);
+            })
+            .catch(() => {
+              alert("Failed to Fetch Brands List");
+            });
+        }
         axios
           .get(`/car-modelslist/${itemToEdit.car_made_id}`)
           .then((res) => {
@@ -473,35 +489,29 @@ function ProductsForm({
           });
       }
 
-      axios
-        .get(`/categorieslist/${itemToEdit.category?.maincategory_id}`)
-        .then((res) => {
-          const _categories = res.data.data.map(({ id, name, name_en }) => ({
-            id,
-            name,
-            name_en,
-          })); // Customize
-          setCategories(_categories);
-        })
-        .catch(() => {
-          alert("Failed to Fetch Categories List");
-        });
+      let categoriesList = [];
 
-      axios
-        .get(`/part-categorieslist/${itemToEdit.category_id}`)
-        .then((res) => {
-          const _partCategories = res.data.data.map(
-            ({ id, category_name, name_en }) => ({
-              id,
-              category_name,
-              name_en,
-            })
-          ); // Customize
-          setPartCategories(_partCategories);
-        })
-        .catch(() => {
-          alert("Failed to Fetch Part Categories List");
-        });
+      itemToEdit.allcategory?.slice(1).forEach(async (category, index) => {
+        const { data: currentLevelCategories } = await axios(
+          `/allcategories/details/${category.id}`
+        );
+        if (currentLevelCategories.data?.length) {
+          categoriesList.push(currentLevelCategories.data);
+        }
+        if (index + 2 === itemToEdit.allcategory.length) {
+          setCategories(categoriesList);
+        }
+      });
+
+      // Temporary Guard to be removed until testing is done & there are no previously added products
+      // in the old way causing conflicts.
+      if (itemToEdit.allcategory?.length) {
+        axios(`/allcategories/details/${itemToEdit.allcategory[0].id}`)
+          .then(({ data }) => {
+            setMainCategories(data.data);
+          })
+          .catch(() => {});
+      }
 
       if (itemToEdit.year_from) {
         const fromYear = carYears.find(
@@ -546,7 +556,7 @@ function ProductsForm({
     setAutoSelectModelError(false);
     setAutoSelectTagError(false);
 
-    console.log(formData.allcategory_id);
+    console.log(formData.allcategory);
     // setIsSubmitting(true);
     let data = new FormData();
 
@@ -568,7 +578,7 @@ function ProductsForm({
           data.append(key, 1);
         } else if (key === "tags" || key === "models") {
           data.append(key, JSON.stringify(value.map((val) => val.id)));
-        } else if (key === "allcategory_id") {
+        } else if (key === "allcategory") {
           data.append(key, JSON.stringify(value));
         } else if (
           (key === "discount" && !value) ||
@@ -771,7 +781,11 @@ function ProductsForm({
     setBigImgSize(false);
   };
 
-  return (
+  return !itemToEdit ||
+    (itemToEdit && mainCategories?.length) ||
+    // Temporary Guard to be removed until testing is done & there are no previously added products
+    // in the old way causing conflicts.
+    (itemToEdit && itemToEdit.allcategory.length === 0) ? (
     <div className={classes.paper}>
       <Formik
         initialValues={formData}
@@ -804,7 +818,7 @@ function ProductsForm({
                       updateFormData({
                         ...formData,
                         cartype_id: e.target.value, // Helps in validation & not sent with the request, just checking the user selected a vehicle type
-                        allcategory_id: [e.target.value],
+                        allcategory: [e.target.value],
                         maincategory_id: "", // Same as cartype this is to help in validations & not sent with the request
                         car_made_id: "",
                         models: [],
@@ -897,8 +911,8 @@ function ProductsForm({
                       if (e.target.value) {
                         updateFormData({
                           ...formData,
-                          allcategory_id: [
-                            formData.allcategory_id[0],
+                          allcategory: [
+                            formData.allcategory[0],
                             e.target.value,
                           ],
                           maincategory_id: e.target.value,
@@ -911,7 +925,7 @@ function ProductsForm({
                       } else {
                         updateFormData({
                           ...formData,
-                          allcategory_id: [formData.allcategory_id[0]],
+                          allcategory: [formData.allcategory[0]],
                           maincategory_id: e.target.value,
                         });
                       }
@@ -986,7 +1000,7 @@ function ProductsForm({
                       variant="outlined"
                       select
                       label="Sub Category"
-                      value={formData.allcategory_id[index + 2]}
+                      value={formData.allcategory[index + 2]}
                       name={`subCategory${index}`}
                       onChange={(e) => {
                         handleChange(e);
@@ -994,8 +1008,8 @@ function ProductsForm({
                         if (e.target.value) {
                           updateFormData({
                             ...formData,
-                            allcategory_id: [
-                              ...formData.allcategory_id.slice(0, index + 2),
+                            allcategory: [
+                              ...formData.allcategory.slice(0, index + 2),
                               e.target.value,
                             ],
                           });
@@ -1032,7 +1046,7 @@ function ProductsForm({
                           setCategories([...categories.slice(0, index + 1)]);
                           updateFormData({
                             ...formData,
-                            allcategory_id: formData.allcategory_id.slice(
+                            allcategory: formData.allcategory.slice(
                               0,
                               index + 2
                             ),
@@ -1048,7 +1062,7 @@ function ProductsForm({
                       InputLabelProps={{ shrink: !!formData.maincategory_id }}
                       onBlur={handleBlur}
                       // Check later
-                      error={responseErrors[`allcategory_id.${index + 2}`]}
+                      error={responseErrors[`allcategory.${index + 2}`]}
                       // helperText="Please select a Main Category"
                       fullWidth
                     >
@@ -1901,7 +1915,7 @@ function ProductsForm({
                 <Divider my={1} />
               </Grid>
 
-              {!isGenericCategory(formData.allcategory_id) ? (
+              {!isGenericCategory(formData.allcategory) ? (
                 <>
                   {/* <Grid item xs={6} md={3}>
                     <div>
@@ -2553,6 +2567,10 @@ function ProductsForm({
         message={dialogText}
         handleClose={closeDialog}
       />
+    </div>
+  ) : (
+    <div style={{ height: "250px" }}>
+      <Loader />
     </div>
   );
 }
