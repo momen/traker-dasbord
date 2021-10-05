@@ -407,7 +407,7 @@ function Categories() {
 
   const MassDelete = () => {
     axios
-      .post(`/categories/mass/delete`, {
+      .post(`/allcategories/mass/delete`, {
         ids: JSON.stringify(rowsToDelete),
       })
       .then((res) => {
