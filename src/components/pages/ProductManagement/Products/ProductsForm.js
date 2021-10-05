@@ -195,7 +195,7 @@ function ProductsForm({
 
   const [brands, setBrands] = useState(null);
   const [carModels, setCarModels] = useState(null);
-  const [mainCategories, setMainCategories] = useState([]);
+  const [mainCategories, setMainCategories] = useState(null);
   const [categories, setCategories] = useState([]);
   const [partCategories, setPartCategories] = useState(null);
   const [toYears, setToYears] = useState([]);
@@ -908,6 +908,7 @@ function ProductsForm({
                     name="maincategory_id"
                     onChange={(e) => {
                       handleChange(e);
+                      console.log([formData.allcategory[0], e.target.value]);
                       if (e.target.value) {
                         updateFormData({
                           ...formData,
@@ -1013,6 +1014,10 @@ function ProductsForm({
                               e.target.value,
                             ],
                           });
+                          console.log([
+                            ...formData.allcategory.slice(0, index + 2),
+                            e.target.value,
+                          ]);
                           axios
                             .get(`/allcategories/details/${e.target.value}`)
                             .then((res) => {
