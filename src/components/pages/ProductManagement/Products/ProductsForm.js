@@ -196,7 +196,12 @@ function ProductsForm({
   const [brands, setBrands] = useState(null);
   const [carModels, setCarModels] = useState(null);
   const [mainCategories, setMainCategories] = useState(null);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState(() =>
+    itemToEdit?.allcategory
+      ?.slice(2)
+      .filter((category, index) => category?.siblings?.length)
+      .map((category) => category.siblings)
+  );
   const [partCategories, setPartCategories] = useState(null);
   const [toYears, setToYears] = useState([]);
 
@@ -490,18 +495,6 @@ function ProductsForm({
       }
 
       let categoriesList = [];
-
-      itemToEdit.allcategory?.slice(1).forEach(async (category, index) => {
-        const { data: currentLevelCategories } = await axios(
-          `/allcategories/details/${category.id}`
-        );
-        if (currentLevelCategories.data?.length) {
-          categoriesList.push(currentLevelCategories.data);
-        }
-        if (index + 2 === itemToEdit.allcategory.length) {
-          setCategories(categoriesList);
-        }
-      });
 
       // Temporary Guard to be removed until testing is done & there are no previously added products
       // in the old way causing conflicts.

@@ -484,13 +484,13 @@ function CategoriesForm({
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <Chip
                       className={classes.chip}
-                      label={itemToEdit.photo.file_name}
+                      label={itemToEdit.photo?.file_name}
                       onDelete={() => setImageDeletedOnEdit(true)}
                       variant="outlined"
                       color="primary"
                     />
                     <img
-                      src={itemToEdit.photo.image}
+                      src={itemToEdit.photo?.image}
                       alt={`cat-img`}
                       className={classes.productImages}
                     />
