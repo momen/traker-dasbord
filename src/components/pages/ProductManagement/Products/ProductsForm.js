@@ -860,6 +860,7 @@ function ProductsForm({
                     SelectProps={{
                       native: true,
                     }}
+                    InputLabelProps={{ shrink: !!formData.cartype_id }}
                     onBlur={handleBlur}
                     error={
                       responseErrors?.cartype_id ||
