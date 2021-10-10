@@ -228,7 +228,7 @@ function Users() {
   const columns = [
     { field: "id", headerName: "ID", width: 55 },
     { field: "name", headerName: "Name", width: 100 },
-    { field: "email", headerName: "Email", width: 140 },
+    { field: "email", headerName: "Email", width: 140, flex: 1 },
     {
       field: "roles",
       headerName: "Role",
