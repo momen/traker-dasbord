@@ -483,21 +483,23 @@ function ProductsForm({
               alert("Failed to Fetch Brands List");
             });
         }
-        axios
-          .get(`/car-modelslist/${itemToEdit.car_made_id}`)
-          .then((res) => {
-            const _carModels = res.data.data.map(
-              ({ id, carmodel, name_en }) => ({
-                id,
-                carmodel,
-                name_en,
-              })
-            ); // Customize
-            setCarModels(_carModels);
-          })
-          .catch(() => {
-            alert("Failed to Fetch Models List");
-          });
+        if (itemToEdit.car_made_id) {
+          axios
+            .get(`/car-modelslist/${itemToEdit.car_made_id}`)
+            .then((res) => {
+              const _carModels = res.data.data.map(
+                ({ id, carmodel, name_en }) => ({
+                  id,
+                  carmodel,
+                  name_en,
+                })
+              ); // Customize
+              setCarModels(_carModels);
+            })
+            .catch(() => {
+              alert("Failed to Fetch Models List");
+            });
+        }
       }
 
       let categoriesList = [];
@@ -505,7 +507,7 @@ function ProductsForm({
       // Temporary Guard to be removed until testing is done & there are no previously added products
       // in the old way causing conflicts.
       if (itemToEdit.allcategory?.length) {
-        axios(`/allcategories/details/${itemToEdit.allcategory[0].id}`)
+        axios(`/allcategories/list/${itemToEdit.allcategory[0].id}`)
           .then(({ data }) => {
             setMainCategories(data.data);
           })
@@ -847,7 +849,7 @@ function ProductsForm({
                             alert("Failed to Fetch Brands List");
                           });
                         axios
-                          .get(`allcategories/details/${e.target.value}`)
+                          .get(`allcategories/list/${e.target.value}`)
                           .then((res) => {
                             const _maincategories = res.data.data.map(
                               ({ id, name, name_en }) => ({
@@ -936,7 +938,7 @@ function ProductsForm({
                       }
                       if (e.target.value) {
                         axios
-                          .get(`/allcategories/details/${e.target.value}`)
+                          .get(`/allcategories/list/${e.target.value}`)
                           .then((res) => {
                             const _subCategories = res.data.data.map(
                               ({ id, name, name_en }) => ({
@@ -1025,7 +1027,7 @@ function ProductsForm({
                             e.target.value,
                           ]);
                           axios
-                            .get(`/allcategories/details/${e.target.value}`)
+                            .get(`/allcategories/list/${e.target.value}`)
                             .then((res) => {
                               const _subCategories = res.data.data?.map(
                                 ({ id, name, name_en }) => ({
