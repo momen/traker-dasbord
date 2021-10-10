@@ -224,6 +224,8 @@ function ProductsForm({
               "Please remove any spaces at the beginning",
               (val) => !(val?.substring(0, 1) === " ")
             )
+            .min(2)
+            .max(255)
         : Yup.string()
             .notRequired()
             .test(
@@ -235,7 +237,9 @@ function ProductsForm({
               "Not empty",
               "Please remove any spaces at the beginning",
               (val) => !(val?.substring(0, 1) === " ")
-            ),
+            )
+            .min(2)
+            .max(255),
 
     name_en:
       lang === "en"
@@ -251,6 +255,8 @@ function ProductsForm({
               "Please remove any spaces at the beginning",
               (val) => !(val?.substring(0, 1) === " ")
             )
+            .min(2)
+            .max(255)
         : Yup.string()
             .notRequired()
             .test(
@@ -262,7 +268,9 @@ function ProductsForm({
               "Not empty",
               "Please remove any spaces at the beginning",
               (val) => !(val?.substring(0, 1) === " ")
-            ),
+            )
+            .min(2)
+            .max(255),
     serial_number: Yup.string()
       .required("This field is Required")
       .test(
@@ -319,7 +327,7 @@ function ProductsForm({
             .typeError("This field is Required")
             .min(1, "Enter a value greater than 0")
         : Yup.string().nullable().notRequired(),
-    maincategory_id: Yup.string().required(),
+    maincategory_id: Yup.string().required("This field is Required"),
     // category_id: Yup.string().required(),
     // part_category_id: partCategories?.length
     //   ? Yup.string().required()
@@ -329,9 +337,7 @@ function ProductsForm({
     transmission_id: !isGenericCategory(formData.allcategory)
       ? Yup.string().required()
       : Yup.string().nullable().notRequired(),
-    cartype_id: !isGenericCategory(formData.allcategory)
-      ? Yup.string().required()
-      : Yup.string().nullable().notRequired(),
+    cartype_id: Yup.string().required("This field is Required"),
     store_id: Yup.string().required(),
     quantity:
       formData.producttype_id?.toString() !== "2"
@@ -870,7 +876,7 @@ function ProductsForm({
                       responseErrors?.cartype_id ||
                       Boolean(touched.cartype_id && errors.cartype_id)
                     }
-                    // helperText="Please select a Vehicle Type"
+                    helperText={touched.cartype_id && errors.cartype_id}
                     fullWidth
                   >
                     <option aria-label="None" value="" />
@@ -954,9 +960,11 @@ function ProductsForm({
                     InputLabelProps={{ shrink: !!formData.maincategory_id }}
                     onBlur={handleBlur}
                     // Check later
-                    error={
-                      responseErrors?.category_id ||
-                      Boolean(touched.maincategory_id && errors.maincategory_id)
+                    error={Boolean(
+                      touched.maincategory_id && errors.maincategory_id
+                    )}
+                    helperText={
+                      touched.maincategory_id && errors.maincategory_id
                     }
                     // helperText="Please select a Main Category"
                     fullWidth
@@ -1524,7 +1532,7 @@ function ProductsForm({
                         onValueChange={({ floatValue }) => {
                           updateFormData({
                             ...formData,
-                            holesale_price: Math.round(floatValue),
+                            holesale_price: floatValue,
                           });
                         }}
                         onBlur={handleBlur}
