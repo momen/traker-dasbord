@@ -562,7 +562,9 @@ function Categories() {
                   )
                 }
               >
-                {lang === "ar" ? categoryLevel.name : categoryLevel.name_en}
+                {lang === "ar"
+                  ? categoryLevel.name || categoryLevel.name_en
+                  : categoryLevel.name_en || categoryLevel.name}
               </span>
             ))}
           </Breadcrumbs>

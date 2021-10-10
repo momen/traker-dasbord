@@ -23,6 +23,7 @@ import { Alert as MuiAlert } from "@material-ui/lab";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { useDispatch } from "react-redux";
 import { Login } from "../../../actions";
+import SuccessPopup from "../../SuccessPopup";
 
 const Alert = styled(MuiAlert)(spacing);
 
@@ -42,48 +43,34 @@ const BigAvatar = styled(Avatar)`
   margin: 0 auto ${(props) => props.theme.spacing(5)}px;
 `;
 
-function SignIn() {
+export default function ForgotPassword() {
   const history = useHistory();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
 
-  // useEffect(() => {
-  //   axios.get("/login").then(async (res) => {
-  //     await document
-  //       .getElementById("csrf-token")
-  //       .setAttribute("content", res.data.token);
-  //     console.log(res.data.token);
-  //     dispatch({
-  //       type: "GET_CSRF",
-  //       CSRF: res.data.token,
-  //     });
-  //   });
-  // }, []);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState("");
 
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
+  const closeDialog = () => {
+    setDialogOpen(false);
+    history.push("/sign-in");
   };
 
   return (
     <Wrapper>
-      <Helmet title="Sign In" />
-      <BigAvatar alt="Lucy" src="/static/img/avatars/avatar-1.jpg" />
+      <Helmet title="Reset Password" />
+      {/* <BigAvatar alt="Lucy" src="/static/img/avatars/avatar-1.jpg" /> */}
 
       <Typography component="h1" variant="h4" align="center" gutterBottom>
-        Welcome back!
+        Forgot your password?
       </Typography>
       <Typography component="h2" variant="body1" align="center">
-        Sign in to your account to continue
+        Send a request to your email for a new one.
       </Typography>
 
       <Formik
         initialValues={{
           email: "",
-          password: "",
           // _token: "",
           //   submit: false,
         }}
@@ -92,31 +79,25 @@ function SignIn() {
             .email("Please enter a valid Email.")
             .max(255)
             .required("Email is required."),
-          password: Yup.string()
-            .min(8, "Password must be at least 8 characters.")
-            .required("Password is required."),
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           // values._token = CSRF;
           try {
             axios
-              .post("/login", values, {
+              .post("/user/forget/password", values, {
                 headers: {
                   // Accept: "application/json",
                   // "Content-Type": "application/json",
                   // "X-CSRF-TOKEN": CSRF,
                 },
               })
-              .then(async (res) => {
-                await dispatch(Login(res.data.data));
-                history.push("/");
-                axios.defaults.headers.common[
-                  "Authorization"
-                ] = `Bearer ${res.data.data.token}`;
-                window.localStorage.setItem(
-                  "trkar-token",
-                  JSON.stringify(res.data.data.token)
+              .then(async ({ data }) => {
+                setDialogText(
+                  data.message ||
+                    data.data ||
+                    "Request made successfully, please follow the link on your email"
                 );
+                setDialogOpen(true);
               })
               .catch(({ response }) => {
                 const message =
@@ -130,8 +111,7 @@ function SignIn() {
                 setSubmitting(false);
               });
           } catch (error) {
-            const message =
-              "Couldn't send a Login request, this is a local error";
+            const message = "Couldn't reset password, this is a local error";
 
             setStatus({ success: false });
             setErrors({ submit: message });
@@ -172,60 +152,28 @@ function SignIn() {
               required
               autoFocus
             />
-            <TextField
-              type={showPassword ? "text" : "password"}
-              id="signIn__password"
-              name="password"
-              label="Password"
-              value={values.password}
-              error={Boolean(touched.password && errors.password)}
-              fullWidth
-              helperText={touched.password && errors.password}
-              onBlur={handleBlur}
-              onChange={handleChange}
-              my={2}
-              required
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                    >
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            {/* <input type="hidden" name="_token" value={CSRF} /> */}
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <Button
+              style={{ marginTop: 20 }}
               type="submit"
               fullWidth
               variant="contained"
               color="primary"
               disabled={isSubmitting}
             >
-              Sign in
+              Reset Password
             </Button>
-            <Button
-              component={Link}
-              to="/reset-password"
-              fullWidth
-              color="primary"
-            >
-              Forgot password
+            <Button component={Link} to="/sign-in" fullWidth color="primary">
+              Login
             </Button>
           </form>
         )}
       </Formik>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </Wrapper>
   );
 }
-
-export default SignIn;

@@ -515,40 +515,19 @@ function Products() {
             setLoading(false);
           })
           .catch(({ response }) => {
-            alert(response.data?.errors);
+            alert(
+              response.data?.errors ||
+                response.data?.error ||
+                response.data?.message
+            );
           });
       })
       .catch(({ response }) => {
-        alert(response.data?.errors);
-      });
-  };
-
-  const cancelProduct = () => {
-    axios
-      .post(`/vendor/cancel/order`, {
-        order_id: productToApproveOrRejct,
-      })
-      .then(() => {
-        setOpenRejectDialog(false);
-        setLoading(true);
-        axios
-          .get(
-            `/products?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
-          )
-          .then((res) => {
-            if (Math.ceil(res.data.total / pageSize) < page) {
-              setPage(page - 1);
-            }
-            setRowsCount(res.data.total);
-            setRows(res.data.data);
-            setLoading(false);
-          })
-          .catch(({ response }) => {
-            alert(response.data?.errors);
-          });
-      })
-      .catch(({ response }) => {
-        alert(response.data?.errors);
+        alert(
+          response.data?.errors ||
+            response.data?.error ||
+            response.data?.message
+        );
       });
   };
 
@@ -1155,7 +1134,7 @@ function Products() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Order Approval"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Product Approval"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Are you sure you want to Approve this product?
@@ -1180,35 +1159,6 @@ function Products() {
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={openRejectDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Cancel Order"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to Reject this product?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              cancelProduct();
-            }}
-            color="primary"
-          >
-            Yes
-          </Button>
-          <Button
-            onClick={() => setOpenRejectDialog(false)}
-            color="secondary"
-            autoFocus
-          >
-            No
-          </Button>
-        </DialogActions>
-      </Dialog>
       <SuccessPopup
         open={dialogOpen}
         setOpen={setDialogOpen}

@@ -71,6 +71,9 @@ const ManageAccountGuard = async(() =>
 );
 
 const SignIn = async(() => import("../components/pages/SignIn/SignIn"));
+const ForgotPassword = async(() =>
+  import("../components/pages/SignIn/ForgotPassword")
+);
 
 const Dashborad = async(() =>
   import("../components/pages/Dashboard/Dashboard")
@@ -850,6 +853,12 @@ const authRoutes = {
       path: "/sign-in",
       name: "Sign In",
       component: SignIn,
+      // guard: AppGuard,
+    },
+    {
+      path: "/reset-password",
+      name: "resetPassword",
+      component: ForgotPassword,
       // guard: AppGuard,
     },
     // {

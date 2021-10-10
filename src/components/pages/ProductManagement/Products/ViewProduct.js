@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../../axios";
-import { Button } from "@material-ui/core";
+import { Breadcrumbs, Button } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -12,6 +12,8 @@ import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
 import CurrencyFormat from "react-currency-format";
 import { useSelector } from "react-redux";
+import { NavigateBefore, NavigateNext } from "@material-ui/icons";
+import { useTranslation } from "react-i18next";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -86,6 +88,13 @@ const useStyles = makeStyles({
     marginRight: "5px",
     userSelect: "none",
   },
+  breadcrumbs: {
+    // fontSize: "25px",
+    // marginTop: "25px",
+    // marginLeft: "25px",
+    fontWeight: "bold",
+    textTransform: "capitalize",
+  },
 });
 
 function ViewProduct({ match }) {
@@ -93,6 +102,7 @@ function ViewProduct({ match }) {
   const history = useHistory();
   const { lang } = useSelector((state) => state);
   const [product, setProduct] = useState(""); //Customize
+  const { t } = useTranslation();
 
   //Customize
   useEffect(() => {
@@ -241,9 +251,9 @@ function ViewProduct({ match }) {
                     value={product.price}
                     displayType={"text"}
                     thousandSeparator={true}
-                    prefix={"ريال"}
+                    prefix={t("global.currency")}
                     renderText={(value) => (
-                      <span className={classes.rowContent}>{value}</span>
+                      <span className={classes.rowContent}>&nbsp;{value}</span>
                     )}
                   />
                 </StyledTableCell>
@@ -259,7 +269,7 @@ function ViewProduct({ match }) {
                     value={product.holesale_price}
                     displayType={"text"}
                     thousandSeparator={true}
-                    prefix={"ريال"}
+                    prefix={t("global.currency")}
                     renderText={(value) => (
                       <span className={classes.rowContent}>{value}</span>
                     )}
@@ -326,7 +336,9 @@ function ViewProduct({ match }) {
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>
                   {product.discount
-                    ? `% ${(product.discount / 100) * product.price} ريال`
+                    ? `%${product.discount} - ${
+                        (product.discount / 100) * product.price
+                      } ${t("global.currency")}`
                     : "Not applied"}
                 </span>
                 &emsp;
@@ -342,18 +354,20 @@ function ViewProduct({ match }) {
                 </span>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={`product-tags-${product.id}`}>
-              <StyledTableCell component="th" scope="row">
-                Tags
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                {product.tags?.map((tag) => (
-                  <span key={tag.id} className={classes.tagsBadge}>
-                    {tag.name}
-                  </span>
-                ))}
-              </StyledTableCell>
-            </StyledTableRow>
+            {product.tags?.length ? (
+              <StyledTableRow key={`product-tags-${product.id}`}>
+                <StyledTableCell component="th" scope="row">
+                  Tags
+                </StyledTableCell>
+                <StyledTableCell align="left">
+                  {product.tags?.map((tag) => (
+                    <span key={tag.id} className={classes.tagsBadge}>
+                      {tag.name}
+                    </span>
+                  ))}
+                </StyledTableCell>
+              </StyledTableRow>
+            ) : null}
             <StyledTableRow key={`manufacturer-${product.manufacturer?.id}`}>
               <StyledTableCell component="th" scope="row">
                 Manufacturer
@@ -370,7 +384,11 @@ function ViewProduct({ match }) {
               </StyledTableCell>
               <StyledTableCell align="left">
                 <span className={classes.rowContent}>
-                  {product.origin_country?.country_name}
+                  {lang === "ar"
+                    ? product.origin_country?.country_name ||
+                      product.origin_country?.name_en
+                    : product.origin_country?.name_en ||
+                      product.origin_country?.country_name}
                 </span>
               </StyledTableCell>
             </StyledTableRow>
@@ -404,20 +422,22 @@ function ViewProduct({ match }) {
                     </span>
                   </StyledTableCell>
                 </StyledTableRow>
-                <StyledTableRow key={`models-${product.id}`}>
-                  <StyledTableCell component="th" scope="row">
-                    Models
-                  </StyledTableCell>
-                  <StyledTableCell align="left">
-                    <span className={classes.rowContent}>
-                      {product.car_model?.map((model) => (
-                        <span key={model.id} className={classes.modelsBadge}>
-                          {model.carmodel}
-                        </span>
-                      ))}
-                    </span>
-                  </StyledTableCell>
-                </StyledTableRow>
+                {product.car_model?.length ? (
+                  <StyledTableRow key={`models-${product.id}`}>
+                    <StyledTableCell component="th" scope="row">
+                      Models
+                    </StyledTableCell>
+                    <StyledTableCell align="left">
+                      <span className={classes.rowContent}>
+                        {product.car_model?.map((model) => (
+                          <span key={model.id} className={classes.modelsBadge}>
+                            {model.carmodel}
+                          </span>
+                        ))}
+                      </span>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ) : null}
                 <StyledTableRow key={`year-from-${product.year_from?.id}`}>
                   <StyledTableCell component="th" scope="row">
                     Year From
@@ -445,19 +465,25 @@ function ViewProduct({ match }) {
                 Category
               </StyledTableCell>
               <StyledTableCell align="left">
-                <span className={classes.rowContent}>
-                  {product.category?.name}
-                </span>
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={`part-${product.part_category_id}`}>
-              <StyledTableCell component="th" scope="row">
-                Part Category
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <span className={classes.rowContent}>
-                  {product.part_category?.category_name}
-                </span>
+                <Breadcrumbs
+                  className={classes.breadcrumbs}
+                  separator={
+                    lang === "ar" ? (
+                      <NavigateBefore fontSize="small" />
+                    ) : (
+                      <NavigateNext fontSize="small" />
+                    )
+                  }
+                  aria-label="breadcrumb"
+                >
+                  {product.allcategory?.map((categoryLevel, index) => (
+                    <span className={classes.breadcrumbsTab}>
+                      {lang === "ar"
+                        ? categoryLevel.name || categoryLevel.name_en
+                        : categoryLevel.name_en || categoryLevel.name}
+                    </span>
+                  ))}
+                </Breadcrumbs>
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>

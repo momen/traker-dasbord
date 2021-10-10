@@ -1,5 +1,6 @@
 {
   "global": {
+    "currency": "ريال",
     "submitBtn": "حفظ",
     "resetBtn": "إلغاء",
     "uploadBtn": "أضف صورة",

@@ -612,8 +612,12 @@ function ProductsForm({
                   setDialogOpen(true);
                   setIsSubmitting(false);
                 })
-                .catch((res) => {
-                  setResponseErrors(res.response.data.errors);
+                .catch(({ response }) => {
+                  setResponseErrors(
+                    response.data.errors ||
+                      response.data.error ||
+                      response.data.message
+                  );
                   setIsSubmitting(false);
                 });
             } else {
