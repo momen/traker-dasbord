@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "../../../axios";
-import { Button, TextField, Chip, Grid } from "@material-ui/core";
+import {
+  Button,
+  TextField,
+  Chip,
+  Grid,
+  CircularProgress,
+} from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -11,6 +17,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -88,6 +95,7 @@ const useStyles = makeStyles((theme) => ({
 
 function ViewTicket({ match }) {
   const classes = useStyles();
+  const { t } = useTranslation();
   const history = useHistory();
   const { user, lang } = useSelector((state) => state);
   const [ticket, setTicket] = useState("");
@@ -297,7 +305,17 @@ function ViewTicket({ match }) {
                       onClick={addReply}
                       disabled={!answer || isSubmitting}
                     >
-                      Submit
+                      {isSubmitting ? (
+                        <CircularProgress
+                          style={{
+                            width: "20px",
+                            height: "20px",
+                            color: "#EF9300",
+                          }}
+                        />
+                      ) : (
+                        t("global.submitBtn")
+                      )}
                     </Button>
                   </>
                 ) : null}

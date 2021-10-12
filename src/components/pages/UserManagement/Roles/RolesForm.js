@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import {
   Button,
   Checkbox,
+  CircularProgress,
   Grid,
   makeStyles,
   TextField,
@@ -14,6 +15,7 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import SuccessPopup from "../../../SuccessPopup";
 import { RotateLeft } from "@material-ui/icons";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -103,6 +105,8 @@ function RolesForm({
   setPageHeader,
 }) {
   const classes = useStyles();
+  const { t } = useTranslation();
+
   const formRef = useRef();
 
   //Customize
@@ -365,7 +369,17 @@ function RolesForm({
                 color="primary"
                 disabled={isSubmitting}
               >
-                Submit
+                {isSubmitting ? (
+                  <CircularProgress
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      color: "#EF9300",
+                    }}
+                  />
+                ) : (
+                  t("global.submitBtn")
+                )}
               </Button>
               <Button
                 className={classes.resetButton}
@@ -379,7 +393,7 @@ function RolesForm({
                 }}
                 disabled={isSubmitting}
               >
-                Reset
+                {t("global.resettBtn")}
               </Button>
             </Grid>
           </form>

@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import {
   Button,
+  CircularProgress,
   FormControl,
   Grid,
   makeStyles,
@@ -11,6 +12,7 @@ import { Formik } from "formik";
 import axios from "../../../../axios";
 import { RotateLeft } from "@material-ui/icons";
 import SuccessPopup from "../../../SuccessPopup";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -86,6 +88,7 @@ function CarYearForm({
   setPageHeader,
 }) {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
@@ -215,7 +218,17 @@ function CarYearForm({
                 color="primary"
                 disabled={isSubmitting}
               >
-                Submit
+                {isSubmitting ? (
+                  <CircularProgress
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      color: "#EF9300",
+                    }}
+                  />
+                ) : (
+                  t("global.submitBtn")
+                )}
               </Button>
               <Button
                 className={classes.resetButton}
@@ -227,7 +240,7 @@ function CarYearForm({
                 }}
                 disabled={isSubmitting}
               >
-                Reset
+                {t("global.resetBtn")}
               </Button>
             </Grid>
           </form>

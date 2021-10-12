@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   Button,
+  CircularProgress,
   Grid,
   IconButton,
   makeStyles,
@@ -10,6 +11,7 @@ import axios from "../../../../axios";
 import NumberFormat from "react-number-format";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -52,6 +54,7 @@ const useStyles = makeStyles((theme) => ({
 
 function ProductsForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const [formData, updateFormData] = useState({
     country_name: itemToEdit ? itemToEdit.country_name : "",
@@ -355,7 +358,17 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit }) {
                 color="primary"
                 disabled={isSubmitting} // Update on other components
               >
-                Submit
+                {isSubmitting ? (
+                  <CircularProgress
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      color: "#EF9300",
+                    }}
+                  />
+                ) : (
+                  t("global.submitBtn")
+                )}
               </Button>
               <Button
                 className={classes.button}
@@ -370,7 +383,7 @@ function ProductsForm({ setPage, setOpenPopup, itemToEdit }) {
                   touched.tags = false;
                 }} // Apply to other forms -For refactoring all forms-
               >
-                Reset
+                {t("global.resetBtn")}
               </Button>
             </Grid>
           </form>

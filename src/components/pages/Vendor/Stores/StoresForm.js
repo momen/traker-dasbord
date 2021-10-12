@@ -1,5 +1,11 @@
 import React, { useRef, useState } from "react";
-import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  makeStyles,
+  TextField,
+} from "@material-ui/core";
 import axios from "../../../../axios";
 import Map from "../../../Map/Map";
 import NumberFormat from "react-number-format";
@@ -8,6 +14,7 @@ import { Formik } from "formik";
 import { RotateLeft } from "@material-ui/icons";
 import SuccessPopup from "../../../SuccessPopup";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -115,6 +122,7 @@ function StoresForm({
   setPageHeader,
 }) {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const formRef = useRef();
   const mainPhoneRef = useRef();
@@ -742,7 +750,17 @@ function StoresForm({
                 color="primary"
                 disabled={isSubmitting}
               >
-                Submit
+                {isSubmitting ? (
+                  <CircularProgress
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      color: "#EF9300",
+                    }}
+                  />
+                ) : (
+                  t("global.submitBtn")
+                )}
               </Button>
               <Button
                 className={classes.resetButton}
@@ -754,7 +772,7 @@ function StoresForm({
                 }}
                 disabled={isSubmitting}
               >
-                Reset
+                {t("global.resetBtn")}
               </Button>
             </Grid>
           </form>

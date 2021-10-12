@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import {
   Button,
   Chip,
+  CircularProgress,
   Collapse,
   FormControl,
   Grid,
@@ -571,7 +572,17 @@ function CategoriesForm({
                 color="primary"
                 disabled={isSubmitting}
               >
-                {t("global.submitBtn")}
+                {isSubmitting ? (
+                  <CircularProgress
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      color: "#EF9300",
+                    }}
+                  />
+                ) : (
+                  t("global.submitBtn")
+                )}
               </Button>
               <Button
                 className={classes.resetButton}

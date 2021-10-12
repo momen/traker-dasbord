@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import {
   Button,
   Chip,
+  CircularProgress,
   Collapse,
   FormControl,
   Grid,
@@ -16,6 +17,7 @@ import { RotateLeft } from "@material-ui/icons";
 import SuccessPopup from "../../../SuccessPopup";
 import { Alert } from "@material-ui/lab";
 import { CloseIcon } from "@material-ui/data-grid";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -102,6 +104,7 @@ function CarTypesForm({
   setPageHeader,
 }) {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const formRef = useRef();
   const uploadRef = useRef();
@@ -396,7 +399,17 @@ function CarTypesForm({
                 color="primary"
                 disabled={isSubmitting}
               >
-                Submit
+                {isSubmitting ? (
+                  <CircularProgress
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      color: "#EF9300",
+                    }}
+                  />
+                ) : (
+                  t("global.submitBtn")
+                )}
               </Button>
               <Button
                 className={classes.resetButton}
@@ -408,7 +421,7 @@ function CarTypesForm({
                 }}
                 disabled={isSubmitting}
               >
-                Reset
+                {t("global.resetBtn")}
               </Button>
             </Grid>
           </form>

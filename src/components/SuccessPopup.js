@@ -65,7 +65,7 @@ export default function SuccessPopup({ open, setOpen, message, handleClose }) {
 
         <div className={classes.body}>
           <img src={successIndicator} alt="" />
-          <p className={classes.message}>{message.split("\n")}</p>
+          <p className={classes.message}>{message?.split("\n")}</p>
 
           <Button className={classes.button} onClick={handleClose}>
             OK

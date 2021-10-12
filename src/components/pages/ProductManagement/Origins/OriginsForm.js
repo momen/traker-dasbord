@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react";
-import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
+import { Button, CircularProgress, Grid, makeStyles, TextField } from "@material-ui/core";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import axios from "../../../../axios";
 import { RotateLeft } from "@material-ui/icons";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -75,6 +76,7 @@ const validationSchema = Yup.object().shape({
 
 function OriginsForm({ setPage, setOpenPopup, itemToEdit }) {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState({
@@ -219,7 +221,17 @@ function OriginsForm({ setPage, setOpenPopup, itemToEdit }) {
                 color="primary"
                 disabled={isSubmitting}
               >
-                Submit
+                {isSubmitting ? (
+                  <CircularProgress
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      color: "#EF9300",
+                    }}
+                  />
+                ) : (
+                  t("global.submitBtn")
+                )}
               </Button>
               <Button
                 className={classes.resetButton}
@@ -231,7 +243,7 @@ function OriginsForm({ setPage, setOpenPopup, itemToEdit }) {
                 }}
                 disabled={isSubmitting}
               >
-                Reset
+                {t("global.resetBtn")}
               </Button>
             </Grid>
           </form>

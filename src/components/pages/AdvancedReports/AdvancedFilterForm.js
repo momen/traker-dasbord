@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
+import { Button, CircularProgress, Grid, makeStyles, TextField } from "@material-ui/core";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import axios from "../../../axios";
@@ -8,6 +8,7 @@ import {
   MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -63,6 +64,7 @@ function FAQ_Form({
   setuserIsSearching,
 }) {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const formRef = useRef();
   const [formData, updateFormData] = useState(filterData);
@@ -443,7 +445,17 @@ function FAQ_Form({
                 color="primary"
                 disabled={isSubmitting}
               >
-                Submit
+                {isSubmitting ? (
+                  <CircularProgress
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      color: "#EF9300",
+                    }}
+                  />
+                ) : (
+                  t("global.submitBtn")
+                )}
               </Button>
               <Button
                 className={classes.button}
@@ -454,7 +466,7 @@ function FAQ_Form({
                 }}
                 disabled={isSubmitting}
               >
-                Reset
+                {t("global.resetBtn")}
               </Button>
             </Grid>
           </form>

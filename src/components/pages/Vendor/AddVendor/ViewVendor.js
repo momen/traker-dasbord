@@ -14,6 +14,7 @@ import {
   TextField,
   Typography,
   Grid,
+  CircularProgress,
 } from "@material-ui/core";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -25,6 +26,9 @@ import Paper from "@material-ui/core/Paper";
 import { Fragment } from "react";
 import { ArrowBack } from "@material-ui/icons";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+import SuccessPopup from "../../../SuccessPopup";
+import Loader from "../../../Loader";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -167,9 +171,10 @@ const CustomCheckbox = withStyles({
 
 function ViewVendor({ match }) {
   const classes = useStyles();
+  const { t } = useTranslation();
   const history = useHistory();
   const { user, lang } = useSelector((state) => state);
-  const [vendor, setVendor] = useState("");
+  const [vendor, setVendor] = useState(null);
   const [vendorTypes, setVendorTypes] = useState("");
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -177,6 +182,9 @@ function ViewVendor({ match }) {
   const [itemsToReject, setItemsToReject] = useState([]);
   const [isRejecting, setIsRejecting] = useState(false);
   const [reason, setReason] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [loadingBtn, setLoadingBtn] = useState("");
 
   const rejectionList = [
     { id: 9, fieldEn: "Wholesale Document", fieldAr: "تصريح تاجر الجملة" },
@@ -188,6 +196,14 @@ function ViewVendor({ match }) {
     { id: 5, fieldEn: "Bank Account", fieldAr: "رقم الحساب البنكي" },
     { id: 6, fieldEn: "Bank Document", fieldAr: "المستند البنكي" },
   ];
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState();
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    window.scrollTo(0, 0);
+  };
 
   const openRejectionConfirmation = (fieldId) => {
     setItemToReject(fieldId);
@@ -203,33 +219,48 @@ function ViewVendor({ match }) {
   };
 
   const approveVendor = () => {
+    setLoading(true);
+    setLoadingBtn("approve");
     axios
       .post("admin/approve/vendor", {
         vendor_id: vendor.id,
       })
-      .then(() => {
-        axios.get(`/add-vendors/${match.params.id}`).then((res) => {
-          setVendor(res.data.data);
+      .then(({ data }) => {
+        setDialogText(data.message || data || "Vendor approved successfully.");
+        setDialogOpen(true);
+        axios.get(`/add-vendors/${match.params.id}`).then(({ data }) => {
+          setVendor(data.data);
         });
       })
-      .catch(({ response }) => alert(response.data.errors));
+      .catch(({ response }) => alert(response.data.errors))
+      .finally(() => {
+        setLoading(false);
+        setLoadingBtn("");
+      });
   };
 
   const declineVendor = () => {
+    setLoading(true);
+    setLoadingBtn("decline");
     axios
       .post("admin/decline/vendor", {
         vendor_id: vendor.id,
       })
       .then(({ data }) => {
-        alert(data?.message || "Vendor declined successfully");
+        alert(data?.message || data || "Vendor declined successfully.");
         history.goBack();
       })
-      .catch(({ response }) => alert(response.data.errors));
+      .catch(({ response }) => alert(response.data.errors))
+      .finally(() => {
+        setLoading(false);
+        setLoadingBtn("");
+      });
   };
 
   const rejectInfo = (e) => {
     e.preventDefault();
-    console.log(itemsToReject);
+    setLoading(true);
+    setLoadingBtn("reject");
     axios
       .post("admin/reject/vendor", {
         vendor_id: vendor.id,
@@ -238,7 +269,10 @@ function ViewVendor({ match }) {
       })
       .then(({ data }) => {
         setOpenDialog(false);
-        alert(data.message);
+        setDialogText(
+          data.message || data || "Vendor info rejected successfully."
+        );
+        setDialogOpen(true);
         setReason("");
         setItemsToReject([]);
         setIsRejecting(false);
@@ -246,7 +280,11 @@ function ViewVendor({ match }) {
           setVendor(res.data.data);
         });
       })
-      .catch(({ response }) => alert(response.data.errors));
+      .catch(({ response }) => alert(response.data.errors))
+      .finally(() => {
+        setLoading(false);
+        setLoadingBtn("");
+      });
   };
 
   useEffect(() => {
@@ -270,7 +308,7 @@ function ViewVendor({ match }) {
   const uppercaseWords = (str) =>
     str?.replace(/^(.)|\s+(.)/g, (c) => c.toUpperCase());
 
-  return (
+  return vendor ? (
     <Fragment>
       {/* <Button variant="contained" color="primary" mb={3}>
         Back to list
@@ -283,109 +321,11 @@ function ViewVendor({ match }) {
       <TableContainer component={Paper} style={{ marginTop: "20px" }}>
         <Table className={classes.table} aria-label="customized table">
           <TableBody>
-            <StyledTableRow key={vendor.id}>
-              <StyledTableCell
-                component="th"
-                scope="row"
-                className={classes.attributeName}
-              >
-                ID
-              </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                {vendor.id}
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.serial}>
-              <StyledTableCell component="th" scope="row">
-                Serial
-              </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                {vendor.serial}
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.vendor_name}>
-              <StyledTableCell component="th" scope="row">
-                Vendor
-              </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                <span className={classes.rowContent}>{vendor.vendor_name}</span>
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.company_name}>
-              <StyledTableCell component="th" scope="row">
-                Company Name
-              </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                {vendor.company_name ? (
-                  <span className={classes.rowContent}>
-                    {vendor.company_name}
-                  </span>
-                ) : (
-                  <span style={{ color: "#ff6700", fontWeight: "bold" }}>
-                    Not provided yet
-                  </span>
-                )}
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.email}>
-              <StyledTableCell component="th" scope="row">
-                Email
-              </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                <span className={classes.rowContent}>{vendor.email}</span>
-              </StyledTableCell>
-            </StyledTableRow>
-
-            <StyledTableRow key={user?.phone_no}>
-              <StyledTableCell component="th" scope="row">
-                Phone Number
-              </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                <span className={classes.rowContent}>{vendor?.phone}</span>
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={user?.gender}>
-              <StyledTableCell component="th" scope="row">
-                Gender
-              </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                <span
-                  className={classes.rowContent}
-                  style={{ textTransform: "capitalize" }}
-                >
-                  {vendor?.gender}
-                </span>
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={user?.birthdate}>
-              <StyledTableCell component="th" scope="row">
-                Date of birth
-              </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                <span className={classes.rowContent}>
-                  {vendor?.date_of_birth}
-                </span>
-              </StyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow key={vendor.type}>
-              <StyledTableCell component="th" scope="row">
-                Type
-              </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
-                {vendor.type == 1
-                  ? "Retailer"
-                  : vendor.type == 2
-                  ? "Wholesaler"
-                  : vendor.type == 3
-                  ? "Retailer & Wholesaler"
-                  : "Unkown"}
-              </StyledTableCell>
-            </StyledTableRow>
             <StyledTableRow key={vendor.commercial_no}>
               <StyledTableCell component="th" scope="row">
                 Status
               </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+              <StyledTableCell>
                 {vendor.vendorStatus === "approved" ? (
                   <span
                     style={{
@@ -445,29 +385,109 @@ function ViewVendor({ match }) {
                 )}
               </StyledTableCell>
             </StyledTableRow>
+            <StyledTableRow key={vendor.id}>
+              <StyledTableCell
+                component="th"
+                scope="row"
+                className={classes.attributeName}
+              >
+                ID
+              </StyledTableCell>
+              <StyledTableCell>{vendor.id}</StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={vendor.serial}>
+              <StyledTableCell component="th" scope="row">
+                Serial
+              </StyledTableCell>
+              <StyledTableCell>{vendor.serial}</StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={vendor.vendor_name}>
+              <StyledTableCell component="th" scope="row">
+                Vendor
+              </StyledTableCell>
+              <StyledTableCell>
+                <span className={classes.rowContent}>{vendor.vendor_name}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={vendor.company_name}>
+              <StyledTableCell component="th" scope="row">
+                Company Name
+              </StyledTableCell>
+              <StyledTableCell>
+                {vendor.company_name ? (
+                  <span className={classes.rowContent}>
+                    {vendor.company_name}
+                  </span>
+                ) : (
+                  <span style={{ color: "#ff6700", fontWeight: "bold" }}>
+                    Not provided yet
+                  </span>
+                )}
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={vendor.email}>
+              <StyledTableCell component="th" scope="row">
+                Email
+              </StyledTableCell>
+              <StyledTableCell>
+                <span className={classes.rowContent}>{vendor.email}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+
+            <StyledTableRow key={user?.phone_no}>
+              <StyledTableCell component="th" scope="row">
+                Phone Number
+              </StyledTableCell>
+              <StyledTableCell>
+                <span className={classes.rowContent}>{vendor?.phone}</span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={user?.gender}>
+              <StyledTableCell component="th" scope="row">
+                Gender
+              </StyledTableCell>
+              <StyledTableCell>
+                <span
+                  className={classes.rowContent}
+                  style={{ textTransform: "capitalize" }}
+                >
+                  {vendor?.gender}
+                </span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={user?.birthdate}>
+              <StyledTableCell component="th" scope="row">
+                Date of birth
+              </StyledTableCell>
+              <StyledTableCell>
+                <span className={classes.rowContent}>
+                  {vendor?.date_of_birth}
+                </span>
+              </StyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow key={vendor.type}>
+              <StyledTableCell component="th" scope="row">
+                Type
+              </StyledTableCell>
+              <StyledTableCell>
+                {vendor.type == 1
+                  ? "Retailer"
+                  : vendor.type == 2
+                  ? "Wholesaler"
+                  : vendor.type == 3
+                  ? "Retailer & Wholesaler"
+                  : "Unkown"}
+              </StyledTableCell>
+            </StyledTableRow>
+
             <StyledTableRow key={vendor.commercial_no}>
               <StyledTableCell component="th" scope="row">
                 Commercial Number
               </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+              <StyledTableCell>
                 {vendor.commercial_no ? (
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     {vendor.commercial_no}
-                    {/* {vendor.complete && !vendor.approved && !vendor.declined ? (
-                      <Button
-                        style={{
-                          width: "fit-content",
-                          margin: "5px 15px",
-                          marginLeft: "0px",
-                        }}
-                        // color="secondary"
-                        variant="contained"
-                        className={classes.rejectBtn}
-                        onClick={() => openRejectionConfirmation(1)}
-                      >
-                        Reject
-                      </Button>
-                    ) : null} */}
                   </div>
                 ) : (
                   <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -481,7 +501,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Commercial Document
               </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+              <StyledTableCell>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {vendor.commercialDocs?.file_name}
                   {vendor.commercialDocs?.image ? (
@@ -500,22 +520,6 @@ function ViewVendor({ match }) {
                       >
                         View Document
                       </Button>
-                      {/* {vendor.complete &&
-                      !vendor.approved &&
-                      !vendor.declined ? (
-                        <Button
-                          style={{
-                            width: "fit-content",
-                            margin: "5px 15px",
-                            marginLeft: "0px",
-                          }}
-                          className={classes.rejectBtn}
-                          variant="contained"
-                          onClick={() => openRejectionConfirmation(2)}
-                        >
-                          Reject
-                        </Button>
-                      ) : null} */}
                     </div>
                   ) : (
                     <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -530,24 +534,10 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Tax Card Number
               </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+              <StyledTableCell>
                 {vendor.tax_card_no ? (
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     {vendor.tax_card_no}
-                    {/* {vendor.complete && !vendor.approved && !vendor.declined ? (
-                      <Button
-                        style={{
-                          width: "fit-content",
-                          margin: "5px 15px",
-                          marginLeft: "0px",
-                        }}
-                        className={classes.rejectBtn}
-                        variant="contained"
-                        onClick={() => openRejectionConfirmation(3)}
-                      >
-                        Reject
-                      </Button>
-                    ) : null} */}
                   </div>
                 ) : (
                   <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -561,7 +551,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Tax Document
               </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+              <StyledTableCell>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {vendor.taxCardDocs?.file_name}
                   {vendor.taxCardDocs?.image ? (
@@ -578,22 +568,6 @@ function ViewVendor({ match }) {
                       >
                         View Document
                       </Button>
-                      {/* {vendor.complete &&
-                      !vendor.approved &&
-                      !vendor.declined ? (
-                        <Button
-                          style={{
-                            width: "fit-content",
-                            margin: "5px 15px",
-                            marginLeft: "0px",
-                          }}
-                          className={classes.rejectBtn}
-                          variant="contained"
-                          onClick={() => openRejectionConfirmation(4)}
-                        >
-                          Reject
-                        </Button>
-                      ) : null} */}
                     </div>
                   ) : (
                     <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -609,7 +583,7 @@ function ViewVendor({ match }) {
                 <StyledTableCell component="th" scope="row">
                   Wholesale Document
                 </StyledTableCell>
-                <StyledTableCell align={lang === "en" ? "left" : "right"}>
+                <StyledTableCell>
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <span> {vendor.wholesaleDocs?.file_name}</span>
                     {vendor.wholesaleDocs?.image ? (
@@ -628,22 +602,6 @@ function ViewVendor({ match }) {
                         >
                           View Document
                         </Button>
-                        {/* {vendor.complete &&
-                      !vendor.approved &&
-                      !vendor.declined ? (
-                        <Button
-                          style={{
-                            width: "fit-content",
-                            margin: "5px 15px",
-                            marginLeft: "0px",
-                          }}
-                          className={classes.rejectBtn}
-                          variant="contained"
-                          onClick={() => openRejectionConfirmation(9)}
-                        >
-                          Reject
-                        </Button>
-                      ) : null} */}
                       </div>
                     ) : (
                       <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -659,24 +617,10 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Bank Account
               </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+              <StyledTableCell>
                 {vendor.bank_account ? (
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     {vendor.bank_account}
-                    {/* {vendor.complete && !vendor.approved && !vendor.declined ? (
-                      <Button
-                        style={{
-                          width: "fit-content",
-                          margin: "5px 15px",
-                          marginLeft: "0px",
-                        }}
-                        className={classes.rejectBtn}
-                        variant="contained"
-                        onClick={() => openRejectionConfirmation(5)}
-                      >
-                        Reject
-                      </Button>
-                    ) : null} */}
                   </div>
                 ) : (
                   <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -690,7 +634,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Bank Document
               </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+              <StyledTableCell>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {vendor.bankDocs?.file_name}
                   {vendor.bankDocs?.image ? (
@@ -707,22 +651,6 @@ function ViewVendor({ match }) {
                       >
                         View Document
                       </Button>
-                      {/* {vendor.complete &&
-                      !vendor.approved &&
-                      !vendor.declined ? (
-                        <Button
-                          style={{
-                            width: "fit-content",
-                            margin: "5px 15px",
-                            marginLeft: "0px",
-                          }}
-                          className={classes.rejectBtn}
-                          variant="contained"
-                          onClick={() => openRejectionConfirmation(6)}
-                        >
-                          Reject
-                        </Button>
-                      ) : null} */}
                     </div>
                   ) : (
                     <span style={{ color: "#ff6700", fontWeight: "bold" }}>
@@ -737,7 +665,7 @@ function ViewVendor({ match }) {
               <StyledTableCell component="th" scope="row">
                 Logo
               </StyledTableCell>
-              <StyledTableCell align={lang === "en" ? "left" : "right"}>
+              <StyledTableCell >
                 <img
                   src={vendor.images?.image}
                   alt={vendor.images?.file_name}
@@ -753,22 +681,34 @@ function ViewVendor({ match }) {
                 <StyledTableCell component="th" scope="row">
                   Actions
                 </StyledTableCell>
-                <StyledTableCell align={lang === "en" ? "left" : "right"}>
+                <StyledTableCell>
                   <div style={{ textAlign: "center" }}>
                     <>
                       <Button
                         variant="contained"
                         className={classes.approveBtn}
                         onClick={approveVendor}
-                        disabled={!vendor.vendorStatus === "pending"}
+                        disabled={!vendor.vendorStatus === "pending" || loading}
                       >
-                        {lang === "en" ? "Approve Vendor" : "قبول الطلب"}
+                        {loading && loadingBtn === "approve" ? (
+                          <CircularProgress
+                            style={{
+                              width: "20px",
+                              height: "20px",
+                              color: "#90CA28",
+                            }}
+                          />
+                        ) : lang === "en" ? (
+                          "Approve Vendor"
+                        ) : (
+                          "قبول الطلب"
+                        )}
                       </Button>
                       <Button
                         variant="contained"
                         className={classes.rejectBtn}
                         onClick={() => setIsRejecting(!isRejecting)}
-                        disabled={!vendor.vendorStatus === "pending"}
+                        disabled={!vendor.vendorStatus === "pending" || loading}
                       >
                         {lang === "en" ? "Reject Info" : "طلب استيفاء بيانات"}
                       </Button>
@@ -776,9 +716,23 @@ function ViewVendor({ match }) {
                         variant="contained"
                         className={classes.declineBtn}
                         onClick={declineVendor}
-                        disabled={!vendor.vendorStatus === "approved"}
+                        disabled={
+                          !vendor.vendorStatus === "approved" || loading
+                        }
                       >
-                        {lang === "en" ? "Decline Request" : "رفض الطلب"}
+                        {loading && loadingBtn === "decline" ? (
+                          <CircularProgress
+                            style={{
+                              width: "20px",
+                              height: "20px",
+                              color: "#CA2828",
+                            }}
+                          />
+                        ) : lang === "en" ? (
+                          "Decline Request"
+                        ) : (
+                          "رفض الطلب"
+                        )}
                       </Button>
                     </>
                   </div>
@@ -795,12 +749,6 @@ function ViewVendor({ match }) {
                             <FormControlLabel
                               control={
                                 <CustomCheckbox
-                                  // checked={
-                                  //   itemsToReject.filter(
-                                  //     (item) => item == currentItem.id
-                                  //   ).length
-                                  // }
-                                  // name={category.name}
                                   value={currentItem.id}
                                   onChange={selectRejection}
                                 />
@@ -839,7 +787,17 @@ function ViewVendor({ match }) {
                       disabled={!itemsToReject.length || !reason}
                       onClick={rejectInfo}
                     >
-                      {lang === "en" ? "Submit" : "إرسال"}
+                      {loading && loadingBtn === "reject" ? (
+                        <CircularProgress
+                          style={{
+                            width: "20px",
+                            height: "20px",
+                            color: "#F8CF00",
+                          }}
+                        />
+                      ) : (
+                        t("global.submitBtn")
+                      )}
                     </Button>
                   </Collapse>
                 </StyledTableCell>
@@ -883,7 +841,17 @@ function ViewVendor({ match }) {
           </DialogActions>
         </form>
       </Dialog>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </Fragment>
+  ) : (
+    <div style={{ height: "100%" }}>
+      <Loader />
+    </div>
   );
 }
 

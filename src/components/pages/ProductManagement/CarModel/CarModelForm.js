@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import {
   Button,
+  CircularProgress,
   FormControl,
   Grid,
   makeStyles,
@@ -12,6 +13,7 @@ import { Formik } from "formik";
 import { RotateLeft } from "@material-ui/icons";
 import SuccessPopup from "../../../SuccessPopup";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -101,6 +103,7 @@ function CarModelForm({
   setPageHeader,
 }) {
   const classes = useStyles();
+  const { t } = useTranslation();
   const { lang } = useSelector((state) => state);
 
   const formRef = useRef();
@@ -311,7 +314,17 @@ function CarModelForm({
                 color="primary"
                 disabled={isSubmitting}
               >
-                Submit
+                {isSubmitting ? (
+                  <CircularProgress
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      color: "#EF9300",
+                    }}
+                  />
+                ) : (
+                  t("global.submitBtn")
+                )}
               </Button>
               <Button
                 className={classes.resetButton}
@@ -323,7 +336,7 @@ function CarModelForm({
                 }}
                 disabled={isSubmitting}
               >
-                Reset
+                {t("global.resetBtn")}
               </Button>
             </Grid>
           </form>

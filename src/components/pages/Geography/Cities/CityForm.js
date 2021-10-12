@@ -3,6 +3,7 @@ import {
   Button,
   Checkbox,
   Chip,
+  CircularProgress,
   Collapse,
   FormControl,
   Grid,
@@ -20,6 +21,7 @@ import NumberFormat from "react-number-format";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import SuccessPopup from "../../../SuccessPopup";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -98,6 +100,7 @@ function ProductsForm({
   setPageHeader,
 }) {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const [formData, updateFormData] = useState({
     city_name: itemToEdit ? itemToEdit.city_name : "",
@@ -330,7 +333,17 @@ function ProductsForm({
                 color="primary"
                 disabled={isSubmitting} // Update on other components
               >
-                Submit
+                {isSubmitting ? (
+                  <CircularProgress
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      color: "#EF9300",
+                    }}
+                  />
+                ) : (
+                  t("global.submitBtn")
+                )}
               </Button>
               <Button
                 className={classes.resetButton}
@@ -346,7 +359,7 @@ function ProductsForm({
                   touched.tags = false;
                 }} // Apply to other forms -For refactoring all forms-
               >
-                Reset
+                {t("global.resetBtn")}
               </Button>
             </Grid>
           </form>

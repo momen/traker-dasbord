@@ -202,7 +202,8 @@ function CarMade() {
       headerName: "Vehicle Type",
       width: 200,
       flex: 1,
-      renderCell: (params) => params.value?.type_name,
+      renderCell: (params) =>
+        lang === "ar" ? params.value?.name : params.value?.name_en,
     },
     // {
     //   field: "categoryid",

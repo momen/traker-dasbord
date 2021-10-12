@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import {
   Button,
   Checkbox,
+  CircularProgress,
   Grid,
   IconButton,
   InputAdornment,
@@ -17,6 +18,7 @@ import { RotateLeft, Visibility, VisibilityOff } from "@material-ui/icons";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import SuccessPopup from "../../../SuccessPopup";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -82,6 +84,7 @@ function UsersForm({
   setPageHeader,
 }) {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const validationSchema = Yup.object().shape({
     role: !itemToEdit ? Yup.string().required() : Yup.string().notRequired(),
@@ -411,7 +414,17 @@ function UsersForm({
                   color="primary"
                   disabled={isSubmitting}
                 >
-                  Submit
+                  {isSubmitting ? (
+                    <CircularProgress
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        color: "#EF9300",
+                      }}
+                    />
+                  ) : (
+                    t("global.submitBtn")
+                  )}
                 </Button>
                 <Button
                   className={classes.resetButton}
@@ -425,7 +438,7 @@ function UsersForm({
                   }}
                   disabled={isSubmitting}
                 >
-                  Reset
+                  {t("global.resetBtn")}
                 </Button>
               </Grid>
             </Grid>

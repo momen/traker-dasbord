@@ -3,6 +3,7 @@ import {
   Button,
   Checkbox,
   Chip,
+  CircularProgress,
   Collapse,
   Dialog,
   DialogActions,
@@ -36,6 +37,7 @@ import { useSelector } from "react-redux";
 import clsx from "clsx";
 import { isGenericCategory } from "./helpers";
 import Loader from "../../../Loader";
+import { useTranslation } from "react-i18next";
 
 const Divider = styled(MuiDivider)(spacing);
 
@@ -143,6 +145,7 @@ function ProductsForm({
   setPageHeader,
 }) {
   const classes = useStyles();
+  const { t } = useTranslation();
   const uploadRef = useRef();
   const { lang } = useSelector((state) => state);
 
@@ -2517,7 +2520,17 @@ function ProductsForm({
                 color="primary"
                 disabled={isSubmitting} // Update on other components
               >
-                Submit
+                {isSubmitting ? (
+                  <CircularProgress
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      color: "#EF9300",
+                    }}
+                  />
+                ) : (
+                  t("global.submitBtn")
+                )}
               </Button>
               <Button
                 className={classes.resetButton}
@@ -2533,7 +2546,7 @@ function ProductsForm({
                   touched.tags = false;
                 }} // Apply to other forms -For refactoring all forms-
               >
-                Reset
+                {t("global.resetBtn")}
               </Button>
             </Grid>
           </form>
