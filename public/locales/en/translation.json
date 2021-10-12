@@ -1,7 +1,7 @@
 {
   "global": {
     "currency": "SAR",
-    "submiBtn": "Submit",
+    "submitBtn": "Submit",
     "resetBtn": "Reset",
     "editBtn": "Edit",
     "deleteBtn": "Delete",
