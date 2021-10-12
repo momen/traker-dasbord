@@ -5,9 +5,7 @@ import { Helmet } from "react-helmet";
 import PropTypes from "prop-types";
 
 import {
-  Breadcrumbs as MuiBreadcrumbs,
   Card as MuiCard,
-  CardContent as MuiCardContent,
   Divider as MuiDivider,
   Paper as MuiPaper,
   Typography,
