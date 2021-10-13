@@ -157,6 +157,9 @@ function ProductsForm({
     allcategory: itemToEdit
       ? itemToEdit.allcategory.map((category) => category.id)
       : [],
+    width: itemToEdit ? itemToEdit.width || null : null,
+    height: itemToEdit ? itemToEdit.height || null : null,
+    size: itemToEdit ? itemToEdit.size || null : null,
     name: itemToEdit ? itemToEdit.name || "" : "",
     name_en: itemToEdit ? itemToEdit.name_en || "" : "",
     description: itemToEdit ? itemToEdit.description || "" : "",
@@ -205,7 +208,7 @@ function ProductsForm({
       .filter((category, index) => category?.siblings?.length)
       .map((category) => category.siblings)
   );
-  const [partCategories, setPartCategories] = useState(null);
+  const [isTyres, setIsTyres] = useState(false);
   const [toYears, setToYears] = useState([]);
 
   const [enableDiscount, setEnableDiscount] = useState(
@@ -213,6 +216,24 @@ function ProductsForm({
   );
 
   const validationSchema = Yup.object().shape({
+    width: isTyres
+      ? Yup.number()
+          .required("This field is Required")
+          .typeError("This field is Required")
+          .min(1, "Enter a value greater than 0")
+      : Yup.string().nullable().notRequired(),
+    height: isTyres
+      ? Yup.number()
+          .required("This field is Required")
+          .typeError("This field is Required")
+          .min(1, "Enter a value greater than 0")
+      : Yup.string().nullable().notRequired(),
+    size: isTyres
+      ? Yup.number()
+          .required("This field is Required")
+          .typeError("This field is Required")
+          .min(1, "Enter a value greater than 0")
+      : Yup.string().nullable().notRequired(),
     name:
       lang === "ar"
         ? Yup.string()
@@ -513,6 +534,13 @@ function ProductsForm({
         axios(`/allcategories/list/${itemToEdit.allcategory[0].id}`)
           .then(({ data }) => {
             setMainCategories(data.data);
+            if (
+              data.data.find(
+                (category) => category.id === itemToEdit.allcategory[1].id
+              ).need_attributes
+            ) {
+              setIsTyres(true);
+            }
           })
           .catch(() => {});
       }
@@ -789,11 +817,12 @@ function ProductsForm({
     setBigImgSize(false);
   };
 
-  return !itemToEdit ||
-    (itemToEdit && mainCategories?.length) ||
-    // Temporary Guard to be removed until testing is done & there are no previously added products
-    // in the old way causing conflicts.
-    (itemToEdit && itemToEdit.allcategory.length === 0) ? (
+  return allCategories?.length &&
+    (!itemToEdit ||
+      (itemToEdit && mainCategories?.length) ||
+      // Temporary Guard to be removed until testing is done & there are no previously added products
+      // in the old way causing conflicts.
+      (itemToEdit && itemToEdit.allcategory.length === 0)) ? (
     <div className={classes.paper}>
       <Formik
         initialValues={formData}
@@ -835,6 +864,7 @@ function ProductsForm({
                         transmission_id: "",
                       });
                       setCategories([]);
+                      setIsTyres(false);
                       if (e.target.value) {
                         axios
                           .get(`/cartype/madeslist/${e.target.value}`)
@@ -855,10 +885,11 @@ function ProductsForm({
                           .get(`allcategories/list/${e.target.value}`)
                           .then((res) => {
                             const _maincategories = res.data.data.map(
-                              ({ id, name, name_en }) => ({
+                              ({ id, name, name_en, need_attributes }) => ({
                                 id,
                                 name,
                                 name_en,
+                                need_attributes,
                               })
                             ); // Customize
                             setMainCategories(_maincategories);
@@ -917,7 +948,6 @@ function ProductsForm({
                     name="maincategory_id"
                     onChange={(e) => {
                       handleChange(e);
-                      console.log([formData.allcategory[0], e.target.value]);
                       if (e.target.value) {
                         updateFormData({
                           ...formData,
@@ -939,7 +969,12 @@ function ProductsForm({
                           maincategory_id: e.target.value,
                         });
                       }
-                      if (e.target.value) {
+                      if (
+                        e.target.value &&
+                        !mainCategories?.find(
+                          (category) => category.id == e.target.value
+                        ).need_attributes
+                      ) {
                         axios
                           .get(`/allcategories/list/${e.target.value}`)
                           .then((res) => {
@@ -950,11 +985,17 @@ function ProductsForm({
                                 name_en,
                               })
                             ); // Customize
-                            setCategories([_subCategories]);
+                            setCategories(
+                              _subCategories?.length ? [_subCategories] : []
+                            );
+                            setIsTyres(false);
                           })
                           .catch(() => {
                             alert("Failed to Fetch 1st Sub Categories List");
                           });
+                      } else if (e.target.value) {
+                        setIsTyres(true);
+                        setCategories([]);
                       } else {
                         setCategories([]);
                       }
@@ -1012,7 +1053,7 @@ function ProductsForm({
                       variant="outlined"
                       select
                       label="Sub Category"
-                      value={formData.allcategory[index + 2]}
+                      value={formData.allcategory[index + 2] || null}
                       name={`subCategory${index}`}
                       onChange={(e) => {
                         handleChange(e);
@@ -1147,6 +1188,138 @@ function ProductsForm({
                   ) : null}
                 </div>
               </Grid> */}
+
+              {isTyres ? (
+                <Grid item xs={12}>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ marginBottom: "10px" }}>
+                      {t("components.products.form.tyresSpecsTitle")}
+                    </span>
+                    <Grid
+                      container
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Grid item xs={4} md={3}>
+                        <div>
+                          <NumberFormat
+                            required
+                            variant="outlined"
+                            allowNegative={false}
+                            customInput={TextField}
+                            thousandSeparator={true}
+                            fullWidth
+                            name="width"
+                            label={t("components.products.form.width")}
+                            value={formData.width}
+                            onChange={handleChange}
+                            onValueChange={({ floatValue }) => {
+                              updateFormData({
+                                ...formData,
+                                width: floatValue,
+                              });
+                            }}
+                            onBlur={handleBlur}
+                            error={
+                              responseErrors?.width ||
+                              Boolean(touched.width && errors.width)
+                            }
+                            helperText={touched.width && errors.width}
+                          />
+
+                          {responseErrors ? (
+                            <div className={classes.inputMessage}>
+                              {responseErrors.width?.map((msg) => (
+                                <span key={msg} className={classes.errorMsg}>
+                                  {msg}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      </Grid>
+
+                      <Grid item xs={4} md={3}>
+                        <div>
+                          <NumberFormat
+                            variant="outlined"
+                            allowNegative={false}
+                            customInput={TextField}
+                            thousandSeparator={true}
+                            fullWidth
+                            name="height"
+                            label={t("components.products.form.height")}
+                            value={formData.height}
+                            onChange={handleChange}
+                            onValueChange={({ floatValue }) => {
+                              updateFormData({
+                                ...formData,
+                                height: floatValue,
+                              });
+                            }}
+                            onBlur={handleBlur}
+                            error={
+                              responseErrors?.height ||
+                              Boolean(touched.height && errors.height)
+                            }
+                            helperText={touched.height && errors.height}
+                          />
+
+                          {responseErrors ? (
+                            <div className={classes.inputMessage}>
+                              {responseErrors.height?.map((msg) => (
+                                <span key={msg} className={classes.errorMsg}>
+                                  {msg}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      </Grid>
+
+                      <Grid item xs={4} md={3}>
+                        <div>
+                          <NumberFormat
+                            variant="outlined"
+                            allowNegative={false}
+                            customInput={TextField}
+                            thousandSeparator={true}
+                            fullWidth
+                            name="size"
+                            label={t("components.products.form.size")}
+                            value={formData.size}
+                            onChange={handleChange}
+                            onValueChange={({ floatValue }) => {
+                              updateFormData({
+                                ...formData,
+                                size: floatValue,
+                              });
+                            }}
+                            onBlur={handleBlur}
+                            error={
+                              responseErrors?.size ||
+                              Boolean(touched.size && errors.size)
+                            }
+                            helperText={touched.size && errors.size}
+                          />
+
+                          {responseErrors ? (
+                            <div className={classes.inputMessage}>
+                              {responseErrors.size?.map((msg) => (
+                                <span key={msg} className={classes.errorMsg}>
+                                  {msg}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      </Grid>
+                    </Grid>
+                  </div>
+                </Grid>
+              ) : null}
 
               <Grid item xs={6} sm={6}>
                 <div>

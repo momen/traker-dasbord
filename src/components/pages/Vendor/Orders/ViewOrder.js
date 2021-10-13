@@ -66,7 +66,7 @@ function ViewOrder({ match }) {
   const classes = useStyles();
   const history = useHistory();
   const lastLocation = useLastLocation();
-  const { user } = useSelector((state) => state);
+  const { user, lang } = useSelector((state) => state);
   const [order, setOrder] = useState("");
 
   useEffect(() => {
@@ -143,7 +143,9 @@ function ViewOrder({ match }) {
                     key={product.product_id}
                     className={classes.productsBadge}
                   >
-                    {product.product_name}
+                    {lang === "ar"
+                      ? product.product_name || product.name || product.name_en
+                      : product.name_en || product.product_name || product.name}
                   </span>
                 ))}
               </StyledTableCell>

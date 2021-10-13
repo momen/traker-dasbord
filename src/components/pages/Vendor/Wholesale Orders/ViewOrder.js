@@ -66,7 +66,7 @@ function ViewOrder({ match }) {
   const classes = useStyles();
   const history = useHistory();
   const lastLocation = useLastLocation();
-  const { user } = useSelector((state) => state);
+  const { user, lang } = useSelector((state) => state);
   const [order, setOrder] = useState("");
 
   useEffect(() => {
@@ -186,7 +186,9 @@ function ViewOrder({ match }) {
                       Product Name
                     </StyledTableCell>
                     <StyledTableCell align="left">
-                      {detail.product_name}
+                      {lang === "ar"
+                        ? detail.product_name || detail.name || detail.name_en
+                        : detail.name_en || detail.product_name || detail.name}
                     </StyledTableCell>
                   </StyledTableRow>
                   <StyledTableRow

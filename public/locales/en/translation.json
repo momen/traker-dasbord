@@ -95,6 +95,14 @@
         "category": "Category"
       }
     },
+    "products": {
+      "form": {
+        "tyresSpecsTitle": "Specifications",
+        "width": "Rim Width",
+        "height": "Tyre Height",
+        "size": "Tyre Size"
+      }
+    },
     "ads": {
       "mainHeader": "Advertisments",
       "top": {

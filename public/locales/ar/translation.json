@@ -93,6 +93,14 @@
         "category": "الفئة"
       }
     },
+    "products": {
+      "form": {
+        "tyresSpecsTitle": "الخصائص",
+        "width": "مقاس الجنط",
+        "height": "عرض الإطار",
+        "size": "إرتفاع الإطار"
+      }
+    },
     "ads": {
       "mainHeader": "الإعلانات",
       "top": {
