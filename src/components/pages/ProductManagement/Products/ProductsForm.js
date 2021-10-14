@@ -534,6 +534,8 @@ function ProductsForm({
         axios(`/allcategories/list/${itemToEdit.allcategory[0].id}`)
           .then(({ data }) => {
             setMainCategories(data.data);
+            // Check if the main category is tyres through the need_attributes key
+            // to show the specifications
             if (
               data.data.find(
                 (category) => category.id === itemToEdit.allcategory[1].id
@@ -563,33 +565,9 @@ function ProductsForm({
   };
 
   const handleSubmit = async () => {
-    // if (
-    //   formData.models.length === 0 &&
-    //   formData.category_id &&
-    //   formData.category_id != "43" &&
-    //   formData.category_id != "81" &&
-    //   formData.category_id != "82" &&
-    //   formData.category_id != "83" &&
-    //   formData.category_id != "84" &&
-    //   formData.category_id != "85" &&
-    //   formData.maincategory_id &&
-    //   formData.maincategory_id != "5"
-    // ) {
-    //   setAutoSelectModelError(true);
-    //   return;
-    // }
-    // if (formData.tags.length === 0) {
-    //   setAutoSelectTagError(true);
-    //   return;
-    // }
-
-    //   ? Yup.string().required()
-    //   : Yup.string().nullable().notRequired(),
     setAutoSelectModelError(false);
     setAutoSelectTagError(false);
 
-    console.log(formData.allcategory);
-    // setIsSubmitting(true);
     let data = new FormData();
 
     if (
@@ -640,6 +618,7 @@ function ProductsForm({
             },
           })
           .then((res) => {
+            // If the user is deleting images do it after the edit is done
             if (imagesToDelete.length) {
               axios
                 .post(`/products/remove/checked/media`, {
@@ -789,8 +768,13 @@ function ProductsForm({
 
   const handleReset = () => {
     updateFormData({
+      width: "",
+      height: "",
+      size: "",
       name: "",
+      name_en: "",
       description: "",
+      description_en: "",
       car_made_id: "",
       models: [],
       year_from: "",
@@ -1244,6 +1228,7 @@ function ProductsForm({
                       <Grid item xs={4} md={3}>
                         <div>
                           <NumberFormat
+                            required
                             variant="outlined"
                             allowNegative={false}
                             customInput={TextField}
@@ -1282,6 +1267,7 @@ function ProductsForm({
                       <Grid item xs={4} md={3}>
                         <div>
                           <NumberFormat
+                            required
                             variant="outlined"
                             allowNegative={false}
                             customInput={TextField}
