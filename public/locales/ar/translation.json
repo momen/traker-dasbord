@@ -22,6 +22,7 @@
     "logs": "السجل",
     "productMgt": "إدارة المنتجات",
     "allCategories": "فئات",
+    "defaultCategories": "فئات شريط المهام",
     "mainCatgory": "فئات رئيسية",
     "category": "فئات فرعية",
     "partCategory": "فئات فرعية ثانية",
@@ -92,6 +93,12 @@
         "mainCategory": "الفئة الرئيسية",
         "category": "الفئة"
       }
+    },
+    "navbarCategories": {
+      "title": "فئات شريط المهام",
+      "headerText": "يمكنك اختيار 5 فئات لكل نوع مركبات لتظهر في شريط المهام (يمكن اختيار فئات مشتركة في أي من النوعين)",
+      "carCategoriesTitle": "فئات سيارات ركوب",
+      "commercialCategoriesTitle": "فئات مركبات تجارية"
     },
     "products": {
       "form": {

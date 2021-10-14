@@ -213,16 +213,19 @@ function ViewProduct({ match }) {
                 </p>
               </StyledTableCell>
             </StyledTableRow>
-            <StyledTableRow key={product.description}>
-              <StyledTableCell component="th" scope="row">
-                Tyre Specifications
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <p className={classes.rowContent}>
-                  {`${product.width}/${product.height}/${product.size}`}
-                </p>
-              </StyledTableCell>
-            </StyledTableRow>
+            {product?.tyres_belong ? (
+              <StyledTableRow key={"tyre-specs"}>
+                <StyledTableCell component="th" scope="row">
+                  Tyre Specifications
+                </StyledTableCell>
+                <StyledTableCell align="left">
+                  <p className={classes.rowContent}>
+                    {`${product.width}/${product.height}/${product.size}`}
+                  </p>
+                </StyledTableCell>
+              </StyledTableRow>
+            ) : null}
+
             <StyledTableRow key={`product-type-${product.producttype_id?.id}`}>
               <StyledTableCell component="th" scope="row">
                 Product Type

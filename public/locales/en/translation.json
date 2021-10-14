@@ -24,6 +24,7 @@
     "logs": "Audit Logs",
     "productMgt": "Product Management",
     "allCategories": "Categories",
+    "defaultCategories": "Navbar Categories",
     "mainCatgory": "Main Categories",
     "category": "Categories",
     "partCategory": "Part Categories",
@@ -94,6 +95,12 @@
         "mainCategory": "Main Category",
         "category": "Category"
       }
+    },
+    "navbarCategories": {
+      "title": "Navbar Categories",
+      "headerText": "You can choose 5 Categories for each vehicle type to appear in the navigation bar on the website (You can select common categories on both types).",
+      "carCategoriesTitle": "Cars Categories",
+      "commercialCategoriesTitle": "Commercial Vehicles Categories"
     },
     "products": {
       "form": {

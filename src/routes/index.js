@@ -3,6 +3,7 @@ import React from "react";
 import async from "../components/Async";
 
 import {
+  Airplay,
   Calendar,
   Clipboard,
   FileText,
@@ -100,6 +101,11 @@ const MainCategories = async(() =>
 );
 const AllCategories = async(() =>
   import("../components/pages/ProductManagement/AllCategories/Categories")
+);
+const DefaultCategories = async(() =>
+  import(
+    "../components/pages/ProductManagement/DefaultCategories/DefaultCategories"
+  )
 );
 const Categories = async(() =>
   import("../components/pages/ProductManagement/Categories/Categories")
@@ -391,30 +397,38 @@ const productManagementRoutes = {
       guard: PermissionGuard,
       permission: "product_category_access",
     },
-    {
-      path: "/product/main-categories",
-      name: "mainCatgory",
-      component: MainCategories,
-      icon: <Class />,
-      guard: PermissionGuard,
-      permission: "main_categories_access",
-    },
-    {
-      path: "/product/categories",
-      name: "category",
-      component: Categories,
-      icon: <Folder />,
-      guard: PermissionGuard,
-      permission: "product_category_access",
-    },
-    {
-      path: "/product/part-category",
-      name: "partCategory",
-      component: PartCategory,
-      icon: <Category />,
-      guard: PermissionGuard,
-      permission: "part_category_access",
-    },
+    // {
+    //   path: "/product/default-categories",
+    //   name: "defaultCategories",
+    //   component: DefaultCategories,
+    //   icon: <Airplay />,
+    //   guard: PermissionGuard,
+    //   permission: "product_category_access",
+    // },
+    // {
+    //   path: "/product/main-categories",
+    //   name: "mainCatgory",
+    //   component: MainCategories,
+    //   icon: <Class />,
+    //   guard: PermissionGuard,
+    //   permission: "main_categories_access",
+    // },
+    // {
+    //   path: "/product/categories",
+    //   name: "category",
+    //   component: Categories,
+    //   icon: <Folder />,
+    //   guard: PermissionGuard,
+    //   permission: "product_category_access",
+    // },
+    // {
+    //   path: "/product/part-category",
+    //   name: "partCategory",
+    //   component: PartCategory,
+    //   icon: <Category />,
+    //   guard: PermissionGuard,
+    //   permission: "part_category_access",
+    // },
     {
       path: "/product/brands",
       name: "brands",
