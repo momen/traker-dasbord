@@ -397,14 +397,14 @@ const productManagementRoutes = {
       guard: PermissionGuard,
       permission: "product_category_access",
     },
-    {
-      path: "/product/default-categories",
-      name: "defaultCategories",
-      component: DefaultCategories,
-      icon: <Airplay />,
-      guard: PermissionGuard,
-      permission: "product_category_access",
-    },
+    // {
+    //   path: "/product/default-categories",
+    //   name: "defaultCategories",
+    //   component: DefaultCategories,
+    //   icon: <Airplay />,
+    //   guard: PermissionGuard,
+    //   permission: "product_category_access",
+    // },
     // {
     //   path: "/product/main-categories",
     //   name: "mainCatgory",
