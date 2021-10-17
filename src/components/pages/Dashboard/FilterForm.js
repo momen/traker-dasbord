@@ -149,7 +149,6 @@ function FAQ_Form({
                 <Grid item xs={6}>
                   <div>
                     <KeyboardDatePicker
-                      dir="ltr"
                       name="from"
                       disableToolbar
                       disableFuture
@@ -194,7 +193,6 @@ function FAQ_Form({
                 <Grid item xs={6}>
                   <div>
                     <KeyboardDatePicker
-                      dir="ltr"
                       name="to"
                       disableToolbar
                       disableFuture

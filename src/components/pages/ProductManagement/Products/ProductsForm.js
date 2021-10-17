@@ -463,7 +463,7 @@ function ProductsForm({
   const [autoSelectModelError, setAutoSelectModelError] = useState(false);
   const [autoSelectTagError, setAutoSelectTagError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false); // Update on other components
-  const [responseErrors, setResponseErrors] = useState("");
+  const [responseErrors, setResponseErrors] = useState({});
   const [bigImgSize, setBigImgSize] = useState(false);
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -1103,7 +1103,11 @@ function ProductsForm({
                       InputLabelProps={{ shrink: !!formData.maincategory_id }}
                       onBlur={handleBlur}
                       // Check later
-                      error={responseErrors[`allcategory.${index + 2}`]}
+                      error={
+                        (typeof responseErrors === "object" &&
+                          responseErrors[`allcategory.${index + 2}`]) ||
+                        false
+                      }
                       // helperText="Please select a Main Category"
                       fullWidth
                     >
@@ -2595,7 +2599,8 @@ function ProductsForm({
                         <Chip
                           className={clsx(
                             classes.chip,
-                            responseErrors[`photo.${index}`] &&
+                            typeof responseErrors === "object" &&
+                              responseErrors[`photo.${index}`] &&
                               classes.chipError
                           )}
                           // icon={<FaceIcon/>}
@@ -2604,7 +2609,9 @@ function ProductsForm({
                           variant="outlined"
                         />
                         <p className={classes.imageErrorMsg}>
-                          {responseErrors[`photo.${index}`]}
+                          {typeof responseErrors === "object"
+                            ? responseErrors[`photo.${index}`]
+                            : ""}
                         </p>
                       </div>
 
@@ -2663,7 +2670,8 @@ function ProductsForm({
               </Grid>
             </Grid>
 
-            {typeof responseErrors === "string" ? (
+            {typeof responseErrors === "string" ||
+            responseErrors === "object" ? (
               <Grid item xs={12}>
                 <span key={`faluire-msg`} className={classes.errorMsg}>
                   {responseErrors}

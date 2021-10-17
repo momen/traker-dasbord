@@ -135,7 +135,6 @@ function FAQ_Form({
                 <Grid item xs={12} sm={6}>
                   <div style={{ width: "100%" }}>
                     <KeyboardDatePicker
-                      dir="ltr"
                       name="from"
                       fullWidth
                       disableToolbar
@@ -181,7 +180,6 @@ function FAQ_Form({
                 <Grid item xs={12} sm={6}>
                   <div style={{ width: "100%" }}>
                     <KeyboardDatePicker
-                      dir="ltr"
                       name="to"
                       fullWidth
                       disableToolbar

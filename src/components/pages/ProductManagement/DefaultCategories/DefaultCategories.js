@@ -21,6 +21,7 @@ import {
 import { spacing } from "@material-ui/system";
 import axios from "../../../../axios";
 import { useSelector } from "react-redux";
+import SuccessPopup from "../../../SuccessPopup";
 
 const Card = styled(MuiCard)(spacing);
 const Divider = styled(MuiDivider)(spacing);
@@ -40,6 +41,13 @@ const useStyles = makeStyles((theme) => ({
     color: "#424242",
     fontWeight: 600,
     fontSize: "20px",
+  },
+  categoryWrapper: {
+    border: "1px solid #CCCCCC",
+    height: 40,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   submitButton: {
     height: 40,
@@ -63,25 +71,38 @@ export default function DefaultCategories() {
   const { t } = useTranslation();
   const { userPermissions, lang } = useSelector((state) => state);
   const history = useHistory();
+  const [currentNavBarCategories, setCurrentNavBarCategories] = useState({
+    car: [],
+    commercial: [],
+  });
   const [carCategories, setCarCategories] = useState([]);
-  const [carCategoriesForm, setCarCategoriesForm] = useState([
+  const [selectedCarCategories, setSelectedCarCategories] = useState([
     null,
     null,
     null,
     null,
     null,
   ]);
-  const [commercialCategories, setCommercialCategories] = useState([]);
-  const [commercialCategoriesForm, setCommercialCategoriesForm] = useState([
+  const [commercialCategories, setCommercialCategories] = useState([
     null,
     null,
     null,
     null,
     null,
   ]);
+  const [selectedCommercialCategories, setSelectedCommercialCategories] =
+    useState([null, null, null, null, null]);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
   const [mode, setMode] = useState("view");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState("");
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setMode("view");
+  };
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
@@ -100,14 +121,35 @@ export default function DefaultCategories() {
           axios(`allcategories/navbarlist/${categoriesToDisplay[1].id}`),
         ]).then(([car_categories, commercial_categories]) => {
           setCarCategories(car_categories.data.data);
+
+          setSelectedCarCategories(
+            car_categories.data.data
+              .filter((category) => category.navbar)
+              .map((category) => category.id.toString())
+          );
+
           setCommercialCategories(commercial_categories.data.data);
+          let _commercialCategories = [...selectedCommercialCategories];
+          commercial_categories.data.data
+            .filter((category) => category.navbar)
+            .forEach(
+              (category, index) => (_commercialCategories[index] = category.id)
+            );
+          setSelectedCommercialCategories([..._commercialCategories]);
+
+          setCurrentNavBarCategories({
+            car: car_categories.data.data.filter((category) => category.navbar),
+            commercial: commercial_categories.data.data.filter(
+              (category) => category.navbar
+            ),
+          });
           setInitialFetchDone(true);
         });
       })
       .catch(() => {
         alert("Failed to Fetch data");
       });
-  }, [lang]);
+  }, [lang, mode]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -115,16 +157,17 @@ export default function DefaultCategories() {
     Promise.all([
       axios.post("allcategories/mark/navbar", {
         id: 1,
-        navbars: JSON.stringify(carCategoriesForm),
+        navbars: JSON.stringify(selectedCarCategories),
       }),
       axios.post("allcategories/mark/navbar", {
         id: 3,
-        navbars: JSON.stringify(commercialCategoriesForm),
+        navbars: JSON.stringify(selectedCommercialCategories),
       }),
     ])
       .then(([carMessage, commercialMessage]) => {
+        setDialogText(`${carMessage}.
+        ${commercialMessage}.`);
         setIsSubmitting(false);
-        setMode("view");
       })
       .catch();
   };
@@ -148,39 +191,23 @@ export default function DefaultCategories() {
           {t("components.navbarCategories.carCategoriesTitle")}
         </p>
 
-        <form onSubmit={handleSubmit}>
-          <Grid container>
+        {mode === "view" ? (
+          <Grid container spacing={2}>
             <Grid item xs={11} md={9}>
               <Grid container justify="center" spacing={2}>
-                {carCategoriesForm.map((dummy, index) => (
-                  <Grid item xs={12} sm={6} md={4}>
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      select
-                      SelectProps={{
-                        native: true,
-                      }}
-                      onChange={(e) => {
-                        let categoriesList = [...carCategoriesForm];
-                        console.log(categoriesList);
-
-                        categoriesList[index] = e.target.value || null;
-                        console.log(categoriesList);
-                        setCarCategoriesForm([...categoriesList]);
-                      }}
-                    >
-                      <option aria-label="None" value="" />
-                      {carCategories?.map((category) => (
-                        <option value={category.id}>
-                          {lang === "ar"
-                            ? category.name || category.name_en
-                            : category.name_en || category.name}
-                        </option>
-                      ))}
-                    </TextField>
-                  </Grid>
-                ))}
+                {Array(5)
+                  .fill(null)
+                  .map((dummy, index) => (
+                    <Grid item xs={12} sm={6} md={4}>
+                      <div className={classes.categoryWrapper}>
+                        {lang === "ar"
+                          ? currentNavBarCategories.car[index]?.name ||
+                            currentNavBarCategories.car[index]?.name_en
+                          : currentNavBarCategories.car[index]?.name_en ||
+                            currentNavBarCategories.car[index]?.name}
+                      </div>
+                    </Grid>
+                  ))}
               </Grid>
             </Grid>
             <Grid item xs={1} md={3}></Grid>
@@ -190,70 +217,156 @@ export default function DefaultCategories() {
                 {t("components.navbarCategories.commercialCategoriesTitle")}
               </p>
             </Grid>
-
             <Grid item xs={11} md={9}>
               <Grid container justify="center" spacing={2}>
-                {commercialCategoriesForm.map((dummy, index) => (
-                  <Grid item xs={12} sm={6} md={4}>
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      select
-                      SelectProps={{
-                        native: true,
-                      }}
-                      value={commercialCategoriesForm[index]}
-                      onChange={(e) => {
-                        let categoriesList = [...commercialCategoriesForm];
-                        categoriesList[index] = e.target.value || null;
-                        setCommercialCategoriesForm([...categoriesList]);
-                      }}
-                    >
-                      <option aria-label="None" value="" />
-                      {commercialCategories?.map((category) => (
-                        <option value={category.id}>
-                          {lang === "ar"
-                            ? category.name || category.name_en
-                            : category.name_en || category.name}
-                        </option>
-                      ))}
-                    </TextField>
-                  </Grid>
-                ))}
+                {Array(5)
+                  .fill(null)
+                  .map((dummy, index) => (
+                    <Grid item xs={12} sm={6} md={4}>
+                      <div className={classes.categoryWrapper}>
+                        {lang === "ar"
+                          ? currentNavBarCategories.commercial[index]?.name ||
+                            currentNavBarCategories.commercial[index]?.name_en
+                          : currentNavBarCategories.commercial[index]
+                              ?.name_en ||
+                            currentNavBarCategories.commercial[index]?.name}
+                      </div>
+                    </Grid>
+                  ))}
               </Grid>
             </Grid>
-
-            <Grid xs={12} style={{ marginTop: 20 }}>
+            <Grid item xs={12}>
               <Button
                 className={classes.submitButton}
-                type="submit"
                 variant="contained"
                 color="primary"
-                disabled={
-                  mode === "edit" &&
-                  (carCategoriesForm.includes(null) ||
-                    commercialCategoriesForm.includes(null) ||
-                    isSubmitting)
-                } // Update on other components
+                onClick={() => setMode("edit")}
               >
-                {isSubmitting ? (
-                  <CircularProgress
-                    style={{
-                      width: "20px",
-                      height: "20px",
-                      color: "#EF9300",
-                    }}
-                  />
-                ) : mode === "view" ? (
-                  t("global.editBtn")
-                ) : (
-                  t("global.submitBtn")
-                )}
+                {t("global.editBtn")}
               </Button>
             </Grid>
           </Grid>
-        </form>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <Grid container>
+              <Grid item xs={11} md={9}>
+                <Grid container justify="center" spacing={2}>
+                  {selectedCarCategories.map((id, currentIndex) => (
+                    <Grid item xs={12} sm={6} md={4}>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        select
+                        SelectProps={{
+                          native: true,
+                        }}
+                        value={selectedCarCategories[currentIndex]}
+                        onChange={(e) => {
+                          let carList = [];
+                          carList = selectedCarCategories.map(
+                            (categoryId, categoryIndex) =>
+                              categoryIndex === currentIndex
+                                ? e.target.value || ""
+                                : categoryId
+                          );
+                          console.log(carList);
+                          setSelectedCarCategories([...carList]);
+                        }}
+                      >
+                        <option aria-label="None" value="" />
+                        {carCategories?.map((category) =>
+                          category.id != selectedCarCategories[currentIndex] ? (
+                            <option value={category.id}>
+                              {lang === "ar"
+                                ? category.name || category.name_en
+                                : category.name_en || category.name}
+                            </option>
+                          ) : null
+                        )}
+                      </TextField>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Grid>
+              <Grid item xs={1} md={3}></Grid>
+
+              <Grid item xs={12}>
+                <p className={classes.vehicleTypeTitle}>
+                  {t("components.navbarCategories.commercialCategoriesTitle")}
+                </p>
+              </Grid>
+
+              <Grid item xs={11} md={9}>
+                <Grid container justify="center" spacing={2}>
+                  {selectedCommercialCategories.map((id, index) => (
+                    <Grid item xs={12} sm={6} md={4}>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        select
+                        SelectProps={{
+                          native: true,
+                        }}
+                        value={selectedCommercialCategories[index]}
+                        onChange={(e) => {
+                          let categoriesList = [
+                            ...selectedCommercialCategories,
+                          ];
+                          categoriesList[index] = e.target.value || null;
+                          setSelectedCommercialCategories([...categoriesList]);
+                        }}
+                      >
+                        <option aria-label="None" value="" />
+                        {commercialCategories?.map((category) =>
+                          category.id !==
+                          selectedCommercialCategories[index] ? (
+                            <option value={category.id}>
+                              {lang === "ar"
+                                ? category.name || category.name_en
+                                : category.name_en || category.name}
+                            </option>
+                          ) : null
+                        )}
+                      </TextField>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Grid>
+
+              <Grid xs={12} style={{ marginTop: 20 }}>
+                <Button
+                  className={classes.submitButton}
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={
+                    selectedCarCategories.includes(null) ||
+                    commercialCategories.includes(null) ||
+                    isSubmitting
+                  } // Update on other components
+                >
+                  {t("global.submitBtn")}
+                  {isSubmitting ? (
+                    <CircularProgress
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        color: "#EF9300",
+                      }}
+                    />
+                  ) : null}
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        )}
       </Paper>
+      <SuccessPopup
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        message={dialogText}
+        handleClose={closeDialog}
+      />
     </React.Fragment>
   ) : (
     <div style={{ height: "100%" }}>
