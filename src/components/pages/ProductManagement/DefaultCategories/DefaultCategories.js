@@ -83,13 +83,7 @@ export default function DefaultCategories() {
     null,
     null,
   ]);
-  const [commercialCategories, setCommercialCategories] = useState([
-    null,
-    null,
-    null,
-    null,
-    null,
-  ]);
+  const [commercialCategories, setCommercialCategories] = useState([]);
   const [selectedCommercialCategories, setSelectedCommercialCategories] =
     useState([null, null, null, null, null]);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
@@ -100,60 +94,70 @@ export default function DefaultCategories() {
   const [dialogText, setDialogText] = useState("");
 
   const closeDialog = () => {
-    setDialogOpen(false);
+    setInitialFetchDone(false);
     setMode("view");
+    setDialogOpen(false);
   };
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
     // First get all the available categories for the first level (Level 0)
-    axios
-      .get(`allcategories`)
-      .then(({ data }) => {
-        // Filter the categories to have the list of only main categories & exclude the common one.
-        const categoriesToDisplay = data.data
-          ?.filter((category) => category.top)
-          .sort((current, next) => current.id - next.id);
-        // Fetch the default categories under these vehicle types (categories)
-        // to show in the navbar on the website.
-        Promise.all([
-          axios(`allcategories/navbarlist/${categoriesToDisplay[0].id}`),
-          axios(`allcategories/navbarlist/${categoriesToDisplay[1].id}`),
-        ]).then(([car_categories, commercial_categories]) => {
-          setCarCategories(car_categories.data.data);
-
-          setSelectedCarCategories(
+    if (mode === "view") {
+      axios
+        .get(`allcategories`)
+        .then(({ data }) => {
+          // Filter the categories to have the list of only main categories & exclude the common one.
+          const categoriesToDisplay = data.data
+            ?.filter((category) => category.top)
+            .sort((current, next) => current.id - next.id);
+          // Fetch the default categories under these vehicle types (categories)
+          // to show in the navbar on the website.
+          Promise.all([
+            axios(`allcategories/navbarlist/${categoriesToDisplay[0].id}`),
+            axios(`allcategories/navbarlist/${categoriesToDisplay[1].id}`),
+          ]).then(([car_categories, commercial_categories]) => {
+            setCarCategories(car_categories.data.data);
+            let _carCategories = [...selectedCarCategories];
             car_categories.data.data
               .filter((category) => category.navbar)
-              .map((category) => category.id.toString())
-          );
+              .forEach(
+                (category, index) =>
+                  (_carCategories[index] = parseInt(category.id))
+              );
+            setSelectedCarCategories([..._carCategories]);
 
-          setCommercialCategories(commercial_categories.data.data);
-          let _commercialCategories = [...selectedCommercialCategories];
-          commercial_categories.data.data
-            .filter((category) => category.navbar)
-            .forEach(
-              (category, index) => (_commercialCategories[index] = category.id)
-            );
-          setSelectedCommercialCategories([..._commercialCategories]);
+            setCommercialCategories(commercial_categories.data.data);
+            let _commercialCategories = [...selectedCommercialCategories];
+            commercial_categories.data.data
+              .filter((category) => category.navbar)
+              .forEach(
+                (category, index) =>
+                  (_commercialCategories[index] = parseInt(category.id))
+              );
+            setSelectedCommercialCategories([..._commercialCategories]);
 
-          setCurrentNavBarCategories({
-            car: car_categories.data.data.filter((category) => category.navbar),
-            commercial: commercial_categories.data.data.filter(
-              (category) => category.navbar
-            ),
+            setCurrentNavBarCategories({
+              car: car_categories.data.data.filter(
+                (category) => category.navbar
+              ),
+              commercial: commercial_categories.data.data.filter(
+                (category) => category.navbar
+              ),
+            });
+            setInitialFetchDone(true);
           });
-          setInitialFetchDone(true);
+        })
+        .catch(() => {
+          alert("Failed to Fetch data");
         });
-      })
-      .catch(() => {
-        alert("Failed to Fetch data");
-      });
+    }
   }, [lang, mode]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    console.log(selectedCarCategories);
+    console.log(selectedCommercialCategories);
     Promise.all([
       axios.post("allcategories/mark/navbar", {
         id: 1,
@@ -165,8 +169,9 @@ export default function DefaultCategories() {
       }),
     ])
       .then(([carMessage, commercialMessage]) => {
-        setDialogText(`${carMessage}.
-        ${commercialMessage}.`);
+        setDialogText(`${carMessage.data.data}.
+        ${commercialMessage.data.data}.`);
+        setDialogOpen(true);
         setIsSubmitting(false);
       })
       .catch();
@@ -251,41 +256,49 @@ export default function DefaultCategories() {
             <Grid container>
               <Grid item xs={11} md={9}>
                 <Grid container justify="center" spacing={2}>
-                  {selectedCarCategories.map((id, currentIndex) => (
-                    <Grid item xs={12} sm={6} md={4}>
-                      <TextField
-                        fullWidth
-                        variant="outlined"
-                        select
-                        SelectProps={{
-                          native: true,
-                        }}
-                        value={selectedCarCategories[currentIndex]}
-                        onChange={(e) => {
-                          let carList = [];
-                          carList = selectedCarCategories.map(
-                            (categoryId, categoryIndex) =>
-                              categoryIndex === currentIndex
-                                ? e.target.value || ""
-                                : categoryId
-                          );
-                          console.log(carList);
-                          setSelectedCarCategories([...carList]);
-                        }}
-                      >
-                        <option aria-label="None" value="" />
-                        {carCategories?.map((category) =>
-                          category.id != selectedCarCategories[currentIndex] ? (
-                            <option value={category.id}>
-                              {lang === "ar"
-                                ? category.name || category.name_en
-                                : category.name_en || category.name}
-                            </option>
-                          ) : null
-                        )}
-                      </TextField>
-                    </Grid>
-                  ))}
+                  {Array(5)
+                    .fill(null)
+                    .map((id, currentIndex) => (
+                      <Grid item xs={12} sm={6} md={4}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          select
+                          SelectProps={{
+                            native: true,
+                          }}
+                          value={selectedCarCategories[currentIndex]}
+                          onChange={(e) => {
+                            let carList = [];
+                            carList = selectedCarCategories.map(
+                              (categoryId, categoryIndex) =>
+                                categoryIndex === currentIndex
+                                  ? e.target.value || ""
+                                  : categoryId
+                            );
+                            setSelectedCarCategories([...carList]);
+                          }}
+                        >
+                          <option aria-label="None" value="" />
+                          {carCategories?.map((category) =>
+                            !selectedCarCategories.includes(category.id) ? (
+                              <option value={category.id}>
+                                {lang === "ar"
+                                  ? category.name || category.name_en
+                                  : category.name_en || category.name}
+                              </option>
+                            ) : selectedCarCategories[currentIndex] ==
+                              category.id ? (
+                              <option value={category.id}>
+                                {lang === "ar"
+                                  ? category.name || category.name_en
+                                  : category.name_en || category.name}
+                              </option>
+                            ) : null
+                          )}
+                        </TextField>
+                      </Grid>
+                    ))}
                 </Grid>
               </Grid>
               <Grid item xs={1} md={3}></Grid>
@@ -298,38 +311,53 @@ export default function DefaultCategories() {
 
               <Grid item xs={11} md={9}>
                 <Grid container justify="center" spacing={2}>
-                  {selectedCommercialCategories.map((id, index) => (
-                    <Grid item xs={12} sm={6} md={4}>
-                      <TextField
-                        fullWidth
-                        variant="outlined"
-                        select
-                        SelectProps={{
-                          native: true,
-                        }}
-                        value={selectedCommercialCategories[index]}
-                        onChange={(e) => {
-                          let categoriesList = [
-                            ...selectedCommercialCategories,
-                          ];
-                          categoriesList[index] = e.target.value || null;
-                          setSelectedCommercialCategories([...categoriesList]);
-                        }}
-                      >
-                        <option aria-label="None" value="" />
-                        {commercialCategories?.map((category) =>
-                          category.id !==
-                          selectedCommercialCategories[index] ? (
-                            <option value={category.id}>
-                              {lang === "ar"
-                                ? category.name || category.name_en
-                                : category.name_en || category.name}
-                            </option>
-                          ) : null
-                        )}
-                      </TextField>
-                    </Grid>
-                  ))}
+                  {Array(5)
+                    .fill(null)
+                    .map((id, currentIndex) => (
+                      <Grid item xs={12} sm={6} md={4}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          select
+                          SelectProps={{
+                            native: true,
+                          }}
+                          value={selectedCommercialCategories[currentIndex]}
+                          onChange={(e) => {
+                            let commercialList = [];
+                            commercialList = selectedCommercialCategories.map(
+                              (categoryId, categoryIndex) =>
+                                categoryIndex === currentIndex
+                                  ? e.target.value || ""
+                                  : categoryId
+                            );
+                            setSelectedCommercialCategories([
+                              ...commercialList,
+                            ]);
+                          }}
+                        >
+                          <option aria-label="None" value="" />
+                          {commercialCategories?.map((category) =>
+                            !selectedCommercialCategories.includes(
+                              category.id
+                            ) ? (
+                              <option value={category.id}>
+                                {lang === "ar"
+                                  ? category.name || category.name_en
+                                  : category.name_en || category.name}
+                              </option>
+                            ) : selectedCommercialCategories[currentIndex] ==
+                              category.id ? (
+                              <option value={category.id}>
+                                {lang === "ar"
+                                  ? category.name || category.name_en
+                                  : category.name_en || category.name}
+                              </option>
+                            ) : null
+                          )}
+                        </TextField>
+                      </Grid>
+                    ))}
                 </Grid>
               </Grid>
 
@@ -340,8 +368,10 @@ export default function DefaultCategories() {
                   variant="contained"
                   color="primary"
                   disabled={
-                    selectedCarCategories.includes(null) ||
-                    commercialCategories.includes(null) ||
+                    selectedCarCategories.filter((category) => category)
+                      .length < 5 ||
+                    selectedCommercialCategories.filter((category) => category)
+                      .length < 5 ||
                     isSubmitting
                   } // Update on other components
                 >
