@@ -63,6 +63,7 @@ const useStyles = makeStyles((theme) => ({
   errorMsg: {
     color: "#ff0000",
     fontWeight: "500",
+    width: "fit-content",
   },
 }));
 
@@ -212,7 +213,7 @@ function CreateCarMade({
                   helperText={touched.car_made && errors.car_made}
                 />
               </Grid>
-              {responseErrors ? (
+              {responseErrors?.car_made ? (
                 <Grid item xs={12}>
                   {responseErrors.car_made?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
@@ -224,7 +225,7 @@ function CreateCarMade({
 
               <Grid item xs={4}>
                 <TextField
-                variant="outlined"
+                  variant="outlined"
                   name="name_en"
                   required
                   fullWidth
@@ -243,7 +244,7 @@ function CreateCarMade({
                   helperText={touched.name_en && errors.name_en}
                 />
               </Grid>
-              {responseErrors ? (
+              {responseErrors?.name_en ? (
                 <Grid item xs={12}>
                   {responseErrors.name_en?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
@@ -253,11 +254,11 @@ function CreateCarMade({
                 </Grid>
               ) : null}
 
-              <Grid xs={4}></Grid>
+              <Grid item xs={4}></Grid>
 
               <Grid item xs={4}>
                 <TextField
-                variant="outlined"
+                  variant="outlined"
                   select
                   label="Vehicle Type"
                   value={formData.cartype_id}
@@ -288,7 +289,7 @@ function CreateCarMade({
                   ))}
                 </TextField>
               </Grid>
-              {responseErrors ? (
+              {responseErrors?.cartype_id ? (
                 <Grid item xs={12}>
                   {responseErrors.cartype_id?.map((msg) => (
                     <span key={msg} className={classes.errorMsg}>
@@ -297,15 +298,16 @@ function CreateCarMade({
                   ))}
                 </Grid>
               ) : null}
+
+              {typeof responseErrors === "string" ? (
+                <Grid item xs={12}>
+                  <span key={`faluire-msg`} className={classes.errorMsg}>
+                    {responseErrors}
+                  </span>
+                </Grid>
+              ) : null}
             </Grid>
 
-            {typeof responseErrors === "string" ? (
-              <Grid item xs={12}>
-                <span key={`faluire-msg`} className={classes.errorMsg}>
-                  {responseErrors}
-                </span>
-              </Grid>
-            ) : null}
             <Grid container justify="center">
               <Button
                 className={classes.submitButton}

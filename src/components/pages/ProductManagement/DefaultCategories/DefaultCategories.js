@@ -22,6 +22,7 @@ import { spacing } from "@material-ui/system";
 import axios from "../../../../axios";
 import { useSelector } from "react-redux";
 import SuccessPopup from "../../../SuccessPopup";
+import { RotateLeft } from "@material-ui/icons";
 
 const Card = styled(MuiCard)(spacing);
 const Divider = styled(MuiDivider)(spacing);
@@ -155,9 +156,10 @@ export default function DefaultCategories() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
     console.log(selectedCarCategories);
     console.log(selectedCommercialCategories);
+    return;
+    setIsSubmitting(true);
     Promise.all([
       axios.post("allcategories/mark/navbar", {
         id: 1,
@@ -385,6 +387,14 @@ export default function DefaultCategories() {
                       }}
                     />
                   ) : null}
+                </Button>
+
+                <Button
+                  className={classes.resetButton}
+                  variant="contained"
+                  startIcon={<RotateLeft />}
+                >
+                  {t("global.resetBtn")}
                 </Button>
               </Grid>
             </Grid>
