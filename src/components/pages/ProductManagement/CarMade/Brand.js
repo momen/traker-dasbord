@@ -532,6 +532,7 @@ function CarMade() {
             onClick={() => {
               setViewMode("data-grid");
               setPageHeader("Brands List");
+              setCarMade("");
             }}
           >
             <ArrowBack className={classes.backIcon} />
