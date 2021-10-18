@@ -120,30 +120,44 @@ export default function DefaultCategories() {
             setCarCategories(car_categories.data.data);
             let _carCategories = [...selectedCarCategories];
             car_categories.data.data
-              .filter((category) => category.navbar)
+              .filter((category) => category.navbar && category.car_navbar)
               .forEach(
                 (category, index) =>
-                  (_carCategories[index] = parseInt(category.id))
+                  // Sequence starts from 1 so you have to subtract 1 as the array starts from index 0
+                  (_carCategories[category.sequence - 1] = parseInt(
+                    category.id
+                  ))
               );
             setSelectedCarCategories([..._carCategories]);
 
             setCommercialCategories(commercial_categories.data.data);
             let _commercialCategories = [...selectedCommercialCategories];
             commercial_categories.data.data
-              .filter((category) => category.navbar)
+              .filter(
+                (category) => category.navbar && category.commercial_navbar
+              )
               .forEach(
                 (category, index) =>
-                  (_commercialCategories[index] = parseInt(category.id))
+                  // Sequence starts from 1 so you have to subtract 1 as the array starts from index 0
+                  (_commercialCategories[category.sequence - 1] = parseInt(
+                    category.id
+                  ))
               );
             setSelectedCommercialCategories([..._commercialCategories]);
 
             setCurrentNavBarCategories({
-              car: car_categories.data.data.filter(
-                (category) => category.navbar
-              ),
-              commercial: commercial_categories.data.data.filter(
-                (category) => category.navbar
-              ),
+              car: car_categories.data.data
+                .filter((category) => category.navbar && category.car_navbar)
+                .sort((current, next) => current.sequence - next.sequence),
+              // Filter the selected categories only & sort them according to
+              // the sequence key.
+              commercial: commercial_categories.data.data
+                .filter(
+                  (category) => category.navbar && category.commercial_navbar
+                )
+                .sort((current, next) => current.sequence - next.sequence),
+              // Filter the selected categories only & sort them according to
+              // the sequence key.
             });
             setInitialFetchDone(true);
           });
@@ -158,7 +172,6 @@ export default function DefaultCategories() {
     e.preventDefault();
     console.log(selectedCarCategories);
     console.log(selectedCommercialCategories);
-    return;
     setIsSubmitting(true);
     Promise.all([
       axios.post("allcategories/mark/navbar", {
@@ -275,7 +288,7 @@ export default function DefaultCategories() {
                             carList = selectedCarCategories.map(
                               (categoryId, categoryIndex) =>
                                 categoryIndex === currentIndex
-                                  ? e.target.value || ""
+                                  ? parseInt(e.target.value) || ""
                                   : categoryId
                             );
                             setSelectedCarCategories([...carList]);
@@ -330,7 +343,7 @@ export default function DefaultCategories() {
                             commercialList = selectedCommercialCategories.map(
                               (categoryId, categoryIndex) =>
                                 categoryIndex === currentIndex
-                                  ? e.target.value || ""
+                                  ? parseInt(e.target.value) || ""
                                   : categoryId
                             );
                             setSelectedCommercialCategories([
