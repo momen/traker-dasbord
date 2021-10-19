@@ -394,14 +394,10 @@ function PendingOrders() {
   useEffect(() => {
     setLoading(true);
     if (!userIsSearching) {
-      console.log(statusToFilterBy);
       axios
-        .post(
-          `/show/orders?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`,
-          {
-            fetch: statusToFilterBy,
-          }
-        )
+        .post(`/show/orders?page=${page}&per_page=${pageSize}`, {
+          fetch: statusToFilterBy.toString(),
+        })
         .then((res) => {
           setRowsCount(res.data.total);
           setRows(res.data.data);
