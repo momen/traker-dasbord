@@ -160,16 +160,22 @@ function Support() {
 
   async function downloadImage(imageObject) {
     // alert(imageObject.url);
-    const image = await fetch(imageObject.image);
-    const imageBlog = await image.blob();
-    const imageURL = URL.createObjectURL(imageBlog);
-
-    const link = document.createElement("a");
-    link.href = imageURL;
-    link.download = imageObject.file_name;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // const image = await fetch(imageObject.image);
+    // const imageBlog = await image.blob();
+    // const imageURL = URL.createObjectURL(imageBlog);
+    // const link = document.createElement("a");
+    // link.href = imageURL;
+    // link.download = imageObject.file_name;
+    // document.body.appendChild(link);
+    // link.click();
+    // document.body.removeChild(link);
+    // const fileName = imageObject.url.split("/").pop();
+    // const el = document.createElement("a");
+    // el.setAttribute("href", imageObject.url);
+    // el.setAttribute("download", fileName);
+    // document.body.appendChild(el);
+    // el.click();
+    // el.remove();
   }
 
   useEffect(() => {
@@ -297,6 +303,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
+                  marginBottom: 20,
                 }}
               >
                 <img
@@ -314,13 +321,19 @@ function Support() {
                     marginTop: 20,
                   }}
                 >
-                  <div
+                  <a
+                    href={ad.photo.url}
+                    download
                     className={classes.actionsContainer}
-                    onClick={() => downloadImage(ad.photo)}
                   >
+                    {/* <div
+
+                    onClick={() => downloadImage(ad.photo)}
+                    > */}
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}
-                  </div>
+                    {/* </div> */}
+                  </a>
                   <div
                     className={classes.actionsContainer}
                     onClick={() => openDeleteConfirmation(ad.id)}
@@ -389,6 +402,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
+                  marginBottom: 20,
                   // marginBottom: 25,
                 }}
               >
@@ -495,6 +509,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
+                  marginBottom: 20,
                 }}
               >
                 <img
@@ -589,6 +604,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
+                  marginBottom: 20,
                   // marginBottom: 25,
                 }}
               >
@@ -1217,6 +1233,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
+                  marginBottom: 20,
                 }}
               >
                 <img
@@ -1306,6 +1323,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
+                  marginBottom: 20,
                   // marginBottom: 25,
                 }}
               >
@@ -1407,6 +1425,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
+                  marginBottom: 20,
                 }}
               >
                 <img
@@ -1496,6 +1515,7 @@ function Support() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
+                  marginBottom: 20,
                   // marginBottom: 25,
                 }}
               >

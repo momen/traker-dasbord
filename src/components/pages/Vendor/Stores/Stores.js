@@ -227,6 +227,7 @@ function Stores() {
       field: "company",
       headerName: "Company",
       width: 100,
+      sortable: false,
       renderCell: (params) => params.row.vendor?.company_name,
     },
     {

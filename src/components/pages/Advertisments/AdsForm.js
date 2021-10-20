@@ -68,6 +68,10 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 2, 2),
     maxWidth: "100%",
   },
+  productImages: {
+    height: "60px",
+    marginRight: "20px",
+  },
   uploadInput: {
     display: "none",
   },
@@ -244,7 +248,7 @@ function AdsForm({ initialData, setOpenPopup, itemToEdit }) {
           resetForm,
         }) => (
           <form ref={formRef} className={classes.form} onSubmit={handleSubmit}>
-            <Grid container spacing={8}>
+            <Grid container spacing={6}>
               <Grid item xs={12}>
                 <TextField
                   name="ad_url"
@@ -298,14 +302,21 @@ function AdsForm({ initialData, setOpenPopup, itemToEdit }) {
               </Grid>
 
               {imgName ? (
-                <Grid item xs md={9}>
-                  <Chip
-                    className={classes.chip}
-                    // icon={<FaceIcon/>}
-                    label={imgName}
-                    onDelete={handleDeleteImage}
-                    variant="outlined"
-                  />
+                <Grid item xs={12}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Chip
+                      className={classes.chip}
+                      label={imgName}
+                      onDelete={handleDeleteImage}
+                      variant="outlined"
+                      color="primary"
+                    />
+                    <img
+                      src={URL.createObjectURL(formData.photo)}
+                      alt={`cat-img`}
+                      className={classes.productImages}
+                    />
+                  </div>
                 </Grid>
               ) : null}
 
