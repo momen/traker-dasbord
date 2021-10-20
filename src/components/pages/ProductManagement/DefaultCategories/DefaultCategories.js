@@ -172,6 +172,7 @@ export default function DefaultCategories() {
     e.preventDefault();
     console.log(selectedCarCategories);
     console.log(selectedCommercialCategories);
+    return;
     setIsSubmitting(true);
     Promise.all([
       axios.post("allcategories/mark/navbar", {
