@@ -65,6 +65,21 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 2, 2),
     width: "15%",
   },
+  resetButton: {
+    height: 40,
+    fontFamily: `"Almarai", sans-serif`,
+    fontWeight: "600",
+    color: "#7B7B7B",
+    background: "#ffffff",
+    border: "2px solid #7B7B7B",
+    borderRadius: 0,
+    // "&:hover": {
+    //   background: "#EF9300",
+    //   color: "#ffffff",
+    // },
+    margin: theme.spacing(3, 2, 2),
+    width: "15%",
+  },
 }));
 
 export default function DefaultCategories() {
@@ -172,7 +187,7 @@ export default function DefaultCategories() {
     e.preventDefault();
     console.log(selectedCarCategories);
     console.log(selectedCommercialCategories);
-    return;
+    // return;
     setIsSubmitting(true);
     Promise.all([
       axios.post("allcategories/mark/navbar", {
@@ -407,6 +422,7 @@ export default function DefaultCategories() {
                   className={classes.resetButton}
                   variant="contained"
                   startIcon={<RotateLeft />}
+                  onClick={() => setMode("view")}
                 >
                   {t("global.resetBtn")}
                 </Button>
