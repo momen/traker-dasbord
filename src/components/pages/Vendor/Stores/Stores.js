@@ -224,6 +224,13 @@ function Stores() {
 
   const columnsAdmin = [
     {
+      field: "id",
+      headerName: "ID",
+      width: 60,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
       field: "company",
       headerName: "Company",
       width: 100,
@@ -244,7 +251,7 @@ function Stores() {
     },
     {
       field: "vendor_name",
-      headerName: "Vendor Name",
+      headerName: "Vendor",
       sortable: false,
       width: 100,
     },
