@@ -321,16 +321,6 @@ function PendingVendors() {
               // padding: "5px"
             }}
           >
-            {/* {userPermissions.includes("add_vendor_show") ? (
-              <Button
-                style={{ marginRight: "5px" }}
-                variant="contained"
-                size="small"
-                onClick={() => history.push(`/vendor/vendors/${params.row.id}`)}
-              >
-                View
-              </Button>
-            ) : null} */}
             {userPermissions.includes("add_vendor_edit") ? (
               <Button
                 className={classes.actionBtn}
@@ -361,7 +351,7 @@ function PendingVendors() {
                 Delete
               </Button>
             ) : null}
-            {userPermissions.includes("admin_access_vendor_orders") ? (
+            {/* {userPermissions.includes("admin_access_vendor_orders") ? (
               <Button
                 className={classes.actionBtn}
                 // color="secondary"
@@ -388,7 +378,7 @@ function PendingVendors() {
               >
                 View Invoices
               </Button>
-            ) : null}
+            ) : null} */}
           </div>
         );
       },

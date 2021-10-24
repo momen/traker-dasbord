@@ -228,6 +228,8 @@ function Stores() {
       headerName: "Company",
       width: 100,
       sortable: false,
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) => params.row.vendor?.company_name,
     },
     {
@@ -243,11 +245,13 @@ function Stores() {
     {
       field: "vendor_name",
       headerName: "Vendor Name",
+      sortable: false,
       width: 100,
     },
     {
       field: "vendor_type",
       headerName: "Vendor Type",
+      sortable: false,
       width: 120,
       renderCell: (params) =>
         params.row.vendor?.type == "1"
@@ -272,6 +276,7 @@ function Stores() {
     {
       field: "members",
       headerName: "Members",
+      sortable: false,
       width: 150,
       renderCell: (params) => (
         <div>
@@ -717,7 +722,7 @@ function Stores() {
                   LoadingOverlay: CustomLoadingOverlay,
                 }}
                 loading={loading}
-                checkboxSelection
+                // checkboxSelection
                 disableColumnMenu
                 autoHeight={true}
                 onRowClick={
