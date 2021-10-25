@@ -392,6 +392,7 @@ function Stores() {
       field: "members",
       headerName: "Members",
       width: 150,
+      sortable: false,
       renderCell: (params) => (
         <div>
           {params.value?.map((member) => (

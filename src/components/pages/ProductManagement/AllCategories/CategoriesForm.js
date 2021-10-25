@@ -227,7 +227,7 @@ function CategoriesForm({
       return;
     }
 
-    setImgName(e.target.files[0].name);
+    setImgName(e.target.files[0]?.name);
     updateFormData({
       ...formData,
       photo: e.target.files[0],

@@ -220,6 +220,10 @@ function Categories() {
   const [pageHeader, setPageHeader] = useState("Categories");
   const [viewMode, setViewMode] = useState("data-grid");
 
+  // Toggle this flag to prevent the user to click multiple times on the
+  // category if there is a delay or network issues.
+  const [enableClick, setEnableClick] = useState(true);
+
   const columns = [
     {
       field: "id",
@@ -331,6 +335,7 @@ function Categories() {
     setSelectedCategory(categoryId);
     setCurrentLevel(levelToSet);
     setBreadcrumbs([...breadcrumbs.slice(0, breadcrumbIndex + 1)]);
+    setEnableClick(false);
   };
 
   const handlePageSize = ({ pageSize }) => {
@@ -489,9 +494,10 @@ function Categories() {
         })
         .catch(({ response }) => {
           alert(
-            response.data?.errors ||
-              response.data?.error ||
-              response.data?.message
+            response?.data?.errors ||
+              response?.data?.error ||
+              response?.data?.message ||
+              "Network or server error."
           );
         });
     } else {
@@ -505,9 +511,10 @@ function Categories() {
         })
         .catch(({ response }) => {
           alert(
-            response.data?.errors ||
-              response.data?.error ||
-              response.data?.message
+            response?.data?.errors ||
+              response?.data?.error ||
+              response?.data?.message ||
+              "Network or server error."
           );
         });
     }
@@ -521,6 +528,11 @@ function Categories() {
     viewMode,
     lang,
   ]);
+
+  useEffect(() => {
+    // Now the user is able to click again on a category to access it's sub categories
+    setEnableClick(true);
+  }, [rows]);
 
   return (
     <React.Fragment>
@@ -569,7 +581,7 @@ function Categories() {
             ))}
           </Breadcrumbs>
           <Toolbar className={classes.toolBar}>
-            {currentLevel !== 0 ? (
+            {currentLevel !== 0 && enableClick ? (
               <div style={{ display: "flex", alignItems: "flex-end" }}>
                 {userPermissions.includes("product_category_create") ? (
                   <Button
@@ -640,16 +652,19 @@ function Categories() {
                 LoadingOverlay: CustomLoadingOverlay,
               }}
               loading={loading}
-              checkboxSelection
+              checkboxSelection={currentLevel > 0 ? true : false}
               disableColumnMenu
               autoHeight={true}
               onRowClick={
                 ({ row }) => {
-                  if (row.id) {
+                  if (row.id && enableClick) {
                     setSelectedCategory(row.id);
                     setCurrentLevel(currentLevel + 1);
                     setBreadcrumbs([...breadcrumbs, row]);
                   }
+                  // Prevent the user to click again until its back to true
+                  // after the data is fetched successfully.
+                  setEnableClick(false);
                 }
                 // userPermissions.includes("product_category_show")
                 //   ? ({ row }) => history.push(`/product/categories/${row.id}`)
