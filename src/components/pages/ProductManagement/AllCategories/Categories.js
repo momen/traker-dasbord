@@ -292,7 +292,8 @@ function Categories() {
                 View
               </Button>
             ) : null} */}
-            {userPermissions.includes("product_category_edit") ? (
+            {userPermissions.includes("product_category_edit") &&
+            params.row.allcategory_id ? (
               <Button
                 className={classes.actionBtn}
                 startIcon={<Edit />}
@@ -652,12 +653,13 @@ function Categories() {
                 LoadingOverlay: CustomLoadingOverlay,
               }}
               loading={loading}
-              checkboxSelection={currentLevel > 0 ? true : false}
+              checkboxSelection={currentLevel > 0 && enableClick ? true : false}
               disableColumnMenu
               autoHeight={true}
               onRowClick={
                 ({ row }) => {
                   if (row.id && enableClick) {
+                    setuserIsSearching(false);
                     setSearchValue("");
                     setPage(1);
                     setSelectedCategory(row.id);

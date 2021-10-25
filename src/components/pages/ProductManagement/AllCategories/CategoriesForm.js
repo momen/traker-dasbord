@@ -117,7 +117,7 @@ const validationSchema = Yup.object().shape({
       "Please remove any spaces at the beginning",
       (val) => !(val?.substring(0, 1) === " ")
     ),
-  allcategory_id: Yup.string().required(),
+  // allcategory_id: Yup.string().required(),
 });
 
 function CategoriesForm({
@@ -160,7 +160,7 @@ function CategoriesForm({
   };
 
   const handleSubmit = async () => {
-    if (!formData.photo) {
+    if (!formData.photo && imageDeletedOnEdit) {
       setOpenAlert(true);
       return;
     }
@@ -169,14 +169,9 @@ function CategoriesForm({
     data.append("name_en", formData.name_en);
     data.append("allcategory_id", formData.allcategory_id);
 
-    // if (
-    //   (formData.photo && !imageDeletedOnEdit) ||
-    //   (formData.photo && imageDeletedOnEdit)
-    // ) {
-    data.append("photo", formData.photo, formData.photo.name);
-    // } else {
-    //   data.append("photo", "");
-    // }
+    if ((formData.photo && !itemToEdit) || imageDeletedOnEdit) {
+      data.append("photo", formData.photo, formData.photo.name);
+    }
 
     setIsSubmitting(true);
 
