@@ -268,7 +268,7 @@ function Categories() {
       width: 220,
       sortable: false,
       disableClickEventBubbling: true,
-      hide: currentLevel === 0 ? true : false,
+      hide: currentLevel === 0 || !enableClick ? true : false,
       renderCell: (params) => {
         // let carMade = params.getValue("id");
         return (
@@ -658,6 +658,8 @@ function Categories() {
               onRowClick={
                 ({ row }) => {
                   if (row.id && enableClick) {
+                    setSearchValue("");
+                    setPage(1);
                     setSelectedCategory(row.id);
                     setCurrentLevel(currentLevel + 1);
                     setBreadcrumbs([...breadcrumbs, row]);

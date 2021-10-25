@@ -160,19 +160,23 @@ function CategoriesForm({
   };
 
   const handleSubmit = async () => {
-    // if (!formData.photo && !itemToEdit) {
-    //   setOpenAlert(true);
-    // } else {
+    if (!formData.photo) {
+      setOpenAlert(true);
+      return;
+    }
     let data = new FormData();
     data.append("name", formData.name);
     data.append("name_en", formData.name_en);
     data.append("allcategory_id", formData.allcategory_id);
 
-    if (formData.photo && !imageDeletedOnEdit) {
-      data.append("photo", formData.photo, formData.photo.name);
-    } else {
-      data.append("photo", "");
-    }
+    // if (
+    //   (formData.photo && !imageDeletedOnEdit) ||
+    //   (formData.photo && imageDeletedOnEdit)
+    // ) {
+    data.append("photo", formData.photo, formData.photo.name);
+    // } else {
+    //   data.append("photo", "");
+    // }
 
     setIsSubmitting(true);
 
@@ -486,7 +490,10 @@ function CategoriesForm({
                     <Chip
                       className={classes.chip}
                       label={itemToEdit.photo?.file_name}
-                      onDelete={() => setImageDeletedOnEdit(true)}
+                      onDelete={() => {
+                        setImageDeletedOnEdit(true);
+                        updateFormData({ ...formData, photo: "" });
+                      }}
                       variant="outlined"
                       color="primary"
                     />
