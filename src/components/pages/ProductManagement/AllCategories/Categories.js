@@ -669,7 +669,7 @@ function Categories() {
                     setCurrentLevel((level) => ++level);
                     setuserIsSearching(false);
                     setSelectedCategory(row.id);
-                    setPage(1);
+                    handlePageSize({ pageSize: 10 });
                     // setBreadcrumbs([...breadcrumbs, row]);
                   }
                   // Prevent the user to click again until its back to true
