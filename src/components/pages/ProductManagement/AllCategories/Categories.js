@@ -333,8 +333,8 @@ function Categories() {
     levelToSet,
     breadcrumbIndex
   ) => {
-    setSelectedCategory(categoryId);
     setCurrentLevel(levelToSet);
+    setSelectedCategory(categoryId);
     setBreadcrumbs([...breadcrumbs.slice(0, breadcrumbIndex + 1)]);
     setEnableClick(false);
   };
@@ -477,7 +477,11 @@ function Categories() {
 
   //Request the page records either on the initial render, or whenever the page changes
   useEffect(() => {
-    if (openPopup) return;
+    if (
+      openPopup ||
+      (!userIsSearching && !selectedCategory && currentLevel !== 0)
+    )
+      return;
     const URI =
       currentLevel === 0
         ? `allcategories`
@@ -489,8 +493,11 @@ function Categories() {
           `/${URI}?page=${page}&per_page=${pageSize}&ordered_by=${sortModel[0].field}&sort_type=${sortModel[0].sort}`
         )
         .then((res) => {
+          res.data.breadcrumbs?.reverse();
           setRowsCount(res.data.total);
           setRows(res.data.data);
+          setBreadcrumbs(res.data.breadcrumbs || []);
+          // setCurrentLevel(res.data.breadcrumbs?.length || 0);
           setLoading(false);
         })
         .catch(({ response }) => {
@@ -522,7 +529,7 @@ function Categories() {
   }, [
     page,
     searchValue,
-    currentLevel,
+    selectedCategory,
     openPopup,
     sortModel,
     pageSize,
@@ -659,12 +666,11 @@ function Categories() {
               onRowClick={
                 ({ row }) => {
                   if (row.id && enableClick) {
+                    setCurrentLevel((level) => ++level);
                     setuserIsSearching(false);
-                    setSearchValue("");
-                    setPage(1);
                     setSelectedCategory(row.id);
-                    setCurrentLevel(currentLevel + 1);
-                    setBreadcrumbs([...breadcrumbs, row]);
+                    setPage(1);
+                    // setBreadcrumbs([...breadcrumbs, row]);
                   }
                   // Prevent the user to click again until its back to true
                   // after the data is fetched successfully.
