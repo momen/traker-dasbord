@@ -301,6 +301,7 @@ function CarMade() {
       }
       setSearchValue(search);
     }
+    setPage(1);
   };
 
   const openDeleteConfirmation = (id) => {

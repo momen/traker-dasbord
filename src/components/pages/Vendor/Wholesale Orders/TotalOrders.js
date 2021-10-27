@@ -317,6 +317,7 @@ function PendingOrders() {
       }
       setSearchValue(search);
     }
+    setPage(1);
   };
 
   const approveOrder = () => {

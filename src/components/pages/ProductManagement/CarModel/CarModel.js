@@ -293,6 +293,7 @@ function CarModel() {
       }
       setSearchValue(search);
     }
+    setPage(1);
   };
 
   const openDeleteConfirmation = (id) => {

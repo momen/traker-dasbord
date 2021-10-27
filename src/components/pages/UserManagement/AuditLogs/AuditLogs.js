@@ -227,6 +227,7 @@ function AuditLogs() {
       }
       setSearchValue(search);
     }
+    setPage(1);
   };
 
   //Request the page records either on the initial render, or whenever the page changes

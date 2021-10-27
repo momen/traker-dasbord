@@ -158,7 +158,20 @@ function Support() {
       });
   };
 
-  async function downloadImage(imageObject) {
+  async function downloadImage(e, imageObject) {
+    e.preventDefault();
+
+    const file = await fetch(e.target.href);
+
+    const blob = await file.blob();
+
+    const blobUrl = URL.createObjectURL(blob);
+
+    const downloadLink = document.createElement("a");
+    downloadLink.href = blobUrl;
+    downloadLink.download = "aa.jpg";
+
+    downloadLink.click();
     // alert(imageObject.url);
     // const image = await fetch(imageObject.image);
     // const imageBlog = await image.blob();
@@ -322,13 +335,13 @@ function Support() {
                   }}
                 >
                   <a
-                    href={ad.photo.url}
+                    href={ad.photo.image}
                     download
                     className={classes.actionsContainer}
+                    onClick={(e) => downloadImage(e, ad.photo)}
                   >
                     {/* <div
 
-                    onClick={() => downloadImage(ad.photo)}
                     > */}
                     <GetApp className={classes.btnIcon} />
                     {t("components.ads.downloadBtnText")}

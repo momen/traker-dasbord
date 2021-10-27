@@ -489,6 +489,7 @@ function Products() {
       }
       setSearchValue(search);
     }
+    setPage(1);
   };
 
   const approveProduct = () => {

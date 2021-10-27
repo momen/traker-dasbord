@@ -496,6 +496,7 @@ function Stores() {
       }
       setSearchValue(search);
     }
+    setPage(1);
   };
 
   const openDeleteConfirmation = (id) => {

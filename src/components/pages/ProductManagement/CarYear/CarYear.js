@@ -262,6 +262,7 @@ function CarYear() {
       }
       setSearchValue(search);
     }
+    setPage(1);
   };
 
   const openDeleteConfirmation = (id) => {
