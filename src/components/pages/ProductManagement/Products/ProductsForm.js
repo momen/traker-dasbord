@@ -565,6 +565,7 @@ function ProductsForm({
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     setAutoSelectModelError(false);
     setAutoSelectTagError(false);
 

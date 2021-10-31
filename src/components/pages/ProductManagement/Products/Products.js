@@ -933,9 +933,9 @@ function Products() {
                               <MenuItem value={"category_id"}>
                                 Category
                               </MenuItem>
-                              <MenuItem value={"part_category_id"}>
+                              {/* <MenuItem value={"part_category_id"}>
                                 Part Category
-                              </MenuItem>
+                              </MenuItem> */}
                               {user?.roles[0].title === "Admin" ? (
                                 <MenuItem value={"vendor_id"}>
                                   Vendor Name
